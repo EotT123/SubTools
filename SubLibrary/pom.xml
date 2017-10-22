@@ -8,7 +8,7 @@
 			<id>jlangdetect-googlecode</id>
 			<name>JLangDetect Maven repository</name>
 			<url>http://mvn.is.inf.uni-due.de:8081/nexus/content/groups/public/</url>
-		</repository>		
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -96,6 +96,16 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.uwetrottmann.thetvdb-java</groupId>
+			<artifactId>thetvdb-java</artifactId>
+			<version>1.5.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -105,8 +115,8 @@
 				<version>2.4</version>
 				<configuration>
 					<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -11,9 +11,9 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git@github.com:phdelodder/SubTools.git</connection>
-		<url>scm:git:git@github.com:phdelodder/SubTools.git</url>
-		<developerConnection>scm:git:git@github.com:phdelodder/SubTools.git</developerConnection>
+		<connection>scm:git:git@github.com:EotT123/SubTools.git</connection>
+		<url>scm:git:git@github.com:EotT123/SubTools.git</url>
+		<developerConnection>scm:git:git@github.com:EotT123/SubTools.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -25,7 +25,7 @@
 
 	<issueManagement>
 		<system>github</system>
-		<url>https://github.com/phdelodder/SubTools/issues</url>
+		<url>https://github.com/EotT123/SubTools/issues</url>
 	</issueManagement>
 
 	<build>
@@ -34,7 +34,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.1</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
