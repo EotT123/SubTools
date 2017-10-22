@@ -34,16 +34,6 @@ public class Manager {
 		}
 	}
 
-	public String downloadText2(String urlString) throws ManagerException {
-		try {
-			return httpClient.downloadText(urlString);
-		} catch (MalformedURLException e) {
-			throw new ManagerException("incorrect url", e);
-		} catch (IOException e) {
-			throw new ManagerException(e);
-		}
-	}
-
 	public InputStream getContentStream(String urlString, String userAgent, boolean longTermCache)
 			throws ManagerSetupException, ManagerException, IOException {
 		return IOUtils.toInputStream(getContent(urlString, userAgent, longTermCache), "UTF-8");

@@ -22,9 +22,7 @@ public class JTheTVDBAdapter {
 		this.jtvapi = null;
 		try {
 			this.jtvapi = new TheTVDBApi("A1720D2DDFDCE82D", manager);
-			exceptions =
-					manager
-							.downloadText2("https://raw.githubusercontent.com/midgetspy/sb_tvdb_scene_exceptions/gh-pages/exceptions.txt");
+			exceptions = manager.downloadText("https://raw.githubusercontent.com/midgetspy/sb_tvdb_scene_exceptions/gh-pages/exceptions.txt");
 		} catch (TheTVDBException e) {
 			LOGGER.error(e.getMessage(), e);
 		} catch (ManagerException e) {
