@@ -206,19 +206,18 @@ public class HttpClient {
 		return matcher.find();
 	}
 
-	
 	public String downloadText(String url) throws java.io.IOException {
 		BufferedReader in = null;
-	    String content = null;
-	    try {
-	    	in = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
-	        content = in.lines().collect(Collectors.joining());
+		String content = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(new URL(url).openStream(), StandardCharsets.UTF_8));
+			content = in.lines().collect(Collectors.joining());
 
-	    }
-	    finally {
-	        if (in != null) in.close(); 
-	    }
-	    return content.toString();
+		} finally {
+			if (in != null)
+				in.close();
+		}
+		return content.toString();
 	}
 
 }

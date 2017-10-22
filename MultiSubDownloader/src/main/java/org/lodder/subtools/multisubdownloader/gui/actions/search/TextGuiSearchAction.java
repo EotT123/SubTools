@@ -20,107 +20,107 @@ import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 public class TextGuiSearchAction extends GuiSearchAction {
 
-  private SubtitleSelection subtitleSelection;
+	private SubtitleSelection subtitleSelection;
 
-  public TextGuiSearchAction(GUI mainWindow, Settings settings, SubtitleProviderStore subtitleProviderStore) {
-    super();
-    this.setGUI(mainWindow);
-    this.setSettings(settings);
-    this.setProviderStore(subtitleProviderStore);
-  }
+	public TextGuiSearchAction(GUI mainWindow, Settings settings, SubtitleProviderStore subtitleProviderStore) {
+		super();
+		this.setGUI(mainWindow);
+		this.setSettings(settings);
+		this.setProviderStore(subtitleProviderStore);
+	}
 
-  public void setSubtitleSelection(SubtitleSelection subtitleSelection) {
-    this.subtitleSelection = subtitleSelection;
-  }
+	public void setSubtitleSelection(SubtitleSelection subtitleSelection) {
+		this.subtitleSelection = subtitleSelection;
+	}
 
-  @Override
-  protected List<Release> createReleases() throws ActionException {
-    String name = getInputPanel().getReleaseName();
-    VideoSearchType type = getInputPanel().getType();
-    
-    VideoTableModel model =
-        (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
-    model.clearTable();
+	@Override
+	protected List<Release> createReleases() throws ActionException {
+		String name = getInputPanel().getReleaseName();
+		VideoSearchType type = getInputPanel().getType();
 
-    // TODO: Redefine what a "release" is.
-    Release release;
-    if (type.equals(VideoSearchType.EPISODE)) {
-      int season = getInputPanel().getSeason();
-      int episode = getInputPanel().getEpisode();
-      String quality = getInputPanel().getQuality();
+		VideoTableModel model =
+				(VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+		model.clearTable();
 
-      release = createTvRelease(name, season, episode, quality);
-    } else if (type.equals(VideoSearchType.MOVIE)) {
-      String quality = getInputPanel().getQuality();
+		// TODO: Redefine what a "release" is.
+		Release release;
+		if (type.equals(VideoSearchType.EPISODE)) {
+			int season = getInputPanel().getSeason();
+			int episode = getInputPanel().getEpisode();
+			String quality = getInputPanel().getQuality();
 
-      release = createMovieRelease(name, quality);
-    } else {
-      release = releaseFactory.createRelease(new File(name));
-    }
+			release = createTvRelease(name, season, episode, quality);
+		} else if (type.equals(VideoSearchType.MOVIE)) {
+			String quality = getInputPanel().getQuality();
 
-    List<Release> releases = new ArrayList<>();
-    if (release != null) {
-      releases.add(release);
-    }
+			release = createMovieRelease(name, quality);
+		} else {
+			release = releaseFactory.createRelease(new File(name));
+		}
 
-    return releases;
-  }
+		List<Release> releases = new ArrayList<>();
+		if (release != null) {
+			releases.add(release);
+		}
 
-  private Release createMovieRelease(String name, String quality) {
-    Release release;
-    release = new MovieRelease();
-    ((MovieRelease) release).setTitle(name);
-    release.setQuality(quality);
-    return release;
-  }
+		return releases;
+	}
 
-  private Release createTvRelease(String name, int season, int episode, String quality) {
-    Release release;
-    List<Integer> episodes = new ArrayList<>();
-    episodes.add(episode);
+	private Release createMovieRelease(String name, String quality) {
+		Release release;
+		release = new MovieRelease();
+		((MovieRelease) release).setTitle(name);
+		release.setQuality(quality);
+		return release;
+	}
 
-    release = new TvRelease();
-    ((TvRelease) release).setShow(name);
-    ((TvRelease) release).setSeason(season);
-    ((TvRelease) release).setEpisodeNumbers(episodes);
-    release.setQuality(quality);
-    return release;
-  }
+	private Release createTvRelease(String name, int season, int episode, String quality) {
+		Release release;
+		List<Integer> episodes = new ArrayList<>();
+		episodes.add(episode);
 
-  @Override
-  public void onFound(Release release, List<Subtitle> subtitles) {
-    VideoTableModel model =
-        (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+		release = new TvRelease();
+		((TvRelease) release).setShow(name);
+		((TvRelease) release).setSeason(season);
+		((TvRelease) release).setEpisodeNumbers(episodes);
+		release.setQuality(quality);
+		return release;
+	}
 
-    if (filtering != null) {
-      subtitles = filtering.getFiltered(subtitles, release);
-    }
+	@Override
+	public void onFound(Release release, List<Subtitle> subtitles) {
+		VideoTableModel model =
+				(VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
 
-    release.getMatchingSubs().addAll(subtitles);
+		if (filtering != null) {
+			subtitles = filtering.getFiltered(subtitles, release);
+		}
 
-    // use automatic selection to reduce the selection for the user
-    if (subtitleSelection != null) {
-      subtitles = subtitleSelection.getAutomaticSelection(subtitles);
-    }
+		release.getMatchingSubs().addAll(subtitles);
 
-    for (Subtitle subtitle : subtitles) {
-      model.addRow(subtitle);
-    }
+		// use automatic selection to reduce the selection for the user
+		if (subtitleSelection != null) {
+			subtitles = subtitleSelection.getAutomaticSelection(subtitles);
+		}
 
-    /* Let GuiSearchAction also make some decisions */
-    super.onFound(release, subtitles);
-  }
+		for (Subtitle subtitle : subtitles) {
+			model.addRow(subtitle);
+		}
 
-  @Override
-  protected void validate() throws SearchSetupException {
-    if (getInputPanel().getReleaseName().isEmpty()) {
-      throw new SearchSetupException("Geen Movie/Episode/Release opgegeven");
-    }
+		/* Let GuiSearchAction also make some decisions */
+		super.onFound(release, subtitles);
+	}
 
-    super.validate();
-  }
+	@Override
+	protected void validate() throws SearchSetupException {
+		if (getInputPanel().getReleaseName().isEmpty()) {
+			throw new SearchSetupException("Geen Movie/Episode/Release opgegeven");
+		}
 
-  private SearchTextInputPanel getInputPanel() {
-    return (SearchTextInputPanel) this.searchPanel.getInputPanel();
-  }
+		super.validate();
+	}
+
+	private SearchTextInputPanel getInputPanel() {
+		return (SearchTextInputPanel) this.searchPanel.getInputPanel();
+	}
 }

@@ -19,108 +19,110 @@ import org.slf4j.LoggerFactory;
 
 public class CleanAction {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CleanAction.class);
-  
-  private LibrarySettings librarySettings;
-  private final String[] fileFilters = new String[] {"nfo", "jpg", "sfv", "srr", "srs", "nzb",
-      "torrent", "txt"};
-  private final String[] folderFilters = new String[] {"sample", "Sample"};
-  private final static String sampleDirName = "sample";
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanAction.class);
 
-  public CleanAction(LibrarySettings librarySettings) {
-    this.librarySettings = librarySettings;
-  }
+	private LibrarySettings librarySettings;
+	private final String[] fileFilters = new String[] { "nfo", "jpg", "sfv", "srr", "srs", "nzb",
+			"torrent", "txt" };
+	private final String[] folderFilters = new String[] { "sample", "Sample" };
+	private final static String sampleDirName = "sample";
 
-  public void cleanUpFiles(Release release, File path, String videoFileName) throws IOException {
-    LOGGER.trace("cleanUpFiles: LibraryOtherFileAction", librarySettings.getLibraryOtherFileAction());
+	public CleanAction(LibrarySettings librarySettings) {
+		this.librarySettings = librarySettings;
+	}
 
-    String[] files = release.getPath().list(new FilenameExtensionFilter(fileFilters));
-    if (files == null) files = new String[] {};
+	public void cleanUpFiles(Release release, File path, String videoFileName) throws IOException {
+		LOGGER.trace("cleanUpFiles: LibraryOtherFileAction", librarySettings.getLibraryOtherFileAction());
 
-    String[] folders = release.getPath().list(new FilenameContainsFilter(folderFilters));
-    if (folders == null) folders = new String[] {};
+		String[] files = release.getPath().list(new FilenameExtensionFilter(fileFilters));
+		if (files == null)
+			files = new String[] {};
 
-    // remove duplicates using set
-    final Set<String> list =
-        new LinkedHashSet<String>(Arrays.asList(StringUtils.join(files, folders)));
+		String[] folders = release.getPath().list(new FilenameContainsFilter(folderFilters));
+		if (folders == null)
+			folders = new String[] {};
 
-    switch (librarySettings.getLibraryOtherFileAction()) {
-      case MOVE:
-        doMove(release, list, path);
-        break;
-      case MOVEANDRENAME:
-        doMoveAndRename(release, list, path, videoFileName);
-        break;
-      case NOTHING:
-        break;
-      case REMOVE:
-        doRemove(release, list);
-        break;
-      case RENAME:
-        doRename(release, path, videoFileName, files);
-        break;
-      default:
-        break;
-    }
-  }
+		// remove duplicates using set
+		final Set<String> list =
+				new LinkedHashSet<String>(Arrays.asList(StringUtils.join(files, folders)));
 
-  private void doRename(Release release, File path, String videoFileName, String[] files)
-      throws IOException {
-    for (String s : files) {
-      String extension = ReleaseParser.extractFileNameExtension(s);
+		switch (librarySettings.getLibraryOtherFileAction()) {
+			case MOVE:
+				doMove(release, list, path);
+				break;
+			case MOVEANDRENAME:
+				doMoveAndRename(release, list, path, videoFileName);
+				break;
+			case NOTHING:
+				break;
+			case REMOVE:
+				doRemove(release, list);
+				break;
+			case RENAME:
+				doRename(release, path, videoFileName, files);
+				break;
+			default:
+				break;
+		}
+	}
 
-      File f = new File(release.getPath(), s);
+	private void doRename(Release release, File path, String videoFileName, String[] files)
+			throws IOException {
+		for (String s : files) {
+			String extension = ReleaseParser.extractFileNameExtension(s);
 
-      if (s.contains(sampleDirName) && !f.isDirectory()) {
-        extension = sampleDirName + "." + extension;
-      }
+			File f = new File(release.getPath(), s);
 
-      if (f.isFile()) {
-        final String filename =
-            videoFileName.substring(0, videoFileName.lastIndexOf(".")).concat("." + extension);
-        Files.move(f, new File(release.getPath(), filename));
-      } else {
-        Files.move(f, new File(path, s));
-      }
-    }
-  }
+			if (s.contains(sampleDirName) && !f.isDirectory()) {
+				extension = sampleDirName + "." + extension;
+			}
 
-  private void doRemove(Release release, Set<String> list) throws IOException {
-    for (String s : list) {
-      final File file = new File(release.getPath(), s);
-      if (file.isDirectory()) {
-        FileUtils.deleteDirectory(file);
-      } else {
-        @SuppressWarnings("unused")
-        boolean isDelete = file.delete();
-      }
-    }
-  }
+			if (f.isFile()) {
+				final String filename =
+						videoFileName.substring(0, videoFileName.lastIndexOf(".")).concat("." + extension);
+				Files.move(f, new File(release.getPath(), filename));
+			} else {
+				Files.move(f, new File(path, s));
+			}
+		}
+	}
 
-  private void doMoveAndRename(Release release, Set<String> list, File path, String videoFileName)
-      throws IOException {
-    for (String s : list) {
-      String extension = ReleaseParser.extractFileNameExtension(s);
+	private void doRemove(Release release, Set<String> list) throws IOException {
+		for (String s : list) {
+			final File file = new File(release.getPath(), s);
+			if (file.isDirectory()) {
+				FileUtils.deleteDirectory(file);
+			} else {
+				@SuppressWarnings("unused")
+				boolean isDelete = file.delete();
+			}
+		}
+	}
 
-      File f = new File(release.getPath(), s);
+	private void doMoveAndRename(Release release, Set<String> list, File path, String videoFileName)
+			throws IOException {
+		for (String s : list) {
+			String extension = ReleaseParser.extractFileNameExtension(s);
 
-      if (s.contains(sampleDirName) && !f.isDirectory()) {
-        extension = sampleDirName + "." + extension;
-      }
+			File f = new File(release.getPath(), s);
 
-      if (f.isFile()) {
-        final String filename =
-            videoFileName.substring(0, videoFileName.lastIndexOf(".")).concat("." + extension);
-        Files.move(f, new File(path, filename));
-      } else {
-        Files.move(f, new File(path, s));
-      }
-    }
-  }
+			if (s.contains(sampleDirName) && !f.isDirectory()) {
+				extension = sampleDirName + "." + extension;
+			}
 
-  private void doMove(Release release, Set<String> list, File path) throws IOException {
-    for (String s : list) {
-      Files.move(new File(release.getPath(), s), new File(path, s));
-    }
-  }
+			if (f.isFile()) {
+				final String filename =
+						videoFileName.substring(0, videoFileName.lastIndexOf(".")).concat("." + extension);
+				Files.move(f, new File(path, filename));
+			} else {
+				Files.move(f, new File(path, s));
+			}
+		}
+	}
+
+	private void doMove(Release release, Set<String> list, File path) throws IOException {
+		for (String s : list) {
+			Files.move(new File(release.getPath(), s), new File(path, s));
+		}
+	}
 }

@@ -39,77 +39,77 @@ import org.lodder.subtools.sublibrary.data.tvrage.TVRageApi;
  */
 public class TVRageEpisodeList implements Serializable {
 
-    /*
-     * Serial Version
-     */
-    private static final long serialVersionUID = 1L;
-    /*
-     * Properties
-     */
-    private String showName;
-    private int totalSeasons;
-    private Map<TVRageEpisodeNumber, TVRageEpisode> episodeList;
+	/*
+	 * Serial Version
+	 */
+	private static final long serialVersionUID = 1L;
+	/*
+	 * Properties
+	 */
+	private String showName;
+	private int totalSeasons;
+	private Map<TVRageEpisodeNumber, TVRageEpisode> episodeList;
 
-    public TVRageEpisodeList() {
-        showName = TVRageApi.UNKNOWN;
-        totalSeasons = 0;
-        episodeList = new TreeMap<TVRageEpisodeNumber, TVRageEpisode>();
-    }
+	public TVRageEpisodeList() {
+		showName = TVRageApi.UNKNOWN;
+		totalSeasons = 0;
+		episodeList = new TreeMap<TVRageEpisodeNumber, TVRageEpisode>();
+	}
 
-    public boolean isValid() {
-        return isValidString(showName) && !episodeList.isEmpty();
-    }
+	public boolean isValid() {
+		return isValidString(showName) && !episodeList.isEmpty();
+	}
 
-    public Map<TVRageEpisodeNumber, TVRageEpisode> getEpisodeList() {
-        return episodeList;
-    }
+	public Map<TVRageEpisodeNumber, TVRageEpisode> getEpisodeList() {
+		return episodeList;
+	}
 
-    public void setEpisodeList(Map<TVRageEpisodeNumber, TVRageEpisode> episodeList) {
-        this.episodeList = episodeList;
-    }
+	public void setEpisodeList(Map<TVRageEpisodeNumber, TVRageEpisode> episodeList) {
+		this.episodeList = episodeList;
+	}
 
-    public void addEpisode(TVRageEpisode episode) {
-        episodeList.put(episode.getEpisodeNumber(), episode);
-    }
+	public void addEpisode(TVRageEpisode episode) {
+		episodeList.put(episode.getEpisodeNumber(), episode);
+	}
 
-    public TVRageEpisode getEpisode(TVRageEpisodeNumber episodeNumber) {
-        return episodeList.get(episodeNumber);
-    }
+	public TVRageEpisode getEpisode(TVRageEpisodeNumber episodeNumber) {
+		return episodeList.get(episodeNumber);
+	}
 
-    public TVRageEpisode getEpisode(int season, int episode) {
-        return getEpisode(new TVRageEpisodeNumber(season, episode));
-    }
+	public TVRageEpisode getEpisode(int season, int episode) {
+		return getEpisode(new TVRageEpisodeNumber(season, episode));
+	}
 
-    public TVRageEpisode getEpisode(String season, String episode) {
-        return getEpisode(new TVRageEpisodeNumber(season, episode));
-    }
+	public TVRageEpisode getEpisode(String season, String episode) {
+		return getEpisode(new TVRageEpisodeNumber(season, episode));
+	}
 
-    public String getShowName() {
-        return showName;
-    }
+	public String getShowName() {
+		return showName;
+	}
 
-    public int getTotalSeasons() {
-        return totalSeasons;
-    }
+	public int getTotalSeasons() {
+		return totalSeasons;
+	}
 
-    public void setShowName(String showName) {
-        if (isValidString(showName)) {
-            this.showName = showName.trim();
-        } else {
-            this.showName = TVRageApi.UNKNOWN;
-        }
-    }
+	public void setShowName(String showName) {
+		if (isValidString(showName)) {
+			this.showName = showName.trim();
+		} else {
+			this.showName = TVRageApi.UNKNOWN;
+		}
+	}
 
-    public void setTotalSeasons(int totalSeasons) {
-        this.totalSeasons = totalSeasons;
-    }
+	public void setTotalSeasons(int totalSeasons) {
+		this.totalSeasons = totalSeasons;
+	}
 
-    public void setTotalSeasons(String totalSeasons) {
-        this.totalSeasons = NumberUtils.toInt(totalSeasons, 0);
-    }
+	public void setTotalSeasons(String totalSeasons) {
+		this.totalSeasons = NumberUtils.toInt(totalSeasons, 0);
+	}
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
 }

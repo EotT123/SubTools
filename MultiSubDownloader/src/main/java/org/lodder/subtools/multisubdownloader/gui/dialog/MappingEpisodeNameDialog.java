@@ -33,192 +33,192 @@ import org.slf4j.LoggerFactory;
 
 public class MappingEpisodeNameDialog extends MultiSubDialog {
 
-  /**
-     *
-     */
-  private static final long serialVersionUID = 1L;
-  private final JPanel contentPanel = new JPanel();
-  private JTable table;
-  private final SettingsControl prefCtrl;
-  private final Settings pref;
-  private JCheckBox chkAutoUpdateMapping;
-  
-  private static final Logger LOGGER = LoggerFactory.getLogger(MappingEpisodeNameDialog.class);
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+	private final JPanel contentPanel = new JPanel();
+	private JTable table;
+	private final SettingsControl prefCtrl;
+	private final Settings pref;
+	private JCheckBox chkAutoUpdateMapping;
 
-  /**
-   * Create the dialog.
-   */
-  public MappingEpisodeNameDialog(JFrame frame, final SettingsControl prefCtrl) {
-    super(frame, Messages.getString("MappingEpisodeNameDialog.Title"), true);
-    this.prefCtrl = prefCtrl;
-    pref = prefCtrl.getSettings();
-    initialize();
-    loadMappingTable();
-    repaint();
-  }
+	private static final Logger LOGGER = LoggerFactory.getLogger(MappingEpisodeNameDialog.class);
 
-  private void loadMappingTable() {
-    DefaultTableModel model = (DefaultTableModel) table.getModel();
-    while (model.getRowCount() > 0) {
-      model.removeRow(0);
-    }
-    for (int i = 0; i < pref.getMappingSettings().getMappingList().size(); i++) {
-      String tvdbId = "";
-      if (pref.getMappingSettings().getMappingList().get(i).getTvdbId() > 0)
-        tvdbId = Integer.toString(pref.getMappingSettings().getMappingList().get(i).getTvdbId());
-      model.addRow(new String[] {pref.getMappingSettings().getMappingList().get(i).getSceneName(),
-          tvdbId});
-    }
+	/**
+	 * Create the dialog.
+	 */
+	public MappingEpisodeNameDialog(JFrame frame, final SettingsControl prefCtrl) {
+		super(frame, Messages.getString("MappingEpisodeNameDialog.Title"), true);
+		this.prefCtrl = prefCtrl;
+		pref = prefCtrl.getSettings();
+		initialize();
+		loadMappingTable();
+		repaint();
+	}
 
-    chkAutoUpdateMapping.setSelected(pref.isAutoUpdateMapping());
-  }
+	private void loadMappingTable() {
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		while (model.getRowCount() > 0) {
+			model.removeRow(0);
+		}
+		for (int i = 0; i < pref.getMappingSettings().getMappingList().size(); i++) {
+			String tvdbId = "";
+			if (pref.getMappingSettings().getMappingList().get(i).getTvdbId() > 0)
+				tvdbId = Integer.toString(pref.getMappingSettings().getMappingList().get(i).getTvdbId());
+			model.addRow(new String[] { pref.getMappingSettings().getMappingList().get(i).getSceneName(),
+					tvdbId });
+		}
 
-  private void initialize() {
-    setResizable(false);
-    setBounds(100, 100, 450, 300);
-    getContentPane().setLayout(new BorderLayout());
-    contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-    getContentPane().add(contentPanel, BorderLayout.CENTER);
-    GridBagLayout gbl_contentPanel = new GridBagLayout();
-    gbl_contentPanel.columnWidths = new int[] {0, 0};
-    gbl_contentPanel.rowHeights = new int[] {0, 40, 0};
-    gbl_contentPanel.columnWeights = new double[] {1.0, Double.MIN_VALUE};
-    gbl_contentPanel.rowWeights = new double[] {0.0, 1.0, Double.MIN_VALUE};
-    contentPanel.setLayout(gbl_contentPanel);
-    {
-      JPanel pnlButtons = new JPanel();
-      GridBagConstraints gbc_pnlButtons = new GridBagConstraints();
-      gbc_pnlButtons.insets = new Insets(0, 0, 5, 0);
-      gbc_pnlButtons.fill = GridBagConstraints.BOTH;
-      gbc_pnlButtons.gridx = 0;
-      gbc_pnlButtons.gridy = 0;
-      contentPanel.add(pnlButtons, gbc_pnlButtons);
-      {
-        JButton btnAdd = new JButton(Messages.getString("MappingEpisodeNameDialog.AddRow"));
-        btnAdd.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent arg0) {
-            String scene =
-                JOptionPane.showInputDialog(Messages
-                    .getString("MappingEpisodeNameDialog.EnterSceneShowName"));
-            if (!scene.equals("")) {
-              String tvdbId =
-                  JOptionPane.showInputDialog(Messages
-                      .getString("MappingEpisodeNameDialog.EnterTvdbId"));
-              if (!tvdbId.equals("")) {
-                DefaultTableModel model = (DefaultTableModel) table.getModel();
-                model.addRow(new Object[] {scene, tvdbId});
-              }
-            }
-          }
-        });
-        pnlButtons.add(btnAdd);
-      }
-      {
-        JButton btnDeleteSelectedRow =
-            new JButton(Messages.getString("MappingEpisodeNameDialog.DeleteRow"));
-        btnDeleteSelectedRow.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent arg0) {
-            int row = table.getSelectedRow();
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
-            model.removeRow(row);
-          }
-        });
-        pnlButtons.add(btnDeleteSelectedRow);
-      }
-    }
-    {
-      JScrollPane scrollPane = new JScrollPane();
-      GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-      gbc_scrollPane.fill = GridBagConstraints.BOTH;
-      gbc_scrollPane.gridx = 0;
-      gbc_scrollPane.gridy = 1;
-      contentPanel.add(scrollPane, gbc_scrollPane);
-      {
-        table = new JTable();
-        table.setModel(new DefaultTableModel(new Object[][] {}, new String[] {
-            Messages.getString("MappingEpisodeNameDialog.SceneShowName"),
-            Messages.getString("MappingEpisodeNameDialog.TvdbId")}) {
-          /**
-                     *
-                     */
-          private static final long serialVersionUID = 1L;
-          @SuppressWarnings("rawtypes")
-          Class[] columnTypes = new Class[] {String.class, String.class, String.class};
+		chkAutoUpdateMapping.setSelected(pref.isAutoUpdateMapping());
+	}
 
-          @SuppressWarnings({"unchecked", "rawtypes"})
-          public Class getColumnClass(int columnIndex) {
-            return columnTypes[columnIndex];
-          }
+	private void initialize() {
+		setResizable(false);
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		GridBagLayout gbl_contentPanel = new GridBagLayout();
+		gbl_contentPanel.columnWidths = new int[] { 0, 0 };
+		gbl_contentPanel.rowHeights = new int[] { 0, 40, 0 };
+		gbl_contentPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gbl_contentPanel.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		contentPanel.setLayout(gbl_contentPanel);
+		{
+			JPanel pnlButtons = new JPanel();
+			GridBagConstraints gbc_pnlButtons = new GridBagConstraints();
+			gbc_pnlButtons.insets = new Insets(0, 0, 5, 0);
+			gbc_pnlButtons.fill = GridBagConstraints.BOTH;
+			gbc_pnlButtons.gridx = 0;
+			gbc_pnlButtons.gridy = 0;
+			contentPanel.add(pnlButtons, gbc_pnlButtons);
+			{
+				JButton btnAdd = new JButton(Messages.getString("MappingEpisodeNameDialog.AddRow"));
+				btnAdd.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						String scene =
+								JOptionPane.showInputDialog(Messages
+										.getString("MappingEpisodeNameDialog.EnterSceneShowName"));
+						if (!scene.equals("")) {
+							String tvdbId =
+									JOptionPane.showInputDialog(Messages
+											.getString("MappingEpisodeNameDialog.EnterTvdbId"));
+							if (!tvdbId.equals("")) {
+								DefaultTableModel model = (DefaultTableModel) table.getModel();
+								model.addRow(new Object[] { scene, tvdbId });
+							}
+						}
+					}
+				});
+				pnlButtons.add(btnAdd);
+			}
+			{
+				JButton btnDeleteSelectedRow =
+						new JButton(Messages.getString("MappingEpisodeNameDialog.DeleteRow"));
+				btnDeleteSelectedRow.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						int row = table.getSelectedRow();
+						DefaultTableModel model = (DefaultTableModel) table.getModel();
+						model.removeRow(row);
+					}
+				});
+				pnlButtons.add(btnDeleteSelectedRow);
+			}
+		}
+		{
+			JScrollPane scrollPane = new JScrollPane();
+			GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+			gbc_scrollPane.fill = GridBagConstraints.BOTH;
+			gbc_scrollPane.gridx = 0;
+			gbc_scrollPane.gridy = 1;
+			contentPanel.add(scrollPane, gbc_scrollPane);
+			{
+				table = new JTable();
+				table.setModel(new DefaultTableModel(new Object[][] {}, new String[] {
+						Messages.getString("MappingEpisodeNameDialog.SceneShowName"),
+						Messages.getString("MappingEpisodeNameDialog.TvdbId") }) {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+					@SuppressWarnings("rawtypes")
+					Class[] columnTypes = new Class[] { String.class, String.class, String.class };
 
-          boolean[] columnEditables = new boolean[] {true, true, true};
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					public Class getColumnClass(int columnIndex) {
+						return columnTypes[columnIndex];
+					}
 
-          public boolean isCellEditable(int row, int column) {
-            return columnEditables[column];
-          }
-        });
-        RowSorter<TableModel> sorter;
-        sorter = new TableRowSorter<TableModel>(table.getModel());
-        table.setRowSorter(sorter);
-        scrollPane.setViewportView(table);
-      }
-    }
-    {
-      JPanel buttonPane = new JPanel();
-      getContentPane().add(buttonPane, BorderLayout.SOUTH);
-      {
-        JButton okButton = new JButton(Messages.getString("MappingEpisodeNameDialog.OK"));
-        okButton.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent arg0) {
-            setVisible(false);
-            storeMappingTable();
-          }
-        });
-        buttonPane.setLayout(new MigLayout("", "[117px][grow,fill][62px,trailing]",
-            "[][25px,grow,fill]"));
-        {
-          JButton btnUpdateMapping =
-              new JButton(Messages.getString("MappingEpisodeNameDialog.UpdateWithOnlineMapping"));
-          btnUpdateMapping.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              try {
-                storeMappingTable();
-                prefCtrl.updateMappingFromOnline();
-                loadMappingTable();
-              } catch (Throwable e) {
-                LOGGER.error("btnUpdateMapping", e);
-              } 
-            }
-          });
-          {
-            chkAutoUpdateMapping =
-                new JCheckBox(Messages.getString("MappingEpisodeNameDialog.UpdateMappingOnStart"));
-            buttonPane.add(chkAutoUpdateMapping, "cell 0 0 2 1");
-          }
-          buttonPane.add(btnUpdateMapping, "cell 0 1,alignx left,aligny top");
-        }
-        okButton.setActionCommand(Messages.getString("MappingEpisodeNameDialog.OK"));
-        buttonPane.add(okButton, "cell 2 1,alignx right,aligny top");
-        getRootPane().setDefaultButton(okButton);
-      }
-    }
-  }
+					boolean[] columnEditables = new boolean[] { true, true, true };
 
-  private void storeMappingTable() {
-    List<MappingTvdbScene> list = new ArrayList<MappingTvdbScene>();
-    DefaultTableModel model = (DefaultTableModel) table.getModel();
-    MappingTvdbScene item;
-    for (int i = 0; i < model.getRowCount(); i++) {
-      int tvdbid = 0;
-      if (model.getValueAt(i, 1) != null && ((String) model.getValueAt(i, 1)).length() != 0) {
-        tvdbid = Integer.parseInt((String) model.getValueAt(i, 1));
-      }
-      String scene = (String) model.getValueAt(i, 0);
-      item = new MappingTvdbScene(scene, tvdbid);
-      list.add(item);
-    }
-    pref.getMappingSettings().setMappingList(list);
+					public boolean isCellEditable(int row, int column) {
+						return columnEditables[column];
+					}
+				});
+				RowSorter<TableModel> sorter;
+				sorter = new TableRowSorter<TableModel>(table.getModel());
+				table.setRowSorter(sorter);
+				scrollPane.setViewportView(table);
+			}
+		}
+		{
+			JPanel buttonPane = new JPanel();
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton okButton = new JButton(Messages.getString("MappingEpisodeNameDialog.OK"));
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						setVisible(false);
+						storeMappingTable();
+					}
+				});
+				buttonPane.setLayout(new MigLayout("", "[117px][grow,fill][62px,trailing]",
+						"[][25px,grow,fill]"));
+				{
+					JButton btnUpdateMapping =
+							new JButton(Messages.getString("MappingEpisodeNameDialog.UpdateWithOnlineMapping"));
+					btnUpdateMapping.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							try {
+								storeMappingTable();
+								prefCtrl.updateMappingFromOnline();
+								loadMappingTable();
+							} catch (Throwable e) {
+								LOGGER.error("btnUpdateMapping", e);
+							}
+						}
+					});
+					{
+						chkAutoUpdateMapping =
+								new JCheckBox(Messages.getString("MappingEpisodeNameDialog.UpdateMappingOnStart"));
+						buttonPane.add(chkAutoUpdateMapping, "cell 0 0 2 1");
+					}
+					buttonPane.add(btnUpdateMapping, "cell 0 1,alignx left,aligny top");
+				}
+				okButton.setActionCommand(Messages.getString("MappingEpisodeNameDialog.OK"));
+				buttonPane.add(okButton, "cell 2 1,alignx right,aligny top");
+				getRootPane().setDefaultButton(okButton);
+			}
+		}
+	}
 
-    pref.setAutoUpdateMapping(chkAutoUpdateMapping.isSelected());
-  }
+	private void storeMappingTable() {
+		List<MappingTvdbScene> list = new ArrayList<MappingTvdbScene>();
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		MappingTvdbScene item;
+		for (int i = 0; i < model.getRowCount(); i++) {
+			int tvdbid = 0;
+			if (model.getValueAt(i, 1) != null && ((String) model.getValueAt(i, 1)).length() != 0) {
+				tvdbid = Integer.parseInt((String) model.getValueAt(i, 1));
+			}
+			String scene = (String) model.getValueAt(i, 0);
+			item = new MappingTvdbScene(scene, tvdbid);
+			list.add(item);
+		}
+		pref.getMappingSettings().setMappingList(list);
+
+		pref.setAutoUpdateMapping(chkAutoUpdateMapping.isSelected());
+	}
 
 }

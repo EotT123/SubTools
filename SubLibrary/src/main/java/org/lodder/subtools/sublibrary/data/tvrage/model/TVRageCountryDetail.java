@@ -36,56 +36,56 @@ import static org.lodder.subtools.sublibrary.data.tvrage.TVRageApi.isValidString
  */
 public class TVRageCountryDetail implements Serializable {
 
-    /*
-     * Serial Version
-     */
-    private static final long serialVersionUID = 1L;
-    /*
-     * Properties
-     */
-    private String country;
-    private String detail;
+	/*
+	 * Serial Version
+	 */
+	private static final long serialVersionUID = 1L;
+	/*
+	 * Properties
+	 */
+	private String country;
+	private String detail;
 
-    public TVRageCountryDetail() {
-        this.country = TVRageApi.UNKNOWN;
-        this.detail = TVRageApi.UNKNOWN;
-    }
+	public TVRageCountryDetail() {
+		this.country = TVRageApi.UNKNOWN;
+		this.detail = TVRageApi.UNKNOWN;
+	}
 
-    public TVRageCountryDetail(String country, String detail) {
-        this.country = country;
-        this.detail = detail;
-    }
+	public TVRageCountryDetail(String country, String detail) {
+		this.country = country;
+		this.detail = detail;
+	}
 
-    public String getCountry() {
-        return country;
-    }
+	public String getCountry() {
+		return country;
+	}
 
-    public void setCountry(String country) {
-        if (isValidString(country)) {
-            this.country = country.trim();
-        } else {
-            this.country = TVRageApi.UNKNOWN;
-        }
-    }
+	public void setCountry(String country) {
+		if (isValidString(country)) {
+			this.country = country.trim();
+		} else {
+			this.country = TVRageApi.UNKNOWN;
+		}
+	}
 
-    public String getDetail() {
-        return detail;
-    }
+	public String getDetail() {
+		return detail;
+	}
 
-    public void setDetail(String detail) {
-        if (isValidString(detail)) {
-            this.detail = detail.trim();
-        } else {
-            this.detail = TVRageApi.UNKNOWN;
-        }
-    }
+	public void setDetail(String detail) {
+		if (isValidString(detail)) {
+			this.detail = detail.trim();
+		} else {
+			this.detail = TVRageApi.UNKNOWN;
+		}
+	}
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
 
-    public boolean isValid() {
-        return isValidString(country) && isValidString(detail);
-    }
+	public boolean isValid() {
+		return isValidString(country) && isValidString(detail);
+	}
 }

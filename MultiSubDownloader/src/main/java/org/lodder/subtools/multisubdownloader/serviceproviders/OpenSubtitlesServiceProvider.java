@@ -7,21 +7,21 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JOpenSubAdapter;
 
 public class OpenSubtitlesServiceProvider implements ServiceProvider {
-  @Override
-  public int getPriority() {
-    /* We define a priority lower than SubtitleServiceProvider */
-    return 1;
-  }
+	@Override
+	public int getPriority() {
+		/* We define a priority lower than SubtitleServiceProvider */
+		return 1;
+	}
 
-  @Override
-  public void register(Container app) {
-    /* Resolve the SubtitleProviderStore from the IoC Container */
-    SubtitleProviderStore subtitleProviderStore = (SubtitleProviderStore) app.make("SubtitleProviderStore");
+	@Override
+	public void register(Container app) {
+		/* Resolve the SubtitleProviderStore from the IoC Container */
+		SubtitleProviderStore subtitleProviderStore = (SubtitleProviderStore) app.make("SubtitleProviderStore");
 
-    /* Create the SubtitleProvider */
-    SubtitleProvider openSubtitlesProvider = new JOpenSubAdapter();
+		/* Create the SubtitleProvider */
+		SubtitleProvider openSubtitlesProvider = new JOpenSubAdapter();
 
-    /* Add the SubtitleProvider to the store */
-    subtitleProviderStore.addProvider(openSubtitlesProvider);
-  }
+		/* Add the SubtitleProvider to the store */
+		subtitleProviderStore.addProvider(openSubtitlesProvider);
+	}
 }

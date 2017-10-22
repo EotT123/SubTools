@@ -9,23 +9,23 @@ import org.lodder.subtools.sublibrary.settings.model.MappingTvdbScene;
 
 public abstract class VideoFileControl {
 
-    protected Release release;
+	protected Release release;
 
-    public VideoFileControl(Release release) {
-        this.release = release;
-    }
+	public VideoFileControl(Release release) {
+		this.release = release;
+	}
 
-    abstract Release process(List<MappingTvdbScene> dict) throws ReleaseControlException;
+	abstract Release process(List<MappingTvdbScene> dict) throws ReleaseControlException;
 
-    public Release process() throws ReleaseControlException {
-        return this.process(new ArrayList<MappingTvdbScene>());
-    }
-    
-    public void setVideoFile(Release release) {
-        this.release = release;
-    }
-    
-    public Release getVideoFile() {
-        return release;
-    }
+	public Release process() throws ReleaseControlException {
+		return this.process(new ArrayList<MappingTvdbScene>());
+	}
+
+	public void setVideoFile(Release release) {
+		this.release = release;
+	}
+
+	public Release getVideoFile() {
+		return release;
+	}
 }

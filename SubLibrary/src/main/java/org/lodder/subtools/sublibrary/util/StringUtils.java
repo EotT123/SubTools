@@ -28,18 +28,18 @@ public class StringUtils {
 	}
 
 	public static String removeIllegalWindowsChars(String text) {
-	    text = text.replace("|", "");
-	    text = text.replace("\"", "");
-	    text = text.replace("<", "");
-	    text = text.replace(">", "");
-	    text = text.replace("?", "");
-	    text = text.replace("*", "");
-	    text = text.replace(":", "");
-	    text = text.replace("/", "");
-	    text = text.replace("\\", "");
-	    if (text.length() > 0 && text.substring(text.length() - 1).equals(".")) {
-	      text = text.substring(0, text.length() - 1);
-	    }
-	    return text.trim();
-	  }
+		text = text.replace("|", "");
+		text = text.replace("\"", "");
+		text = text.replace("<", "");
+		text = text.replace(">", "");
+		text = text.replace("?", "");
+		text = text.replace("*", "");
+		text = text.replace(":", "");
+		text = text.replace("/", "");
+		text = text.replace("\\", "");
+		if (text.length() > 0 && text.substring(text.length() - 1).equals(".")) {
+			text = text.substring(0, text.length() - 1);
+		}
+		return text.trim();
+	}
 }

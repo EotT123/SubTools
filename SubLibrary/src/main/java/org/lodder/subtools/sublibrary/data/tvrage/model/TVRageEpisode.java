@@ -33,147 +33,147 @@ import org.lodder.subtools.sublibrary.data.tvrage.TVRageParser;
 
 public class TVRageEpisode implements Serializable {
 
-    /*
-     * Serial Version
-     */
-    private static final long serialVersionUID = 1L;
-    /*
-     * Properties
-     */
-    private static final String UNKNOWN = TVRageApi.UNKNOWN;
-    private TVRageEpisodeNumber episodeNumber = new TVRageEpisodeNumber(0, 0);
-    private String productionId = UNKNOWN;
-    private Date airDate = null;
-    private String link = UNKNOWN;
-    private String title = UNKNOWN;
-    private String summary = UNKNOWN;
-    private float rating = 0.0f;
-    private String screenCap = UNKNOWN;
+	/*
+	 * Serial Version
+	 */
+	private static final long serialVersionUID = 1L;
+	/*
+	 * Properties
+	 */
+	private static final String UNKNOWN = TVRageApi.UNKNOWN;
+	private TVRageEpisodeNumber episodeNumber = new TVRageEpisodeNumber(0, 0);
+	private String productionId = UNKNOWN;
+	private Date airDate = null;
+	private String link = UNKNOWN;
+	private String title = UNKNOWN;
+	private String summary = UNKNOWN;
+	private float rating = 0.0f;
+	private String screenCap = UNKNOWN;
 
-    public void setEpisodeNumber(TVRageEpisodeNumber episodeNumber) {
-        this.episodeNumber = episodeNumber;
-    }
+	public void setEpisodeNumber(TVRageEpisodeNumber episodeNumber) {
+		this.episodeNumber = episodeNumber;
+	}
 
-    public TVRageEpisodeNumber getEpisodeNumber() {
-        return episodeNumber;
-    }
+	public TVRageEpisodeNumber getEpisodeNumber() {
+		return episodeNumber;
+	}
 
-    public boolean isValid() {
-        return episodeNumber.isValid() && isValidString(title);
-    }
+	public boolean isValid() {
+		return episodeNumber.isValid() && isValidString(title);
+	}
 
-    /**
-     * Added as a convenience method
-     *
-     * @return
-     */
-    public int getEpisode() {
-        return episodeNumber.getEpisode();
-    }
+	/**
+	 * Added as a convenience method
+	 *
+	 * @return
+	 */
+	public int getEpisode() {
+		return episodeNumber.getEpisode();
+	}
 
-    /**
-     * Added as a convenience method
-     *
-     * @return
-     */
-    public int getSeason() {
-        return episodeNumber.getSeason();
-    }
+	/**
+	 * Added as a convenience method
+	 *
+	 * @return
+	 */
+	public int getSeason() {
+		return episodeNumber.getSeason();
+	}
 
-    public String getProductionId() {
-        return productionId;
-    }
+	public String getProductionId() {
+		return productionId;
+	}
 
-    public void setProductionId(String productionId) {
-        if (isValidString(productionId)) {
-            this.productionId = productionId.trim();
-        } else {
-            this.productionId = UNKNOWN;
-        }
-    }
+	public void setProductionId(String productionId) {
+		if (isValidString(productionId)) {
+			this.productionId = productionId.trim();
+		} else {
+			this.productionId = UNKNOWN;
+		}
+	}
 
-    public Date getAirDate() {
-        return (Date) airDate.clone();
-    }
+	public Date getAirDate() {
+		return (Date) airDate.clone();
+	}
 
-    public void setAirDate(Date airDate) {
-        this.airDate = (Date) airDate.clone();
-    }
+	public void setAirDate(Date airDate) {
+		this.airDate = (Date) airDate.clone();
+	}
 
-    public void setAirDate(String airDate) {
-        if (isValidString(airDate)) {
-            try {
-                this.airDate = TVRageParser.parseDate(airDate);
-            } catch (Exception ex) {
-                this.airDate = null;
-            }
-        } else {
-            this.airDate = null;
-        }
-    }
+	public void setAirDate(String airDate) {
+		if (isValidString(airDate)) {
+			try {
+				this.airDate = TVRageParser.parseDate(airDate);
+			} catch (Exception ex) {
+				this.airDate = null;
+			}
+		} else {
+			this.airDate = null;
+		}
+	}
 
-    public String getLink() {
-        return link;
-    }
+	public String getLink() {
+		return link;
+	}
 
-    public void setLink(String link) {
-        if (isValidString(link)) {
-            this.link = link.trim();
-        } else {
-            this.link = UNKNOWN;
-        }
-    }
+	public void setLink(String link) {
+		if (isValidString(link)) {
+			this.link = link.trim();
+		} else {
+			this.link = UNKNOWN;
+		}
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public void setTitle(String title) {
-        if (isValidString(title)) {
-            this.title = title.trim();
-        } else {
-            this.title = UNKNOWN;
-        }
-    }
+	public void setTitle(String title) {
+		if (isValidString(title)) {
+			this.title = title.trim();
+		} else {
+			this.title = UNKNOWN;
+		}
+	}
 
-    public String getSummary() {
-        return summary;
-    }
+	public String getSummary() {
+		return summary;
+	}
 
-    public void setSummary(String summary) {
-        if (isValidString(summary)) {
-            this.summary = summary.trim();
-        } else {
-            this.summary = UNKNOWN;
-        }
-    }
+	public void setSummary(String summary) {
+		if (isValidString(summary)) {
+			this.summary = summary.trim();
+		} else {
+			this.summary = UNKNOWN;
+		}
+	}
 
-    public float getRating() {
-        return rating;
-    }
+	public float getRating() {
+		return rating;
+	}
 
-    public void setRating(float rating) {
-        this.rating = rating;
-    }
+	public void setRating(float rating) {
+		this.rating = rating;
+	}
 
-    public void setRating(String rating) {
-        this.rating = NumberUtils.toFloat(rating, 0.0f);
-    }
+	public void setRating(String rating) {
+		this.rating = NumberUtils.toFloat(rating, 0.0f);
+	}
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
 
-    public String getScreenCap() {
-        return screenCap;
-    }
+	public String getScreenCap() {
+		return screenCap;
+	}
 
-    public void setScreenCap(String screenCap) {
-        if (isValidString(screenCap)) {
-            this.screenCap = screenCap.trim();
-        } else {
-            this.screenCap = UNKNOWN;
-        }
-    }
+	public void setScreenCap(String screenCap) {
+		if (isValidString(screenCap)) {
+			this.screenCap = screenCap.trim();
+		} else {
+			this.screenCap = UNKNOWN;
+		}
+	}
 }

@@ -7,19 +7,19 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 
 public class SubtitleServiceProvider implements ServiceProvider {
 
-  @Override
-  public int getPriority() {
-    return 0;
-  }
+	@Override
+	public int getPriority() {
+		return 0;
+	}
 
-  @Override
-  public void register(Container app) {
-    final SubtitleProviderStore store = new SubtitleProviderStore();
-    app.bind("SubtitleProviderStore", new Resolver() {
-      @Override
-      public Object resolve() {
-        return store;
-      }
-    });
-  }
+	@Override
+	public void register(Container app) {
+		final SubtitleProviderStore store = new SubtitleProviderStore();
+		app.bind("SubtitleProviderStore", new Resolver() {
+			@Override
+			public Object resolve() {
+				return store;
+			}
+		});
+	}
 }

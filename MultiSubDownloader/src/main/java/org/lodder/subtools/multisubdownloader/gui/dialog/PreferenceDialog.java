@@ -45,627 +45,628 @@ import org.slf4j.LoggerFactory;
 
 public class PreferenceDialog extends MultiSubDialog {
 
-  /**
-     *
-     */
-  private static final long serialVersionUID = -5730220264781738564L;
-  private final JPanel contentPanel = new JPanel();
-  private final Emitter eventEmitter;
-  private JCheckBox chkOnlyFound, chkAlwaysConfirm, chkSubtitleExactMethod,
-      chkSubtitleKeywordMethod;
-  private SettingsControl settingsCtrl;
-  private EpisodeLibraryPanel pnlEpisodeLibrary;
-  private JListWithImages excludeList;
-  private JCheckBox chkStopOnSearchError;
-  private MovieLibraryPanel pnlMovieLibrary;
-  private JTextField txtProxyHost, txtAddic7edUsername;
-  private JTextField txtProxyPort, txtAddic7edPassword;
-  private JCheckBox chkProxyserverGebruiken, chkUserAddic7edLogin, chkExcludeHearingImpaired;
-  private JListWithImages defaultIncomingFoldersList, localSourcesFoldersList;
-  private JCheckBox chkSerieSourceAddic7ed, chkSerieSourceTvSubtitles, chkSerieSourcePodnapisi,
-      chkSerieSourceOpensubtitles, chkSerieSourceLocal, chkSerieSourceSubsMax;
-  private JComboBox<SettingsProcessEpisodeSource> cbxEpisodeProcessSource;
-  private JCheckBox chkMinScoreSelection;
-  private JSlider sldMinScoreSelection;
-  private Manager manager;
-  private JComboBox<UpdateCheckPeriod> cbxUpdateCheckPeriod;
-  private JCheckBox chkDefaultSelection;
-  private DefaultSelectionPanel pnlDefaultSelection;
-  
-  private static final Logger LOGGER = LoggerFactory.getLogger(PreferenceDialog.class);
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5730220264781738564L;
+	private final JPanel contentPanel = new JPanel();
+	private final Emitter eventEmitter;
+	private JCheckBox chkOnlyFound, chkAlwaysConfirm, chkSubtitleExactMethod,
+			chkSubtitleKeywordMethod;
+	private SettingsControl settingsCtrl;
+	private EpisodeLibraryPanel pnlEpisodeLibrary;
+	private JListWithImages excludeList;
+	private JCheckBox chkStopOnSearchError;
+	private MovieLibraryPanel pnlMovieLibrary;
+	private JTextField txtProxyHost, txtAddic7edUsername;
+	private JTextField txtProxyPort, txtAddic7edPassword;
+	private JCheckBox chkProxyserverGebruiken, chkUserAddic7edLogin, chkExcludeHearingImpaired;
+	private JListWithImages defaultIncomingFoldersList, localSourcesFoldersList;
+	private JCheckBox chkSerieSourceAddic7ed, chkSerieSourceTvSubtitles, chkSerieSourcePodnapisi,
+			chkSerieSourceOpensubtitles, chkSerieSourceLocal, chkSerieSourceSubsMax;
+	private JComboBox<SettingsProcessEpisodeSource> cbxEpisodeProcessSource;
+	private JCheckBox chkMinScoreSelection;
+	private JSlider sldMinScoreSelection;
+	private Manager manager;
+	private JComboBox<UpdateCheckPeriod> cbxUpdateCheckPeriod;
+	private JCheckBox chkDefaultSelection;
+	private DefaultSelectionPanel pnlDefaultSelection;
 
-  /**
-   * Create the dialog.
-   */
-  public PreferenceDialog(JFrame frame, final SettingsControl settingsCtrl, Emitter eventEmitter,
-      Manager manager) {
-    super(frame, Messages.getString("PreferenceDialog.Title"), true);
-    this.settingsCtrl = settingsCtrl;
-    this.eventEmitter = eventEmitter;
-    this.manager = manager;
-    initialize();
-    setPreferenceSettings();
-    repaint();
-  }
+	private static final Logger LOGGER = LoggerFactory.getLogger(PreferenceDialog.class);
 
-  private void initialize() {
-    setResizable(false);
-    setModalityType(ModalityType.APPLICATION_MODAL);
-    setBounds(100, 100, 650, 700);
-    getContentPane().setLayout(new BorderLayout());
-    contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-    getContentPane().add(contentPanel, BorderLayout.CENTER);
-    contentPanel.setLayout(new BorderLayout(0, 0));
-    {
-      JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-      tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-      contentPanel.add(tabbedPane);
-      {
-        JPanel pnlGeneral = new JPanel();
-        tabbedPane
-            .addTab(Messages.getString("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
-        pnlGeneral.setLayout(new MigLayout("", "[127px,grow][grow][grow]",
-            "[23px][grow][][][grow,center][][grow]"));
-        {
-          JLabel lblDefaultIncomingFolder =
-              new JLabel(Messages.getString("PreferenceDialog.DefaultIncomingFolder"));
-          pnlGeneral.add(lblDefaultIncomingFolder, "cell 0 0,alignx left,aligny center");
-        }
-        {
-          JButton btnBrowse = new JButton(Messages.getString("PreferenceDialog.AddFolder"));
-          btnBrowse.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              File path =
-                  MemoryFolderChooser.getInstance().selectDirectory(getContentPane(),
-                      Messages.getString("PreferenceDialog.SelectFolder"));
-              if (defaultIncomingFoldersList.getModel().getSize() == 0) {
-                defaultIncomingFoldersList.addItem(SettingsExcludeType.FOLDER,
-                    path.getAbsolutePath());
-              } else {
-                boolean exists = false;
-                for (int i = 0; i < defaultIncomingFoldersList.getModel().getSize(); i++) {
-                  if (defaultIncomingFoldersList.getDescription(i) != null
-                      && defaultIncomingFoldersList.getDescription(i)
-                          .equals(path.getAbsolutePath())) {
-                    exists = true;
-                  }
-                }
-                if (!exists) {
-                  defaultIncomingFoldersList.addItem(SettingsExcludeType.FOLDER,
-                      path.getAbsolutePath());
-                }
-              }
-            }
-          });
-          pnlGeneral.add(btnBrowse, "cell 1 0,alignx left,aligny top");
-        }
-        {
-          JButton button = new JButton(Messages.getString("PreferenceDialog.DeleteFolder"));
-          button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              DefaultListModel<JPanel> model =
-                  (DefaultListModel<JPanel>) defaultIncomingFoldersList.getModel();
-              int selected = defaultIncomingFoldersList.getSelectedIndex();
-              if (model.size() > 0 && selected >= 0) {
-                model.removeElementAt(selected);
-              }
-            }
-          });
-          pnlGeneral.add(button, "cell 2 0");
-        }
-        {
-          JScrollPane scrollPane = new JScrollPane();
-          pnlGeneral.add(scrollPane, "cell 1 1 2 1,grow");
-          {
-            defaultIncomingFoldersList = new JListWithImages();
-            scrollPane.setViewportView(defaultIncomingFoldersList);
-          }
-        }
-        {
-          JLabel lblUitsluitLijst = new JLabel(Messages.getString("PreferenceDialog.ExcludeList"));
-          pnlGeneral.add(lblUitsluitLijst, "cell 0 2,alignx right,gaptop 10");
-        }
-        {
-          JButton btnAddUitsluitMap = new JButton(Messages.getString("PreferenceDialog.AddFolder"));
-          btnAddUitsluitMap.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              addExcludeItem(SettingsExcludeType.FOLDER);
-            }
-          });
-          pnlGeneral.add(btnAddUitsluitMap, "cell 1 2,alignx center,gaptop 10");
-        }
-        {
-          JButton btnVerwijderUitsluitMap =
-              new JButton(Messages.getString("PreferenceDialog.DeleteItem"));
-          btnVerwijderUitsluitMap.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              removeExcludeItem();
-            }
-          });
-          pnlGeneral.add(btnVerwijderUitsluitMap, "cell 2 2,alignx center,gaptop 10");
-        }
-        {
-          JButton btnAddUitsluitRegex =
-              new JButton(Messages.getString("PreferenceDialog.RegexToevoegen"));
-          btnAddUitsluitRegex.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              addExcludeItem(SettingsExcludeType.REGEX);
-            }
-          });
-          pnlGeneral.add(btnAddUitsluitRegex, "cell 1 3,alignx center");
-        }
-        {
-          JScrollPane scrollPane = new JScrollPane();
-          pnlGeneral.add(scrollPane, "cell 1 4 2 1,grow");
-          {
-            excludeList = new JListWithImages();
+	/**
+	 * Create the dialog.
+	 */
+	public PreferenceDialog(JFrame frame, final SettingsControl settingsCtrl, Emitter eventEmitter,
+			Manager manager) {
+		super(frame, Messages.getString("PreferenceDialog.Title"), true);
+		this.settingsCtrl = settingsCtrl;
+		this.eventEmitter = eventEmitter;
+		this.manager = manager;
+		initialize();
+		setPreferenceSettings();
+		repaint();
+	}
 
-            scrollPane.setViewportView(excludeList);
-          }
-        }
-        {
-          JLabel lblNewUpdateCheck =
-              new JLabel(Messages.getString("PreferenceDialog.NewUpdateCheck"));
-          pnlGeneral.add(lblNewUpdateCheck, "cell 0 5 2 1");
-        }
-        {
-          cbxUpdateCheckPeriod = new JComboBox<UpdateCheckPeriod>();
-          cbxUpdateCheckPeriod.setModel(new DefaultComboBoxModel<UpdateCheckPeriod>(
-              UpdateCheckPeriod.values()));
-          pnlGeneral.add(cbxUpdateCheckPeriod, "cell 2 5,growx");
-        }
-        {
-          JPanel pnlProxySettings = new JPanel();
-          pnlGeneral.add(pnlProxySettings, "cell 0 6 3 1,grow");
-          pnlProxySettings.setLayout(new MigLayout("", "[50px:n][][grow][grow]", "[][][][]"));
-          pnlProxySettings.add(new JLabel(Messages.getString("PreferenceDialog.ConfigureProxy")),
-              "cell 0 0 4 1,gapy 5");
-          pnlProxySettings.add(new JSeparator(), "cell 0 0 4 1,growx,gapy 5");
-          {
-            chkProxyserverGebruiken =
-                new JCheckBox(Messages.getString("PreferenceDialog.UseProxyServer"));
-            pnlProxySettings.add(chkProxyserverGebruiken, "cell 0 1 3 1");
-          }
-          {
-            JLabel lblProxyHost = new JLabel(Messages.getString("PreferenceDialog.Hostname"));
-            pnlProxySettings.add(lblProxyHost, "cell 1 2,alignx trailing");
-          }
-          {
-            txtProxyHost = new JTextField();
-            pnlProxySettings.add(txtProxyHost, "cell 2 2,growx");
-            txtProxyHost.setColumns(10);
-          }
-          {
-            JLabel lblProxyPoort = new JLabel(Messages.getString("PreferenceDialog.Port"));
-            pnlProxySettings.add(lblProxyPoort, "cell 1 3,alignx trailing");
-          }
-          {
-            txtProxyPort = new JTextField();
-            pnlProxySettings.add(txtProxyPort, "cell 2 3,growx");
-            txtProxyPort.setColumns(10);
-          }
+	private void initialize() {
+		setResizable(false);
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setBounds(100, 100, 650, 700);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(new BorderLayout(0, 0));
+		{
+			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+			contentPanel.add(tabbedPane);
+			{
+				JPanel pnlGeneral = new JPanel();
+				tabbedPane
+						.addTab(Messages.getString("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
+				pnlGeneral.setLayout(new MigLayout("", "[127px,grow][grow][grow]",
+						"[23px][grow][][][grow,center][][grow]"));
+				{
+					JLabel lblDefaultIncomingFolder =
+							new JLabel(Messages.getString("PreferenceDialog.DefaultIncomingFolder"));
+					pnlGeneral.add(lblDefaultIncomingFolder, "cell 0 0,alignx left,aligny center");
+				}
+				{
+					JButton btnBrowse = new JButton(Messages.getString("PreferenceDialog.AddFolder"));
+					btnBrowse.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							File path =
+									MemoryFolderChooser.getInstance().selectDirectory(getContentPane(),
+											Messages.getString("PreferenceDialog.SelectFolder"));
+							if (defaultIncomingFoldersList.getModel().getSize() == 0) {
+								defaultIncomingFoldersList.addItem(SettingsExcludeType.FOLDER,
+										path.getAbsolutePath());
+							} else {
+								boolean exists = false;
+								for (int i = 0; i < defaultIncomingFoldersList.getModel().getSize(); i++) {
+									if (defaultIncomingFoldersList.getDescription(i) != null
+											&& defaultIncomingFoldersList.getDescription(i)
+													.equals(path.getAbsolutePath())) {
+										exists = true;
+									}
+								}
+								if (!exists) {
+									defaultIncomingFoldersList.addItem(SettingsExcludeType.FOLDER,
+											path.getAbsolutePath());
+								}
+							}
+						}
+					});
+					pnlGeneral.add(btnBrowse, "cell 1 0,alignx left,aligny top");
+				}
+				{
+					JButton button = new JButton(Messages.getString("PreferenceDialog.DeleteFolder"));
+					button.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							DefaultListModel<JPanel> model =
+									(DefaultListModel<JPanel>) defaultIncomingFoldersList.getModel();
+							int selected = defaultIncomingFoldersList.getSelectedIndex();
+							if (model.size() > 0 && selected >= 0) {
+								model.removeElementAt(selected);
+							}
+						}
+					});
+					pnlGeneral.add(button, "cell 2 0");
+				}
+				{
+					JScrollPane scrollPane = new JScrollPane();
+					pnlGeneral.add(scrollPane, "cell 1 1 2 1,grow");
+					{
+						defaultIncomingFoldersList = new JListWithImages();
+						scrollPane.setViewportView(defaultIncomingFoldersList);
+					}
+				}
+				{
+					JLabel lblUitsluitLijst = new JLabel(Messages.getString("PreferenceDialog.ExcludeList"));
+					pnlGeneral.add(lblUitsluitLijst, "cell 0 2,alignx right,gaptop 10");
+				}
+				{
+					JButton btnAddUitsluitMap = new JButton(Messages.getString("PreferenceDialog.AddFolder"));
+					btnAddUitsluitMap.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							addExcludeItem(SettingsExcludeType.FOLDER);
+						}
+					});
+					pnlGeneral.add(btnAddUitsluitMap, "cell 1 2,alignx center,gaptop 10");
+				}
+				{
+					JButton btnVerwijderUitsluitMap =
+							new JButton(Messages.getString("PreferenceDialog.DeleteItem"));
+					btnVerwijderUitsluitMap.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							removeExcludeItem();
+						}
+					});
+					pnlGeneral.add(btnVerwijderUitsluitMap, "cell 2 2,alignx center,gaptop 10");
+				}
+				{
+					JButton btnAddUitsluitRegex =
+							new JButton(Messages.getString("PreferenceDialog.RegexToevoegen"));
+					btnAddUitsluitRegex.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							addExcludeItem(SettingsExcludeType.REGEX);
+						}
+					});
+					pnlGeneral.add(btnAddUitsluitRegex, "cell 1 3,alignx center");
+				}
+				{
+					JScrollPane scrollPane = new JScrollPane();
+					pnlGeneral.add(scrollPane, "cell 1 4 2 1,grow");
+					{
+						excludeList = new JListWithImages();
 
-        }
-      }
+						scrollPane.setViewportView(excludeList);
+					}
+				}
+				{
+					JLabel lblNewUpdateCheck =
+							new JLabel(Messages.getString("PreferenceDialog.NewUpdateCheck"));
+					pnlGeneral.add(lblNewUpdateCheck, "cell 0 5 2 1");
+				}
+				{
+					cbxUpdateCheckPeriod = new JComboBox<UpdateCheckPeriod>();
+					cbxUpdateCheckPeriod.setModel(new DefaultComboBoxModel<UpdateCheckPeriod>(
+							UpdateCheckPeriod.values()));
+					pnlGeneral.add(cbxUpdateCheckPeriod, "cell 2 5,growx");
+				}
+				{
+					JPanel pnlProxySettings = new JPanel();
+					pnlGeneral.add(pnlProxySettings, "cell 0 6 3 1,grow");
+					pnlProxySettings.setLayout(new MigLayout("", "[50px:n][][grow][grow]", "[][][][]"));
+					pnlProxySettings.add(new JLabel(Messages.getString("PreferenceDialog.ConfigureProxy")),
+							"cell 0 0 4 1,gapy 5");
+					pnlProxySettings.add(new JSeparator(), "cell 0 0 4 1,growx,gapy 5");
+					{
+						chkProxyserverGebruiken =
+								new JCheckBox(Messages.getString("PreferenceDialog.UseProxyServer"));
+						pnlProxySettings.add(chkProxyserverGebruiken, "cell 0 1 3 1");
+					}
+					{
+						JLabel lblProxyHost = new JLabel(Messages.getString("PreferenceDialog.Hostname"));
+						pnlProxySettings.add(lblProxyHost, "cell 1 2,alignx trailing");
+					}
+					{
+						txtProxyHost = new JTextField();
+						pnlProxySettings.add(txtProxyHost, "cell 2 2,growx");
+						txtProxyHost.setColumns(10);
+					}
+					{
+						JLabel lblProxyPoort = new JLabel(Messages.getString("PreferenceDialog.Port"));
+						pnlProxySettings.add(lblProxyPoort, "cell 1 3,alignx trailing");
+					}
+					{
+						txtProxyPort = new JTextField();
+						pnlProxySettings.add(txtProxyPort, "cell 2 3,growx");
+						txtProxyPort.setColumns(10);
+					}
 
-      {
-        pnlEpisodeLibrary =
-            new EpisodeLibraryPanel(settingsCtrl.getSettings().getEpisodeLibrarySettings(), manager, false);
-        tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieLibrary"), null,
-            pnlEpisodeLibrary, null);
-      }
-      {
-        pnlMovieLibrary =
-            new MovieLibraryPanel(settingsCtrl.getSettings().getMovieLibrarySettings(), manager, false);
-        tabbedPane.addTab(Messages.getString("PreferenceDialog.MovieLibrary"), null,
-            pnlMovieLibrary, null);
-      }
-      {
-        JPanel pnlOptions = new JPanel();
-        tabbedPane.addTab(Messages.getString("PreferenceDialog.Options"), null, pnlOptions, null);
-        pnlOptions.setLayout(new MigLayout("", "[][433px,grow][433px,grow][100px,grow][]",
-            "[][][][][grow][][25px][][][][23px][][23px][][]"));
-        pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.DownloadOptions")),
-            "cell 0 0 5 1");
-        pnlOptions.add(new JSeparator(), "cell 0 0 5 1,growx");
-        chkAlwaysConfirm =
-            new JCheckBox(Messages.getString("PreferenceDialog.CheckBeforeDownloading"));
-        pnlOptions.add(chkAlwaysConfirm, "cell 1 1 3 1,grow");
-        {
-          chkMinScoreSelection =
-              new JCheckBox(Messages.getString("PreferenceDialog.MinAutomaticScoreSelection"));
-          pnlOptions.add(chkMinScoreSelection, "cell 1 2");
-        }
-        {
-          sldMinScoreSelection = new JSlider();
-          sldMinScoreSelection.setMinimum(0);
-          sldMinScoreSelection.setMaximum(100);
-          pnlOptions.add(sldMinScoreSelection, "cell 2 2");
-        }
-        {
-          chkDefaultSelection =
-              new JCheckBox(Messages.getString("PreferenceDialog.DefaultSelection"));
-          chkDefaultSelection.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-              pnlDefaultSelection.setEnabled(chkDefaultSelection.isSelected());
-            }
-          });
-          pnlOptions.add(chkDefaultSelection, "cell 1 3");
-        }
-        {
-          pnlDefaultSelection = new DefaultSelectionPanel();
-          pnlDefaultSelection.setEnabled(false);
-          pnlOptions.add(pnlDefaultSelection, "cell 1 4 2 1,grow");
-        }
-        pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.SearchFilter")),
-            "cell 0 5 5 1");
-        pnlOptions.add(new JSeparator(), "cell 0 5 5 1,growx");
-        chkSubtitleExactMethod =
-            new JCheckBox(Messages.getString("PreferenceDialog.SearchFilterExact"));
-        pnlOptions.add(chkSubtitleExactMethod, "cell 1 6 3 1,grow");
-        {
-          chkSubtitleKeywordMethod =
-              new JCheckBox(Messages.getString("PreferenceDialog.SearchFilterKeyword"));
-          pnlOptions.add(chkSubtitleKeywordMethod, "cell 1 7 3 1");
-        }
-        {
-          chkExcludeHearingImpaired =
-              new JCheckBox(Messages.getString("PreferenceDialog.ExcludeHearingImpaired"));
-          pnlOptions.add(chkExcludeHearingImpaired, "cell 1 8 3 1");
-        }
-        pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.TableOptions")),
-            "cell 0 9 5 1");
-        pnlOptions.add(new JSeparator(), "cell 0 9 5 1,growx");
-        chkOnlyFound = new JCheckBox(Messages.getString("PreferenceDialog.ShowOnlyFound"));
-        pnlOptions.add(chkOnlyFound, "cell 1 10 3 1,growx,aligny center");
-        pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.ErrorHandlingOption")),
-            "cell 0 11 5 1");
-        pnlOptions.add(new JSeparator(), "cell 0 11 5 1,growx");
-        chkStopOnSearchError = new JCheckBox(Messages.getString("PreferenceDialog.StopAfterError"));
-        pnlOptions.add(chkStopOnSearchError, "cell 1 12 3 1,alignx left,aligny center");
-        {
-          JLabel label = new JLabel(Messages.getString("PreferenceDialog.SerieDatabaseSource"));
-          pnlOptions.add(label, "cell 0 13 5 1");
-          pnlOptions.add(new JSeparator(), "cell 0 13 5 1,growx");
-        }
-        {
-          cbxEpisodeProcessSource = new JComboBox<SettingsProcessEpisodeSource>();
-          cbxEpisodeProcessSource.setModel(new DefaultComboBoxModel<SettingsProcessEpisodeSource>(
-              SettingsProcessEpisodeSource.values()));
-          cbxEpisodeProcessSource.setEnabled(false);
-          pnlOptions.add(cbxEpisodeProcessSource, "cell 1 14,growx");
-        }
-      }
-      {
+				}
+			}
 
-        JPanel pnlSerieSources = new JPanel();
-        tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieSources"), null,
-            pnlSerieSources, null);
-        pnlSerieSources.setLayout(new MigLayout("", "[grow]", "[][top][]"));
-        JPanel pnlSerieSourcesSelectionSettings = new JPanel();
-        pnlSerieSources.add(pnlSerieSourcesSelectionSettings, "cell 0 0 3 1,grow");
-        pnlSerieSourcesSelectionSettings.setLayout(new MigLayout("",
-            "[50px:n][][100.00,grow][grow][grow]", "[][][][][][][]"));
-        pnlSerieSourcesSelectionSettings.add(new JLabel("Selecteer de gewenste providers"),
-            "cell 0 0 5 1,gapy 5");
-        pnlSerieSources.add(pnlSerieSourcesSelectionSettings, "cell 0 0 3 1,grow");
-        pnlSerieSourcesSelectionSettings.add(new JSeparator(), "cell 0 0 5 1,growx,gapy 5");
+			{
+				pnlEpisodeLibrary =
+						new EpisodeLibraryPanel(settingsCtrl.getSettings().getEpisodeLibrarySettings(), manager, false);
+				tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieLibrary"), null,
+						pnlEpisodeLibrary, null);
+			}
+			{
+				pnlMovieLibrary =
+						new MovieLibraryPanel(settingsCtrl.getSettings().getMovieLibrarySettings(), manager, false);
+				tabbedPane.addTab(Messages.getString("PreferenceDialog.MovieLibrary"), null,
+						pnlMovieLibrary, null);
+			}
+			{
+				JPanel pnlOptions = new JPanel();
+				tabbedPane.addTab(Messages.getString("PreferenceDialog.Options"), null, pnlOptions, null);
+				pnlOptions.setLayout(new MigLayout("", "[][433px,grow][433px,grow][100px,grow][]",
+						"[][][][][grow][][25px][][][][23px][][23px][][]"));
+				pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.DownloadOptions")),
+						"cell 0 0 5 1");
+				pnlOptions.add(new JSeparator(), "cell 0 0 5 1,growx");
+				chkAlwaysConfirm =
+						new JCheckBox(Messages.getString("PreferenceDialog.CheckBeforeDownloading"));
+				pnlOptions.add(chkAlwaysConfirm, "cell 1 1 3 1,grow");
+				{
+					chkMinScoreSelection =
+							new JCheckBox(Messages.getString("PreferenceDialog.MinAutomaticScoreSelection"));
+					pnlOptions.add(chkMinScoreSelection, "cell 1 2");
+				}
+				{
+					sldMinScoreSelection = new JSlider();
+					sldMinScoreSelection.setMinimum(0);
+					sldMinScoreSelection.setMaximum(100);
+					pnlOptions.add(sldMinScoreSelection, "cell 2 2");
+				}
+				{
+					chkDefaultSelection =
+							new JCheckBox(Messages.getString("PreferenceDialog.DefaultSelection"));
+					chkDefaultSelection.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							pnlDefaultSelection.setEnabled(chkDefaultSelection.isSelected());
+						}
+					});
+					pnlOptions.add(chkDefaultSelection, "cell 1 3");
+				}
+				{
+					pnlDefaultSelection = new DefaultSelectionPanel();
+					pnlDefaultSelection.setEnabled(false);
+					pnlOptions.add(pnlDefaultSelection, "cell 1 4 2 1,grow");
+				}
+				pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.SearchFilter")),
+						"cell 0 5 5 1");
+				pnlOptions.add(new JSeparator(), "cell 0 5 5 1,growx");
+				chkSubtitleExactMethod =
+						new JCheckBox(Messages.getString("PreferenceDialog.SearchFilterExact"));
+				pnlOptions.add(chkSubtitleExactMethod, "cell 1 6 3 1,grow");
+				{
+					chkSubtitleKeywordMethod =
+							new JCheckBox(Messages.getString("PreferenceDialog.SearchFilterKeyword"));
+					pnlOptions.add(chkSubtitleKeywordMethod, "cell 1 7 3 1");
+				}
+				{
+					chkExcludeHearingImpaired =
+							new JCheckBox(Messages.getString("PreferenceDialog.ExcludeHearingImpaired"));
+					pnlOptions.add(chkExcludeHearingImpaired, "cell 1 8 3 1");
+				}
+				pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.TableOptions")),
+						"cell 0 9 5 1");
+				pnlOptions.add(new JSeparator(), "cell 0 9 5 1,growx");
+				chkOnlyFound = new JCheckBox(Messages.getString("PreferenceDialog.ShowOnlyFound"));
+				pnlOptions.add(chkOnlyFound, "cell 1 10 3 1,growx,aligny center");
+				pnlOptions.add(new JLabel(Messages.getString("PreferenceDialog.ErrorHandlingOption")),
+						"cell 0 11 5 1");
+				pnlOptions.add(new JSeparator(), "cell 0 11 5 1,growx");
+				chkStopOnSearchError = new JCheckBox(Messages.getString("PreferenceDialog.StopAfterError"));
+				pnlOptions.add(chkStopOnSearchError, "cell 1 12 3 1,alignx left,aligny center");
+				{
+					JLabel label = new JLabel(Messages.getString("PreferenceDialog.SerieDatabaseSource"));
+					pnlOptions.add(label, "cell 0 13 5 1");
+					pnlOptions.add(new JSeparator(), "cell 0 13 5 1,growx");
+				}
+				{
+					cbxEpisodeProcessSource = new JComboBox<SettingsProcessEpisodeSource>();
+					cbxEpisodeProcessSource.setModel(new DefaultComboBoxModel<SettingsProcessEpisodeSource>(
+							SettingsProcessEpisodeSource.values()));
+					cbxEpisodeProcessSource.setEnabled(false);
+					pnlOptions.add(cbxEpisodeProcessSource, "cell 1 14,growx");
+				}
+			}
+			{
 
-        chkSerieSourceAddic7ed = new JCheckBox("Addic7ed");
-        pnlSerieSourcesSelectionSettings.add(chkSerieSourceAddic7ed, "cell 0 1 2 1");
-        chkSerieSourceTvSubtitles = new JCheckBox("Tv Subtitles");
-        pnlSerieSourcesSelectionSettings.add(chkSerieSourceTvSubtitles, "cell 0 2 2 1");
-        chkSerieSourcePodnapisi = new JCheckBox("Podnapisi");
-        pnlSerieSourcesSelectionSettings.add(chkSerieSourcePodnapisi, "cell 0 3 2 1");
-        chkSerieSourceOpensubtitles = new JCheckBox("Opensubtitles");
-        pnlSerieSourcesSelectionSettings.add(chkSerieSourceOpensubtitles, "cell 0 4 2 1");
-        chkSerieSourceLocal = new JCheckBox("Lokaal");
-        pnlSerieSourcesSelectionSettings.add(chkSerieSourceLocal, "cell 0 5 2 1");
-        {
-          chkSerieSourceSubsMax = new JCheckBox("SubsMax");
-          pnlSerieSourcesSelectionSettings.add(chkSerieSourceSubsMax, "cell 0 6");
-        }
-        JPanel pnlAddic7edLoginSettings = new JPanel();
-        pnlSerieSources.add(pnlAddic7edLoginSettings, "cell 0 1 3 1,grow");
-        pnlAddic7edLoginSettings.setLayout(new MigLayout("", "[50px:n][][grow][grow]", "[][][][]"));
-        pnlAddic7edLoginSettings
-            .add(new JLabel(Messages.getString("PreferenceDialog.Addic7edLogin")),
-                "cell 0 0 4 1,gapy 5");
-        pnlAddic7edLoginSettings.add(new JSeparator(), "cell 0 0 4 1,growx,gapy 5");
-        {
-          chkUserAddic7edLogin =
-              new JCheckBox(Messages.getString("PreferenceDialog.UseAddic7edLogin"));
-          pnlAddic7edLoginSettings.add(chkUserAddic7edLogin, "cell 0 1 3 1");
-        }
-        {
-          JLabel lblUsername = new JLabel(Messages.getString("PreferenceDialog.Username"));
-          pnlAddic7edLoginSettings.add(lblUsername, "cell 1 2,alignx trailing");
-        }
-        {
-          txtAddic7edUsername = new JTextField();
-          pnlAddic7edLoginSettings.add(txtAddic7edUsername, "cell 2 2,growx");
-          txtAddic7edUsername.setColumns(10);
-        }
-        {
-          JLabel lblAddic7edPassword = new JLabel(Messages.getString("PreferenceDialog.Password"));
-          pnlAddic7edLoginSettings.add(lblAddic7edPassword, "cell 1 3,alignx trailing");
-        }
-        {
-          txtAddic7edPassword = new JTextField();
-          pnlAddic7edLoginSettings.add(txtAddic7edPassword, "cell 2 3,growx");
-          txtAddic7edPassword.setColumns(10);
-        }
-        JPanel pnlLocalSourcesSettings = new JPanel();
-        pnlSerieSources.add(pnlLocalSourcesSettings, "cell 0 2 3 1,grow");
-        pnlLocalSourcesSettings.setLayout(new MigLayout("", "[][][][grow]", "[][][]"));
-        pnlLocalSourcesSettings.add(
-            new JLabel(Messages.getString("PreferenceDialog.LocalFolders")), "cell 0 0 5 1,gapy 5");
-        pnlLocalSourcesSettings.add(new JSeparator(), "cell 0 0 5 1,growx,gapy 5");
+				JPanel pnlSerieSources = new JPanel();
+				tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieSources"), null,
+						pnlSerieSources, null);
+				pnlSerieSources.setLayout(new MigLayout("", "[grow]", "[][top][]"));
+				JPanel pnlSerieSourcesSelectionSettings = new JPanel();
+				pnlSerieSources.add(pnlSerieSourcesSelectionSettings, "cell 0 0 3 1,grow");
+				pnlSerieSourcesSelectionSettings.setLayout(new MigLayout("",
+						"[50px:n][][100.00,grow][grow][grow]", "[][][][][][][]"));
+				pnlSerieSourcesSelectionSettings.add(new JLabel("Selecteer de gewenste providers"),
+						"cell 0 0 5 1,gapy 5");
+				pnlSerieSources.add(pnlSerieSourcesSelectionSettings, "cell 0 0 3 1,grow");
+				pnlSerieSourcesSelectionSettings.add(new JSeparator(), "cell 0 0 5 1,growx,gapy 5");
 
-        {
-          JLabel lblLocalSources =
-              new JLabel(Messages.getString("PreferenceDialog.LocalFolderWithSubtitles"));
-          pnlLocalSourcesSettings.add(lblLocalSources, "cell 0 1,alignx left,aligny center");
-        }
-        {
-          JButton btnBrowseLocalSources =
-              new JButton(Messages.getString("PreferenceDialog.AddFolder"));
-          btnBrowseLocalSources.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              File path =
-                  MemoryFolderChooser.getInstance().selectDirectory(getContentPane(),
-                      Messages.getString("PreferenceDialog.SelectFolder"));
-              if (localSourcesFoldersList.getModel().getSize() == 0) {
-                localSourcesFoldersList.addItem(SettingsExcludeType.FOLDER, path.getAbsolutePath());
-              } else {
-                boolean exists = false;
-                for (int i = 0; i < localSourcesFoldersList.getModel().getSize(); i++) {
-                  if (localSourcesFoldersList.getDescription(i) != null
-                      && localSourcesFoldersList.getDescription(i).equals(path.getAbsolutePath())) {
-                    exists = true;
-                  }
-                }
-                if (!exists) {
-                  localSourcesFoldersList.addItem(SettingsExcludeType.FOLDER,
-                      path.getAbsolutePath());
-                }
-              }
-            }
-          });
-          pnlLocalSourcesSettings.add(btnBrowseLocalSources, "cell 1 1,alignx left,aligny top");
-        }
-        {
-          JButton btnRemoveLocalSources =
-              new JButton(Messages.getString("PreferenceDialog.DeleteFolder"));
-          btnRemoveLocalSources.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              DefaultListModel<JPanel> model =
-                  (DefaultListModel<JPanel>) localSourcesFoldersList.getModel();
-              int selected = localSourcesFoldersList.getSelectedIndex();
-              if (model.size() > 0 && selected >= 0) {
-                model.removeElementAt(selected);
-              }
-            }
-          });
-          pnlLocalSourcesSettings.add(btnRemoveLocalSources, "cell 2 1");
-        }
-        {
-          JScrollPane scrlPlocalSources = new JScrollPane();
-          pnlLocalSourcesSettings.add(scrlPlocalSources, "cell 1 2 2 1,grow");
-          {
-            localSourcesFoldersList = new JListWithImages();
-            scrlPlocalSources.setViewportView(localSourcesFoldersList);
-          }
-        }
-      }
-    }
-    {
-      JPanel buttonPane = new JPanel();
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-      getContentPane().add(buttonPane, BorderLayout.SOUTH);
-      {
-        JButton okButton = new JButton(Messages.getString("PreferenceDialog.OK"));
-        okButton.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent arg0) {
-            testAndSaveValues();
-          }
-        });
-        okButton.setActionCommand(Messages.getString("PreferenceDialog.OK"));
-        buttonPane.add(okButton);
-        getRootPane().setDefaultButton(okButton);
-      }
-      {
-        JButton cancelButton = new JButton(Messages.getString("PreferenceDialog.Cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent arg0) {
-            setVisible(false);
-          }
-        });
-        cancelButton.setActionCommand("Cancel");
-        buttonPane.add(cancelButton);
-      }
-    }
-  }
+				chkSerieSourceAddic7ed = new JCheckBox("Addic7ed");
+				pnlSerieSourcesSelectionSettings.add(chkSerieSourceAddic7ed, "cell 0 1 2 1");
+				chkSerieSourceTvSubtitles = new JCheckBox("Tv Subtitles");
+				pnlSerieSourcesSelectionSettings.add(chkSerieSourceTvSubtitles, "cell 0 2 2 1");
+				chkSerieSourcePodnapisi = new JCheckBox("Podnapisi");
+				pnlSerieSourcesSelectionSettings.add(chkSerieSourcePodnapisi, "cell 0 3 2 1");
+				chkSerieSourceOpensubtitles = new JCheckBox("Opensubtitles");
+				pnlSerieSourcesSelectionSettings.add(chkSerieSourceOpensubtitles, "cell 0 4 2 1");
+				chkSerieSourceLocal = new JCheckBox("Lokaal");
+				pnlSerieSourcesSelectionSettings.add(chkSerieSourceLocal, "cell 0 5 2 1");
+				{
+					chkSerieSourceSubsMax = new JCheckBox("SubsMax");
+					pnlSerieSourcesSelectionSettings.add(chkSerieSourceSubsMax, "cell 0 6");
+				}
+				JPanel pnlAddic7edLoginSettings = new JPanel();
+				pnlSerieSources.add(pnlAddic7edLoginSettings, "cell 0 1 3 1,grow");
+				pnlAddic7edLoginSettings.setLayout(new MigLayout("", "[50px:n][][grow][grow]", "[][][][]"));
+				pnlAddic7edLoginSettings
+						.add(new JLabel(Messages.getString("PreferenceDialog.Addic7edLogin")),
+								"cell 0 0 4 1,gapy 5");
+				pnlAddic7edLoginSettings.add(new JSeparator(), "cell 0 0 4 1,growx,gapy 5");
+				{
+					chkUserAddic7edLogin =
+							new JCheckBox(Messages.getString("PreferenceDialog.UseAddic7edLogin"));
+					pnlAddic7edLoginSettings.add(chkUserAddic7edLogin, "cell 0 1 3 1");
+				}
+				{
+					JLabel lblUsername = new JLabel(Messages.getString("PreferenceDialog.Username"));
+					pnlAddic7edLoginSettings.add(lblUsername, "cell 1 2,alignx trailing");
+				}
+				{
+					txtAddic7edUsername = new JTextField();
+					pnlAddic7edLoginSettings.add(txtAddic7edUsername, "cell 2 2,growx");
+					txtAddic7edUsername.setColumns(10);
+				}
+				{
+					JLabel lblAddic7edPassword = new JLabel(Messages.getString("PreferenceDialog.Password"));
+					pnlAddic7edLoginSettings.add(lblAddic7edPassword, "cell 1 3,alignx trailing");
+				}
+				{
+					txtAddic7edPassword = new JTextField();
+					pnlAddic7edLoginSettings.add(txtAddic7edPassword, "cell 2 3,growx");
+					txtAddic7edPassword.setColumns(10);
+				}
+				JPanel pnlLocalSourcesSettings = new JPanel();
+				pnlSerieSources.add(pnlLocalSourcesSettings, "cell 0 2 3 1,grow");
+				pnlLocalSourcesSettings.setLayout(new MigLayout("", "[][][][grow]", "[][][]"));
+				pnlLocalSourcesSettings.add(
+						new JLabel(Messages.getString("PreferenceDialog.LocalFolders")), "cell 0 0 5 1,gapy 5");
+				pnlLocalSourcesSettings.add(new JSeparator(), "cell 0 0 5 1,growx,gapy 5");
 
-  private void setPreferenceSettings() {
-    for (int i = 0; i < settingsCtrl.getSettings().getExcludeList().size(); i++) {
-      excludeList.addItem(settingsCtrl.getSettings().getExcludeList().get(i).getType(),
-          settingsCtrl.getSettings().getExcludeList().get(i).getDescription());
-    }
-    for (int i = 0; i < settingsCtrl.getSettings().getDefaultIncomingFolders().size(); i++) {
-      defaultIncomingFoldersList.addItem(SettingsExcludeType.FOLDER, settingsCtrl.getSettings()
-          .getDefaultIncomingFolders().get(i).getAbsolutePath());
-    }
-    for (int i = 0; i < settingsCtrl.getSettings().getLocalSourcesFolders().size(); i++) {
-      localSourcesFoldersList.addItem(SettingsExcludeType.FOLDER, settingsCtrl.getSettings()
-          .getLocalSourcesFolders().get(i).getAbsolutePath());
-    }
-    chkProxyserverGebruiken.setSelected(settingsCtrl.getSettings().isGeneralProxyEnabled());
-    txtProxyHost.setText(settingsCtrl.getSettings().getGeneralProxyHost());
-    txtProxyPort.setText(String.valueOf(settingsCtrl.getSettings().getGeneralProxyPort()));
-    chkAlwaysConfirm.setSelected(settingsCtrl.getSettings().isOptionsAlwaysConfirm());
-    chkMinScoreSelection.setSelected(settingsCtrl.getSettings().isOptionsMinAutomaticSelection());
-    sldMinScoreSelection
-        .setValue(settingsCtrl.getSettings().getOptionsMinAutomaticSelectionValue());
-    chkSubtitleExactMethod.setSelected(settingsCtrl.getSettings().isOptionSubtitleExactMatch());
-    chkSubtitleKeywordMethod.setSelected(settingsCtrl.getSettings().isOptionSubtitleKeywordMatch());
-    chkExcludeHearingImpaired.setSelected(settingsCtrl.getSettings()
-        .isOptionSubtitleExcludeHearingImpaired());
-    chkOnlyFound.setSelected(settingsCtrl.getSettings().isOptionsShowOnlyFound());
-    chkStopOnSearchError.setSelected(settingsCtrl.getSettings().isOptionsStopOnSearchError());
-    cbxEpisodeProcessSource.setSelectedItem(settingsCtrl.getSettings().getProcessEpisodeSource());
-    pnlEpisodeLibrary.setLibrarySettings(settingsCtrl.getSettings().getEpisodeLibrarySettings());
-    pnlMovieLibrary.setLibrarySettings(settingsCtrl.getSettings().getMovieLibrarySettings());
-    chkUserAddic7edLogin.setSelected(settingsCtrl.getSettings().isLoginAddic7edEnabled());
-    txtAddic7edUsername.setText(settingsCtrl.getSettings().getLoginAddic7edUsername());
-    txtAddic7edPassword.setText(settingsCtrl.getSettings().getLoginAddic7edPassword());
-    chkSerieSourceAddic7ed.setSelected(settingsCtrl.getSettings().isSerieSourceAddic7ed());
-    chkSerieSourceTvSubtitles.setSelected(settingsCtrl.getSettings().isSerieSourceTvSubtitles());
-    chkSerieSourcePodnapisi.setSelected(settingsCtrl.getSettings().isSerieSourcePodnapisi());
-    chkSerieSourceOpensubtitles
-        .setSelected(settingsCtrl.getSettings().isSerieSourceOpensubtitles());
-    chkSerieSourceLocal.setSelected(settingsCtrl.getSettings().isSerieSourceLocal());
-    chkSerieSourceSubsMax.setSelected(settingsCtrl.getSettings().isSerieSourceSubsMax());
-    cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.getSettings().getUpdateCheckPeriod());
-    chkDefaultSelection.setSelected(settingsCtrl.getSettings().isOptionsDefaultSelection());
-    pnlDefaultSelection.setDefaultSelectionList(settingsCtrl.getSettings()
-        .getOptionsDefaultSelectionQualityList());
-  }
+				{
+					JLabel lblLocalSources =
+							new JLabel(Messages.getString("PreferenceDialog.LocalFolderWithSubtitles"));
+					pnlLocalSourcesSettings.add(lblLocalSources, "cell 0 1,alignx left,aligny center");
+				}
+				{
+					JButton btnBrowseLocalSources =
+							new JButton(Messages.getString("PreferenceDialog.AddFolder"));
+					btnBrowseLocalSources.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							File path =
+									MemoryFolderChooser.getInstance().selectDirectory(getContentPane(),
+											Messages.getString("PreferenceDialog.SelectFolder"));
+							if (localSourcesFoldersList.getModel().getSize() == 0) {
+								localSourcesFoldersList.addItem(SettingsExcludeType.FOLDER, path.getAbsolutePath());
+							} else {
+								boolean exists = false;
+								for (int i = 0; i < localSourcesFoldersList.getModel().getSize(); i++) {
+									if (localSourcesFoldersList.getDescription(i) != null
+											&& localSourcesFoldersList.getDescription(i).equals(path.getAbsolutePath())) {
+										exists = true;
+									}
+								}
+								if (!exists) {
+									localSourcesFoldersList.addItem(SettingsExcludeType.FOLDER,
+											path.getAbsolutePath());
+								}
+							}
+						}
+					});
+					pnlLocalSourcesSettings.add(btnBrowseLocalSources, "cell 1 1,alignx left,aligny top");
+				}
+				{
+					JButton btnRemoveLocalSources =
+							new JButton(Messages.getString("PreferenceDialog.DeleteFolder"));
+					btnRemoveLocalSources.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							DefaultListModel<JPanel> model =
+									(DefaultListModel<JPanel>) localSourcesFoldersList.getModel();
+							int selected = localSourcesFoldersList.getSelectedIndex();
+							if (model.size() > 0 && selected >= 0) {
+								model.removeElementAt(selected);
+							}
+						}
+					});
+					pnlLocalSourcesSettings.add(btnRemoveLocalSources, "cell 2 1");
+				}
+				{
+					JScrollPane scrlPlocalSources = new JScrollPane();
+					pnlLocalSourcesSettings.add(scrlPlocalSources, "cell 1 2 2 1,grow");
+					{
+						localSourcesFoldersList = new JListWithImages();
+						scrlPlocalSources.setViewportView(localSourcesFoldersList);
+					}
+				}
+			}
+		}
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton okButton = new JButton(Messages.getString("PreferenceDialog.OK"));
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						testAndSaveValues();
+					}
+				});
+				okButton.setActionCommand(Messages.getString("PreferenceDialog.OK"));
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+			}
+			{
+				JButton cancelButton = new JButton(Messages.getString("PreferenceDialog.Cancel"));
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						setVisible(false);
+					}
+				});
+				cancelButton.setActionCommand("Cancel");
+				buttonPane.add(cancelButton);
+			}
+		}
+	}
 
-  protected boolean testOptionsTab() {
-    return true;
-  }
+	private void setPreferenceSettings() {
+		for (int i = 0; i < settingsCtrl.getSettings().getExcludeList().size(); i++) {
+			excludeList.addItem(settingsCtrl.getSettings().getExcludeList().get(i).getType(),
+					settingsCtrl.getSettings().getExcludeList().get(i).getDescription());
+		}
+		for (int i = 0; i < settingsCtrl.getSettings().getDefaultIncomingFolders().size(); i++) {
+			defaultIncomingFoldersList.addItem(SettingsExcludeType.FOLDER, settingsCtrl.getSettings()
+					.getDefaultIncomingFolders().get(i).getAbsolutePath());
+		}
+		for (int i = 0; i < settingsCtrl.getSettings().getLocalSourcesFolders().size(); i++) {
+			localSourcesFoldersList.addItem(SettingsExcludeType.FOLDER, settingsCtrl.getSettings()
+					.getLocalSourcesFolders().get(i).getAbsolutePath());
+		}
+		chkProxyserverGebruiken.setSelected(settingsCtrl.getSettings().isGeneralProxyEnabled());
+		txtProxyHost.setText(settingsCtrl.getSettings().getGeneralProxyHost());
+		txtProxyPort.setText(String.valueOf(settingsCtrl.getSettings().getGeneralProxyPort()));
+		chkAlwaysConfirm.setSelected(settingsCtrl.getSettings().isOptionsAlwaysConfirm());
+		chkMinScoreSelection.setSelected(settingsCtrl.getSettings().isOptionsMinAutomaticSelection());
+		sldMinScoreSelection
+				.setValue(settingsCtrl.getSettings().getOptionsMinAutomaticSelectionValue());
+		chkSubtitleExactMethod.setSelected(settingsCtrl.getSettings().isOptionSubtitleExactMatch());
+		chkSubtitleKeywordMethod.setSelected(settingsCtrl.getSettings().isOptionSubtitleKeywordMatch());
+		chkExcludeHearingImpaired.setSelected(settingsCtrl.getSettings()
+				.isOptionSubtitleExcludeHearingImpaired());
+		chkOnlyFound.setSelected(settingsCtrl.getSettings().isOptionsShowOnlyFound());
+		chkStopOnSearchError.setSelected(settingsCtrl.getSettings().isOptionsStopOnSearchError());
+		cbxEpisodeProcessSource.setSelectedItem(settingsCtrl.getSettings().getProcessEpisodeSource());
+		pnlEpisodeLibrary.setLibrarySettings(settingsCtrl.getSettings().getEpisodeLibrarySettings());
+		pnlMovieLibrary.setLibrarySettings(settingsCtrl.getSettings().getMovieLibrarySettings());
+		chkUserAddic7edLogin.setSelected(settingsCtrl.getSettings().isLoginAddic7edEnabled());
+		txtAddic7edUsername.setText(settingsCtrl.getSettings().getLoginAddic7edUsername());
+		txtAddic7edPassword.setText(settingsCtrl.getSettings().getLoginAddic7edPassword());
+		chkSerieSourceAddic7ed.setSelected(settingsCtrl.getSettings().isSerieSourceAddic7ed());
+		chkSerieSourceTvSubtitles.setSelected(settingsCtrl.getSettings().isSerieSourceTvSubtitles());
+		chkSerieSourcePodnapisi.setSelected(settingsCtrl.getSettings().isSerieSourcePodnapisi());
+		chkSerieSourceOpensubtitles
+				.setSelected(settingsCtrl.getSettings().isSerieSourceOpensubtitles());
+		chkSerieSourceLocal.setSelected(settingsCtrl.getSettings().isSerieSourceLocal());
+		chkSerieSourceSubsMax.setSelected(settingsCtrl.getSettings().isSerieSourceSubsMax());
+		cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.getSettings().getUpdateCheckPeriod());
+		chkDefaultSelection.setSelected(settingsCtrl.getSettings().isOptionsDefaultSelection());
+		pnlDefaultSelection.setDefaultSelectionList(settingsCtrl.getSettings()
+				.getOptionsDefaultSelectionQualityList());
+	}
 
-  protected boolean testGeneralTab() {
-    try {
-      Integer.parseInt(txtProxyPort.getText());
-    } catch (Exception e) {
-      String message = Messages.getString("PreferenceDialog.ProxyPortNumericRequired");
-      JOptionPane.showConfirmDialog(this, message, Messages.getString("PreferenceDialog.Name"),
-          JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
-      LOGGER.debug("testGeneralTab: De proxy poort moet een numerische waarde zijn!");
-      return false;
-    }
-    return true;
-  }
+	protected boolean testOptionsTab() {
+		return true;
+	}
 
-  protected boolean testSerieSourcesTab() {
-    if (chkUserAddic7edLogin.isSelected()) {
-      if (txtAddic7edUsername.getText().isEmpty() || txtAddic7edPassword.getText().isEmpty()) {
-        String message =
-            Messages.getString("PreferenceDialog.Addic7edLoginSelectEnterUsernamePassword");
-        JOptionPane.showConfirmDialog(this, message, Messages.getString("PreferenceDialog.Name"),
-            JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
-        LOGGER.debug("testSerieSourcesTab: Addic7ed login geselecteerd! Gelieve een username en pasword in te vullen.");
-        return false;
-      }
-    }
-    return true;
-  }
+	protected boolean testGeneralTab() {
+		try {
+			Integer.parseInt(txtProxyPort.getText());
+		} catch (Exception e) {
+			String message = Messages.getString("PreferenceDialog.ProxyPortNumericRequired");
+			JOptionPane.showConfirmDialog(this, message, Messages.getString("PreferenceDialog.Name"),
+					JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+			LOGGER.debug("testGeneralTab: De proxy poort moet een numerische waarde zijn!");
+			return false;
+		}
+		return true;
+	}
 
-  private void addExcludeItem(SettingsExcludeType seType) {
-    if (seType == SettingsExcludeType.FOLDER) {
-      File path =
-          MemoryFolderChooser.getInstance().selectDirectory(getContentPane(),
-              Messages.getString("PreferenceDialog.SelectExcludeFolder"));
-      excludeList.addItem(seType, path.getAbsolutePath());
-    } else if (seType == SettingsExcludeType.REGEX) {
-      String regex = JOptionPane.showInputDialog(Messages.getString("PreferenceDialog.EnterRegex"));
-      excludeList.addItem(seType, regex);
-    }
-  }
+	protected boolean testSerieSourcesTab() {
+		if (chkUserAddic7edLogin.isSelected()) {
+			if (txtAddic7edUsername.getText().isEmpty() || txtAddic7edPassword.getText().isEmpty()) {
+				String message =
+						Messages.getString("PreferenceDialog.Addic7edLoginSelectEnterUsernamePassword");
+				JOptionPane.showConfirmDialog(this, message, Messages.getString("PreferenceDialog.Name"),
+						JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+				LOGGER.debug("testSerieSourcesTab: Addic7ed login geselecteerd! Gelieve een username en pasword in te vullen.");
+				return false;
+			}
+		}
+		return true;
+	}
 
-  private void removeExcludeItem() {
-    DefaultListModel<JPanel> model = (DefaultListModel<JPanel>) excludeList.getModel();
-    int selected = excludeList.getSelectedIndex();
-    if (model.size() > 0 && selected >= 0) {
-      model.removeElementAt(selected);
-    }
-  }
+	private void addExcludeItem(SettingsExcludeType seType) {
+		if (seType == SettingsExcludeType.FOLDER) {
+			File path =
+					MemoryFolderChooser.getInstance().selectDirectory(getContentPane(),
+							Messages.getString("PreferenceDialog.SelectExcludeFolder"));
+			excludeList.addItem(seType, path.getAbsolutePath());
+		} else if (seType == SettingsExcludeType.REGEX) {
+			String regex = JOptionPane.showInputDialog(Messages.getString("PreferenceDialog.EnterRegex"));
+			excludeList.addItem(seType, regex);
+		}
+	}
 
-  private void testAndSaveValues() {
-    boolean status = true;
-    if (testGeneralTab()) {
-      ArrayList<File> folList = new ArrayList<File>();
-      for (int i = 0; i < defaultIncomingFoldersList.getModel().getSize(); i++) {
-        folList.add(new File(defaultIncomingFoldersList.getDescription(i)));
-      }
-      settingsCtrl.getSettings().setDefaultIncomingFolders(folList);
+	private void removeExcludeItem() {
+		DefaultListModel<JPanel> model = (DefaultListModel<JPanel>) excludeList.getModel();
+		int selected = excludeList.getSelectedIndex();
+		if (model.size() > 0 && selected >= 0) {
+			model.removeElementAt(selected);
+		}
+	}
 
-      ArrayList<SettingsExcludeItem> list = new ArrayList<SettingsExcludeItem>();
-      for (int i = 0; i < excludeList.getModel().getSize(); i++) {
-        SettingsExcludeType excludeListType = excludeList.getType(i);
-        if (excludeListType == null || excludeList.getDescription(i) == null) continue;
-        SettingsExcludeItem sei =
-            new SettingsExcludeItem(excludeList.getDescription(i), excludeListType);
-        list.add(sei);
-      }
-      settingsCtrl.getSettings().setExcludeList(list);
-      settingsCtrl.getSettings().setUpdateCheckPeriod(
-          (UpdateCheckPeriod) cbxUpdateCheckPeriod.getSelectedItem());
-      settingsCtrl.getSettings().setGeneralProxyEnabled(chkProxyserverGebruiken.isSelected());
-      settingsCtrl.getSettings().setGeneralProxyHost(txtProxyHost.getText());
-      settingsCtrl.getSettings().setGeneralProxyPort(Integer.parseInt(txtProxyPort.getText()));
-    } else {
-      status = false;
-    }
-    if (pnlEpisodeLibrary.isValidPanelValues()) {
-      LibrarySettings libs = pnlEpisodeLibrary.getLibrarySettings();
-      settingsCtrl.getSettings().setEpisodeLibrarySettings(libs);
-    } else {
-      status = false;
-    }
-    if (pnlMovieLibrary.isValidPanelValues()) {
-      LibrarySettings libs = pnlMovieLibrary.getLibrarySettings();
-      settingsCtrl.getSettings().setMovieLibrarySettings(libs);
-    } else {
-      status = false;
-    }
-    if (testOptionsTab()) {
-      settingsCtrl.getSettings().setOptionsAlwaysConfirm(chkAlwaysConfirm.isSelected());
-      settingsCtrl.getSettings().setOptionsMinAutomaticSelection(chkMinScoreSelection.isSelected());
-      settingsCtrl.getSettings().setOptionsMinAutomaticSelectionValue(
-          sldMinScoreSelection.getValue());
-      settingsCtrl.getSettings().setOptionSubtitleExactMatch(chkSubtitleExactMethod.isSelected());
-      settingsCtrl.getSettings().setOptionSubtitleKeywordMatch(
-          chkSubtitleKeywordMethod.isSelected());
-      settingsCtrl.getSettings().setOptionSubtitleExcludeHearingImpaired(
-          chkExcludeHearingImpaired.isSelected());
-      settingsCtrl.getSettings().setOptionsShowOnlyFound(chkOnlyFound.isSelected());
-      settingsCtrl.getSettings().setOptionsStopOnSearchError(chkStopOnSearchError.isSelected());
-      settingsCtrl.getSettings().setProcessEpisodeSource(
-          (SettingsProcessEpisodeSource) cbxEpisodeProcessSource.getSelectedItem());
-      settingsCtrl.getSettings().setOptionsDefaultSelection(this.chkDefaultSelection.isSelected());
-      settingsCtrl.getSettings().setOptionsDefaultSelectionQualityList(
-          this.pnlDefaultSelection.getDefaultSelectionList());
-    } else {
-      status = false;
-    }
-    if (testSerieSourcesTab()) {
-      settingsCtrl.getSettings().setLoginAddic7edEnabled(chkUserAddic7edLogin.isSelected());
-      settingsCtrl.getSettings().setLoginAddic7edUsername(txtAddic7edUsername.getText());
-      settingsCtrl.getSettings().setLoginAddic7edPassword(txtAddic7edPassword.getText());
-      ArrayList<File> folList = new ArrayList<File>();
-      for (int i = 0; i < localSourcesFoldersList.getModel().getSize(); i++) {
-        folList.add(new File(localSourcesFoldersList.getDescription(i)));
-      }
-      settingsCtrl.getSettings().setLocalSourcesFolders(folList);
-      settingsCtrl.getSettings().setSerieSourceAddic7ed(chkSerieSourceAddic7ed.isSelected());
-      settingsCtrl.getSettings().setSerieSourceTvSubtitles(chkSerieSourceTvSubtitles.isSelected());
-      settingsCtrl.getSettings().setSerieSourcePodnapisi(chkSerieSourcePodnapisi.isSelected());
-      settingsCtrl.getSettings().setSerieSourceOpensubtitles(
-          chkSerieSourceOpensubtitles.isSelected());
-      settingsCtrl.getSettings().setSerieSourceLocal(chkSerieSourceLocal.isSelected());
-      settingsCtrl.getSettings().setSerieSourceSubsMax(chkSerieSourceSubsMax.isSelected());
-    } else {
-      status = false;
-    }
+	private void testAndSaveValues() {
+		boolean status = true;
+		if (testGeneralTab()) {
+			ArrayList<File> folList = new ArrayList<File>();
+			for (int i = 0; i < defaultIncomingFoldersList.getModel().getSize(); i++) {
+				folList.add(new File(defaultIncomingFoldersList.getDescription(i)));
+			}
+			settingsCtrl.getSettings().setDefaultIncomingFolders(folList);
 
-    if (status) {
-      setVisible(false);
-      settingsCtrl.store();
-    }
-    this.eventEmitter.fire(new Event("providers.settings.change"));
-  }
+			ArrayList<SettingsExcludeItem> list = new ArrayList<SettingsExcludeItem>();
+			for (int i = 0; i < excludeList.getModel().getSize(); i++) {
+				SettingsExcludeType excludeListType = excludeList.getType(i);
+				if (excludeListType == null || excludeList.getDescription(i) == null)
+					continue;
+				SettingsExcludeItem sei =
+						new SettingsExcludeItem(excludeList.getDescription(i), excludeListType);
+				list.add(sei);
+			}
+			settingsCtrl.getSettings().setExcludeList(list);
+			settingsCtrl.getSettings().setUpdateCheckPeriod(
+					(UpdateCheckPeriod) cbxUpdateCheckPeriod.getSelectedItem());
+			settingsCtrl.getSettings().setGeneralProxyEnabled(chkProxyserverGebruiken.isSelected());
+			settingsCtrl.getSettings().setGeneralProxyHost(txtProxyHost.getText());
+			settingsCtrl.getSettings().setGeneralProxyPort(Integer.parseInt(txtProxyPort.getText()));
+		} else {
+			status = false;
+		}
+		if (pnlEpisodeLibrary.isValidPanelValues()) {
+			LibrarySettings libs = pnlEpisodeLibrary.getLibrarySettings();
+			settingsCtrl.getSettings().setEpisodeLibrarySettings(libs);
+		} else {
+			status = false;
+		}
+		if (pnlMovieLibrary.isValidPanelValues()) {
+			LibrarySettings libs = pnlMovieLibrary.getLibrarySettings();
+			settingsCtrl.getSettings().setMovieLibrarySettings(libs);
+		} else {
+			status = false;
+		}
+		if (testOptionsTab()) {
+			settingsCtrl.getSettings().setOptionsAlwaysConfirm(chkAlwaysConfirm.isSelected());
+			settingsCtrl.getSettings().setOptionsMinAutomaticSelection(chkMinScoreSelection.isSelected());
+			settingsCtrl.getSettings().setOptionsMinAutomaticSelectionValue(
+					sldMinScoreSelection.getValue());
+			settingsCtrl.getSettings().setOptionSubtitleExactMatch(chkSubtitleExactMethod.isSelected());
+			settingsCtrl.getSettings().setOptionSubtitleKeywordMatch(
+					chkSubtitleKeywordMethod.isSelected());
+			settingsCtrl.getSettings().setOptionSubtitleExcludeHearingImpaired(
+					chkExcludeHearingImpaired.isSelected());
+			settingsCtrl.getSettings().setOptionsShowOnlyFound(chkOnlyFound.isSelected());
+			settingsCtrl.getSettings().setOptionsStopOnSearchError(chkStopOnSearchError.isSelected());
+			settingsCtrl.getSettings().setProcessEpisodeSource(
+					(SettingsProcessEpisodeSource) cbxEpisodeProcessSource.getSelectedItem());
+			settingsCtrl.getSettings().setOptionsDefaultSelection(this.chkDefaultSelection.isSelected());
+			settingsCtrl.getSettings().setOptionsDefaultSelectionQualityList(
+					this.pnlDefaultSelection.getDefaultSelectionList());
+		} else {
+			status = false;
+		}
+		if (testSerieSourcesTab()) {
+			settingsCtrl.getSettings().setLoginAddic7edEnabled(chkUserAddic7edLogin.isSelected());
+			settingsCtrl.getSettings().setLoginAddic7edUsername(txtAddic7edUsername.getText());
+			settingsCtrl.getSettings().setLoginAddic7edPassword(txtAddic7edPassword.getText());
+			ArrayList<File> folList = new ArrayList<File>();
+			for (int i = 0; i < localSourcesFoldersList.getModel().getSize(); i++) {
+				folList.add(new File(localSourcesFoldersList.getDescription(i)));
+			}
+			settingsCtrl.getSettings().setLocalSourcesFolders(folList);
+			settingsCtrl.getSettings().setSerieSourceAddic7ed(chkSerieSourceAddic7ed.isSelected());
+			settingsCtrl.getSettings().setSerieSourceTvSubtitles(chkSerieSourceTvSubtitles.isSelected());
+			settingsCtrl.getSettings().setSerieSourcePodnapisi(chkSerieSourcePodnapisi.isSelected());
+			settingsCtrl.getSettings().setSerieSourceOpensubtitles(
+					chkSerieSourceOpensubtitles.isSelected());
+			settingsCtrl.getSettings().setSerieSourceLocal(chkSerieSourceLocal.isSelected());
+			settingsCtrl.getSettings().setSerieSourceSubsMax(chkSerieSourceSubsMax.isSelected());
+		} else {
+			status = false;
+		}
+
+		if (status) {
+			setVisible(false);
+			settingsCtrl.store();
+		}
+		this.eventEmitter.fire(new Event("providers.settings.change"));
+	}
 }

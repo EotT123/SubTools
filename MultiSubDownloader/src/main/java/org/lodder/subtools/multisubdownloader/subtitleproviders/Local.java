@@ -22,141 +22,140 @@ import org.slf4j.LoggerFactory;
 
 public class Local implements SubtitleProvider {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
 
-  private Settings settings;
-  private Manager manager;
+	private Settings settings;
+	private Manager manager;
 
-  public Local(Settings settings, Manager manager) {
-    this.settings = settings;
-    this.manager = manager;
-  }
+	public Local(Settings settings, Manager manager) {
+		this.settings = settings;
+		this.manager = manager;
+	}
 
-  @Override
-  public String getName() {
-    return "Local";
-  }
+	@Override
+	public String getName() {
+		return "Local";
+	}
 
-  @Override
-  public List<Subtitle> search(Release release, String languageCode) {
-    if (release instanceof MovieRelease) {
-      return this.search((MovieRelease) release, languageCode);
-    } else if (release instanceof TvRelease) {
-      return this.search((TvRelease) release, languageCode);
-    }
-    return new ArrayList<Subtitle>();
-  }
+	@Override
+	public List<Subtitle> search(Release release, String languageCode) {
+		if (release instanceof MovieRelease) {
+			return this.search((MovieRelease) release, languageCode);
+		} else if (release instanceof TvRelease) {
+			return this.search((TvRelease) release, languageCode);
+		}
+		return new ArrayList<Subtitle>();
+	}
 
-  private List<File> getPossibleSubtitles(String filter) {
-    List<File> possibleSubtitles = new ArrayList<File>();
-    for (File local : settings.getLocalSourcesFolders()) {
-      possibleSubtitles.addAll(getAllSubtitlesFiles(local, filter));
-    }
+	private List<File> getPossibleSubtitles(String filter) {
+		List<File> possibleSubtitles = new ArrayList<File>();
+		for (File local : settings.getLocalSourcesFolders()) {
+			possibleSubtitles.addAll(getAllSubtitlesFiles(local, filter));
+		}
 
-    return possibleSubtitles;
-  }
+		return possibleSubtitles;
+	}
 
+	public List<Subtitle> search(TvRelease tvRelease, String languagecode) {
+		List<Subtitle> listFoundSubtitles = new ArrayList<Subtitle>();
+		ReleaseParser vfp = new ReleaseParser();
 
-  public List<Subtitle> search(TvRelease tvRelease, String languagecode) {
-    List<Subtitle> listFoundSubtitles = new ArrayList<Subtitle>();
-    ReleaseParser vfp = new ReleaseParser();
+		String filter = "";
+		if (tvRelease.getOriginalShowName().length() > 0) {
+			filter = tvRelease.getOriginalShowName().replaceAll("[^A-Za-z]", "").trim();
+		} else {
+			filter = tvRelease.getShow().replaceAll("[^A-Za-z]", "").trim();
+		}
 
-    String filter = "";
-    if (tvRelease.getOriginalShowName().length() > 0) {
-      filter = tvRelease.getOriginalShowName().replaceAll("[^A-Za-z]", "").trim();
-    } else {
-      filter = tvRelease.getShow().replaceAll("[^A-Za-z]", "").trim();
-    }
+		for (File fileSub : getPossibleSubtitles(filter)) {
+			try {
+				Release release = vfp.parse(fileSub);
+				if (release.getVideoType() == VideoType.EPISODE) {
 
-    for (File fileSub : getPossibleSubtitles(filter)) {
-      try {
-        Release release = vfp.parse(fileSub);
-        if (release.getVideoType() == VideoType.EPISODE) {
+					if (((TvRelease) release).getSeason() == tvRelease.getSeason() && Utils.containsAll(
+							((TvRelease) release).getEpisodeNumbers(), tvRelease.getEpisodeNumbers())) {
 
-          if (((TvRelease) release).getSeason() == tvRelease.getSeason() && Utils.containsAll(
-              ((TvRelease) release).getEpisodeNumbers(), tvRelease.getEpisodeNumbers())) {
+						TvReleaseControl epCtrl = new TvReleaseControl((TvRelease) release, settings, manager);
+						epCtrl.process(settings.getMappingSettings().getMappingList());
+						if (((TvRelease) release).getTvdbid() == tvRelease.getTvdbid()) {
+							String detectedLang = DetectLanguage.execute(fileSub);
+							if (detectedLang.equals(languagecode)) {
+								LOGGER.debug("Local Sub found, adding [{}]", fileSub.toString());
+								listFoundSubtitles.add(new Subtitle(Subtitle.SubtitleSource.LOCAL,
+										fileSub.getName(), fileSub.toString(), languagecode,
+										ReleaseParser.getQualityKeyword(fileSub.getName()),
+										SubtitleMatchType.EVERYTHING,
+										ReleaseParser.extractReleasegroup(fileSub.getName(), true),
+										fileSub.getAbsolutePath(), false));
+							}
+						}
+					}
+				}
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
+					LOGGER.error(e.getMessage(), e);
+				} else {
+					LOGGER.error(e.getMessage());
+				}
+			}
+		}
 
-            TvReleaseControl epCtrl = new TvReleaseControl((TvRelease) release, settings, manager);
-            epCtrl.process(settings.getMappingSettings().getMappingList());
-            if (((TvRelease) release).getTvdbid() == tvRelease.getTvdbid()) {
-              String detectedLang = DetectLanguage.execute(fileSub);
-              if (detectedLang.equals(languagecode)) {
-                LOGGER.debug("Local Sub found, adding [{}]", fileSub.toString());
-                listFoundSubtitles.add(new Subtitle(Subtitle.SubtitleSource.LOCAL,
-                    fileSub.getName(), fileSub.toString(), languagecode,
-                    ReleaseParser.getQualityKeyword(fileSub.getName()),
-                    SubtitleMatchType.EVERYTHING,
-                    ReleaseParser.extractReleasegroup(fileSub.getName(), true),
-                    fileSub.getAbsolutePath(), false));
-              }
-            }
-          }
-        }
-      } catch (Exception e) {
-        if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
-          LOGGER.error(e.getMessage(), e);
-        } else {
-          LOGGER.error(e.getMessage());
-        }
-      }
-    }
+		return listFoundSubtitles;
+	}
 
-    return listFoundSubtitles;
-  }
+	public List<Subtitle> search(MovieRelease movieRelease, String languagecode) {
+		List<Subtitle> listFoundSubtitles = new ArrayList<Subtitle>();
+		ReleaseParser releaseParser = new ReleaseParser();
 
-  public List<Subtitle> search(MovieRelease movieRelease, String languagecode) {
-    List<Subtitle> listFoundSubtitles = new ArrayList<Subtitle>();
-    ReleaseParser releaseParser = new ReleaseParser();
+		String filter = movieRelease.getTitle();
 
-    String filter = movieRelease.getTitle();
+		for (File fileSub : getPossibleSubtitles(filter)) {
+			try {
+				Release release = releaseParser.parse(fileSub);
+				if (release.getVideoType() == VideoType.MOVIE) {
+					MovieReleaseControl movieCtrl =
+							new MovieReleaseControl((MovieRelease) release, settings, manager);
+					movieCtrl.process(settings.getMappingSettings().getMappingList());
+					if (((MovieRelease) release).getImdbid() == movieRelease.getImdbid()) {
+						String detectedLang = DetectLanguage.execute(fileSub);
+						if (detectedLang.equals(languagecode)) {
+							LOGGER.debug("Local Sub found, adding {}", fileSub.toString());
+							listFoundSubtitles.add(new Subtitle(Subtitle.SubtitleSource.LOCAL, fileSub.getName(),
+									fileSub.toString(), "", ReleaseParser.getQualityKeyword(fileSub.getName()),
+									SubtitleMatchType.EVERYTHING,
+									ReleaseParser.extractReleasegroup(fileSub.getName(), true),
+									fileSub.getAbsolutePath(), false));
+						}
+					}
+				}
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
+					LOGGER.error(e.getMessage(), e);
+				} else {
+					LOGGER.error(e.getMessage());
+				}
+			}
+		}
 
-    for (File fileSub : getPossibleSubtitles(filter)) {
-      try {
-        Release release = releaseParser.parse(fileSub);
-        if (release.getVideoType() == VideoType.MOVIE) {
-          MovieReleaseControl movieCtrl =
-              new MovieReleaseControl((MovieRelease) release, settings, manager);
-          movieCtrl.process(settings.getMappingSettings().getMappingList());
-          if (((MovieRelease) release).getImdbid() == movieRelease.getImdbid()) {
-            String detectedLang = DetectLanguage.execute(fileSub);
-            if (detectedLang.equals(languagecode)) {
-              LOGGER.debug("Local Sub found, adding {}", fileSub.toString());
-              listFoundSubtitles.add(new Subtitle(Subtitle.SubtitleSource.LOCAL, fileSub.getName(),
-                  fileSub.toString(), "", ReleaseParser.getQualityKeyword(fileSub.getName()),
-                  SubtitleMatchType.EVERYTHING,
-                  ReleaseParser.extractReleasegroup(fileSub.getName(), true),
-                  fileSub.getAbsolutePath(), false));
-            }
-          }
-        }
-      } catch (Exception e) {
-        if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
-          LOGGER.error(e.getMessage(), e);
-        } else {
-          LOGGER.error(e.getMessage());
-        }
-      }
-    }
+		return listFoundSubtitles;
+	}
 
-    return listFoundSubtitles;
-  }
-
-  private List<File> getAllSubtitlesFiles(File dir, String filter) {
-    final List<File> filelist = new ArrayList<File>();
-    final File[] contents = dir.listFiles();
-    if (contents != null) {
-      for (final File file : contents) {
-        if (file.isFile()) {
-          if (file.getName().replaceAll("[^A-Za-z]", "").toLowerCase()
-              .contains(filter.toLowerCase())
-              && ReleaseParser.extractFileNameExtension(file.getName()).equals("srt")) {
-            filelist.add(file);
-          }
-        } else {
-          filelist.addAll(getAllSubtitlesFiles(file, filter));
-        }
-      }
-    }
-    return filelist;
-  }
+	private List<File> getAllSubtitlesFiles(File dir, String filter) {
+		final List<File> filelist = new ArrayList<File>();
+		final File[] contents = dir.listFiles();
+		if (contents != null) {
+			for (final File file : contents) {
+				if (file.isFile()) {
+					if (file.getName().replaceAll("[^A-Za-z]", "").toLowerCase()
+							.contains(filter.toLowerCase())
+							&& ReleaseParser.extractFileNameExtension(file.getName()).equals("srt")) {
+						filelist.add(file);
+					}
+				} else {
+					filelist.addAll(getAllSubtitlesFiles(file, filter));
+				}
+			}
+		}
+		return filelist;
+	}
 }

@@ -19,143 +19,143 @@ import org.slf4j.LoggerFactory;
 
 public class CliSearchAction extends SearchAction {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);
-  
-  private CLI cmd;
-  private FileListAction filelistAction;
-  private List<File> folders;
-  private boolean isRecursive;
-  private String languageCode;
-  private boolean overwriteSubtitles;
-  private ReleaseFactory releaseFactory;
-  private Filtering filtering;
+	private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);
 
-  public void setCommandLine(CLI cmd) {
-    this.cmd = cmd;
-  }
+	private CLI cmd;
+	private FileListAction filelistAction;
+	private List<File> folders;
+	private boolean isRecursive;
+	private String languageCode;
+	private boolean overwriteSubtitles;
+	private ReleaseFactory releaseFactory;
+	private Filtering filtering;
 
-  public void setFileListAction(FileListAction filelistAction) {
-    this.filelistAction = filelistAction;
-  }
+	public void setCommandLine(CLI cmd) {
+		this.cmd = cmd;
+	}
 
-  public void setFolders(List<File> folders) {
-    this.folders = folders;
-  }
+	public void setFileListAction(FileListAction filelistAction) {
+		this.filelistAction = filelistAction;
+	}
 
-  public void setRecursive(boolean recursive) {
-    this.isRecursive = recursive;
-  }
+	public void setFolders(List<File> folders) {
+		this.folders = folders;
+	}
 
-  public void setOverwriteSubtitles(boolean overwrite) {
-    this.overwriteSubtitles = overwrite;
-  }
+	public void setRecursive(boolean recursive) {
+		this.isRecursive = recursive;
+	}
 
-  public void setReleaseFactory(ReleaseFactory releaseFactory) {
-    this.releaseFactory = releaseFactory;
-  }
+	public void setOverwriteSubtitles(boolean overwrite) {
+		this.overwriteSubtitles = overwrite;
+	}
 
-  public void setFiltering(Filtering filtering) {
-    this.filtering = filtering;
-  }
+	public void setReleaseFactory(ReleaseFactory releaseFactory) {
+		this.releaseFactory = releaseFactory;
+	}
 
-  @Override
-  protected List<Release> createReleases() throws ActionException {
-    filelistAction.setIndexingProgressListener(this.indexingProgressListener);
+	public void setFiltering(Filtering filtering) {
+		this.filtering = filtering;
+	}
 
-    List<File> files = new ArrayList<>();
-    for (File folder : this.folders) {
-      files.addAll(filelistAction.getFileListing(folder, this.isRecursive, this.languageCode,
-          this.overwriteSubtitles));
-    }
+	@Override
+	protected List<Release> createReleases() throws ActionException {
+		filelistAction.setIndexingProgressListener(this.indexingProgressListener);
 
-    /* fix: remove carriage return from progressbar */
-    System.out.println("");
+		List<File> files = new ArrayList<>();
+		for (File folder : this.folders) {
+			files.addAll(filelistAction.getFileListing(folder, this.isRecursive, this.languageCode,
+					this.overwriteSubtitles));
+		}
 
-    LOGGER.debug("# Files found to process [{}] ", files.size());
+		/* fix: remove carriage return from progressbar */
+		System.out.println("");
 
-    int total = files.size();
-    int index = 0;
-    int progress = 0;
+		LOGGER.debug("# Files found to process [{}] ", files.size());
 
-    System.out.println(Messages.getString("CliSearchAction.ParsingFoundFiles"));
-    this.indexingProgressListener.progress(progress);
+		int total = files.size();
+		int index = 0;
+		int progress = 0;
 
-    List<Release> releases = new ArrayList<>();
-    for (File file : files) {
-      index++;
-      progress = (int) Math.floor((float) index / total * 100);
+		System.out.println(Messages.getString("CliSearchAction.ParsingFoundFiles"));
+		this.indexingProgressListener.progress(progress);
 
-      /* Tell progressListener which file we are processing */
-      this.indexingProgressListener.progress(file.getName());
+		List<Release> releases = new ArrayList<>();
+		for (File file : files) {
+			index++;
+			progress = (int) Math.floor((float) index / total * 100);
 
-      Release release = this.releaseFactory.createRelease(file);
-      if (release == null) {
-        continue;
-      }
+			/* Tell progressListener which file we are processing */
+			this.indexingProgressListener.progress(file.getName());
 
-      releases.add(release);
+			Release release = this.releaseFactory.createRelease(file);
+			if (release == null) {
+				continue;
+			}
 
-      /* Update progressListener */
-      this.indexingProgressListener.progress(progress);
-    }
+			releases.add(release);
 
-    return releases;
-  }
+			/* Update progressListener */
+			this.indexingProgressListener.progress(progress);
+		}
 
-  @Override
-  protected String getLanguageCode() {
-    return this.languageCode;
-  }
+		return releases;
+	}
 
-  public void setLanguageCode(String languageCode) {
-    this.languageCode = languageCode;
-  }
+	@Override
+	protected String getLanguageCode() {
+		return this.languageCode;
+	}
 
-  @Override
-  public void onFound(Release release, List<Subtitle> subtitles) {
-    if (filtering != null) {
-      subtitles = filtering.getFiltered(subtitles, release);
-    }
+	public void setLanguageCode(String languageCode) {
+		this.languageCode = languageCode;
+	}
 
-    release.getMatchingSubs().addAll(subtitles);
-    if (searchManager.getProgress() < 100) {
-      return;
-    }
+	@Override
+	public void onFound(Release release, List<Subtitle> subtitles) {
+		if (filtering != null) {
+			subtitles = filtering.getFiltered(subtitles, release);
+		}
 
-    LOGGER.debug("found files for doDownload [{}]", releases.size());
+		release.getMatchingSubs().addAll(subtitles);
+		if (searchManager.getProgress() < 100) {
+			return;
+		}
 
-    /* stop printing progress */
-    this.searchProgressListener.completed();
+		LOGGER.debug("found files for doDownload [{}]", releases.size());
 
-    this.cmd.download(releases);
-  }
+		/* stop printing progress */
+		this.searchProgressListener.completed();
 
-  @Override
-  protected void validate() throws SearchSetupException {
-    if (this.cmd == null) {
-      throw new SearchSetupException("Cmd must be set.");
-    }
-    if (this.languageCode == null) {
-      throw new SearchSetupException("LanguageCode must be set.");
-    }
-    if (this.filelistAction == null) {
-      throw new SearchSetupException("Actions must be set.");
-    }
-    if (this.folders == null || this.folders.size() <= 0) {
-      throw new SearchSetupException("Folders must be set.");
-    }
-    if (this.releaseFactory == null) {
-      throw new SearchSetupException("releaseFactory must be set.");
-    }
-    if (this.filtering == null) {
-      throw new SearchSetupException("Filtering must be set.");
-    }
-    super.validate();
-  }
+		this.cmd.download(releases);
+	}
 
-  @Override
-  protected String getLanguageCode(String language) {
-    /* Already provided and validated as code in cli */
-    return language;
-  }
+	@Override
+	protected void validate() throws SearchSetupException {
+		if (this.cmd == null) {
+			throw new SearchSetupException("Cmd must be set.");
+		}
+		if (this.languageCode == null) {
+			throw new SearchSetupException("LanguageCode must be set.");
+		}
+		if (this.filelistAction == null) {
+			throw new SearchSetupException("Actions must be set.");
+		}
+		if (this.folders == null || this.folders.size() <= 0) {
+			throw new SearchSetupException("Folders must be set.");
+		}
+		if (this.releaseFactory == null) {
+			throw new SearchSetupException("releaseFactory must be set.");
+		}
+		if (this.filtering == null) {
+			throw new SearchSetupException("Filtering must be set.");
+		}
+		super.validate();
+	}
+
+	@Override
+	protected String getLanguageCode(String language) {
+		/* Already provided and validated as code in cli */
+		return language;
+	}
 }

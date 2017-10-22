@@ -17,124 +17,124 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public class FileGuiSearchAction extends GuiSearchAction {
 
-  private FileListAction filelistAction;
+	private FileListAction filelistAction;
 
-  public FileGuiSearchAction(GUI mainWindow, Settings settings, SubtitleProviderStore subtitleProviderStore) {
-    super();
-    this.setGUI(mainWindow);
-    this.setSettings(settings);
-    this.setProviderStore(subtitleProviderStore);
-  }
+	public FileGuiSearchAction(GUI mainWindow, Settings settings, SubtitleProviderStore subtitleProviderStore) {
+		super();
+		this.setGUI(mainWindow);
+		this.setSettings(settings);
+		this.setProviderStore(subtitleProviderStore);
+	}
 
-  public void setFileListAction(FileListAction filelistAction) {
-    this.filelistAction = filelistAction;
-  }
+	public void setFileListAction(FileListAction filelistAction) {
+		this.filelistAction = filelistAction;
+	}
 
-  @Override
-  public void onFound(Release release, List<Subtitle> subtitles) {
-    VideoTableModel model =
-        (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+	@Override
+	public void onFound(Release release, List<Subtitle> subtitles) {
+		VideoTableModel model =
+				(VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
 
-    if (filtering != null) {
-      subtitles = filtering.getFiltered(subtitles, release);
-    }
+		if (filtering != null) {
+			subtitles = filtering.getFiltered(subtitles, release);
+		}
 
-    release.getMatchingSubs().addAll(subtitles);
+		release.getMatchingSubs().addAll(subtitles);
 
-    model.addRow(release);
-    mainwindow.repaint();
+		model.addRow(release);
+		mainwindow.repaint();
 
-    /* Let GuiSearchAction also make some decisions */
-    super.onFound(release, subtitles);
-  }
+		/* Let GuiSearchAction also make some decisions */
+		super.onFound(release, subtitles);
+	}
 
-  @Override
-  protected List<Release> createReleases() throws ActionException {
-    SearchFileInputPanel inputPanel = getInputPanel();
-    String filePath = inputPanel.getIncomingPath();
-    String languageCode = getLanguageCode(inputPanel.getSelectedLanguage());
-    boolean recursive = inputPanel.isRecursiveSelected();
-    boolean overwriteExistingSubtitles = inputPanel.isForceOverwrite();
-    
-    VideoTableModel model =
-        (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
-    model.clearTable();
+	@Override
+	protected List<Release> createReleases() throws ActionException {
+		SearchFileInputPanel inputPanel = getInputPanel();
+		String filePath = inputPanel.getIncomingPath();
+		String languageCode = getLanguageCode(inputPanel.getSelectedLanguage());
+		boolean recursive = inputPanel.isRecursiveSelected();
+		boolean overwriteExistingSubtitles = inputPanel.isForceOverwrite();
 
-    /* get a list of videofiles */
-    List<File> files = getFiles(filePath, languageCode, recursive, overwriteExistingSubtitles);
+		VideoTableModel model =
+				(VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+		model.clearTable();
 
-    /* create a list of releases from videofiles */
-    return createReleases(files);
-  }
+		/* get a list of videofiles */
+		List<File> files = getFiles(filePath, languageCode, recursive, overwriteExistingSubtitles);
 
-  private List<Release> createReleases(List<File> files) throws ActionException {
-    /* parse every videofile */
-    List<Release> releases = new ArrayList<>();
+		/* create a list of releases from videofiles */
+		return createReleases(files);
+	}
 
-    int total = files.size();
-    int index = 0;
-    int progress = 0;
+	private List<Release> createReleases(List<File> files) throws ActionException {
+		/* parse every videofile */
+		List<Release> releases = new ArrayList<>();
 
-    this.indexingProgressListener.progress(progress);
+		int total = files.size();
+		int index = 0;
+		int progress = 0;
 
-    for (File file : files) {
-      index++;
-      progress = (int) Math.floor((float) index / total * 100);
+		this.indexingProgressListener.progress(progress);
 
-      /* Tell progressListener which file we are processing */
-      this.indexingProgressListener.progress(file.getName());
+		for (File file : files) {
+			index++;
+			progress = (int) Math.floor((float) index / total * 100);
 
-      Release r = releaseFactory.createRelease(file);
-      if (r != null) {
-        releases.add(r);
-      }
+			/* Tell progressListener which file we are processing */
+			this.indexingProgressListener.progress(file.getName());
 
-      /* Update progressListener */
-      this.indexingProgressListener.progress(progress);
-    }
+			Release r = releaseFactory.createRelease(file);
+			if (r != null) {
+				releases.add(r);
+			}
 
-    return releases;
-  }
+			/* Update progressListener */
+			this.indexingProgressListener.progress(progress);
+		}
 
-  private List<File> getFiles(String filePath, String languageCode, boolean recursive,
-                              boolean overwriteExistingSubtitles) {
-    /* Get a list of selected directories */
-    List<File> dirs = new ArrayList<>();
-    if (!filePath.isEmpty()) {
-      dirs.add(new File(filePath));
-    } else {
-      dirs.addAll(this.settings.getDefaultFolders());
-    }
+		return releases;
+	}
 
-    /* Scan directories for videofiles */
-    List<File> files = new ArrayList<>();
+	private List<File> getFiles(String filePath, String languageCode, boolean recursive,
+			boolean overwriteExistingSubtitles) {
+		/* Get a list of selected directories */
+		List<File> dirs = new ArrayList<>();
+		if (!filePath.isEmpty()) {
+			dirs.add(new File(filePath));
+		} else {
+			dirs.addAll(this.settings.getDefaultFolders());
+		}
 
-    /* Tell Action where to send progressUpdates */
-    this.filelistAction.setIndexingProgressListener(this.indexingProgressListener);
+		/* Scan directories for videofiles */
+		List<File> files = new ArrayList<>();
 
-    /* Start the getFileListing Action */
-    for (File dir : dirs) {
-      files.addAll(
-          this.filelistAction.getFileListing(dir, recursive, languageCode, overwriteExistingSubtitles));
-    }
-    return files;
-  }
+		/* Tell Action where to send progressUpdates */
+		this.filelistAction.setIndexingProgressListener(this.indexingProgressListener);
 
-  protected void validate() throws SearchSetupException {
-    if (this.filelistAction == null) {
-      throw new SearchSetupException("Actions-object must be set.");
-    }
+		/* Start the getFileListing Action */
+		for (File dir : dirs) {
+			files.addAll(
+					this.filelistAction.getFileListing(dir, recursive, languageCode, overwriteExistingSubtitles));
+		}
+		return files;
+	}
 
-    String path = getInputPanel().getIncomingPath();
-    if (path.equals("") && !this.settings.hasDefaultFolders()) {
-      throw new SearchSetupException("Geen map geselecteerd");
-    }
+	protected void validate() throws SearchSetupException {
+		if (this.filelistAction == null) {
+			throw new SearchSetupException("Actions-object must be set.");
+		}
 
-    super.validate();
-  }
+		String path = getInputPanel().getIncomingPath();
+		if (path.equals("") && !this.settings.hasDefaultFolders()) {
+			throw new SearchSetupException("Geen map geselecteerd");
+		}
 
-  private SearchFileInputPanel getInputPanel() {
-    return (SearchFileInputPanel) this.searchPanel.getInputPanel();
-  }
+		super.validate();
+	}
+
+	private SearchFileInputPanel getInputPanel() {
+		return (SearchFileInputPanel) this.searchPanel.getInputPanel();
+	}
 
 }

@@ -16,52 +16,52 @@ import ch.qos.logback.core.encoder.EchoEncoder;
 import ch.qos.logback.core.encoder.Encoder;
 
 public class LogTextAppender extends AppenderBase<ILoggingEvent> {
-    private Encoder<ILoggingEvent> encoder = new EchoEncoder<>();
-    private ByteArrayOutputStream out = new ByteArrayOutputStream();
+	private Encoder<ILoggingEvent> encoder = new EchoEncoder<>();
+	private ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    private JTextArea jTextArea;
+	private JTextArea jTextArea;
 
-    public LogTextAppender(JTextArea jTextArea) {
-        this.jTextArea = jTextArea;
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        
-        PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
-        patternLayoutEncoder.setPattern("%msg%n");
-        patternLayoutEncoder.setContext(loggerContext);
-        patternLayoutEncoder.start();
-        
-        setContext(loggerContext);
-        start();
-        loggerContext.getLogger("ROOT").addAppender(this);
-    }
+	public LogTextAppender(JTextArea jTextArea) {
+		this.jTextArea = jTextArea;
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-    @Override
-    public void start() {
-        try {
-            encoder.init(out);
-        } catch (IOException e) {
-        }
-        super.start();
-    }
+		PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
+		patternLayoutEncoder.setPattern("%msg%n");
+		patternLayoutEncoder.setContext(loggerContext);
+		patternLayoutEncoder.start();
 
-    @Override
-    public void append(ILoggingEvent event) {
-        try {
-            encoder.doEncode(event);
-            out.flush();
-            final String line = out.toString("UTF-8");
+		setContext(loggerContext);
+		start();
+		loggerContext.getLogger("ROOT").addAppender(this);
+	}
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (jTextArea != null) {
-                        jTextArea.append(line);
-                    }
-                }
-            });
-            out.reset();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	@Override
+	public void start() {
+		try {
+			encoder.init(out);
+		} catch (IOException e) {
+		}
+		super.start();
+	}
+
+	@Override
+	public void append(ILoggingEvent event) {
+		try {
+			encoder.doEncode(event);
+			out.flush();
+			final String line = out.toString("UTF-8");
+
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					if (jTextArea != null) {
+						jTextArea.append(line);
+					}
+				}
+			});
+			out.reset();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

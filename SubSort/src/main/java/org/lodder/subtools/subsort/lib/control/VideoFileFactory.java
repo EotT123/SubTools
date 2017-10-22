@@ -12,9 +12,10 @@ import org.lodder.subtools.sublibrary.settings.model.MappingTvdbScene;
 
 public class VideoFileFactory {
 
-  public static Release get(final File file, List<MappingTvdbScene> dict, Manager manager) throws ControlFactoryException, ReleaseParseException, ReleaseControlException {
-    VideoFileControl vfc = VideoFileControlFactory.getController(file, manager);
-    Release release = null;
+	public static Release get(final File file, List<MappingTvdbScene> dict, Manager manager)
+			throws ControlFactoryException, ReleaseParseException, ReleaseControlException {
+		VideoFileControl vfc = VideoFileControlFactory.getController(file, manager);
+		Release release = null;
 		if (vfc instanceof EpisodeFileControl) {
 			release = vfc.process(dict);
 		} else if (vfc instanceof MovieFileControl) {

@@ -19,142 +19,144 @@ import org.slf4j.LoggerFactory;
 
 public abstract class SearchAction implements Runnable, Cancelable, SearchHandler {
 
-  protected Settings settings;
-  protected SubtitleProviderStore subtitleProviderStore;
-  protected SearchManager searchManager;
-  protected List<Release> releases;
-  protected IndexingProgressListener indexingProgressListener;
-  protected SearchProgressListener searchProgressListener;
-  protected StatusListener statusListener;
-  
-  private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
+	protected Settings settings;
+	protected SubtitleProviderStore subtitleProviderStore;
+	protected SearchManager searchManager;
+	protected List<Release> releases;
+	protected IndexingProgressListener indexingProgressListener;
+	protected SearchProgressListener searchProgressListener;
+	protected StatusListener statusListener;
 
-  public void setSettings(Settings settings) {
-    this.settings = settings;
-  }
+	private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
-  public void setProviderStore(SubtitleProviderStore store) {
-    this.subtitleProviderStore = store;
-  }
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
 
-  public void setStatusListener(StatusListener listener) {
-    this.statusListener = listener;
-  }
+	public void setProviderStore(SubtitleProviderStore store) {
+		this.subtitleProviderStore = store;
+	}
 
-  public void setSearchProgressListener(SearchProgressListener listener) {
-    this.searchProgressListener = listener;
-  }
+	public void setStatusListener(StatusListener listener) {
+		this.statusListener = listener;
+	}
 
-  public void setIndexingProgressListener(IndexingProgressListener listener) {
-    this.indexingProgressListener = listener;
-  }
+	public void setSearchProgressListener(SearchProgressListener listener) {
+		this.searchProgressListener = listener;
+	}
 
-  @Override
-  public void run() {
-    LOGGER.trace("SearchAction is being executed");
-    try {
-      this.search();
-    } catch (ActionException e) {
-      LOGGER.trace(e.getMessage(), e);
-      if (this.statusListener != null) {
-        this.statusListener.onError(e);
-      }
-    }
-  }
+	public void setIndexingProgressListener(IndexingProgressListener listener) {
+		this.indexingProgressListener = listener;
+	}
 
-  private void search() throws ActionException {
-    this.setStatusListener(this.indexingProgressListener);
+	@Override
+	public void run() {
+		LOGGER.trace("SearchAction is being executed");
+		try {
+			this.search();
+		} catch (ActionException e) {
+			LOGGER.trace(e.getMessage(), e);
+			if (this.statusListener != null) {
+				this.statusListener.onError(e);
+			}
+		}
+	}
 
-    validate();
+	private void search() throws ActionException {
+		this.setStatusListener(this.indexingProgressListener);
 
-    String languageCode = this.getLanguageCode();
+		validate();
 
-    setStatusMessage(Messages.getString("SearchAction.StatusIndexing"));
+		String languageCode = this.getLanguageCode();
 
-    this.releases = createReleases();
+		setStatusMessage(Messages.getString("SearchAction.StatusIndexing"));
 
-    if (Thread.currentThread().isInterrupted()) return;
+		this.releases = createReleases();
 
-    if (this.releases.size() <= 0) {
-      this.cancel(true);
-      return;
-    }
+		if (Thread.currentThread().isInterrupted())
+			return;
 
-    this.indexingProgressListener.completed();
+		if (this.releases.size() <= 0) {
+			this.cancel(true);
+			return;
+		}
 
-    this.setStatusListener(this.searchProgressListener);
+		this.indexingProgressListener.completed();
 
-    /* Create a new SearchManager. */
-    this.searchManager = new SearchManager(this.settings);
+		this.setStatusListener(this.searchProgressListener);
 
-    /* Tell the manager which language we want */
-    this.searchManager.setLanguage(languageCode);
+		/* Create a new SearchManager. */
+		this.searchManager = new SearchManager(this.settings);
 
-    /* Tell the manager which providers to use */
-    for (SubtitleProvider subtitleProvider : this.subtitleProviderStore.getAllProviders()) {
-      if (!settings.isSerieSource(subtitleProvider.getName())) {
-        continue;
-      }
+		/* Tell the manager which language we want */
+		this.searchManager.setLanguage(languageCode);
 
-      this.searchManager.addProvider(subtitleProvider);
-    }
+		/* Tell the manager which providers to use */
+		for (SubtitleProvider subtitleProvider : this.subtitleProviderStore.getAllProviders()) {
+			if (!settings.isSerieSource(subtitleProvider.getName())) {
+				continue;
+			}
 
-    /* Tell the manager which releases to search. */
-    for (Release release : this.releases) {
-      this.searchManager.addRelease(release);
-    }
+			this.searchManager.addProvider(subtitleProvider);
+		}
 
-    /* Listen for when the manager tells us Subtitles are found */
-    this.searchManager.onFound(this);
+		/* Tell the manager which releases to search. */
+		for (Release release : this.releases) {
+			this.searchManager.addRelease(release);
+		}
 
-    /* Tell the manager where to push progressUpdates */
-    this.searchManager.setProgressListener(this.searchProgressListener);
+		/* Listen for when the manager tells us Subtitles are found */
+		this.searchManager.onFound(this);
 
-    setStatusMessage(Messages.getString("SearchAction.StatusSearching"));
+		/* Tell the manager where to push progressUpdates */
+		this.searchManager.setProgressListener(this.searchProgressListener);
 
-    /* Tell the manager to start searching */
-    this.searchManager.start();
-  }
+		setStatusMessage(Messages.getString("SearchAction.StatusSearching"));
 
-  protected abstract List<Release> createReleases() throws ActionException;
+		/* Tell the manager to start searching */
+		this.searchManager.start();
+	}
 
-  protected void setStatusMessage(String message) {
-    this.statusListener.onStatus(message);
-  }
+	protected abstract List<Release> createReleases() throws ActionException;
 
-  @Override
-  public boolean cancel(boolean mayInterruptIfRunning) {
-    if (searchManager != null) this.searchManager.cancel(mayInterruptIfRunning);
-    Thread.currentThread().interrupt();
-    this.indexingProgressListener.completed();
-    this.searchProgressListener.completed();
-    return true;
-  }
+	protected void setStatusMessage(String message) {
+		this.statusListener.onStatus(message);
+	}
 
-  protected abstract String getLanguageCode();
+	@Override
+	public boolean cancel(boolean mayInterruptIfRunning) {
+		if (searchManager != null)
+			this.searchManager.cancel(mayInterruptIfRunning);
+		Thread.currentThread().interrupt();
+		this.indexingProgressListener.completed();
+		this.searchProgressListener.completed();
+		return true;
+	}
 
-  protected String getLanguageCode(String language) {
-    if (language.equals("Nederlands")) {
-      return "nl";
-    } else if (language.equals("Engels")) {
-      return "en";
-    }
-    return null;
-  }
+	protected abstract String getLanguageCode();
 
-  protected void validate() throws SearchSetupException {
-    if (this.settings == null) {
-      throw new SearchSetupException("Settings must be set.");
-    }
-    if (this.subtitleProviderStore == null) {
-      throw new SearchSetupException("SubtitleProviderStore must be set.");
-    }
-    if (this.searchProgressListener == null) {
-      throw new SearchSetupException("SearchProgressListener must be set.");
-    }
-    if (this.indexingProgressListener == null) {
-      throw new SearchSetupException("IndexingProgressListener must be set.");
-    }
-  }
+	protected String getLanguageCode(String language) {
+		if (language.equals("Nederlands")) {
+			return "nl";
+		} else if (language.equals("Engels")) {
+			return "en";
+		}
+		return null;
+	}
+
+	protected void validate() throws SearchSetupException {
+		if (this.settings == null) {
+			throw new SearchSetupException("Settings must be set.");
+		}
+		if (this.subtitleProviderStore == null) {
+			throw new SearchSetupException("SubtitleProviderStore must be set.");
+		}
+		if (this.searchProgressListener == null) {
+			throw new SearchSetupException("SearchProgressListener must be set.");
+		}
+		if (this.indexingProgressListener == null) {
+			throw new SearchSetupException("IndexingProgressListener must be set.");
+		}
+	}
 
 }

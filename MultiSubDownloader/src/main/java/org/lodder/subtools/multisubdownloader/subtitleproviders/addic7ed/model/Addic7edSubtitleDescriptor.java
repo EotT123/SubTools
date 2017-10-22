@@ -77,7 +77,8 @@ public class Addic7edSubtitleDescriptor {
 	}
 
 	/**
-	 * @param uploader the uploader to set
+	 * @param uploader
+	 *            the uploader to set
 	 */
 	public void setUploader(String uploader) {
 		Uploader = uploader;
@@ -91,7 +92,8 @@ public class Addic7edSubtitleDescriptor {
 	}
 
 	/**
-	 * @param hearingImpaired the hearingImpaired to set
+	 * @param hearingImpaired
+	 *            the hearingImpaired to set
 	 */
 	public void setHearingImpaired(boolean hearingImpaired) {
 		this.hearingImpaired = hearingImpaired;

@@ -62,7 +62,7 @@ public class MovieReleaseControl extends ReleaseControl {
 			} catch (IMDBException e) {
 				LOGGER.warn("IMDBAPI Failed {}, using OMDBAPI as fallback", release);
 				OMDBDetails omdbinfo;
-				
+
 				try {
 					omdbinfo = omdbapi.getOMDBMovieDetails(movieRelease.getImdbidAsString());
 					if (omdbinfo != null) {

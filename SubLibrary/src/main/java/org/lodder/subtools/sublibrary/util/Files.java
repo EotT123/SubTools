@@ -25,7 +25,8 @@ public class Files {
 	private static final int BUF_SIZE = 0x1000; // 4K
 
 	public static void copy(File from, File to) throws IOException {
-		try (FileInputStream input = new FileInputStream(from); FileOutputStream output = new FileOutputStream(to)) {
+		try (FileInputStream input = new FileInputStream(from);
+				FileOutputStream output = new FileOutputStream(to)) {
 			byte[] buf = new byte[BUF_SIZE];
 			while (true) {
 				int r;
@@ -134,9 +135,8 @@ public class Files {
 	}
 
 	/*
-	 * Determines if a byte array is compressed. The java.util.zip GZip
-	 * implementaiton does not expose the GZip header so it is difficult to
-	 * determine if a string is compressed.
+	 * Determines if a byte array is compressed. The java.util.zip GZip implementaiton does not expose the GZip header
+	 * so it is difficult to determine if a string is compressed.
 	 * 
 	 * @param bytes an array of bytes
 	 * 

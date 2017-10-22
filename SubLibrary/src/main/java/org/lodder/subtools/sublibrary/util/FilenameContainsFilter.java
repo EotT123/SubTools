@@ -6,26 +6,26 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 public class FilenameContainsFilter implements FilenameFilter {
-    private final TreeSet<String> contains = new TreeSet<String>();
+	private final TreeSet<String> contains = new TreeSet<String>();
 
-    public FilenameContainsFilter(String s) {
-        contains.add(s.trim());
-    }
+	public FilenameContainsFilter(String s) {
+		contains.add(s.trim());
+	}
 
-    public FilenameContainsFilter(String[] sarray) {
-        for (String s : Arrays.asList(sarray)) {
-            contains.add(s.trim());
-        }
-        contains.remove("");
-    }
-    
-    @Override
-    public boolean accept(File dir, String name) {
-        for (String contain : contains) {
-            if (name.contains(contain)) {
-                return true;
-            }
-        }
-        return false;
-    }
+	public FilenameContainsFilter(String[] sarray) {
+		for (String s : Arrays.asList(sarray)) {
+			contains.add(s.trim());
+		}
+		contains.remove("");
+	}
+
+	@Override
+	public boolean accept(File dir, String name) {
+		for (String contain : contains) {
+			if (name.contains(contain)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
