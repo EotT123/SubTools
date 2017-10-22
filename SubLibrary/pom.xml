@@ -44,12 +44,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.3.2</version>
+			<version>3.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.7.3</version>
+			<version>1.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlrpc</groupId>
@@ -59,12 +59,12 @@
 		<dependency>
 			<groupId>com.dropbox.core</groupId>
 			<artifactId>dropbox-core-sdk</artifactId>
-			<version>2.0.6</version>
+			<version>2.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.5</version>
+			<version>2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -75,8 +75,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.0.3-beta</version>
-			<scope>provided</scope>
+			<version>2.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.mkolisnyk</groupId>
@@ -86,12 +85,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-			<version>4.0</version>
+			<version>4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.3.2</version>
+			<version>2.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
