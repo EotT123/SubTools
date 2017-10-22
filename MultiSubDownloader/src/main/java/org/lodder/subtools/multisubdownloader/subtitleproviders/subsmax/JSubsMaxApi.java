@@ -83,6 +83,9 @@ public class JSubsMaxApi extends Html {
 								break;
 							case "link":
 								if (submaxitem != null) {
+									if (tagContent == null) {
+										throw new NullPointerException("tagContent should not be null");
+									}
 									int pos = tagContent.lastIndexOf('/');
 									tagContent =
 											tagContent.substring(0, pos) + "/download-subtitle"
