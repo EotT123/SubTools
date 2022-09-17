@@ -27,6 +27,16 @@
 		<system>github</system>
 		<url>https://github.com/phdelodder/SubTools/issues</url>
 	</issueManagement>
+	
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<url>https://raw.githubusercontent.com/EotT123/SubTools/master/</url>
+			<releases>
+	            <enabled>true</enabled>
+			</releases>	
+		</repository>
+	</distributionManagement>
 
 	<build>
 		<pluginManagement>
