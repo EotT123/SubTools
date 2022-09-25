@@ -1,0 +1,41 @@
+---
+name: "tagged-release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  gh_tagged_release:
+    runs-on: "ubuntu-latest"
+    env:
+      JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 16
+      uses: actions/setup-java@v3
+      with:
+        java-version: '16'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        files: |
+          *.jar
+      id: "automatic_releases"
+    - name: "Automatically mirror release artifacts"
+      env:
+        GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
+      run: |
+        ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
+    - uses: "marvinpinto/action-keybase-notifications@latest"
+      if: always()
+      with:
+        job_status: ${{ job.status }}
+        opensentinel_token: ${{ secrets.OSL_TOKEN }}
