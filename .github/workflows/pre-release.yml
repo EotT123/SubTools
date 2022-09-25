@@ -1,13 +1,15 @@
 ---
-name: "tagged-release"
+name: "pre-release"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "master"
+    tags-ignore:
+      - "*"
 
 jobs:
-  gh_tagged_release:
+  gh_pre_release:
     runs-on: "ubuntu-latest"
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
@@ -22,15 +24,24 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - uses: "EotT123/SubTools@latest"
+
+    - uses: "./packages/automatic-releases/"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
         files: |
           *.jar
       id: "automatic_releases"
+
     - name: "Automatically mirror release artifacts"
       env:
         GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
       run: |
-        ./.github/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
+        ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
+    - uses: "./packages/keybase-notifications"
+      if: always()
+      with:
+        job_status: ${{ job.status }}
+        opensentinel_token: ${{ secrets.OSL_TOKEN }}
