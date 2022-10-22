@@ -25,4 +25,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.buildRelease.outputs.releaseName }}
-        path: "/home/runner/work/SubTools/SubTools/MultiSubDownloader/target/multisubdownloader.jar"
+        path: "/home/runner/work/SubTools/SubTools/MultiSubDownloader/target/multisubdownloader.*.jar"
