@@ -24,4 +24,5 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v3
       with:
+        name: multisubdownloader.jar
         path: "/home/runner/work/SubTools/SubTools/MultiSubDownloader/target/multisubdownloader*.jar"
