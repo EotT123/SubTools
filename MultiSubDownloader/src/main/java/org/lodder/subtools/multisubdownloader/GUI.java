@@ -251,8 +251,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 .withTranslateShowNamesAction(this::showTranslateShowNames)
                 .withExportTranslationsAction(() -> exportImport.exportSettings(ExportImport.SettingsType.SERIE_MAPPING))
                 .withImportTranslationsAction(() -> exportImport.importSettings(ExportImport.SettingsType.SERIE_MAPPING))
-                .withExportExclusionsAction(() -> exportImport.exportSettings(ExportImport.SettingsType.EXCLUDE))
-                .withImportExclusionsAction(() -> exportImport.importSettings(ExportImport.SettingsType.EXCLUDE))
                 .withExportPreferencesAction(() -> exportImport.exportSettings(ExportImport.SettingsType.PREFERENCES))
                 .withImportPreferencesAction(() -> exportImport.importSettings(ExportImport.SettingsType.PREFERENCES))
                 .withCheckUpdateAction(() -> checkUpdate(true))

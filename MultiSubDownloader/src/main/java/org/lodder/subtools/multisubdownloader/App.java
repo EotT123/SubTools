@@ -143,7 +143,7 @@ public class App {
         Path file = Path.of(line.getCliOptionValue(CliOption.IMPORT_PREFERENCES));
         try {
             if (file.isRegularFile()) {
-                prefctrl.importPreferences(file, true);
+                prefctrl.importPreferences(file);
             }
         } catch (Exception e) {
             LOGGER.error("executeArgs: importPreferences", e);

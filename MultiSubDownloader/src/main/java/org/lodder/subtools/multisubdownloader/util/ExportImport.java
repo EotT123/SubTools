@@ -11,14 +11,12 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 
 import javax.swing.JFileChooser;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.settings.model.PathOrRegex;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -28,9 +26,7 @@ import org.lodder.subtools.sublibrary.util.filefilter.ExtensionFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.JsonFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.XmlFileFilter;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 
 import java.awt.Component;
 
@@ -54,7 +50,6 @@ public class ExportImport {
     @RequiredArgsConstructor
     @Getter
     public enum SettingsType {
-        EXCLUDE(FileType.JSON),
         PREFERENCES(FileType.XML),
         SERIE_MAPPING(FileType.JSON);
 
@@ -80,7 +75,6 @@ public class ExportImport {
             }
             try {
                 switch (listType) {
-                    case EXCLUDE -> ExportImportExclude.importSettings(path, userInteractionHandler, settingsControl);
                     case PREFERENCES -> ExportImportPreferences.importSettings(path, userInteractionHandler, settingsControl);
                     case SERIE_MAPPING -> ExportImportSerieMapping.importSettings(path, userInteractionHandler, manager);
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
@@ -104,7 +98,6 @@ public class ExportImport {
                 .ifPresent(path -> {
                     try {
                         switch (listType) {
-                            case EXCLUDE -> ExportImportExclude.exportSettings(path, settingsControl);
                             case PREFERENCES -> ExportImportPreferences.exportSettings(path, settingsControl);
                             case SERIE_MAPPING -> ExportImportSerieMapping.exportSettings(path, manager);
                             default -> throw new IllegalArgumentException("Unexpected value: " + listType);
@@ -114,33 +107,6 @@ public class ExportImport {
                                 Messages.getString("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
                     }
                 });
-    }
-
-    @UtilityClass
-    public static class ExportImportExclude {
-
-        public void exportSettings(Path path, SettingsControl settingsControl) throws Exception {
-            Files.writeString(path, new GsonBuilder().setPrettyPrinting().create()
-                    .toJson(settingsControl.getSettings().getExcludeList().stream().map(PathOrRegex::getValue).toList()));
-        }
-
-        public void importSettings(Path path, UserInteractionHandler userInteractionHandler, SettingsControl settingsControl)
-                throws ParserConfigurationException, CorruptSettingsFileException {
-            List<PathOrRegex> excludeList;
-            try {
-                excludeList = Arrays.stream(new Gson().fromJson(Files.readString(path), String[].class)).map(PathOrRegex::new).toList();
-            } catch (JsonSyntaxException | IOException e) {
-                throw new CorruptSettingsFileException(e);
-            }
-
-            getImportStyle(userInteractionHandler).ifPresent(importStyle -> {
-                if (importStyle == ImportStyle.OVERWRITE) {
-                    settingsControl.getSettings().getExcludeList().clear();
-                }
-                settingsControl.getSettings().getExcludeList().addAll(excludeList);
-                settingsControl.store();
-            });
-        }
     }
 
     @ExtensionMethod({ StreamExtension.class })
@@ -153,14 +119,11 @@ public class ExportImport {
 
         public void importSettings(Path path, UserInteractionHandler userInteractionHandler, SettingsControl settingsControl)
                 throws CorruptSettingsFileException {
-            getImportStyle(userInteractionHandler).stream().asThrowingStream(CorruptSettingsFileException.class)
-                    .map(importStyle -> importStyle == ImportStyle.OVERWRITE).forEach(overwrite -> {
-                        try {
-                            settingsControl.importPreferences(path, overwrite);
-                        } catch (IOException | BackingStoreException | InvalidPreferencesFormatException e) {
-                            throw new CorruptSettingsFileException(e);
-                        }
-                    });
+            try {
+                settingsControl.importPreferences(path);
+            } catch (IOException | BackingStoreException | InvalidPreferencesFormatException e) {
+                throw new CorruptSettingsFileException(e);
+            }
         }
     }
 

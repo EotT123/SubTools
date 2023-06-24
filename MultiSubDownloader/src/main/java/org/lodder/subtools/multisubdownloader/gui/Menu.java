@@ -36,8 +36,6 @@ public class Menu extends JMenuBar {
     private JMenu mnImportExport;
     private JMenuItem mntmExportTranslate;
     private JMenuItem mntmImportTranslate;
-    private JMenuItem mntmExportExclusions;
-    private JMenuItem mntmImportExclusions;
     private JMenuItem mntmExportPreferences;
     private JMenuItem mntmImportPreferences;
     private JMenuItem mntmAbout;
@@ -70,8 +68,6 @@ public class Menu extends JMenuBar {
         mnHelp = new JMenu(Messages.getString("Menu.Help"));
         mntmExportTranslate = new JMenuItem(Messages.getString("Menu.ExportMappingTvdbScene"));
         mntmImportTranslate = new JMenuItem(Messages.getString("Menu.ImportMappingTvdbScene"));
-        mntmExportExclusions = new JMenuItem(Messages.getString("Menu.ExportExclusions"));
-        mntmImportExclusions = new JMenuItem(Messages.getString("Menu.ImportExclusions"));
         mntmExportPreferences = new JMenuItem(Messages.getString("Menu.ExportPreferences"));
         mntmImportPreferences = new JMenuItem(Messages.getString("Menu.ImportPreferences"));
         mntmAbout = new JMenuItem(Messages.getString("Menu.About"));
@@ -102,8 +98,6 @@ public class Menu extends JMenuBar {
 
         mnImportExport.add(mntmExportTranslate);
         mnImportExport.add(mntmImportTranslate);
-        mnImportExport.add(mntmExportExclusions);
-        mnImportExport.add(mntmImportExclusions);
         mnImportExport.add(mntmExportPreferences);
         mnImportExport.add(mntmImportPreferences);
         add(mnImportExport);
@@ -204,11 +198,6 @@ public class Menu extends JMenuBar {
         return this;
     }
 
-    public Menu withExportExclusionsAction(Runnable exportExclusionsAction) {
-        addActionListener(mntmExportExclusions, exportExclusionsAction);
-        return this;
-    }
-
     public Menu withExportPreferencesAction(Runnable exportPreferencesAction) {
         addActionListener(mntmExportPreferences, exportPreferencesAction);
         return this;
@@ -236,11 +225,6 @@ public class Menu extends JMenuBar {
 
     public Menu withImportPreferencesAction(Runnable importPreferencesAction) {
         addActionListener(mntmImportPreferences, importPreferencesAction);
-        return this;
-    }
-
-    public Menu withImportExclusionsAction(Runnable importExclusionsAction) {
-        addActionListener(mntmImportExclusions, importExclusionsAction);
         return this;
     }
 
