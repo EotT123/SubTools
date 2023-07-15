@@ -43,9 +43,7 @@ public class ArrowButton extends JButton {
                 * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? arrowCount : 3)
                 + getBorder().getBorderInsets(this).left + getBorder().getBorderInsets(this).right,
                 arrowSize
-                        * (direction == SwingConstants.NORTH || direction == SwingConstants.SOUTH
-                        ? arrowCount
-                        : 3)
+                        * (direction == SwingConstants.NORTH || direction == SwingConstants.SOUTH ? arrowCount : 3)
                         + getBorder().getBorderInsets(this).top
                         + getBorder().getBorderInsets(this).bottom);
     }
@@ -69,16 +67,12 @@ public class ArrowButton extends JButton {
         for (int i = 0; i < arrowCount; i++) {
             paintArrow(g,
                     (w - arrowSize
-                            * (direction == SwingConstants.EAST || direction == SwingConstants.WEST
-                            ? arrowCount
-                            : 1))
+                            * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? arrowCount : 1))
                             / 2
                             + arrowSize
                             * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? i : 0),
                     (h - arrowSize
-                            * (direction == SwingConstants.EAST || direction == SwingConstants.WEST
-                            ? 1
-                            : arrowCount))
+                            * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? 1 : arrowCount))
                             / 2
                             + arrowSize
                             * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? 0 : i),
