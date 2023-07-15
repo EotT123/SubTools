@@ -10,9 +10,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 
 public class MyPasswordField extends JPasswordField implements MypasswordFieldOthersIntf {
 
