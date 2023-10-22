@@ -168,6 +168,7 @@
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>gestdown</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
@@ -203,7 +204,33 @@
 								<importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping>
 								<importMapping>java.time.LocalDateTime=java.time.Instant</importMapping>
 							</importMappings>
-
+						</configuration>
+					</execution>
+					<execution>
+						<id>opensubtitles</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<generatorName>java</generatorName>
+							<inputSpec>${project.basedir}/src/main/resources/opensubtitles/open-api.json</inputSpec>
+							<output>${project.build.directory}/generated-source/openapi</output>
+							<modelPackage>org.opensubtitles.model</modelPackage>
+							<apiPackage>org.opensubtitles.api</apiPackage>
+							<invokerPackage>org.opensubtitles.invoker</invokerPackage>
+							<packageName>org.opensubtitles</packageName>
+							<!--<language>java</language>-->
+							<!--<skipValidateSpec>true</skipValidateSpec>-->
+							<apisToGenerate>Authentication,Download,Subtitles</apisToGenerate>
+							<generateModelTests>false</generateModelTests>
+							<configOptions>
+								<typeMappings>integer=int,int=int</typeMappings>
+								<useSwaggerAnnotations>false</useSwaggerAnnotations>
+								<serializableModel>true</serializableModel>
+								<booleanGetterPrefix>is</booleanGetterPrefix>
+								<disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+								<!--<sourceFolder>src/gen/java</sourceFolder>-->
+							</configOptions>
 						</configuration>
 					</execution>
 				</executions>
