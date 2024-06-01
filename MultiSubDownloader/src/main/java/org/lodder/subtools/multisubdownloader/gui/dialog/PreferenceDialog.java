@@ -1,23 +1,15 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
 import java.io.Serial;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
 import org.lodder.subtools.multisubdownloader.framework.event.Event;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.JButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.container.ContainerExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.GeneralPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.MovieLibraryPanel;
@@ -28,12 +20,6 @@ import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ JComponentExtension.class, ContainerExtension.class, AbstractButtonExtension.class, JButtonExtension.class })
 public class PreferenceDialog extends MultiSubDialog {
 
     @Serial

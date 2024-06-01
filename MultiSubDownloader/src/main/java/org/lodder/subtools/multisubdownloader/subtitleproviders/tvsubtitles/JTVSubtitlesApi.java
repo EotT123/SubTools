@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,9 +23,7 @@ import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.StreamExtension;
 
-@ExtensionMethod({ StreamExtension.class })
 public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";

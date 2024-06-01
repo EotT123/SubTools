@@ -1,26 +1,20 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import javax.swing.*;
 import java.io.Serial;
 
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-
+import lombok.experimental.ExtensionMethod;
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox.JCheckBoxExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jslider.JSliderExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 
-import lombok.experimental.ExtensionMethod;
-import net.miginfocom.swing.MigLayout;
-
-@ExtensionMethod({ JTextFieldExtension.class, JCheckBoxExtension.class, JComponentExtension.class, JSliderExtension.class })
+@ExtensionMethod({ JTextFieldExtension.class, JSliderExtension.class })
 public class OptionsPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial

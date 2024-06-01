@@ -18,8 +18,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox.JCheckBoxExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyPasswordField;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
@@ -30,7 +28,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.Op
 import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 
-@ExtensionMethod({ JTextFieldExtension.class, JCheckBoxExtension.class, JComponentExtension.class, AbstractButtonExtension.class })
+@ExtensionMethod({ JTextFieldExtension.class, AbstractButtonExtension.class })
 public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
@@ -94,8 +92,8 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
             // LOCAL
             this.chkSourceLocal = new JCheckBox(Messages.getString("PreferenceDialog.Local"));
-            JScrollPane scrlPlocalSources =
-                    new JScrollPane().scrollPane(this.localSourcesFoldersList = JListWithImages.createForType(Path.class).distinctValues().build());
+            JScrollPane scrLocalSources =
+                    new JScrollPane().withView(this.localSourcesFoldersList = JListWithImages.createForType(Path.class).distinctValues().build());
             JButton btnBrowseLocalSources = new JButton(Messages.getString("PreferenceDialog.AddFolder"))
                     .withActionListener(() -> MemoryFolderChooser.getInstance()
                             .selectDirectory(this, Messages.getString("PreferenceDialog.SelectFolder"))
@@ -107,7 +105,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             PanelCheckBox.checkbox(chkSourceLocal).panelOnNewLine().addTo(titelPanel)
                     .addComponent("aligny top, gapy 5px", new JLabel(Messages.getString("PreferenceDialog.LocalFolderWithSubtitles")))
                     .addComponent("wrap", new JPanel(new MigLayout("insets 0", "[grow, nogrid]")).addComponent("split", btnBrowseLocalSources)
-                            .addComponent("wrap", btnRemoveLocalSources).addComponent("wrap", scrlPlocalSources));
+                            .addComponent("wrap", btnRemoveLocalSources).addComponent("wrap", scrLocalSources));
         }
 
         loadPreferenceSettings();

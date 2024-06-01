@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.util;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -10,8 +12,14 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 
-import javax.swing.JFileChooser;
-
+import com.google.gson.GsonBuilder;
+import io.gsonfire.GsonFireBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.StandardException;
+import lombok.experimental.UtilityClass;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
@@ -20,23 +28,9 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler.MessageSeverity;
-import org.lodder.subtools.sublibrary.util.StreamExtension;
 import org.lodder.subtools.sublibrary.util.filefilter.ExtensionFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.JsonFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.XmlFileFilter;
-
-import com.google.gson.GsonBuilder;
-
-import java.awt.Component;
-
-import io.gsonfire.GsonFireBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
-import lombok.experimental.StandardException;
-import lombok.experimental.UtilityClass;
 
 @RequiredArgsConstructor
 public class ExportImport {
@@ -108,7 +102,6 @@ public class ExportImport {
                 });
     }
 
-    @ExtensionMethod({ StreamExtension.class })
     @UtilityClass
     public static class ExportImportPreferences {
 

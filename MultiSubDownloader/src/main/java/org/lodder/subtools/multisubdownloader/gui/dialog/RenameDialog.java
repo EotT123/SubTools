@@ -22,11 +22,6 @@ import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.JButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.container.ContainerExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldPath;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.MovieLibraryPanel;
@@ -39,10 +34,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.StreamExtension;
 
-@ExtensionMethod({ JTextFieldExtension.class, ContainerExtension.class, JButtonExtension.class, AbstractButtonExtension.class,
-        JComponentExtension.class })
 public class RenameDialog extends MultiSubDialog implements PropertyChangeListener {
 
     @Serial
@@ -58,6 +50,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         setResizable(false);
         setBounds(100, 100, 650, 680);
         getContentPane().setLayout(new MigLayout("fill, nogrid", "[]", "[][]20:push[]"));
+
         TitlePanel.title(Messages.getString("PreferenceDialog.Settings"))
                 .padding(0).paddingLeft(20).fillContents(true).addTo(getContentPane(), "span, grow, wrap")
                 .addComponent("shrink", new JLabel(Messages.getString("PreferenceDialog.Location")))
@@ -124,7 +117,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
-    @ExtensionMethod({ Files.class, StreamExtension.class })
+    @ExtensionMethod({ Files.class })
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;

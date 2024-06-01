@@ -21,14 +21,11 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import extensions.java.nio.file.Path.PathExt;
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
 public abstract class DiskCache<K, V> extends Cache<K, V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskCache.class);
@@ -41,7 +38,7 @@ public abstract class DiskCache<K, V> extends Cache<K, V> {
         try {
             synchronized (cache.getCacheMap()) {
                 Path path = Path.of(System.getProperty("user.home")).resolve(".MultiSubDownloader");
-                if (!path.exists()) {
+                if (!Files.exists(path)) {
                     try {
                         Files.createDirectory(path);
                     } catch (IOException e) {
@@ -89,7 +86,7 @@ public abstract class DiskCache<K, V> extends Cache<K, V> {
                     LOGGER.error("Deleting cache file to fix errors");
                     connection.close();
                     try {
-                        PathExt.delete(path);
+                        path.deletePath();
                     } catch (IOException e) {
                         LOGGER.error("Error while deleting the cache file, please delete it yourself: %s (%s)".formatted(path, e.getMessage()), e);
                     }

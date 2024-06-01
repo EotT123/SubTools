@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
+import static extensions.javax.swing.Component.ComponentExt.*;
+
 import java.io.Serial;
 
 import javax.swing.JCheckBox;
@@ -7,9 +9,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
-
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox.JCheckBoxExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -21,10 +20,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 
-@ExtensionMethod({ JComponentExtension.class, JCheckBoxExtension.class })
 public class PanelCheckBox extends JPanel {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -52,7 +49,7 @@ public class PanelCheckBox extends JPanel {
         super.addImpl(checkbox, panelOnNewLine ? "span" : "", -1);
         super.addImpl(panel, "span, growx, " + (addVerticalSeparator ? "" : "gapx " + leftGap), -1);
         checkbox.addCheckedChangeListener(selected -> setEnabledChildren(panel, selected));
-        JComponentExtension.setRecursive(this, this::addContainerListener);
+        setRecursive(this, this::addContainerListener);
         setEnabledChildren(panel, isSelected());
     }
 

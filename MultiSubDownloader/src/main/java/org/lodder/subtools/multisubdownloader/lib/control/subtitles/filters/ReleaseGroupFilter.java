@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters;
 
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -9,10 +8,9 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({StringUtils.class})
-public class ReleasegroupFilter extends SubtitleFilter {
+public class ReleaseGroupFilter extends SubtitleFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReleasegroupFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseGroupFilter.class);
 
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {

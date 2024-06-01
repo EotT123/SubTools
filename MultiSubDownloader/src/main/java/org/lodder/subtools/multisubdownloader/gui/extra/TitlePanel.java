@@ -1,25 +1,15 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.Serial;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox.JCheckBoxExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
-
-import java.awt.Container;
-import java.awt.LayoutManager;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 
-@ExtensionMethod({ JComponentExtension.class, JCheckBoxExtension.class })
 public class TitlePanel extends JPanel {
     @Serial
     private static final long serialVersionUID = 1L;

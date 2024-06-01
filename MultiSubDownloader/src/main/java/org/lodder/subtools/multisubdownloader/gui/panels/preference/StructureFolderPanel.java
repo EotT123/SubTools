@@ -14,9 +14,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox.JCheckBoxExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldPath;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
@@ -29,7 +27,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 
-@ExtensionMethod({ JTextFieldExtension.class, JComponentExtension.class, JCheckBoxExtension.class, AbstractButtonExtension.class })
+@ExtensionMethod({ JTextFieldExtension.class,  AbstractButtonExtension.class })
 public class StructureFolderPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial

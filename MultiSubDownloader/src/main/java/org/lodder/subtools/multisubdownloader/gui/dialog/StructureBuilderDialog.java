@@ -15,10 +15,7 @@ import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.JButtonExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.component.ComponentExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.container.ContainerExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryBuilder;
@@ -34,7 +31,7 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-@ExtensionMethod({ JButtonExtension.class, AbstractButtonExtension.class, JComponentExtension.class, ContainerExtension.class,
+@ExtensionMethod({ AbstractButtonExtension.class, ContainerExtension.class,
         ComponentExtension.class, JTextFieldExtension.class })
 public class StructureBuilderDialog extends MultiSubDialog implements DocumentListener {
 

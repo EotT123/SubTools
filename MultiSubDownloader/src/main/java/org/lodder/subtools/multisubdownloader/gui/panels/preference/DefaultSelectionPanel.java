@@ -2,34 +2,25 @@ package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
 import static java.util.function.Predicate.*;
 
+import javax.swing.*;
+import javax.swing.table.*;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableModel;
-
+import lombok.experimental.ExtensionMethod;
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.ArrowButton;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jscrollpane.JScrollPaneExtension;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
-import java.awt.Component;
-import java.awt.Container;
-
-import lombok.experimental.ExtensionMethod;
-import net.miginfocom.swing.MigLayout;
-
-@ExtensionMethod({ Arrays.class, JComponentExtension.class, AbstractButtonExtension.class, JScrollPaneExtension.class })
+@ExtensionMethod({ Arrays.class,  AbstractButtonExtension.class, JScrollPaneExtension.class })
 public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf {
 
     private static final long serialVersionUID = 1L;

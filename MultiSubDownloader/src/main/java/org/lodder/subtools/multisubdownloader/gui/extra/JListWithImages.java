@@ -13,10 +13,7 @@ import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.experimental.ExtensionMethod;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
 
-@ExtensionMethod({ JComponentExtension.class })
 public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     @Serial

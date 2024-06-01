@@ -15,7 +15,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import lombok.experimental.ExtensionMethod;
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
@@ -24,9 +23,7 @@ import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
 import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
-import org.lodder.subtools.sublibrary.util.StreamExtension;
 
-@ExtensionMethod({ StreamExtension.class })
 @UtilityClass
 @Extension
 public class PathExt {

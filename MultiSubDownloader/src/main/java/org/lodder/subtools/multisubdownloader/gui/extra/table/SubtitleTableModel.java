@@ -2,18 +2,14 @@ package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
 import static org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName.*;
 
+import javax.swing.table.*;
 import java.io.Serial;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.swing.table.DefaultTableModel;
-
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ Arrays.class })
 public class SubtitleTableModel extends DefaultTableModel {
 
     @Serial

@@ -9,13 +9,12 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.util.StreamExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ StringUtils.class, Files.class, StreamExtension.class })
+@ExtensionMethod({ StringUtils.class, Files.class })
 public class CleanAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanAction.class);
