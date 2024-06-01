@@ -21,7 +21,6 @@ import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
 @Getter
-@ExtensionMethod({ OptionalExtension.class })
 public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, ProviderSerieId, ApiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edViaProxyAdapter.class);

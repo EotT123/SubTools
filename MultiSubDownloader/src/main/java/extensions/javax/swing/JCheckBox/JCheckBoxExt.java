@@ -1,20 +1,24 @@
-package org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox;
+package extensions.javax.swing.JCheckBox;
 
 import javax.swing.*;
 import java.util.Arrays;
 
 import lombok.experimental.UtilityClass;
+import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.Self;
+import manifold.ext.rt.api.This;
 import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 
+@Extension
 @UtilityClass
 public class JCheckBoxExtension {
 
-    public <T extends JCheckBox> T addCheckedChangeListener(T checkBox, BooleanConsumer... listeners) {
+    public static @Self JCheckBox addCheckedChangeListener(@This JCheckBox checkBox, BooleanConsumer... listeners) {
         checkBox.addItemListener(e -> Arrays.stream(listeners).forEach(listener -> listener.accept(((JCheckBox) e.getSource()).isSelected())));
         return checkBox;
     }
 
-    public <T extends JCheckBox> T visible(T checkBox, boolean visible) {
+    public static @Self JCheckBox visible(@This JCheckBox checkBox, boolean visible) {
         checkBox.setVisible(visible);
         return checkBox;
     }

@@ -32,14 +32,12 @@ import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ OptionalExtension.class })
 public class SubsceneApi extends Html implements SubtitleApi {
 
     private static final int RATEDURATION_SHORT = 1; // seconds

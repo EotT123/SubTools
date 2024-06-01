@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
+import javax.swing.*;
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -9,8 +10,9 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JOptionPane;
-
+import lombok.AccessLevel;
+import lombok.Getter;
+import name.falgout.jeffrey.throwing.ThrowingLongFunction;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -23,17 +25,11 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-
 @Getter(value = AccessLevel.PROTECTED)
-@ExtensionMethod({ OptionalExtension.class })
 public class TheTvdbAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheTvdbAdapter.class);
@@ -101,7 +97,7 @@ public class TheTvdbAdapter {
         if (tvdbSerie.isEmpty()) {
             valueBuilder.optionalValue(tvdbSerie)
                     .storeTempNullValue()
-                    .timeToLive(OptionalExtension.map(valueBuilder.getTemporaryTimeToLive(), v -> v * 2)
+                    .timeToLive(valueBuilder.getTemporaryTimeToLive().map(v ->  v * 2)
                             .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
                     .storeAsTempValue();
         } else {
@@ -109,7 +105,7 @@ public class TheTvdbAdapter {
             manager.valueBuilder()
                     .cacheType(CacheType.DISK)
                     .key("%s-serieId-%s".formatted(getProviderName(), encodedSerieName))
-                    .optionalValue(tvdbSerie.mapToObj(tvdbS -> new SerieMapping(serieName, tvdbS.getId(), tvdbS.getSerieName())))
+                    .optionalValue(tvdbSerie.map(tvdbS -> new SerieMapping(serieName, tvdbS.getId(), tvdbS.getSerieName())))
                     .storeTempNullValue()
                     .store();
         }

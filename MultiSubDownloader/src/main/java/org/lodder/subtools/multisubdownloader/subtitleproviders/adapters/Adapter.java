@@ -1,7 +1,5 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
-import static org.lodder.subtools.sublibrary.util.OptionalExtension.*;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -30,14 +28,12 @@ import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.experimental.ExtensionMethod;
 
 /**
- *
  * @param <T> type of the subtitle objects returned by the api
  * @param <S> type of the ProviderSerieId
  * @param <X> type of the exception thrown by the api
@@ -182,8 +178,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             serieNameValueBuilder
                     .value(new SerieMapping(serieName, null, null, seasonToUse))
                     .storeTempNullValue()
-                    .timeToLive(OptionalExtension
-                            .map(serieNameValueBuilder.getTemporaryTimeToLive(), v -> v * 2)
+                    .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
                             .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
                     .storeAsTempValue();
             return Optional.empty();
@@ -219,8 +214,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                     serieNameValueBuilder
                             .value(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse))
                             .storeTempNullValue()
-                            .timeToLive(OptionalExtension
-                                    .map(serieNameValueBuilder.getTemporaryTimeToLive(), v -> v * 2)
+                            .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
                                     .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
                             .storeAsTempValue();
                     previousResultsValueBuilder.collectionValue(providerSerieIds).store();

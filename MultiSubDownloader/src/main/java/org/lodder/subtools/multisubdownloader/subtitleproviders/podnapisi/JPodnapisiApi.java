@@ -23,7 +23,6 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.StringUtil;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
@@ -34,7 +33,7 @@ import lombok.experimental.ExtensionMethod;
 
 @Getter(value = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-@ExtensionMethod({ OptionalExtension.class, StringUtil.class })
+@ExtensionMethod({ StringUtil.class })
 public class JPodnapisiApi implements SubtitleApi {
 
     public static final int maxAge = 90;

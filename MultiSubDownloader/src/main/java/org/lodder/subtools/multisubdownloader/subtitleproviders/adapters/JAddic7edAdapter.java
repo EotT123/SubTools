@@ -22,7 +22,6 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.StringUtil;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
@@ -32,7 +31,6 @@ import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 
 @Getter
-@ExtensionMethod({ OptionalExtension.class })
 public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor, ProviderSerieId, Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edAdapter.class);

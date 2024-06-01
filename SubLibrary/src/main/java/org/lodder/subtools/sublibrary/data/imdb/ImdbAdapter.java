@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import com.pivovarit.function.ThrowingBiFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Manager;
@@ -15,16 +16,10 @@ import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pivovarit.function.ThrowingBiFunction;
-
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ OptionalExtension.class })
 public class ImdbAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImdbAdapter.class);

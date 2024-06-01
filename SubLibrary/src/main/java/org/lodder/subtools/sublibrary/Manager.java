@@ -38,7 +38,6 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
 import org.lodder.subtools.sublibrary.cache.InMemoryCache;
 import org.lodder.subtools.sublibrary.util.IOUtils;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.xml.XMLHelper;
@@ -46,7 +45,6 @@ import org.w3c.dom.Document;
 
 @Setter
 @RequiredArgsConstructor
-@ExtensionMethod({ OptionalExtension.class })
 public class Manager {
 
     private final HttpClient httpClient;
@@ -839,7 +837,7 @@ public class Manager {
             } else if (optionalSupplier != null) {
                 value = executeSupplier(optionalSupplier).orElse(null);
             } else if (optionalIntSupplier != null) {
-                value = OptionalExtension.mapToObj(executeSupplier(optionalIntSupplier), i -> i).orElse(null);
+                value = executeSupplier(optionalIntSupplier).mapToObj(i -> i).orElse(null);
             } else if (collectionSupplier != null) {
                 value = executeSupplier(collectionSupplier);
             } else if (optionalValue != null) {

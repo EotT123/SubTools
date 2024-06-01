@@ -9,13 +9,11 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.Structure
 import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
 @RequiredArgsConstructor
-@ExtensionMethod({ OptionalExtension.class, StringUtils.class })
 public abstract class LibraryBuilder {
 
     private final boolean useTvdb;

@@ -23,12 +23,11 @@ import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.StreamExtension;
 
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ OptionalExtension.class, StreamExtension.class })
+@ExtensionMethod({ StreamExtension.class })
 public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";

@@ -28,11 +28,9 @@ import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ OptionalExtension.class })
 public class JAddic7edApi extends Html implements SubtitleApi {
 
     private static final long RATEDURATION = 1; // seconds

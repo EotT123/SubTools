@@ -12,13 +12,11 @@ import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ OptionalExtension.class })
 public class MovieReleaseControl extends ReleaseControl {
     private final ImdbAdapter imdbAdapter;
     private final OmdbAdapter omdbAdapter;

@@ -11,10 +11,14 @@
 	<name>MultiSubDownloader</name>
 
 	<repositories>
-		<repository>
-			<id>d-maven</id>
-			<url>http://d-maven.googlecode.com/svn/trunk/repo</url>
-		</repository>
+<!--		<repository>-->
+<!--			<id>d-maven</id>-->
+<!--			<url>http://d-maven.googlecode.com/svn/trunk/repo</url>-->
+<!--		</repository>-->
+<!--		<repository>-->
+<!--			<id>Maven Central repo</id>-->
+<!--			<url>http://repo1.maven.org/maven2/</url>-->
+<!--		</repository>-->
 	</repositories>
 
 	<properties>
@@ -61,6 +65,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>systems.manifold</groupId>
+			<artifactId>manifold-ext-rt</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -114,6 +122,18 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<compilerArgs combine.children="append">
+						<arg>-Xplugin:Manifold</arg>
+					</compilerArgs>
+					<annotationProcessorPaths combine.children="append">
+						<path>
+							<groupId>systems.manifold</groupId>
+							<artifactId>manifold-ext</artifactId>
+							<version>${manifold.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -158,10 +178,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.openapitools</groupId>

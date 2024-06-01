@@ -6,26 +6,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.tvdb.exception.TheTvdbException;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
-
 import com.uwetrottmann.thetvdb.TheTvdb;
 import com.uwetrottmann.thetvdb.entities.Episode;
 import com.uwetrottmann.thetvdb.entities.EpisodesResponse;
 import com.uwetrottmann.thetvdb.entities.Series;
 import com.uwetrottmann.thetvdb.entities.SeriesResponse;
 import com.uwetrottmann.thetvdb.entities.SeriesResultsResponse;
-
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
+import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.data.tvdb.exception.TheTvdbException;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
 import retrofit2.Response;
 
-@ExtensionMethod({ OptionalExtension.class })
 public class TheTvdbApi {
 
     @Getter(value = AccessLevel.PRIVATE)

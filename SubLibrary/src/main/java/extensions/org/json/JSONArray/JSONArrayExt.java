@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util;
+package extensions.org.json.JSONArray;
 
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -6,16 +6,17 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import lombok.experimental.UtilityClass;
+import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.This;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import lombok.experimental.UtilityClass;
-
+@Extension
 @UtilityClass
-public class JSONUtils {
+public class JSONArrayExt {
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Stream<JSONObject> stream(JSONArray jsonArray) {
+    public static Stream<JSONObject> stream(@This JSONArray jsonArray) {
         return StreamSupport
                 .stream(Spliterators.spliteratorUnknownSize((Iterator<JSONObject>) (Iterator) jsonArray.iterator(), Spliterator.ORDERED), false);
     }

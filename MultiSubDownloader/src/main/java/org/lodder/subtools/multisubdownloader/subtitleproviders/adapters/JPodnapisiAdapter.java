@@ -22,7 +22,6 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,6 @@ import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 
 @Getter
-@ExtensionMethod({ OptionalExtension.class })
 public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPodnapisiAdapter.class);

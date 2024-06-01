@@ -12,7 +12,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.JSONUtils;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.opensubtitles.api.AuthenticationApi;
 import org.opensubtitles.invoker.ApiClient;
@@ -23,7 +22,7 @@ import org.opensubtitles.model.LoginRequest;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ OptionalExtension.class, JSONUtils.class })
+@ExtensionMethod({ JSONUtils.class })
 public class OpenSubtitlesApi implements SubtitleApi {
 
     private static final String APIKEY = "lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";

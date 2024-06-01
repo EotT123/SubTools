@@ -80,6 +80,10 @@
 			<artifactId>thetvdb-java</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>systems.manifold</groupId>
+			<artifactId>manifold-ext-rt</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
@@ -124,6 +128,30 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<compilerArgs combine.children="append">
+						<arg>-Xplugin:Manifold</arg>
+					</compilerArgs>
+					<annotationProcessorPaths combine.children="append">
+						<path>
+							<groupId>systems.manifold</groupId>
+							<artifactId>manifold-ext</artifactId>
+							<version>${manifold.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<!--class files as source must be available for extension method classes-->
+							<Contains-Sources>java,class</Contains-Sources>
+						</manifestEntries>
+					</archive>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
