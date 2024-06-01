@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Objects;
+import extensions.java.nio.file.Path.PathExt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -29,7 +30,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.lodder.subtools.sublibrary.util.TriConsumer;
 
 public enum SettingValue {
@@ -484,7 +484,7 @@ public enum SettingValue {
 
     private static SettingTypedRootElementFunctionIntf<Path> createSettingPath() {
         return createSetting(Path.class)
-                .toStringMapper(FileUtils::toAbsolutePathAsString)
+                .toStringMapper(PathExt::toAbsolutePathAsString)
                 .toObjectMapper(Path::of);
     }
 

@@ -8,11 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import extensions.java.nio.file.Path.PathExt;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.lodder.subtools.sublibrary.util.NamedMatcher;
 import org.lodder.subtools.sublibrary.util.NamedPattern;
 import org.slf4j.Logger;
@@ -134,7 +134,7 @@ public class ReleaseParser {
                 .season(seasonNumber)
                 .episodes(episodeNumbers)
                 .file(file)
-                .description(FileUtils.withoutExtension(description))
+                .description(PathExt.withoutExtension(description))
                 .releaseGroup(extractReleasegroup(file.getFileName().toString(), true))
                 .special(isSpecialEpisode(seasonNumber, episodeNumbers))
                 .quality(getQualityKeyword(fileParseName))

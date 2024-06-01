@@ -22,13 +22,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import extensions.java.nio.file.Path.PathExt;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.lodder.subtools.sublibrary.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class HttpClient {
@@ -112,11 +111,11 @@ public class HttpClient {
             byte[] data = in.readAllBytes();
             in.close();
 
-            if (url.getFile().endsWith(".zip") || FileUtils.isZipFile(new ByteArrayInputStream(data))) {
-                FileUtils.unzip(new ByteArrayInputStream(data), file, ".srt");
+            if (url.getFile().endsWith(".zip") || PathExt.isZipFile(new ByteArrayInputStream(data))) {
+                PathExt.unzip(new ByteArrayInputStream(data), file, ".srt");
             } else {
-                if (FileUtils.isGZipCompressed(data)) {
-                    data = FileUtils.decompressGZip(data);
+                if (PathExt.isGZipCompressed(data)) {
+                    data = PathExt.decompressGZip(data);
                 }
                 String content = new String(data, StandardCharsets.UTF_8);
                 if (content.contains("Daily Download count exceeded")) {

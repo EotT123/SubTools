@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.NotImplementedException;
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
@@ -27,15 +29,11 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.lodder.subtools.sublibrary.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ FileUtils.class, Files.class })
+@ExtensionMethod({ Files.class })
 public class Local implements SubtitleProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);

@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util;
+package extensions.java.nio.file.Path;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -15,28 +15,35 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.ExtensionMethod;
+import lombok.experimental.UtilityClass;
+import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import org.apache.commons.lang3.StringUtils;
+import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
+import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
+import org.lodder.subtools.sublibrary.util.StreamExtension;
 
 @ExtensionMethod({ StreamExtension.class })
-public class FileUtils {
+@UtilityClass
+@Extension
+public class PathExt {
 
-    public static String getExtension(Path path) {
+    public static String getExtension(@This Path path) {
         return StringUtils.substringAfterLast(path.getFileName().toString(), ".");
     }
 
-    public static boolean hasExtension(Path path, String extension) {
+    public static boolean hasExtension(@This Path path, String extension) {
         return extension.equalsIgnoreCase(getExtension(path));
     }
 
-    public static String changeExtension(Path path, String newExtension) {
+    public static String changeExtension(@This Path path, String newExtension) {
         return StringUtils.substringBeforeLast(path.getFileName().toString(), ".") + "." + newExtension;
     }
 
-    public static String withoutExtension(Path path) {
+    public static String withoutExtension(@This Path path) {
         return changeExtension(path, "");
     }
 
@@ -44,7 +51,7 @@ public class FileUtils {
         return StringUtils.substringBeforeLast(path, ".");
     }
 
-    public static String toAbsolutePathAsString(Path path) {
+    public static String toAbsolutePathAsString(@This Path path) {
         return path.toAbsolutePath().toString();
     }
 
@@ -74,7 +81,7 @@ public class FileUtils {
      * @throws IOException
      *         if an I/O error occurs while moving the path
      */
-    public static Path moveToDir(Path source, Path destinationDir, StandardCopyOption... copyOptions) throws IOException {
+    public static Path moveToDir(@This Path source, Path destinationDir, StandardCopyOption... copyOptions) throws IOException {
         return moveToDirAndRename(source, destinationDir, source.getFileName().toString(), copyOptions);
     }
 
@@ -107,7 +114,7 @@ public class FileUtils {
      * @throws IOException
      *         if an I/O error occurs while moving the path
      */
-    public static Path moveToDirAndRename(Path source, Path destinationDir, String newFileName, StandardCopyOption... copyOptions)
+    public static Path moveToDirAndRename(@This Path source, Path destinationDir, String newFileName, StandardCopyOption... copyOptions)
             throws IOException {
         Files.createDirectories(destinationDir);
         if (Files.isRegularFile(source)) {
@@ -155,7 +162,7 @@ public class FileUtils {
      *         if an I/O error occurs while deleting the path
      */
     // TODO change name? (nameclash)
-    public static void delete(Path path) throws IOException {
+    public static void deletePath(@This Path path) throws IOException {
         Files.walkFileTree(path, new DeleteDirVisitor());
     }
 
@@ -185,7 +192,7 @@ public class FileUtils {
      * @throws IOException
      *         if an I/O error occurs while deleting the path
      */
-    public static Path copyToDir(Path source, Path destinationDir, StandardCopyOption... copyOptions) throws IOException {
+    public static Path copyToDir(@This Path source, Path destinationDir, StandardCopyOption... copyOptions) throws IOException {
         return copyToDirAndRename(source, destinationDir, source.getFileName().toString(), copyOptions);
     }
 
@@ -218,7 +225,7 @@ public class FileUtils {
      * @throws IOException
      *         if an I/O error occurs while deleting the path
      */
-    public static Path copyToDirAndRename(Path source, Path destinationDir, String newFileName, StandardCopyOption... copyOptions)
+    public static Path copyToDirAndRename(@This Path source, Path destinationDir, String newFileName, StandardCopyOption... copyOptions)
             throws IOException {
         if (Files.isRegularFile(source)) {
             Files.createDirectories(destinationDir);
@@ -233,36 +240,36 @@ public class FileUtils {
         }
     }
 
-    public static String getFileNameAsString(Path path) {
+    public static String getFileNameAsString(@This Path path) {
         return path.getFileName().toString();
     }
 
-    public static boolean fileNameContains(Path path, String text) {
+    public static boolean fileNameContains(@This Path path, String text) {
         return path.getFileName().toString().contains(text);
     }
 
-    public static boolean fileNameContainsIgnoreCase(Path path, String text) {
+    public static boolean fileNameContainsIgnoreCase(@This Path path, String text) {
         return StringUtils.containsIgnoreCase(path.getFileName().toString(), text);
     }
 
-    public static boolean isEmptyDir(Path path) throws IOException {
+    public static boolean isEmptyDir(@This Path path) throws IOException {
         requireDir(path);
         return applySubfiles(path, children -> children.findAny().isEmpty());
     }
 
-    public static <T, X extends Exception> T applySubfiles(Path path, ThrowingFunction<Stream<Path>, T, X> function) throws IOException, X {
+    public static <T, X extends Exception> T applySubfiles(@This Path path, ThrowingFunction<Stream<Path>, T, X> function) throws IOException, X {
         try (Stream<Path> pathStream = Files.list(path)) {
             return function.apply(pathStream);
         }
     }
 
-    public static <X extends Exception> void foreachSubfile(Path path, ThrowingConsumer<Stream<Path>, X> consumer) throws IOException, X {
+    public static <X extends Exception> void foreachSubfile(@This Path path, ThrowingConsumer<Stream<Path>, X> consumer) throws IOException, X {
         try (Stream<Path> pathStream = Files.list(path)) {
             consumer.accept(pathStream);
         }
     }
 
-    public static void requireDir(Path path) {
+    public static void requireDir(@This Path path) {
         if (!Files.isDirectory(path)) {
             throw new IllegalArgumentException("[%s] is not a directory".formatted(path));
         }

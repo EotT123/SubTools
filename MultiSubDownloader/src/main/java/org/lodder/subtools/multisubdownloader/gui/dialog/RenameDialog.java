@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -11,14 +13,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingWorker;
-
+import com.google.common.collect.Streams;
+import lombok.Setter;
+import lombok.experimental.ExtensionMethod;
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -41,17 +39,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.lodder.subtools.sublibrary.util.StreamExtension;
-
-import com.google.common.collect.Streams;
-
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import lombok.Setter;
-import lombok.experimental.ExtensionMethod;
-import net.miginfocom.swing.MigLayout;
 
 @ExtensionMethod({ JTextFieldExtension.class, ContainerExtension.class, JButtonExtension.class, AbstractButtonExtension.class,
         JComponentExtension.class })
@@ -136,7 +124,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
-    @ExtensionMethod({ FileUtils.class, Files.class, StreamExtension.class })
+    @ExtensionMethod({ Files.class, StreamExtension.class })
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;

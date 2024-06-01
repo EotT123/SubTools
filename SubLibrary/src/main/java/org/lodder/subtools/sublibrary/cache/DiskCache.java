@@ -19,16 +19,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import extensions.java.nio.file.Path.PathExt;
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-
-import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod({ Files.class })
 public abstract class DiskCache<K, V> extends Cache<K, V> {
@@ -91,7 +89,7 @@ public abstract class DiskCache<K, V> extends Cache<K, V> {
                     LOGGER.error("Deleting cache file to fix errors");
                     connection.close();
                     try {
-                        FileUtils.delete(path);
+                        PathExt.delete(path);
                     } catch (IOException e) {
                         LOGGER.error("Error while deleting the cache file, please delete it yourself: %s (%s)".formatted(path, e.getMessage()), e);
                     }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.ExtensionMethod;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
@@ -17,14 +19,10 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ FileUtils.class, Files.class })
+@ExtensionMethod({ Files.class })
 @RequiredArgsConstructor
 public class DownloadAction {
 
@@ -93,7 +91,7 @@ public class DownloadAction {
                         cleanAction.cleanUpFiles(release, path, videoFileName);
                     }
                     if (librarySettings.isLibraryRemoveEmptyFolders() && release.getPath().isEmptyDir()) {
-                        FileUtils.delete(release.getPath());
+                        release.getPath().deletePath();
                     }
                 }
             }

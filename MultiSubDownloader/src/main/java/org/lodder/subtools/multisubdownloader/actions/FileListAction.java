@@ -9,18 +9,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import extensions.java.nio.file.Path.PathExt;
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
-import org.lodder.subtools.sublibrary.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ Files.class, FileUtils.class })
+@ExtensionMethod({ Files.class })
 public class FileListAction {
 
     private IndexingProgressListener indexingProgressListener;
@@ -138,7 +137,7 @@ public class FileListAction {
             }
             List<String> filters = langCodes.stream().map(word -> word + "." + subtitleExtension).toList();
             String subtitleNameWithoutExtension = subtitleName.replace(subtitleExtensionWithDot, "");
-            return file.getParent().list().map(FileUtils::getFileNameAsString).filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
+            return file.getParent().list().map(PathExt::getFileNameAsString).filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
                     .anyMatch(fileName -> fileName.contains(subtitleNameWithoutExtension));
         }
     }
