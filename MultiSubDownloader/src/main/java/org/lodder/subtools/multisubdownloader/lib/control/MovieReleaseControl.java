@@ -15,8 +15,6 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.experimental.ExtensionMethod;
-
 public class MovieReleaseControl extends ReleaseControl {
     private final ImdbAdapter imdbAdapter;
     private final OmdbAdapter omdbAdapter;
@@ -45,10 +43,10 @@ public class MovieReleaseControl extends ReleaseControl {
             if (movieDetails.isEmpty()) {
                 movieDetails = movieRelease.getImdbId().mapToObj(omdbAdapter::getMovieDetails).orElseGet(Optional::empty);
             }
-            movieDetails.ifPresentDo(info -> {
+            movieDetails.ifPresentOrElse(info -> {
                 movieRelease.setYear(info.year());
                 movieRelease.setName(info.getName());
-            }).ifEmptyDo(() -> LOGGER.error("Unable to get details from OMDB API, continue with filename info {}", movieRelease));
+            }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info {}", movieRelease));
         }
     }
 

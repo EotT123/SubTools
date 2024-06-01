@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import lombok.experimental.ExtensionMethod;
 
-@ExtensionMethod({ CLIExtension.class })
 public class CLI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CLI.class);

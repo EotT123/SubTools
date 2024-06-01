@@ -4,14 +4,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
 import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
 import org.lodder.subtools.sublibrary.model.Release;
-
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
 
 @RequiredArgsConstructor
 public abstract class LibraryBuilder {
@@ -31,8 +29,8 @@ public abstract class LibraryBuilder {
 
     protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers, boolean leadingZero) {
         if (structure.contains(tag.getLabel())) {
-            String afterLabel = structure.substringAfter(tag.getLabel());
-            String separator = afterLabel.isNotEmpty() ? afterLabel.substring(0, 1) : "";
+            String afterLabel =StringUtils.substringAfter(structure, tag.getLabel());
+            String separator = StringUtils.isNotEmpty(afterLabel) ? afterLabel.substring(0, 1) : "";
             if ("%".equals(separator)) {
                 separator = "";
             }

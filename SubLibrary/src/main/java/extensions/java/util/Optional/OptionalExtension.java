@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
@@ -190,15 +191,16 @@ public class OptionalExtension {
         return optional.isPresent() ? OptionalInt.of(mapper.applyAsInt(optional.get())) : OptionalInt.empty();
     }
     //
-        public static OptionalInt mapToOptionalInt(@This Optional<Integer> optional) {
-            return optional.map(OptionalInt::of).orElseGet(OptionalInt::empty);
-        }
+    public static OptionalInt mapToOptionalInt(@This Optional<Integer> optional) {
+        return optional.map(OptionalInt::of).orElseGet(OptionalInt::empty);
+    }
     //
     //    //
     //
-    //    public static <S, T, X extends Exception> Optional<T> mapToObj(@This Optional<S> optional, ThrowingFunction<S, T, X> mapper) throws X {
-    //        return optional.isPresent() ? Optional.ofNullable(mapper.apply(optional.get())) : Optional.empty();
-    //    }
+    public static <T, S, X extends Exception> Optional<S> mapToObj(@This Optional<T> optional, ThrowingFunction<T, S, X> mapper) throws X {
+        return optional.isPresent() ? Optional.ofNullable(mapper.apply(optional.get())) : Optional.empty();
+    }
+
     //
     //    //
     //
@@ -210,12 +212,12 @@ public class OptionalExtension {
     //
     //    //
     //
-    //    public static <T, X extends Exception> void ifPresentOrThrow(@This Optional<T> optional, ThrowingConsumer<T, X> consumer,
-    //            Supplier<X> exceptionSupplier) throws X {
-    //        if (optional.isPresent()) {
-    //            consumer.accept(optional.get());
-    //        } else {
-    //            throw exceptionSupplier.get();
-    //        }
-    //    }
+    public static <T, X extends Exception> void ifPresentOrThrow(@This Optional<T> optional, ThrowingConsumer<T, X> consumer,
+            Supplier<X> exceptionSupplier) throws X {
+        if (optional.isPresent()) {
+            consumer.accept(optional.get());
+        } else {
+            throw exceptionSupplier.get();
+        }
+    }
 }

@@ -1,22 +1,14 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
-import java.io.Serial;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-
-import org.lodder.subtools.multisubdownloader.Messages;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcheckbox.JCheckBoxExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
-
+import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
+import org.lodder.subtools.multisubdownloader.Messages;
+import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 
-@ExtensionMethod({ JCheckBoxExtension.class })
 public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel implements PreferencePanelIntf {
 
     @Serial

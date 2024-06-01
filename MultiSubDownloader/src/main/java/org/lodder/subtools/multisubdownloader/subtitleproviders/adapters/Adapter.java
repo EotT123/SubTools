@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -30,8 +31,6 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.experimental.ExtensionMethod;
 
 /**
  * @param <T> type of the subtitle objects returned by the api
@@ -137,7 +136,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName, int season,
             OptionalInt tvdbIdOptional) throws X {
         Supplier<ValueBuilderIsPresentIntf<Serializable>> tvdbIdValueBuilder =
-                () -> mapToObj(tvdbIdOptional, tvdbId -> getManager().valueBuilder().cacheType(CacheType.DISK)
+                () -> tvdbIdOptional.mapToObj(tvdbId -> getManager().valueBuilder().cacheType(CacheType.DISK)
                         .key("%s-serieName-tvdbId:%s-%s".formatted(getProviderName(), tvdbId,
                                 useSeasonForSerieId() ? season : -1))).orElseThrow();
         if (tvdbIdOptional.isPresent() && tvdbIdValueBuilder.get().isPresent()) {
@@ -153,20 +152,15 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 .key("%s-serieName-name:%s-%s".formatted(getProviderName(), serieName.toLowerCase(), seasonToUse));
 
         if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameValueBuilder.isPresent()) {
-            boolean returnValue;
-            Optional<SerieMapping> value;
             if (serieNameValueBuilder.isTemporaryObject()) {
-                returnValue = !serieNameValueBuilder.isExpiredTemporary();
-                value = Optional.empty();
+                if (!serieNameValueBuilder.isExpiredTemporary()) {
+                    return Optional.empty();
+                }
             } else {
-                value = serieNameValueBuilder.returnType(SerieMapping.class).getOptional();
-                returnValue = true;
-            }
-            if (returnValue) {
-                // if value using the name is present, return it
-                // if tvdbId is known, also persist the value using the tvdbId
-                return ifPresentDo(value,
+                Optional<SerieMapping> serieMapping = serieNameValueBuilder.returnType(SerieMapping.class).getOptional();
+                serieMapping.ifPresent(
                         providerSerieName -> tvdbIdOptional.ifPresent(tvdbId -> tvdbIdValueBuilder.get().value(providerSerieName).store()));
+                return serieMapping;
             }
         }
 
@@ -196,7 +190,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             Optional<S> uriForSerie;
             // Check if the previous results were the same for the service. If so, don't ask the user to select again
             if (previousResultsPresent
-                    && previousResultsValueBuilder.returnType((Class<List<S>>) null, null).getCollection().equals(providerSerieIds)) {
+                && previousResultsValueBuilder.returnType((Class<List<S>>) null, null).getCollection().equals(providerSerieIds)) {
                 uriForSerie = Optional.empty();
             } else {
                 // let the user select the correct provider serie id

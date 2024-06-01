@@ -4,14 +4,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.json.JSONArray;
+import lombok.Getter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.util.JSONUtils;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.opensubtitles.api.AuthenticationApi;
 import org.opensubtitles.invoker.ApiClient;
@@ -19,10 +18,6 @@ import org.opensubtitles.invoker.ApiException;
 import org.opensubtitles.model.Login200Response;
 import org.opensubtitles.model.LoginRequest;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ JSONUtils.class })
 public class OpenSubtitlesApi implements SubtitleApi {
 
     private static final String APIKEY = "lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";
@@ -73,7 +68,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public List<OpensubtitleSerieId> getProviderSerieIds(String serieName) throws OpenSubtitlesException {
         try {
-            JSONArray shows = manager.getPageContentBuilder()
+            return manager.getPageContentBuilder()
                     .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                             + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
                     .userAgent("")
@@ -81,8 +76,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     .retries(1)
                     .retryPredicate(exception -> exception instanceof HttpClientException e && e.getResponseCode() == 429)
                     .retryWait(5)
-                    .getAsJsonArray();
-            return shows.stream()
+                    .getAsJsonArray()
+                    .stream()
                     .filter(show -> "tv".equals(show.getString("kind")))
                     .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"), show.getString("year")))
                     .toList();

@@ -11,7 +11,7 @@ import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 
 @Extension
 @UtilityClass
-public class JCheckBoxExtension {
+public class JCheckBoxExt {
 
     public static @Self JCheckBox addCheckedChangeListener(@This JCheckBox checkBox, BooleanConsumer... listeners) {
         checkBox.addItemListener(e -> Arrays.stream(listeners).forEach(listener -> listener.accept(((JCheckBox) e.getSource()).isSelected())));

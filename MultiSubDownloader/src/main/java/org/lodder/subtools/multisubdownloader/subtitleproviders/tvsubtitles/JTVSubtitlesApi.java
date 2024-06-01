@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,8 +25,6 @@ import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.StreamExtension;
-
-import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod({ StreamExtension.class })
 public class JTVSubtitlesApi extends Html implements SubtitleApi {
@@ -54,11 +53,11 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
     public Set<TVsubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language)
             throws TvSubtitlesException {
         return getEpisodeUrl(SERIE_URL_PREFIX + providerSerieId.getProviderId(), season, episode)
-                .mapToObj(episodeUrl -> getSubtitles(episodeUrl, language))
+                .mapToObj((String episodeUrl) -> getSubtitles(episodeUrl, language))
                 .orElseGet(Set::of);
     }
 
-    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language) throws TvSubtitlesException {
+    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language)     throws TvSubtitlesException {
         return getManager().valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s".formatted(getSubtitleSource().name(), episodeUrl, language))

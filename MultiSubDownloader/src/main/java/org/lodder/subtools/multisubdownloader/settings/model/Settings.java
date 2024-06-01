@@ -24,7 +24,6 @@ import lombok.experimental.ExtensionMethod;
 @Getter
 @Setter
 @Accessors(chain = true)
-@ExtensionMethod({ Arrays.class })
 public class Settings implements UserInteractionSettingsIntf {
 
     private Path lastOutputDir;
