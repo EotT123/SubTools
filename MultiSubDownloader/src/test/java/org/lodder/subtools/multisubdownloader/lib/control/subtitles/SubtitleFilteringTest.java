@@ -116,10 +116,10 @@ class SubtitleFilteringTest {
     private Subtitle createSubtitle(String filename, String releaseGroup, boolean excludeHearing, String quality) {
         Subtitle subtitle = mock(Subtitle.class);
 
-        when(subtitle.getFileName()).thenReturn(filename);
-        when(subtitle.getReleaseGroup()).thenReturn(releaseGroup);
-        when(subtitle.getQuality()).thenReturn(quality);
-        when(subtitle.isHearingImpaired()).thenReturn(excludeHearing);
+        when(subtitle.fileName).thenReturn(filename);
+        when(subtitle.releaseGroup).thenReturn(releaseGroup);
+        when(subtitle.quality).thenReturn(quality);
+        when(subtitle.hearingImpaired).thenReturn(excludeHearing);
 
         return subtitle;
     }

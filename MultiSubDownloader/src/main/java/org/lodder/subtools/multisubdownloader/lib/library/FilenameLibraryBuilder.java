@@ -155,7 +155,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     }
 
     public String buildSubtitle(Release release, Subtitle sub, String filename, Integer version) {
-        return buildSubtitle(release, filename, sub.getLanguage(), version);
+        return buildSubtitle(release, filename, sub.language, version);
     }
 
     public String buildSubtitle(Release release, String filename, Language language, Integer version) {

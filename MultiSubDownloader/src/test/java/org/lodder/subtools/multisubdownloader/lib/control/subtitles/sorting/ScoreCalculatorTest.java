@@ -44,9 +44,9 @@ class ScoreCalculatorTest {
 
     private Subtitle createSubtitle(String filename, String quality, String team) {
         Subtitle subtitle = mock(Subtitle.class);
-        when(subtitle.getFileName()).thenReturn(filename);
-        when(subtitle.getQuality()).thenReturn(quality);
-        when(subtitle.getReleaseGroup()).thenReturn(team);
+        when(subtitle.fileName).thenReturn(filename);
+        when(subtitle.quality).thenReturn(quality);
+        when(subtitle.releaseGroup).thenReturn(team);
         return subtitle;
     }
 

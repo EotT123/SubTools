@@ -11,22 +11,22 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class Release extends Video {
 
-    @val Set<Subtitle> matchingSubs = new HashSet<>();
+    private final Set<Subtitle> matchingSubsSet = new HashSet<>();
     @val Path path;
     @val String quality;
     @val String description;
     @val String releaseGroup;
 
     public void addMatchingSub(Subtitle sub) {
-        matchingSubs.add(sub);
+        matchingSubsSet.add(sub);
     }
 
     public List<Subtitle> getMatchingSubs() {
-        return new ArrayList<>(matchingSubs);
+        return new ArrayList<>(matchingSubsSet);
     }
 
     public int getMatchingSubCount() {
-        return matchingSubs.size();
+        return matchingSubsSet.size();
     }
 
     protected Release(VideoType videoFileType, Path path, String description, String releaseGroup, String quality) {

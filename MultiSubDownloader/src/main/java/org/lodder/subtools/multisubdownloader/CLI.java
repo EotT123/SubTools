@@ -134,9 +134,9 @@ public class CLI {
             System.out.println("No subtitles found for: ${release.fileName}");
         } else {
             IntStream.range(0, selection.size()).forEach(j -> {
-                System.out.println("Downloading subtitle: " + release.getMatchingSubs().get(0).getFileName());
+                System.out.println("Downloading subtitle: " + release.matchingSubs.get(j).fileName);
                 try {
-                    downloadAction.download(release, release.getMatchingSubs().get(j), selection.size() == 1 ? null : j + 1);
+                    downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
                 } catch (IOException | ManagerException e) {
                     LOGGER.error("Error while downloading subtitle for %s (%s)".formatted(release.getReleaseDescription(), e.getMessage()), e);
                 }

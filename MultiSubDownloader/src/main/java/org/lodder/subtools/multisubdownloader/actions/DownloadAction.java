@@ -41,7 +41,7 @@ public class DownloadAction {
     }
 
     public void download(Release release, Subtitle subtitle) throws IOException, ManagerException {
-        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.getFileName(), release.fileName);
+        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
         download(release, subtitle, 0);
     }
 
@@ -64,13 +64,13 @@ public class DownloadAction {
         Path subFile = path.resolve(subFileName);
 
         boolean success;
-        if (subtitle.getSourceLocation() == Subtitle.SourceLocation.FILE) {
-            subtitle.getFile().copyToDir(path);
+        if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
+            subtitle.file.copyToDir(path);
             success = true;
         } else {
             String url;
             try {
-                url = subtitle.getSourceLocation() == Subtitle.SourceLocation.URL ? subtitle.getUrl() : subtitle.getUrlSupplier().get();
+                url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url : subtitle.urlSupplier.get();
                 success = manager.store(url, subFile);
                 LOGGER.debug("doDownload file was [{}] ", success);
             } catch (SubtitlesProviderException e) {
@@ -90,13 +90,13 @@ public class DownloadAction {
                         CleanAction cleanAction = new CleanAction(librarySettings);
                         cleanAction.cleanUpFiles(release, path, videoFileName);
                     }
-                    if (librarySettings.isLibraryRemoveEmptyFolders() && release.getPath().isEmptyDir()) {
-                        release.getPath().deletePath();
+                    if (librarySettings.isLibraryRemoveEmptyFolders() && release.path.isEmptyDir()) {
+                        release.path.deletePath();
                     }
                 }
             }
             if (librarySettings.isLibraryBackupSubtitle()) {
-                String langFolder = subtitle.getLanguage() == null ? Language.ENGLISH.getName() : subtitle.getLanguage().getName();
+                String langFolder = subtitle.language == null ? Language.ENGLISH.getName() : subtitle.language.getName();
                 Path backupPath = librarySettings.getLibraryBackupSubtitlePath().resolve(langFolder);
 
                 if (!backupPath.exists()) {
@@ -108,7 +108,7 @@ public class DownloadAction {
                 }
 
                 if (librarySettings.isLibraryBackupUseWebsiteFileName()) {
-                    subFile.copyToDirAndRename(backupPath, subtitle.getFileName());
+                    subFile.copyToDirAndRename(backupPath, subtitle.fileName);
                 } else {
                     subFile.copyToDirAndRename(backupPath, subFileName);
                 }

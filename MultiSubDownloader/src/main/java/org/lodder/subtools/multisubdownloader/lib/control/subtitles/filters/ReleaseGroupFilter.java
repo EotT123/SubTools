@@ -14,14 +14,14 @@ public class ReleaseGroupFilter extends SubtitleFilter {
 
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {
-        if (subtitle.getReleaseGroup().isEmpty()) {
-            subtitle.setReleaseGroup(ReleaseParser.extractReleasegroup(subtitle.getFileName(), subtitle.getFileName().endsWith(".srt")));
+        if (subtitle.releaseGroup.isEmpty()) {
+            subtitle.releaseGroup = ReleaseParser.extractReleasegroup(subtitle.fileName, subtitle.fileName.endsWith(".srt"));
         }
-        if (!StringUtils.containsAnyIgnoreCase(subtitle.getReleaseGroup(), release.releaseGroup, subtitle.getReleaseGroup())) {
+        if (!StringUtils.containsAnyIgnoreCase(subtitle.releaseGroup, release.releaseGroup, subtitle.releaseGroup)) {
             return false;
         }
-        LOGGER.debug("getSubtitlesFiltered: found KEYWORD based TEAM match [{}] ", subtitle.getFileName());
-        subtitle.setSubtitleMatchType(SubtitleMatchType.TEAM);
+        LOGGER.debug("getSubtitlesFiltered: found KEYWORD based TEAM match [{}] ", subtitle.fileName);
+        subtitle.subtitleMatchType = SubtitleMatchType.TEAM;
         return true;
     }
 

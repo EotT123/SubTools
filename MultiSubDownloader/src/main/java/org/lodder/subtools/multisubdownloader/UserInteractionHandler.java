@@ -10,11 +10,11 @@ public interface UserInteractionHandler extends org.lodder.subtools.sublibrary.u
     default List<Subtitle> getAutomaticSelection(List<Subtitle> subtitles) {
         List<Subtitle> shortlist = !getSettings().isOptionsMinAutomaticSelection ? subtitles :
                 subtitles.stream()
-                        .filter(subtitle -> subtitle.getScore() >= getSettings().optionsMinAutomaticSelectionValue)
+                        .filter(subtitle -> subtitle.score >= getSettings().optionsMinAutomaticSelectionValue)
                         .toList();
         if (getSettings().isOptionsDefaultSelection) {
             List<Subtitle> defaultSelectionsFound = getSettings().optionsDefaultSelectionQualityList.stream()
-                    .flatMap(q -> shortlist.stream().filter(subtitle -> q.isTypeForValue(subtitle.getQuality())))
+                    .flatMap(q -> shortlist.stream().filter(subtitle -> q.isTypeForValue(subtitle.quality)))
                     .distinct().toList();
             if (!defaultSelectionsFound.isEmpty()) {
                 return defaultSelectionsFound;

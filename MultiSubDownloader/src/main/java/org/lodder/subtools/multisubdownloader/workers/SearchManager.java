@@ -110,7 +110,7 @@ public class SearchManager implements Cancelable {
 
         /* set the score of the found subtitles */
         ScoreCalculator calculator = this.scoreCalculators.get(release);
-        subtitles.forEach(subtitle -> subtitle.setScore(calculator.calculate(subtitle)));
+        subtitles.forEach(subtitle -> subtitle.score = calculator.calculate(subtitle));
 
         synchronized (this) {
             calculateProgress();

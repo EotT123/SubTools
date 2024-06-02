@@ -15,14 +15,14 @@ public class KeywordFilter extends SubtitleFilter {
     public boolean useSubtitle(Release release, Subtitle subtitle) {
         String keywordsFile = ReleaseParser.getQualityKeyword(getReleaseName(release));
 
-        if (subtitle.getQuality().isEmpty()) {
-            subtitle.setQuality(ReleaseParser.getQualityKeyword(subtitle.getFileName()));
+        if (subtitle.quality.isEmpty()) {
+            subtitle.quality = ReleaseParser.getQualityKeyword(subtitle.fileName);
         }
         if (!checkKeywordSubtitleMatch(subtitle, keywordsFile)) {
             return false;
         }
-        LOGGER.debug("getSubtitlesFiltered: found KEYWORD match [{}] ", subtitle.getFileName());
-        subtitle.setSubtitleMatchType(SubtitleMatchType.KEYWORD);
+        LOGGER.debug("getSubtitlesFiltered: found KEYWORD match [{}] ", subtitle.fileName);
+        subtitle.subtitleMatchType = SubtitleMatchType.KEYWORD;
         return true;
     }
 

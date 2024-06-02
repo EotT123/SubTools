@@ -140,11 +140,11 @@ public class VideoTableModel extends DefaultTableModel {
     public void addRow(Subtitle subtitle) {
         synchronized (this) {
             Vector<Object> row = SUBTITLE_COLUMNS.stream().map(searchColumn -> switch (searchColumn) {
-                case FILENAME -> subtitle.getFileName();
+                case FILENAME -> subtitle.fileName;
                 case SELECT -> false;
                 case OBJECT -> subtitle;
-                case SOURCE -> subtitle.getSubtitleSource();
-                case SCORE -> subtitle.getScore();
+                case SOURCE -> subtitle.subtitleSource;
+                case SCORE -> subtitle.score;
                 default -> throw new IllegalArgumentException("Unexpected value: " + searchColumn);
             }).collect(Collectors.toCollection(Vector::new));
             this.addRow(row);

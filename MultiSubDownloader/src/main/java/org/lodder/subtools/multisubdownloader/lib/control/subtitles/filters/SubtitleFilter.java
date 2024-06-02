@@ -19,7 +19,7 @@ public abstract class SubtitleFilter {
     }
 
     protected boolean checkKeywordSubtitleMatch(Subtitle subtitle, String keywordsFile) {
-        String keywordsSub = ReleaseParser.getQualityKeyword(subtitle.getFileName());
+        String keywordsSub = ReleaseParser.getQualityKeyword(subtitle.fileName);
         return keywordsFile.equalsIgnoreCase(keywordsSub) || keywordCheck(keywordsFile, keywordsSub);
     }
 

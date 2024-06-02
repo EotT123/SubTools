@@ -28,7 +28,7 @@ public class SubtitleFiltering {
     }
 
     private boolean excludeSubtitleHearingImpaired(Subtitle subtitle, Release release) {
-        return settings.optionSubtitleExcludeHearingImpaired && subtitle.isHearingImpaired();
+        return settings.optionSubtitleExcludeHearingImpaired && subtitle.hearingImpaired;
     }
 
     private boolean excludeSubtitleKeywordMatch(Subtitle subtitle, Release release) {

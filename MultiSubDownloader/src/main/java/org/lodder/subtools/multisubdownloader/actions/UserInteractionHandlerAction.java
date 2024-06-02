@@ -50,7 +50,7 @@ public class UserInteractionHandlerAction {
                 if (settings.optionsAlwaysConfirm) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (release.getMatchingSubs().size() == 1
-                           && release.getMatchingSubs().get(0).getSubtitleMatchType() == SubtitleMatchType.EXACT) {
+                           && release.getMatchingSubs().get(0).subtitleMatchType == SubtitleMatchType.EXACT) {
                     LOGGER.debug("determineWhatSubtitleDownload: Exact Match");
                     return List.of(release.getMatchingSubs().get(0));
                 } else if (release.getMatchingSubs().size() > 1) {

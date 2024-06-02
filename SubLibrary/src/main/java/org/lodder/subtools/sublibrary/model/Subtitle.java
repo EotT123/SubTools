@@ -5,34 +5,31 @@ import java.nio.file.Path;
 import com.pivovarit.function.ThrowingSupplier;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.builder.EqualsExclude;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 
-@Setter
-@Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 public class Subtitle {
     @EqualsExclude
-    private final ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
-    private final String url;
-    private final Path file;
-    private final SourceLocation sourceLocation;
+    @val ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
+    @val String url;
+    @val Path file;
+    @val SourceLocation sourceLocation;
 
-    private String fileName;
-    private Language language;
-    private String releaseGroup;
-    private String uploader;
-    private SubtitleMatchType subtitleMatchType;
-    private SubtitleSource subtitleSource;
-    private boolean hearingImpaired;
-
-    private String quality;
-    private int score;
+    @var String fileName;
+    @var Language language;
+    @var String releaseGroup;
+    @var String uploader;
+    @var SubtitleMatchType subtitleMatchType;
+    @var SubtitleSource subtitleSource;
+    @var boolean hearingImpaired;
+    @var String quality;
+    @var int score;
 
     public enum SourceLocation {
         URL, URL_SUPPLIER, FILE
@@ -73,7 +70,7 @@ public class Subtitle {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + this.getFileName() + " " + this.getQuality();
+        return "${getClass().getSimpleName()}: $fileName $quality";
     }
 
     public Subtitle fileName(String fileName) {

@@ -416,21 +416,19 @@ public class GUI extends JFrame implements PropertyChangeListener {
                         if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
                             final Subtitle subtitle = (Subtitle) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
                             String filename = "";
-                            if (!subtitle.getFileName().endsWith(".srt")) {
-                                filename = subtitle.getFileName() + ".srt";
+                            if (!subtitle.fileName.endsWith(".srt")) {
+                                filename = subtitle.fileName + ".srt";
                             }
                             if (OsCheck.getOperatingSystemType() == OSType.Windows) {
                                 filename = filename.removeIllegalWindowsChars();
                             }
 
                             try {
-                                if (subtitle.getSourceLocation() == Subtitle.SourceLocation.FILE) {
-                                    subtitle.getFile().copyToDir(path);
+                                if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
+                                    subtitle.file.copyToDir(path);
                                 } else {
                                     Manager manager = (Manager) this.app.make("Manager");
-                                    String url =
-                                            subtitle.getSourceLocation() == Subtitle.SourceLocation.URL ? subtitle.getUrl()
-                                                    : subtitle.getUrlSupplier().get();
+                                    String url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url : subtitle.urlSupplier.get();
                                     manager.store(url, path.resolve(filename));
                                 }
                             } catch (IOException | ManagerException e) {
