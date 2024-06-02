@@ -62,7 +62,7 @@ public class CLI {
 
     private void checkUpdate(Manager manager) {
         UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
-        if (u.shouldCheckForNewUpdate(settings.getUpdateCheckPeriod()) && u.isNewVersionAvailable()) {
+        if (u.shouldCheckForNewUpdate(settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
             System.out.println(Messages.getString("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
         }
     }
@@ -148,7 +148,7 @@ public class CLI {
         if (line.hasCliOption(CliOption.FOLDER)) {
             return List.of(Path.of(line.getCliOptionValue(CliOption.FOLDER)));
         } else {
-            return new ArrayList<>(this.settings.getDefaultFolders());
+            return new ArrayList<>(this.settings.defaultFolders);
         }
     }
 

@@ -153,7 +153,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
     private List<Path> getFiles(String filePath, Language language, boolean recursive, boolean overwriteExistingSubtitles) {
         /* Get a list of selected directories */
-        List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : this.getSettings().getDefaultFolders();
+        List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : this.getSettings().defaultFolders;
 
         /* Scan directories for video files */
         /* Tell Action where to send progressUpdates */

@@ -91,7 +91,7 @@ public class FileListAction {
     }
 
     private boolean isExcludedDir(Path path) {
-        boolean excludedDir = settings.getExcludeList().stream().anyMatch(item -> item.isExcludedPath(path));
+        boolean excludedDir = settings.excludeList.stream().anyMatch(item -> item.isExcludedPath(path));
         if (excludedDir) {
             LOGGER.trace("isExcludedDir, skipping [{}]", path);
         }
@@ -99,7 +99,7 @@ public class FileListAction {
     }
 
     private boolean isExcludedFile(Path path) {
-        boolean excludedFile = settings.getExcludeList().stream().anyMatch(item -> item.isExcludedPath(path));
+        boolean excludedFile = settings.excludeList.stream().anyMatch(item -> item.isExcludedPath(path));
         if (excludedFile) {
             LOGGER.trace("isExcludedFile, skipping [{}]", path);
         }
@@ -130,7 +130,7 @@ public class FileListAction {
             Set<String> langCodes = new HashSet<>();
             langCodes.add(language.getLangCode());
             langCodes.addAll(language.getLangCodesOther());
-            String customLangCode = settings.getEpisodeLibrarySettings().getLangCodeMap().get(language);
+            String customLangCode = settings.episodeLibrarySettings.getLangCodeMap().get(language);
             if (!StringUtils.isBlank(customLangCode)) {
                 langCodes.add(customLangCode);
             }

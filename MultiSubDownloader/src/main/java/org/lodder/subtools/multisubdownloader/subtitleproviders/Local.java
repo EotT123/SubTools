@@ -55,7 +55,7 @@ public class Local implements SubtitleProvider {
     }
 
     private List<Path> getPossibleSubtitles(String filter) {
-        return settings.getLocalSourcesFolders().stream()
+        return settings.localSourcesFolders.stream()
                 .flatMap(local -> getAllSubtitlesFiles(local, filter).stream())
                 .toList();
     }

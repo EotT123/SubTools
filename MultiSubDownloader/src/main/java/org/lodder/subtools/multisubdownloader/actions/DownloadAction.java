@@ -34,8 +34,8 @@ public class DownloadAction {
 
     public void download(Release release, Subtitle subtitle, Integer version) throws IOException, ManagerException {
         switch (release.getVideoType()) {
-            case EPISODE -> download(release, subtitle, settings.getEpisodeLibrarySettings(), version);
-            case MOVIE -> download(release, subtitle, settings.getMovieLibrarySettings(), version);
+            case EPISODE -> download(release, subtitle, settings.episodeLibrarySettings, version);
+            case MOVIE -> download(release, subtitle, settings.movieLibrarySettings, version);
             default -> throw new IllegalArgumentException("Unexpected value: " + release.getVideoType());
         }
     }

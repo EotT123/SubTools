@@ -75,7 +75,7 @@ public class TheTvdbAdapter {
         }
         if (serieIds.isEmpty()) {
             tvdbSerie = Optional.empty();
-        } else if (!userInteractionHandler.getSettings().isOptionsConfirmProviderMapping() && serieIds.size() == 1) {
+        } else if (!userInteractionHandler.getSettings().isOptionsConfirmProviderMapping && serieIds.size() == 1) {
             tvdbSerie = Optional.of(serieIds.get(0));
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");

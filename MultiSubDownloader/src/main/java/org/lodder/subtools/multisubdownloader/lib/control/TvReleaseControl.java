@@ -58,7 +58,7 @@ public class TvReleaseControl extends ReleaseControl {
         jtvdba.getSerie(tvRelease.getName()).ifPresentOrThrow(tvdbSerie -> {
             tvRelease.setTvdbId(tvdbSerie.getId());
             tvRelease.setOriginalName(tvdbSerie.serieName);
-            if (getSettings().getProcessEpisodeSource() == SettingsProcessEpisodeSource.TVDB) {
+            if (getSettings().processEpisodeSource == SettingsProcessEpisodeSource.TVDB) {
                 jtvdba.getEpisode(tvdbSerie.getId(), tvRelease.getSeason(), tvRelease.getEpisodeNumbers().get(0))
                         .ifPresent(tvRelease::updateTvdbEpisodeInfo);
             }

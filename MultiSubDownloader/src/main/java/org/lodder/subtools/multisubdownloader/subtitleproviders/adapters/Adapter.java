@@ -179,7 +179,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         }
 
         SerieMapping serieMapping;
-        if (!getUserInteractionSettings().isOptionsConfirmProviderMapping() && providerSerieIds.size() == 1) {
+        if (!getUserInteractionSettings().isOptionsConfirmProviderMapping && providerSerieIds.size() == 1) {
             serieMapping = new SerieMapping(serieName, providerSerieIds.get(0).id, providerSerieIds.get(0).name, seasonToUse);
         } else {
             ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = getManager().valueBuilder()

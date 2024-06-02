@@ -89,7 +89,7 @@ public class SearchManager implements Cancelable {
         this.queue.forEach((key, value) -> queue.get(key).add(release));
         /* Create a scoreCalculator so we can score subtitles for this release */
         // TODO: extract to factory
-        SortWeight weights = new SortWeight(release, this.settings.getSortWeights());
+        SortWeight weights = new SortWeight(release, this.settings.sortWeights);
         this.scoreCalculators.put(release, new ScoreCalculator(weights));
     }
 

@@ -46,9 +46,9 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
         boolean loginEnabled = false;
         String username = "";
         String password = "";
-        if (settings.isLoginOpenSubtitlesEnabled()) {
-            username = StringUtils.trim(settings.getLoginOpenSubtitlesUsername());
-            password = StringUtils.trim(settings.getLoginOpenSubtitlesPassword());
+        if (settings.loginOpenSubtitlesEnabled) {
+            username = StringUtils.trim(settings.loginOpenSubtitlesUsername);
+            password = StringUtils.trim(settings.loginOpenSubtitlesPassword);
             /* Protect against empty login */
             loginEnabled = !username.isEmpty() && !password.isEmpty();
         }

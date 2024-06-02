@@ -103,40 +103,39 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void loadPreferenceSettings() {
-        chkSourceAddic7ed.setSelected(settingsCtrl.getSettings().isSerieSourceAddic7ed());
-        chkUserAddic7edLogin.setSelected(settingsCtrl.getSettings().isLoginAddic7edEnabled());
-        chkSourceAddic7edProxy.setSelected(settingsCtrl.getSettings().isSerieSourceAddic7edProxy());
-        // chkSourceAddic7edProxy.setEnabled(settingsCtrl.getSettings().isSerieSourceAddic7ed());
-        txtAddic7edUsername.setText(settingsCtrl.getSettings().getLoginAddic7edUsername());
-        txtAddic7edPassword.setText(settingsCtrl.getSettings().getLoginAddic7edPassword());
+        chkSourceAddic7ed.setSelected(settingsCtrl.getSettings().serieSourceAddic7ed);
+        chkUserAddic7edLogin.setSelected(settingsCtrl.getSettings().loginAddic7edEnabled);
+        chkSourceAddic7edProxy.setSelected(settingsCtrl.getSettings().serieSourceAddic7edProxy);
+        // chkSourceAddic7edProxy.setEnabled(settingsCtrl.getSettings().serieSourceAddic7ed);
+        txtAddic7edUsername.setText(settingsCtrl.getSettings().loginAddic7edUsername);
+        txtAddic7edPassword.setText(settingsCtrl.getSettings().loginAddic7edPassword);
 
-        chkSourceTvSubtitles.setSelected(settingsCtrl.getSettings().isSerieSourceTvSubtitles());
-        chkSourcePodnapisi.setSelected(settingsCtrl.getSettings().isSerieSourcePodnapisi());
-        chkSourceOpenSubtitles.setSelected(settingsCtrl.getSettings().isSerieSourceOpensubtitles());
-        chkUserOpenSubtitlesLogin.setSelected(settingsCtrl.getSettings().isLoginOpenSubtitlesEnabled());
-        txtOpenSubtitlesUsername.setText(settingsCtrl.getSettings().getLoginOpenSubtitlesUsername());
-        txtOpenSubtitlesPassword.setText(settingsCtrl.getSettings().getLoginOpenSubtitlesPassword());
-        chkSourceSubscene.setSelected(settingsCtrl.getSettings().isSerieSourceSubscene());
-        chkSourceLocal.setSelected(settingsCtrl.getSettings().isSerieSourceLocal());
-        settingsCtrl.getSettings().getLocalSourcesFolders().forEach(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.getImage(), path));
+        chkSourceTvSubtitles.setSelected(settingsCtrl.getSettings().serieSourceTvSubtitles);
+        chkSourcePodnapisi.setSelected(settingsCtrl.getSettings().serieSourcePodnapisi);
+        chkSourceOpenSubtitles.setSelected(settingsCtrl.getSettings().serieSourceOpensubtitles);
+        chkUserOpenSubtitlesLogin.setSelected(settingsCtrl.getSettings().loginOpenSubtitlesEnabled);
+        txtOpenSubtitlesUsername.setText(settingsCtrl.getSettings().loginOpenSubtitlesUsername);
+        txtOpenSubtitlesPassword.setText(settingsCtrl.getSettings().loginOpenSubtitlesPassword);
+        chkSourceSubscene.setSelected(settingsCtrl.getSettings().serieSourceSubscene);
+        chkSourceLocal.setSelected(settingsCtrl.getSettings().serieSourceLocal);
+        settingsCtrl.getSettings().localSourcesFolders.forEach(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.getImage(), path));
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.getSettings()
-                .setSerieSourceAddic7ed(chkSourceAddic7ed.isSelected())
-                .setLoginAddic7edEnabled(chkUserAddic7edLogin.isSelected())
-                .setSerieSourceAddic7edProxy(chkSourceAddic7edProxy.isSelected())
-                .setLoginAddic7edUsername(txtAddic7edUsername.getText())
-                .setLoginAddic7edPassword(new String(txtAddic7edPassword.getPassword()))
-                .setSerieSourceTvSubtitles(chkSourceTvSubtitles.isSelected())
-                .setSerieSourcePodnapisi(chkSourcePodnapisi.isSelected())
-                .setSerieSourceOpensubtitles(chkSourceOpenSubtitles.isSelected())
-                .setLoginOpenSubtitlesEnabled(chkUserOpenSubtitlesLogin.isSelected())
-                .setLoginOpenSubtitlesUsername(txtOpenSubtitlesUsername.getText())
-                .setLoginOpenSubtitlesPassword(new String(txtOpenSubtitlesPassword.getPassword()))
-                .setSerieSourceSubscene(chkSourceSubscene.isSelected())
-                .setSerieSourceLocal(chkSourceLocal.isSelected())
-                .setLocalSourcesFolders(localSourcesFoldersList.stream().map(LabelPanel::getObject).toList());
+        settingsCtrl.getSettings().serieSourceAddic7ed = chkSourceAddic7ed.isSelected();
+        settingsCtrl.getSettings().loginAddic7edEnabled = chkUserAddic7edLogin.isSelected();
+        settingsCtrl.getSettings().serieSourceAddic7edProxy = chkSourceAddic7edProxy.isSelected();
+        settingsCtrl.getSettings().loginAddic7edUsername = txtAddic7edUsername.getText();
+        settingsCtrl.getSettings().loginAddic7edPassword = new String(txtAddic7edPassword.getPassword());
+        settingsCtrl.getSettings().serieSourceTvSubtitles = chkSourceTvSubtitles.isSelected();
+        settingsCtrl.getSettings().serieSourcePodnapisi = chkSourcePodnapisi.isSelected();
+        settingsCtrl.getSettings().serieSourceOpensubtitles = chkSourceOpenSubtitles.isSelected();
+        settingsCtrl.getSettings().loginOpenSubtitlesEnabled = chkUserOpenSubtitlesLogin.isSelected();
+        settingsCtrl.getSettings().loginOpenSubtitlesUsername = txtOpenSubtitlesUsername.getText();
+        settingsCtrl.getSettings().loginOpenSubtitlesPassword = new String(txtOpenSubtitlesPassword.getPassword());
+        settingsCtrl.getSettings().serieSourceSubscene = chkSourceSubscene.isSelected();
+        settingsCtrl.getSettings().serieSourceLocal = chkSourceLocal.isSelected();
+        settingsCtrl.getSettings().localSourcesFolders = localSourcesFoldersList.stream().map(LabelPanel::getObject).toList();
     }
 
     private boolean hasValidSettingsAddic7ed() {

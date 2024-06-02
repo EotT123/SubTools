@@ -175,13 +175,13 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
     }
 
     public void loadPreferenceSettings() {
-        Source.values().stream().filter(not(settingsCtrl.getSettings().getOptionsDefaultSelectionQualityList()::contains))
+        Source.values().stream().filter(not(settingsCtrl.getSettings().optionsDefaultSelectionQualityList::contains))
                 .forEach(unusedPatternsTable::addItem);
-        settingsCtrl.getSettings().getOptionsDefaultSelectionQualityList().forEach(usedPatternsTable::addItem);
+        settingsCtrl.getSettings().optionsDefaultSelectionQualityList.forEach(usedPatternsTable::addItem);
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.getSettings().setOptionsDefaultSelectionQualityList(usedPatternsTable.getItems());
+        settingsCtrl.getSettings().optionsDefaultSelectionQualityList = usedPatternsTable.getItems();
     }
 
     @Override

@@ -107,10 +107,10 @@ public class SettingsControl {
     }
 
     public void updateProxySettings() {
-        if (settings.isGeneralProxyEnabled()) {
+        if (settings.generalProxyEnabled) {
             System.getProperties().put("proxySet", "true");
-            System.getProperties().put("proxyHost", settings.getGeneralProxyHost());
-            System.getProperties().put("proxyPort", settings.getGeneralProxyPort());
+            System.getProperties().put("proxyHost", settings.generalProxyHost);
+            System.getProperties().put("proxyPort", settings.generalProxyPort);
         } else {
             System.getProperties().put("proxySet", "false");
         }
@@ -121,7 +121,7 @@ public class SettingsControl {
      */
     private void migrateSettings() {
         SettingValue.loadAll(this, preferences);
-        int version = settings.getSettingsVersion();
+        int version = settings.settingsVersion;
         if (version == 0) {
             migrateSettingsV0ToV1();
             settings = new Settings();
@@ -164,7 +164,7 @@ public class SettingsControl {
 
         // int lastItemExclude = preferences.getInt("lastItemExclude", 0);
         // if (lastItemExclude > 0) {
-        // List<SettingsExcludeItem> excludeList = settings.getExcludeList();
+        // List<SettingsExcludeItem> excludeList = settings.excludeList;
         // IntStream.range(0, preferences.getInt("lastItemExclude", 0)).forEach(i -> {
         // String description = preferences.get("ExcludeDescription" + i, "");
         // PathMatchType type;
@@ -179,23 +179,23 @@ public class SettingsControl {
         // }
 
         EPISODE_LIBRARY_FOLDER_STRUCTURE.load(this, preferences);
-        settings.getEpisodeLibrarySettings()
-                .setLibraryFolderStructure(migrateLibraryStructureV0(settings.getEpisodeLibrarySettings().getLibraryFolderStructure()));
+        settings.episodeLibrarySettings
+                .setLibraryFolderStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
         EPISODE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
 
         EPISODE_LIBRARY_FILENAME_STRUCTURE.load(this, preferences);
-        settings.getEpisodeLibrarySettings()
-                .setLibraryFilenameStructure(migrateLibraryStructureV0(settings.getEpisodeLibrarySettings().getLibraryFilenameStructure()));
+        settings.episodeLibrarySettings
+                .setLibraryFilenameStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
         EPISODE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         MOVIE_LIBRARY_FOLDER_STRUCTURE.load(this, preferences);
-        settings.getEpisodeLibrarySettings()
-                .setLibraryFolderStructure(migrateLibraryStructureV0(settings.getEpisodeLibrarySettings().getLibraryFolderStructure()));
+        settings.episodeLibrarySettings
+                .setLibraryFolderStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
         MOVIE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
 
         MOVIE_LIBRARY_FILENAME_STRUCTURE.load(this, preferences);
-        settings.getEpisodeLibrarySettings()
-                .setLibraryFilenameStructure(migrateLibraryStructureV0(settings.getEpisodeLibrarySettings().getLibraryFilenameStructure()));
+        settings.episodeLibrarySettings
+                .setLibraryFilenameStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
         MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         try {
@@ -208,29 +208,29 @@ public class SettingsControl {
             LOGGER.error("Error during migration of settings, ignoring...");
         }
 
-        settings.setSettingsVersion(1);
+        settings.settingsVersion = 1;
         SETTINGS_VERSION.store(this, preferences);
     }
 
     @SuppressWarnings("deprecation")
     public void migrateSettingsV1ToV2() {
-        settings.getEpisodeLibrarySettings()
+        settings.episodeLibrarySettings
                 .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(preferences.get(EPISODE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
         EPISODE_LIBRARY_OTHER_FILE_ACTION.store(this, preferences);
 
-        settings.getMovieLibrarySettings()
+        settings.movieLibrarySettings
                 .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(preferences.get(MOVIE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
         MOVIE_LIBRARY_OTHER_FILE_ACTION.store(this, preferences);
 
-        settings.getEpisodeLibrarySettings()
+        settings.episodeLibrarySettings
                 .setLibraryAction(LibraryActionType.fromString(preferences.get(EPISODE_LIBRARY_ACTION.getKey(), "")));
         EPISODE_LIBRARY_ACTION.store(this, preferences);
 
-        settings.getMovieLibrarySettings()
+        settings.movieLibrarySettings
                 .setLibraryAction(LibraryActionType.fromString(preferences.get(MOVIE_LIBRARY_ACTION.getKey(), "")));
         MOVIE_LIBRARY_ACTION.store(this, preferences);
 
-        settings.setSettingsVersion(2);
+        settings.settingsVersion = 2;
         SETTINGS_VERSION.store(this, preferences);
     }
 
@@ -252,7 +252,7 @@ public class SettingsControl {
         // });
         // preferences.remove("DictionarySize");
 
-        settings.setSettingsVersion(3);
+        settings.settingsVersion = 3;
         SETTINGS_VERSION.store(this, preferences);
     }
 
@@ -269,7 +269,7 @@ public class SettingsControl {
         // preferences.put("ExcludeItem" + i, newValue);
         // });
         // EXCLUDE_ITEM.store(this, preferences);
-        settings.setSettingsVersion(4);
+        settings.settingsVersion = 4;
         SETTINGS_VERSION.store(this, preferences);
     }
 
@@ -282,7 +282,7 @@ public class SettingsControl {
                                     .key(serieMappingPair.getKey())
                                     .remove();
                         }));
-        settings.setSettingsVersion(5);
+        settings.settingsVersion = 5;
         SETTINGS_VERSION.store(this, preferences);
     }
 
@@ -306,7 +306,7 @@ public class SettingsControl {
         }
         DEFAULT_SELECTION_QUALITY.store(this, preferences);
 
-        settings.setSettingsVersion(6);
+        settings.settingsVersion = 6;
         SETTINGS_VERSION.store(this, preferences);
     }
 
@@ -318,44 +318,44 @@ public class SettingsControl {
                 librarySettings.getLangCodeMap().put(language, value.trim());
             }
         };
-        consumer.accept("EpisodeLibraryDefaultNlText", Language.DUTCH, settings.getEpisodeLibrarySettings());
-        consumer.accept("EpisodeLibraryDefaultEnText", Language.ENGLISH, settings.getEpisodeLibrarySettings());
-        consumer.accept("MovieLibraryDefaultNlText", Language.DUTCH, settings.getMovieLibrarySettings());
-        consumer.accept("MovieLibraryDefaultENText", Language.ENGLISH, settings.getMovieLibrarySettings());
+        consumer.accept("EpisodeLibraryDefaultNlText", Language.DUTCH, settings.episodeLibrarySettings);
+        consumer.accept("EpisodeLibraryDefaultEnText", Language.ENGLISH, settings.episodeLibrarySettings);
+        consumer.accept("MovieLibraryDefaultNlText", Language.DUTCH, settings.movieLibrarySettings);
+        consumer.accept("MovieLibraryDefaultENText", Language.ENGLISH, settings.movieLibrarySettings);
 
         EPISODE_LIBRARY_LANG_CODE_MAPPING.store(this, preferences);
         MOVIE_LIBRARY_LANG_CODE_MAPPING.store(this, preferences);
 
-        if (settings.getEpisodeLibrarySettings().hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME)) {
-            if (StringUtils.isBlank(settings.getEpisodeLibrarySettings().getLibraryFilenameStructure())) {
-                settings.getMovieLibrarySettings().setLibraryFilenameStructure("%SHOW NAME%%SEPARATOR%%Season %S%");
+        if (settings.episodeLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME)) {
+            if (StringUtils.isBlank(settings.episodeLibrarySettings.getLibraryFilenameStructure())) {
+                settings.movieLibrarySettings.setLibraryFilenameStructure("%SHOW NAME%%SEPARATOR%%Season %S%");
                 MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
                 EPISODE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
             }
-            if (StringUtils.isBlank(settings.getEpisodeLibrarySettings().getLibraryFolderStructure())) {
-                settings.getMovieLibrarySettings().setLibraryFolderStructure("%SHOW NAME%.S%SS%E%EE%.%TITLE%");
+            if (StringUtils.isBlank(settings.episodeLibrarySettings.getLibraryFolderStructure())) {
+                settings.movieLibrarySettings.setLibraryFolderStructure("%SHOW NAME%.S%SS%E%EE%.%TITLE%");
                 EPISODE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
             }
         }
 
-        if (settings.getMovieLibrarySettings().hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME)) {
-            if (StringUtils.isBlank(settings.getMovieLibrarySettings().getLibraryFilenameStructure())) {
-                settings.getMovieLibrarySettings().setLibraryFilenameStructure("%MOVIE TITLE% (%YEAR%)");
+        if (settings.movieLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME)) {
+            if (StringUtils.isBlank(settings.movieLibrarySettings.getLibraryFilenameStructure())) {
+                settings.movieLibrarySettings.setLibraryFilenameStructure("%MOVIE TITLE% (%YEAR%)");
                 MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
             }
         }
 
-        settings.setSettingsVersion(7);
+        settings.settingsVersion = 7;
         SETTINGS_VERSION.store(this, preferences);
     }
 
     public void migrateSettingsV7ToV8() {
-        if (settings.isLoginOpenSubtitlesEnabled()
-            && !OpenSubtitlesApi.isValidCredentials(settings.getLoginOpenSubtitlesUsername(), settings.getLoginOpenSubtitlesPassword())) {
-            settings.setLoginOpenSubtitlesEnabled(false);
+        if (settings.loginOpenSubtitlesEnabled
+            && !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername, settings.loginOpenSubtitlesPassword)) {
+            settings.loginOpenSubtitlesEnabled = false;
             LOGIN_OPEN_SUBTITLES_ENABLED.store(this, preferences);
         }
-        settings.setSettingsVersion(8);
+        settings.settingsVersion = 8;
         SETTINGS_VERSION.store(this, preferences);
     }
 

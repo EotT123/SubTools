@@ -142,14 +142,14 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void loadPreferenceSettings() {
-        cbxLanguage.setSelectedItem(settingsCtrl.getSettings().getLanguage());
-        defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.getImage(), settingsCtrl.getSettings().getDefaultIncomingFolders());
-        settingsCtrl.getSettings().getExcludeList().forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.getImage(), pathOrRegex));
-        cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.getSettings().getUpdateCheckPeriod());
-        cbxUpdateType.setSelectedItem(settingsCtrl.getSettings().getUpdateType());
-        chkUseProxy.setSelected(settingsCtrl.getSettings().isGeneralProxyEnabled());
-        txtProxyHost.setText(settingsCtrl.getSettings().getGeneralProxyHost());
-        txtProxyPort.setObject(settingsCtrl.getSettings().getGeneralProxyPort());
+        cbxLanguage.setSelectedItem(settingsCtrl.getSettings().language);
+        defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.getImage(), settingsCtrl.getSettings().defaultIncomingFolders);
+        settingsCtrl.getSettings().excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.getImage(), pathOrRegex));
+        cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.getSettings().updateCheckPeriod);
+        cbxUpdateType.setSelectedItem(settingsCtrl.getSettings().updateType);
+        chkUseProxy.setSelected(settingsCtrl.getSettings().generalProxyEnabled);
+        txtProxyHost.setText(settingsCtrl.getSettings().generalProxyHost);
+        txtProxyPort.setObject(settingsCtrl.getSettings().generalProxyPort);
     }
 
     public void savePreferenceSettings() {
@@ -159,16 +159,14 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         }
         List<Path> defaultIncomingFolders = defaultIncomingFoldersList.stream().map(LabelPanel::getObject).toList();
         List<PathOrRegex> exclList = excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().getValue())).toList();
-        settingsCtrl.getSettings()
-                .setLanguage(cbxLanguage.getSelectedItem())
-                .setDefaultIncomingFolders(defaultIncomingFolders)
-                .setExcludeList(exclList)
-                .setUpdateCheckPeriod(cbxUpdateCheckPeriod.getSelectedItem())
-                .setUpdateType(cbxUpdateType.getSelectedItem())
-                .setGeneralProxyEnabled(chkUseProxy.isSelected())
-                .setGeneralProxyHost(txtProxyHost.getText())
-                .setGeneralProxyPort(txtProxyPort.getOptionalObject().orElse(80));
-
+        settingsCtrl.getSettings().language = cbxLanguage.getSelectedItem();
+        settingsCtrl.getSettings().defaultIncomingFolders = defaultIncomingFolders;
+        settingsCtrl.getSettings().replaceExcludeList(exclList);
+        settingsCtrl.getSettings().updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedItem();
+        settingsCtrl.getSettings().updateType = cbxUpdateType.getSelectedItem();
+        settingsCtrl.getSettings().generalProxyEnabled = chkUseProxy.isSelected();
+        settingsCtrl.getSettings().generalProxyHost = txtProxyHost.getText();
+        settingsCtrl.getSettings().generalProxyPort = txtProxyPort.getOptionalObject().orElse(80);
     }
 
     @Override

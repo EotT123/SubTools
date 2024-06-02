@@ -28,15 +28,15 @@ public class SubtitleFiltering {
     }
 
     private boolean excludeSubtitleHearingImpaired(Subtitle subtitle, Release release) {
-        return settings.isOptionSubtitleExcludeHearingImpaired() && subtitle.isHearingImpaired();
+        return settings.optionSubtitleExcludeHearingImpaired && subtitle.isHearingImpaired();
     }
 
     private boolean excludeSubtitleKeywordMatch(Subtitle subtitle, Release release) {
-        return settings.isOptionSubtitleKeywordMatch() &&
+        return settings.optionSubtitleKeywordMatch &&
                (keyword.excludeSubtitle(release, subtitle) || releaseGroup.excludeSubtitle(release, subtitle));
     }
 
     private boolean excludeSubtitleExactMatch(Subtitle subtitle, Release release) {
-        return settings.isOptionSubtitleExactMatch() && exactName.excludeSubtitle(release, subtitle);
+        return settings.optionSubtitleExactMatch && exactName.excludeSubtitle(release, subtitle);
     }
 }

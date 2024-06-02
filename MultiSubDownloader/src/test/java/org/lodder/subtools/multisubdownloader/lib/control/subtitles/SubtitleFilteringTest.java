@@ -96,9 +96,9 @@ class SubtitleFilteringTest {
     private Settings createSettings(boolean keyword, boolean exact, boolean excludehearing) {
         Settings settings = mock(Settings.class);
 
-        when(settings.isOptionSubtitleExactMatch()).thenReturn(exact);
-        when(settings.isOptionSubtitleKeywordMatch()).thenReturn(keyword);
-        when(settings.isOptionSubtitleExcludeHearingImpaired()).thenReturn(excludehearing);
+        when(settings.optionSubtitleExactMatch).thenReturn(exact);
+        when(settings.optionSubtitleKeywordMatch).thenReturn(keyword);
+        when(settings.optionSubtitleExcludeHearingImpaired).thenReturn(excludehearing);
 
         return settings;
     }

@@ -68,11 +68,11 @@ public class PreferenceDialog extends MultiSubDialog {
             tabbedPane.addTab(Messages.getString("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
 
             this.pnlEpisodeLibrary =
-                    new EpisodeLibraryPanel(settingsCtrl.getSettings().getEpisodeLibrarySettings(), manager, false, userInteractionHandler);
+                    new EpisodeLibraryPanel(settingsCtrl.getSettings().episodeLibrarySettings, manager, false, userInteractionHandler);
             tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieLibrary"), null, pnlEpisodeLibrary, null);
 
             this.pnlMovieLibrary =
-                    new MovieLibraryPanel(settingsCtrl.getSettings().getMovieLibrarySettings(), manager, false, userInteractionHandler);
+                    new MovieLibraryPanel(settingsCtrl.getSettings().movieLibrarySettings, manager, false, userInteractionHandler);
             tabbedPane.addTab(Messages.getString("PreferenceDialog.MovieLibrary"), null, pnlMovieLibrary, null);
 
             this.pnlOptions = new OptionsPanel(settingsCtrl);

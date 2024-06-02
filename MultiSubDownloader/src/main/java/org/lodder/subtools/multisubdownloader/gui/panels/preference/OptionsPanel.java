@@ -69,32 +69,31 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void loadPreferenceSettings() {
-        chkAlwaysConfirm.setSelected(settingsCtrl.getSettings().isOptionsAlwaysConfirm());
-        chkMinScoreSelection.setSelected(settingsCtrl.getSettings().isOptionsMinAutomaticSelection());
-        sldMinScoreSelection.setValue(settingsCtrl.getSettings().getOptionsMinAutomaticSelectionValue());
-        chkDefaultSelection.setSelected(settingsCtrl.getSettings().isOptionsDefaultSelection());
-        chkSubtitleExactMethod.setSelected(settingsCtrl.getSettings().isOptionSubtitleExactMatch());
-        chkSubtitleKeywordMethod.setSelected(settingsCtrl.getSettings().isOptionSubtitleKeywordMatch());
-        chkExcludeHearingImpaired.setSelected(settingsCtrl.getSettings().isOptionSubtitleExcludeHearingImpaired());
-        chkOnlyFound.setSelected(settingsCtrl.getSettings().isOptionsShowOnlyFound());
-        chkStopOnSearchError.setSelected(settingsCtrl.getSettings().isOptionsStopOnSearchError());
-        cbxEpisodeProcessSource.setSelectedItem(settingsCtrl.getSettings().getProcessEpisodeSource());
-        chkConfirmProviderMapping.setSelected(settingsCtrl.getSettings().isOptionsConfirmProviderMapping());
+        chkAlwaysConfirm.setSelected(settingsCtrl.getSettings().optionsAlwaysConfirm);
+        chkMinScoreSelection.setSelected(settingsCtrl.getSettings().isOptionsMinAutomaticSelection);
+        sldMinScoreSelection.setValue(settingsCtrl.getSettings().optionsMinAutomaticSelectionValue);
+        chkDefaultSelection.setSelected(settingsCtrl.getSettings().isOptionsDefaultSelection);
+        chkSubtitleExactMethod.setSelected(settingsCtrl.getSettings().optionSubtitleExactMatch);
+        chkSubtitleKeywordMethod.setSelected(settingsCtrl.getSettings().optionSubtitleKeywordMatch);
+        chkExcludeHearingImpaired.setSelected(settingsCtrl.getSettings().optionSubtitleExcludeHearingImpaired);
+        chkOnlyFound.setSelected(settingsCtrl.getSettings().optionsShowOnlyFound);
+        chkStopOnSearchError.setSelected(settingsCtrl.getSettings().optionsStopOnSearchError);
+        cbxEpisodeProcessSource.setSelectedItem(settingsCtrl.getSettings().processEpisodeSource);
+        chkConfirmProviderMapping.setSelected(settingsCtrl.getSettings().isOptionsConfirmProviderMapping);
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.getSettings()
-                .setOptionsAlwaysConfirm(chkAlwaysConfirm.isSelected())
-                .setOptionsMinAutomaticSelection(chkMinScoreSelection.isSelected())
-                .setOptionsMinAutomaticSelectionValue(sldMinScoreSelection.getValue())
-                .setOptionsDefaultSelection(chkDefaultSelection.isSelected())
-                .setOptionSubtitleExactMatch(chkSubtitleExactMethod.isSelected())
-                .setOptionSubtitleKeywordMatch(chkSubtitleKeywordMethod.isSelected())
-                .setOptionSubtitleExcludeHearingImpaired(chkExcludeHearingImpaired.isSelected())
-                .setOptionsShowOnlyFound(chkOnlyFound.isSelected())
-                .setOptionsStopOnSearchError(chkStopOnSearchError.isSelected())
-                .setProcessEpisodeSource(cbxEpisodeProcessSource.getSelectedItem())
-                .setOptionsConfirmProviderMapping(chkConfirmProviderMapping.isSelected());
+        settingsCtrl.getSettings().optionsAlwaysConfirm = chkAlwaysConfirm.isSelected();
+        settingsCtrl.getSettings().optionsMinAutomaticSelection = chkMinScoreSelection.isSelected();
+        settingsCtrl.getSettings().optionsMinAutomaticSelectionValue = sldMinScoreSelection.getValue();
+        settingsCtrl.getSettings().optionsDefaultSelection = chkDefaultSelection.isSelected();
+        settingsCtrl.getSettings().optionSubtitleExactMatch = chkSubtitleExactMethod.isSelected();
+        settingsCtrl.getSettings().optionSubtitleKeywordMatch = chkSubtitleKeywordMethod.isSelected();
+        settingsCtrl.getSettings().optionSubtitleExcludeHearingImpaired = chkExcludeHearingImpaired.isSelected();
+        settingsCtrl.getSettings().optionsShowOnlyFound = chkOnlyFound.isSelected();
+        settingsCtrl.getSettings().optionsStopOnSearchError = chkStopOnSearchError.isSelected();
+        settingsCtrl.getSettings().processEpisodeSource = cbxEpisodeProcessSource.getSelectedItem();
+        settingsCtrl.getSettings().optionsConfirmProviderMapping = chkConfirmProviderMapping.isSelected();
         pnlDefaultSelection.savePreferenceSettings();
     }
 

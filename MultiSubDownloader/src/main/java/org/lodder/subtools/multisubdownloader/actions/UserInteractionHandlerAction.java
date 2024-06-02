@@ -47,7 +47,7 @@ public class UserInteractionHandlerAction {
             if (!release.getMatchingSubs().isEmpty()) {
                 LOGGER.debug("determineWhatSubtitleDownload for videoFile: [{}] # found subs: [{}]",
                         release.getFileName(), release.getMatchingSubs().size());
-                if (settings.isOptionsAlwaysConfirm()) {
+                if (settings.optionsAlwaysConfirm) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (release.getMatchingSubs().size() == 1
                            && release.getMatchingSubs().get(0).getSubtitleMatchType() == SubtitleMatchType.EXACT) {

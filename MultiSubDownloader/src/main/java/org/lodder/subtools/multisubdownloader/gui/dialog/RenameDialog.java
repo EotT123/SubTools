@@ -64,10 +64,10 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
                 .addComponent("wrap", this.chkRecursive = new JCheckBox(Messages.getString("RenameDialog.RecursiveSearch")));
 
         if (videoType == VideoType.EPISODE) {
-            pnlLibrary = new EpisodeLibraryPanel(settings.getEpisodeLibrarySettings(), manager, true, userInteractionHandler)
+            pnlLibrary = new EpisodeLibraryPanel(settings.episodeLibrarySettings, manager, true, userInteractionHandler)
                     .addTo(getContentPane(), "grow");
         } else {
-            pnlLibrary = new MovieLibraryPanel(settings.getMovieLibrarySettings(), manager, true, userInteractionHandler)
+            pnlLibrary = new MovieLibraryPanel(settings.movieLibrarySettings, manager, true, userInteractionHandler)
                     .addTo(getContentPane(), "grow");
         }
 

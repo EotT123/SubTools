@@ -51,14 +51,14 @@ public class UpdateAvailableGithub {
     }
 
     public Optional<String> getLatestDownloadUrl() {
-        return switch (settings.getUpdateType()) {
+        return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease();
         };
     }
 
     public boolean isNewVersionAvailable() {
-        return switch (settings.getUpdateType()) {
+        return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease().isPresent();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease().isPresent();
         };

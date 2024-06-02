@@ -51,8 +51,8 @@ public class Addic7edServiceProvider implements ServiceProvider {
         String username = "";
         String password = "";
         if (settings.isLoginAddic7edEnabled()) {
-            username = StringUtils.trim(settings.getLoginAddic7edUsername());
-            password = StringUtils.trim(settings.getLoginAddic7edPassword());
+            username = StringUtils.trim(settings.loginAddic7edUsername);
+            password = StringUtils.trim(settings.loginAddic7edPassword);
             /* Protect against empty login */
             loginEnabled = !username.isEmpty() && !password.isEmpty();
         }

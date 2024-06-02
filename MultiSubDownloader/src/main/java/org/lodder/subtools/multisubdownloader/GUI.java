@@ -116,7 +116,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void checkUpdate(final boolean forceUpdateCheck) {
         UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
         Optional<String> updateUrl = (forceUpdateCheck && u.isNewVersionAvailable())
-                                     || (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.getSettings().getUpdateCheckPeriod())
+                                     || (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.getSettings().updateCheckPeriod)
                                          && u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : Optional.empty();
         if (updateUrl.isPresent()) {
             final JEditorPane editorPane = new JEditorPane();
@@ -148,7 +148,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
      * Initialize the contents of the frame.
      */
     private void initialize() {
-        MemoryFolderChooser.getInstance().setMemory(settingsControl.getSettings().getLastOutputDir());
+        MemoryFolderChooser.getInstance().setMemory(settingsControl.getSettings().lastOutputDir);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -205,7 +205,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 (videoType, title) -> new RenameDialog(self(), settings, videoType, title, manager, userInteractionHandler).setVisible(true);
         ExportImport exportImport = new ExportImport(manager, settingsControl, userInteractionHandler, this);
         menuBar = new Menu()
-                .withShowOnlyFound(settings.isOptionsShowOnlyFound())
+                .withShowOnlyFound(settings.optionsShowOnlyFound)
                 .withFileQuitAction(this::close)
                 .withViewFilenameAction(() -> visibilityFunction.accept(SearchColumnName.FILENAME, menuBar.isViewFilenameSelected()))
                 .withViewTypeAction(() -> visibilityFunction.accept(SearchColumnName.TYPE, menuBar.isViewTypeSelected()))
@@ -213,7 +213,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 .withViewSeasonAction(() -> visibilityFunction.accept(SearchColumnName.SEASON, menuBar.isViewSeasonSelected()))
                 .withViewEpisodeAction(() -> visibilityFunction.accept(SearchColumnName.EPISODE, menuBar.isViewEpisodeSelected()))
                 .withViewShowOnlyFoundAction(() -> {
-                    settings.setOptionsShowOnlyFound(menuBar.isShowOnlyFound());
+                    settings.optionsShowOnlyFound = menuBar.isShowOnlyFound();
                     ((VideoTableModel) pnlSearchFile.getResultPanel().getTable().getModel()).setShowOnlyFound(menuBar.isShowOnlyFound());
                 })
                 .withViewClearLogAction(() -> pnlLogging.setLogText(""))
@@ -239,7 +239,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         ResultPanel resultPanel = new ResultPanel();
         SearchTextInputPanel pnlSearchTextInput = new SearchTextInputPanel();
         pnlSearchText = new SearchPanel<>(pnlSearchTextInput, resultPanel);
-        pnlSearchTextInput.setSelectedLanguage(settings.getSubtitleLanguage() == null ? Language.DUTCH : settings.getSubtitleLanguage());
+        pnlSearchTextInput.setSelectedLanguage(settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
         resultPanel.showSelectFoundSubtitlesButton();
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(arg -> downloadText());
@@ -268,8 +268,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         ResultPanel resultPanel = new ResultPanel();
         pnlSearchFileInput = new SearchFileInputPanel();
-        pnlSearchFileInput.setRecursiveSelected(settings.isOptionRecursive());
-        pnlSearchFileInput.setSelectedLanguage(settings.getSubtitleLanguage() == null ? Language.DUTCH : settings.getSubtitleLanguage());
+        pnlSearchFileInput.setRecursiveSelected(settings.optionRecursive);
+        pnlSearchFileInput.setSelectedLanguage(settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
         pnlSearchFile = new SearchPanel<>(pnlSearchFileInput, resultPanel);
 
         resultPanel.setTable(createVideoTable());
@@ -303,7 +303,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         CustomTable customTable = new CustomTable();
         VideoTableModel videoTableModel = VideoTableModel.getDefaultVideoTableModel();
         customTable.setModel(videoTableModel);
-        videoTableModel.setShowOnlyFound(settingsControl.getSettings().isOptionsShowOnlyFound());
+        videoTableModel.setShowOnlyFound(settingsControl.getSettings().optionsShowOnlyFound);
         videoTableModel.setUserInteractionHandler(userInteractionHandler);
         final RowSorter<TableModel> sorter = new TableRowSorter<>(customTable.getModel());
         customTable.setRowSorter(sorter);
@@ -332,7 +332,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             customTable.setColumnVisibility(searchColumn, !hidden);
         };
 
-        ScreenSettings screenSettings = settingsControl.getSettings().getScreenSettings();
+        ScreenSettings screenSettings = settingsControl.getSettings().screenSettings;
 
         visibilityConsumer.accept(SearchColumnName.EPISODE, screenSettings.isHideEpisode(), menuBar::withViewEpisodeSelected);
         visibilityConsumer.accept(SearchColumnName.FILENAME, screenSettings.isHideFilename(), menuBar::withViewFileNameSelected);
@@ -484,19 +484,19 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     private void close() {
-        settingsControl.getSettings().setOptionRecursive(pnlSearchFileInput.isRecursiveSelected());
-        settingsControl.getSettings().setSubtitleLanguage(pnlSearchFileInput.getSelectedLanguage());
+        settingsControl.getSettings().optionRecursive = pnlSearchFileInput.isRecursiveSelected();
+        settingsControl.getSettings().subtitleLanguage = pnlSearchFileInput.getSelectedLanguage();
         storeScreenSettings();
         settingsControl.store();
     }
 
     private void storeScreenSettings() {
         CustomTable customTable = pnlSearchFile.getResultPanel().getTable();
-        settingsControl.getSettings().getScreenSettings().setHideEpisode(customTable.isHideColumn(SearchColumnName.EPISODE));
-        settingsControl.getSettings().getScreenSettings().setHideFilename(customTable.isHideColumn(SearchColumnName.FILENAME));
-        settingsControl.getSettings().getScreenSettings().setHideSeason(customTable.isHideColumn(SearchColumnName.SEASON));
-        settingsControl.getSettings().getScreenSettings().setHideTitle(customTable.isHideColumn(SearchColumnName.TITLE));
-        settingsControl.getSettings().getScreenSettings().setHideType(customTable.isHideColumn(SearchColumnName.TYPE));
+        settingsControl.getSettings().screenSettings.setHideEpisode(customTable.isHideColumn(SearchColumnName.EPISODE));
+        settingsControl.getSettings().screenSettings.setHideFilename(customTable.isHideColumn(SearchColumnName.FILENAME));
+        settingsControl.getSettings().screenSettings.setHideSeason(customTable.isHideColumn(SearchColumnName.SEASON));
+        settingsControl.getSettings().screenSettings.setHideTitle(customTable.isHideColumn(SearchColumnName.TITLE));
+        settingsControl.getSettings().screenSettings.setHideType(customTable.isHideColumn(SearchColumnName.TYPE));
     }
 
     public ProgressDialog setProgressDialog(Cancelable worker) {

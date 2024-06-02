@@ -54,10 +54,10 @@ public class RenameWorker extends SwingWorker<Void, String> implements Cancelabl
                 RenameAction renameAction = null;
                 if (selectedShow.getVideoType() == VideoType.EPISODE) {
                     LOGGER.debug("Treat as EPISODE");
-                    renameAction = new RenameAction(settings.getEpisodeLibrarySettings(), manager, userInteractionHandler);
+                    renameAction = new RenameAction(settings.episodeLibrarySettings, manager, userInteractionHandler);
                 } else if (selectedShow.getVideoType() == VideoType.MOVIE) {
                     LOGGER.debug("Treat as MOVIE");
-                    renameAction = new RenameAction(settings.getMovieLibrarySettings(), manager, userInteractionHandler);
+                    renameAction = new RenameAction(settings.movieLibrarySettings, manager, userInteractionHandler);
                 }
                 if (renameAction != null) {
                     renameAction.rename(selectedShow.getPath().resolve(selectedShow.getFileName()), selectedShow);
