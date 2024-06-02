@@ -62,8 +62,8 @@ public class InputPane {
             InputPaneBuilderTitleIntf {
         @Serial
         private static final long serialVersionUID = 1L;
-        private final static String OK = Messages.getString("App.OK");
-        private final static String CANCEL = Messages.getString("App.Cancel");
+        private static final String OK = Messages.getString("App.OK");
+        private static final String CANCEL = Messages.getString("App.Cancel");
         private String title;
         private String message;
         private String errorMessage;
@@ -125,7 +125,6 @@ public class InputPane {
             pack();
             setVisible(true);
 
-            optionPane.getValue();
             return typedText;
         }
 

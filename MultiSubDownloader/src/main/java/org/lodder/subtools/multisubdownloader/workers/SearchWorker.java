@@ -55,7 +55,7 @@ public class SearchWorker extends Thread {
                 }
             }
         } catch (SubtitlesProviderInitException e) {
-            LOGGER.error("API %s INIT (%s)".formatted(e.getProviderName(), e.getMessage()), e);
+            LOGGER.error("API %s INIT (%s)".formatted(e.providerName, e.getMessage()), e);
         }
     }
 
