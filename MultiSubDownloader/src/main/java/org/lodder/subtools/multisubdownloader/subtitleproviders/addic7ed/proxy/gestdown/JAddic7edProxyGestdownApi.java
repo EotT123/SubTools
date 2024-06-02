@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import extensions.java.lang.String.StringExt;
 import org.gestdown.api.SubtitlesApi;
 import org.gestdown.api.TvShowsApi;
 import org.gestdown.invoker.ApiException;
@@ -21,9 +22,6 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.StringUtil;
-
-import lombok.experimental.ExtensionMethod;
 
 // see https://www.gestdown.info/Api
 public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
@@ -66,7 +64,7 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
     private Subtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {
         return Subtitle.downloadSource(getDownloadUrl(sub.getDownloadUri()))
                 .subtitleSource(getSubtitleSource())
-                .fileName(StringUtil
+                .fileName(StringExt
                         .removeIllegalFilenameChars("%s - %s - %s".formatted(episodedto.getShow(), episodedto.getTitle(), sub.getVersion())))
                 .language(language)
                 .quality(ReleaseParser.getQualityKeyword(episodedto.getTitle() + " " + sub.getVersion()))

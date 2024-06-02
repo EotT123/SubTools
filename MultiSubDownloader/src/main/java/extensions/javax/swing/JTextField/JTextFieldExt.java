@@ -9,7 +9,7 @@ import manifold.ext.rt.api.This;
 
 @UtilityClass
 @Extension
-public class JTextFieldExtension {
+public class JTextFieldExt {
 
     public static @Self JTextField withColumns(@This JTextField textField, int columns) {
         textField.setColumns(columns);

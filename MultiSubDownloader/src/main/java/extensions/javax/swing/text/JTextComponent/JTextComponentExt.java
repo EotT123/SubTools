@@ -1,0 +1,18 @@
+package extensions.javax.swing.text.JTextComponent;
+
+import javax.swing.text.*;
+
+import lombok.experimental.UtilityClass;
+import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.Self;
+import manifold.ext.rt.api.This;
+
+@UtilityClass
+@Extension
+public class JTextComponentExt {
+
+    public static @Self JTextComponent editable(@This JTextComponent textComponent, boolean editable) {
+        textComponent.setEditable(editable);
+        return textComponent;
+    }
+}

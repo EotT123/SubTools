@@ -1,21 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.Serial;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
-import org.lodder.subtools.multisubdownloader.Messages;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
-
-import java.awt.event.ActionListener;
-
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
+import org.lodder.subtools.multisubdownloader.Messages;
 
-@ExtensionMethod({ JTextFieldExtension.class })
 public class SearchFileInputPanel extends InputPanel {
 
     @Serial

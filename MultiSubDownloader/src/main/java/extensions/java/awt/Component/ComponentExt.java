@@ -1,6 +1,5 @@
-package extensions.javax.swing.Component;
+package extensions.java.awt.Component;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
@@ -24,12 +23,12 @@ public class ComponentExt {
         if (component != null) {
             consumer.accept(component);
             if (component instanceof Container container && condition.test(container)) {
-                container.getComponents().stream().forEach(child -> setRecursive(child, consumer, condition));
+                Arrays.stream(container.getComponents()).forEach(child -> setRecursive(child, consumer, condition));
             }
         }
     }
 
-    public static <T extends Component> @Self Component withMouseListener(@This T component, MouseListener listener) {
+    public static @Self Component withMouseListener(@This Component component, MouseListener listener) {
         component.addMouseListener(listener);
         return component;
     }

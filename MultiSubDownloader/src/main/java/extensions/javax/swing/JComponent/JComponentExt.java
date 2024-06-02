@@ -3,7 +3,7 @@ package extensions.javax.swing.JComponent;
 import javax.swing.*;
 import java.awt.*;
 
-import extensions.javax.swing.Component.ComponentExt;
+import extensions.java.awt.Component.ComponentExt;
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;

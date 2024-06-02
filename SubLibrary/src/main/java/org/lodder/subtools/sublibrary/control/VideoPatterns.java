@@ -31,7 +31,7 @@ public class VideoPatterns {
         private final String value;
 
         public static Stream<String> getValuesStream() {
-            return Quality.values().stream().map(Quality::getValue);
+            return Arrays.stream(Quality.values()).map(Quality::getValue);
         }
     }
 
@@ -47,7 +47,7 @@ public class VideoPatterns {
         }
 
         public static Stream<String> getValuesStream() {
-            return VideoEncoding.values().stream().map(VideoEncoding::getValues).flatMap(Arrays::stream);
+            return Arrays.stream(VideoEncoding.values()).map(VideoEncoding::getValues).flatMap(Arrays::stream);
         }
     }
 
@@ -62,7 +62,7 @@ public class VideoPatterns {
         }
 
         public static Stream<String> getValuesStream() {
-            return AudioEncoding.values().stream().map(AudioEncoding::getValues).flatMap(Arrays::stream);
+            return Arrays.stream(AudioEncoding.values()).map(AudioEncoding::getValues).flatMap(Arrays::stream);
         }
     }
 
@@ -87,7 +87,7 @@ public class VideoPatterns {
         static final Map<String, Source> VALUE_MAP = new HashMap<>();
 
         static {
-            Source.values().stream().forEach(source -> Arrays.stream(source.getValues()).forEach(value -> VALUE_MAP.put(value, source)));
+            Arrays.stream(Source.values()).forEach(source -> Arrays.stream(source.getValues()).forEach(value -> VALUE_MAP.put(value, source)));
         }
 
         final boolean manyDifferentSources;
@@ -99,7 +99,7 @@ public class VideoPatterns {
         }
 
         public static Stream<String> getValuesStream() {
-            return Source.values().stream().map(Source::getValues).flatMap(Arrays::stream);
+            return Arrays.stream(Source.values()).map(Source::getValues).flatMap(Arrays::stream);
         }
 
         public static Source fromValue(String value) {

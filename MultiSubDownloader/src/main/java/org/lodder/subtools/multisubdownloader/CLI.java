@@ -24,7 +24,6 @@ import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFilt
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.multisubdownloader.util.CLIExtension;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;

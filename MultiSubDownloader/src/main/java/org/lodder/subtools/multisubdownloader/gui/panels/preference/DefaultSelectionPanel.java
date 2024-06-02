@@ -5,22 +5,17 @@ import static java.util.function.Predicate.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.ArrowButton;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jscrollpane.JScrollPaneExtension;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
-@ExtensionMethod({ Arrays.class,  AbstractButtonExtension.class, JScrollPaneExtension.class })
 public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf {
 
     private static final long serialVersionUID = 1L;
@@ -65,7 +60,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
         private ScrollTable(String header, Stream<E> items) {
             this.table = new JTable(new DefaultTableModel(new String[] { header }, 1));
-            this.scrollPane = new JScrollPane().withViewportView(table);
+            this.scrollPane = new JScrollPane().withViewPort(table);
             this.model = (DefaultTableModel) table.getModel();
             model.removeRow(0);
             if (items != null) {

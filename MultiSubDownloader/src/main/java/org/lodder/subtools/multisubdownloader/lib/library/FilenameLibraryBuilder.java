@@ -13,7 +13,6 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.StringUtil;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -146,7 +145,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
             } else {
                 filename = release.getFileName();
             }
-            filename = StringUtil.removeIllegalWindowsChars(filename);
+            filename = filename.removeIllegalWindowsChars();
             if (replaceSpace) {
                 filename = filename.replace(' ', replacingSpaceChar);
             }
@@ -172,7 +171,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
             filename = changeExtension(filename, ".srt");
         }
 
-        filename = StringUtil.removeIllegalWindowsChars(filename);
+        filename = filename.removeIllegalWindowsChars();
         if (replaceSpace) {
             filename = filename.replace(' ', replacingSpaceChar);
         }

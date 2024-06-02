@@ -1,21 +1,13 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import javax.swing.*;
 import java.io.Serial;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextcomponent.JTextComponentExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
-import lombok.experimental.ExtensionMethod;
-import net.miginfocom.swing.MigLayout;
-
-@ExtensionMethod({ JTextFieldExtension.class, JComponentExtension.class, JTextComponentExtension.class })
 public class SearchTextInputPanel extends InputPanel {
 
     @Serial

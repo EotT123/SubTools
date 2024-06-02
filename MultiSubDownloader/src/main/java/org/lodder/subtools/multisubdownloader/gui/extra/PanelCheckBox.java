@@ -1,7 +1,5 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
-import static extensions.javax.swing.Component.ComponentExt.*;
-
 import java.io.Serial;
 
 import javax.swing.JCheckBox;
@@ -49,7 +47,7 @@ public class PanelCheckBox extends JPanel {
         super.addImpl(checkbox, panelOnNewLine ? "span" : "", -1);
         super.addImpl(panel, "span, growx, " + (addVerticalSeparator ? "" : "gapx " + leftGap), -1);
         checkbox.addCheckedChangeListener(selected -> setEnabledChildren(panel, selected));
-        setRecursive(this, this::addContainerListener);
+        this.setRecursive(this::addContainerListener);
         setEnabledChildren(panel, isSelected());
     }
 

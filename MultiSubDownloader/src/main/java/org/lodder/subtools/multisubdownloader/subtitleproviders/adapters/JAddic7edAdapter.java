@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import extensions.java.lang.String.StringExt;
+import lombok.Getter;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.JAddic7edApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
@@ -22,13 +24,9 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.StringUtil;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 
 @Getter
 public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor, ProviderSerieId, Addic7edException> {
@@ -112,7 +110,7 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
                 .filter(sub -> language == sub.getLanguage())
                 .map(sub -> Subtitle.downloadSource(sub.getUrl())
                         .subtitleSource(getSubtitleSource())
-                        .fileName(StringUtil.removeIllegalFilenameChars(sub.getTitle() + " " + sub.getVersion()))
+                        .fileName(StringExt.removeIllegalFilenameChars(sub.getTitle() + " " + sub.getVersion()))
                         .language(sub.getLanguage())
                         .quality(ReleaseParser.getQualityKeyword(sub.getTitle() + " " + sub.getVersion()))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)

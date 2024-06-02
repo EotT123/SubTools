@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import lombok.Getter;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.SubsceneApi;
@@ -28,13 +29,9 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.StringUtil;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 
 @Getter
 public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor, SubSceneSerieId, SubsceneException> {
@@ -141,7 +138,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
                 .filter(sub -> sub.getName().contains(getSeasonEpisodeString(tvRelease.getSeason(), tvRelease.getEpisodeNumbers().get(0))))
                 .map(sub -> Subtitle.downloadSource(sub.getUrlSupplier())
                         .subtitleSource(getSubtitleSource())
-                        .fileName(StringUtil.removeIllegalFilenameChars(sub.getName()))
+                        .fileName(sub.getName().removeIllegalFilenameChars())
                         .language(sub.getLanguage())
                         .quality(ReleaseParser.getQualityKeyword(sub.getName()))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)

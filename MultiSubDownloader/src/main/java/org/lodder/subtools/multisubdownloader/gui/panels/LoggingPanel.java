@@ -1,24 +1,14 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import javax.swing.*;
 import java.io.Serial;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextArea;
-
+import ch.qos.logback.classic.Level;
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.LogTextAppender;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextarea.JTextAreaExtension;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextcomponent.JTextComponentExtension;
 
-import ch.qos.logback.classic.Level;
-import lombok.experimental.ExtensionMethod;
-import net.miginfocom.swing.MigLayout;
-
-@ExtensionMethod({ JTextComponentExtension.class, JTextAreaExtension.class })
 public class LoggingPanel extends JPanel {
 
     @Serial

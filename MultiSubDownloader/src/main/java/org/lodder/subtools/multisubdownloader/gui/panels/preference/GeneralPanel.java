@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
 
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.GUI;
@@ -16,9 +15,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPan
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.button.AbstractButtonExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.JTextFieldExtension;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldInteger;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -28,7 +25,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 
-@ExtensionMethod({ JTextFieldExtension.class, AbstractButtonExtension.class })
 public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
@@ -86,7 +82,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 new JLabel(Messages.getString("PreferenceDialog.ExcludeList")).addTo(settingsPanel, "aligny center, span 1 2");
 
                 new JScrollPane().addTo(settingsPanel, "growx, span, wrap")
-                        .setViewportView(this.excludeList = JListWithImages.createForType(PathOrRegex.class).distinctValues().build());
+                        .withViewPort(this.excludeList = JListWithImages.createForType(PathOrRegex.class).distinctValues().build());
 
                 Consumer<PathMatchType> addExcludeItemConsumer = type -> {
                     if (type == PathMatchType.FOLDER) {
