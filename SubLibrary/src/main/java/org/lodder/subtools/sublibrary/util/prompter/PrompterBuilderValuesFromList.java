@@ -9,12 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 public class PrompterBuilderValuesFromList {
 
@@ -105,8 +104,8 @@ public class PrompterBuilderValuesFromList {
                     value = prompter.prompt(message);
                 } else {
                     String choicesMessage = IntStream.range(0, elements.size())
-                            .mapToObj(number -> "  - " + (number + 1) + ": " + toStringMapper.apply(elements.get(number)))
-                            .collect(Collectors.joining(System.lineSeparator())) + System.lineSeparator();
+                                                    .mapToObj(number -> "  - " + (number + 1) + ": " + toStringMapper.apply(elements.get(number)))
+                                                    .collect(Collectors.joining(System.lineSeparator())) + System.lineSeparator();
                     value = prompter.prompt(StringUtils.isBlank(message) ? choicesMessage : message + System.lineSeparator() + choicesMessage);
                 }
                 if (StringUtils.isBlank(value) && includeNull) {

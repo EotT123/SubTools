@@ -43,8 +43,8 @@ public class ReleaseParser {
         String seriesName = "";
         List<Integer> episodeNumbers = new ArrayList<>();
         int seasonNumber = 0;
-        Integer year = namedGroups.contains("year") ? Integer.parseInt(namedMatcher.group("year")): null;
-        String description =namedGroups.contains("description") ?  namedMatcher.group("description").substring(1): "";
+        Integer year = namedGroups.contains("year") ? Integer.parseInt(namedMatcher.group("year")) : null;
+        String description = namedGroups.contains("description") ? namedMatcher.group("description").substring(1) : "";
 
         if (namedGroups.contains("moviename")) {
             String movieName;

@@ -3,10 +3,9 @@ package org.lodder.subtools.sublibrary.util.prompter;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
-import org.codehaus.plexus.components.interactivity.Prompter;
-
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.codehaus.plexus.components.interactivity.Prompter;
 
 public class PrompterBuilderBoolean {
 

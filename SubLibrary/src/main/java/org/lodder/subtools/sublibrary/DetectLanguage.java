@@ -7,17 +7,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
-import org.lodder.subtools.sublibrary.util.lazy.LazyThrowingSupplier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.optimaize.langdetect.LanguageDetector;
 import com.optimaize.langdetect.LanguageDetectorBuilder;
 import com.optimaize.langdetect.ngram.NgramExtractors;
 import com.optimaize.langdetect.profiles.LanguageProfileReader;
 import com.optimaize.langdetect.text.CommonTextObjectFactories;
 import com.optimaize.langdetect.text.TextObjectFactory;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
+import org.lodder.subtools.sublibrary.util.lazy.LazyThrowingSupplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DetectLanguage {
 

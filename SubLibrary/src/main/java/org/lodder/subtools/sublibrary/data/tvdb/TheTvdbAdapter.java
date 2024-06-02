@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import name.falgout.jeffrey.throwing.ThrowingLongFunction;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -97,7 +96,7 @@ public class TheTvdbAdapter {
         if (tvdbSerie.isEmpty()) {
             valueBuilder.optionalValue(tvdbSerie)
                     .storeTempNullValue()
-                    .timeToLive(valueBuilder.getTemporaryTimeToLive().map(v ->  v * 2)
+                    .timeToLive(valueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
                             .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
                     .storeAsTempValue();
         } else {

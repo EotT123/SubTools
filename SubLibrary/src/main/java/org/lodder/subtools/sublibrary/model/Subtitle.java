@@ -2,17 +2,15 @@ package org.lodder.subtools.sublibrary.model;
 
 import java.nio.file.Path;
 
-import org.apache.commons.lang3.builder.EqualsExclude;
-import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
-
 import com.pivovarit.function.ThrowingSupplier;
-
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsExclude;
+import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 
 @Setter
 @Getter

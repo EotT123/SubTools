@@ -190,10 +190,12 @@ public class OptionalExtension {
     public static <T, X extends Exception> OptionalInt mapToInt(@This Optional<T> optional, ThrowingToIntFunction<T, X> mapper) throws X {
         return optional.isPresent() ? OptionalInt.of(mapper.applyAsInt(optional.get())) : OptionalInt.empty();
     }
+
     //
     public static OptionalInt mapToOptionalInt(@This Optional<Integer> optional) {
         return optional.map(OptionalInt::of).orElseGet(OptionalInt::empty);
     }
+
     //
     //    //
     //

@@ -2,11 +2,10 @@ package org.lodder.subtools.sublibrary.cache;
 
 import java.util.function.Function;
 
-import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
-
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.jodah.typetools.TypeResolver;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
 public class TypedDiskCache<K, V> extends DiskCache<K, V> {
 

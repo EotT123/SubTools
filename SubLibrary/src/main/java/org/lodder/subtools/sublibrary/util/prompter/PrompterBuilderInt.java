@@ -5,10 +5,9 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-import org.codehaus.plexus.components.interactivity.Prompter;
-
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.codehaus.plexus.components.interactivity.Prompter;
 
 public class PrompterBuilderInt {
 

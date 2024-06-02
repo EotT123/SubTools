@@ -1,5 +1,13 @@
 package org.lodder.subtools.sublibrary.xml;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,15 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
@@ -78,7 +77,7 @@ public class XMLHelper {
         LOGGER.trace("getBooleanAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
         return ((Element) nlList).getAttribute(sAttribute) != null
-                && Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
+               && Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
     }
 
     public static String cleanBadChars(String string) {

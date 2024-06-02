@@ -2,6 +2,7 @@ package org.lodder.subtools.sublibrary.xml;
 
 
 import java.util.HashMap;
+
 /**
  * <a href="http://www.rgagnon.com/javadetails/java-0307.html">Source</a>
  */
@@ -10,6 +11,7 @@ public class StringUtils {
     }
 
     private static final HashMap<String, String> htmlEntities;
+
     static {
         htmlEntities = new HashMap<>();
         htmlEntities.put("&lt;", "<");

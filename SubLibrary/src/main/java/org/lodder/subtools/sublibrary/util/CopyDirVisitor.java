@@ -21,7 +21,7 @@ public class CopyDirVisitor extends SimpleFileVisitor<Path> {
     private final StandardCopyOption[] copyOptions;
 
     public CopyDirVisitor(Path fromPath, Path toPath) {
-        this(fromPath, toPath, new StandardCopyOption[] { StandardCopyOption.REPLACE_EXISTING });
+        this(fromPath, toPath, new StandardCopyOption[]{ StandardCopyOption.REPLACE_EXISTING });
     }
 
     @Override

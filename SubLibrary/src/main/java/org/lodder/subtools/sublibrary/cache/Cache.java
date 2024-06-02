@@ -9,12 +9,10 @@ import java.util.OptionalLong;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.pivovarit.function.ThrowingSupplier;
-
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Getter(value = AccessLevel.PROTECTED)
 public abstract class Cache<K, V> {

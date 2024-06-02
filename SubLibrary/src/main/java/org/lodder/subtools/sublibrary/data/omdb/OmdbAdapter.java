@@ -2,6 +2,8 @@ package org.lodder.subtools.sublibrary.data.omdb;
 
 import java.util.Optional;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
@@ -10,9 +12,6 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.AccessLevel;
-import lombok.Getter;
 
 @Getter(value = AccessLevel.PROTECTED)
 public class OmdbAdapter {

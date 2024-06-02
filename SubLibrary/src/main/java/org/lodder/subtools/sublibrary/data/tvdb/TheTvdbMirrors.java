@@ -50,7 +50,7 @@ public class TheTvdbMirrors {
     }
 
     public String getMirror(String type) {
-        return switch(type){
+        return switch (type) {
             case TYPE_XML -> xmlList.isEmpty() ? null : xmlList.get(RNDM.nextInt(xmlList.size()));
             case TYPE_BANNER -> bannerList.isEmpty() ? null : bannerList.get(RNDM.nextInt(bannerList.size()));
             case TYPE_ZIP -> zipList.isEmpty() ? null : zipList.get(RNDM.nextInt(zipList.size()));

@@ -25,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.experimental.ExtensionMethod;
 import name.falgout.jeffrey.throwing.Nothing;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -405,13 +404,13 @@ public class Manager {
         <S extends T, X extends Exception> ValueBuilderGetValueStoreTempValueIntf<S, X> valueSupplier(ThrowingSupplier<S, X> valueSupplier);
 
         <C extends Collection<S>, S extends T, X extends Exception> ValueBuilderGetCollectionIntf<C, S, X>
-                collectionSupplier(Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
+        collectionSupplier(Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
 
         <S extends T, X extends Exception> ValueBuilderGetOptionalStoreTempValueIntf<S, X>
-                optionalSupplier(ThrowingSupplier<Optional<S>, X> valueSupplier);
+        optionalSupplier(ThrowingSupplier<Optional<S>, X> valueSupplier);
 
         <X extends Exception> ValueBuilderGetOptionalIntStoreTempValueIntf<X>
-                optionalIntSupplier(ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
+        optionalIntSupplier(ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
     }
 
     public interface ValueBuilderGetValueStoreTempValueIntf<T, X extends Exception> extends ValueBuilderGetValueIntf<T, X> {
@@ -561,7 +560,7 @@ public class Manager {
 
         @Override
         public <L extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<L, S, Nothing>
-                returnType(Class<L> collectionReturnType, Class<S> returnType) {
+        returnType(Class<L> collectionReturnType, Class<S> returnType) {
             this.returnType = (Class<T>) returnType;
             return (ValueBuilder<L, S, Nothing>) this;
         }
@@ -574,7 +573,7 @@ public class Manager {
 
         @Override
         public <S extends T, E extends Exception> ValueBuilder<?, S, E>
-                optionalSupplier(ThrowingSupplier<Optional<S>, E> valueSupplier) {
+        optionalSupplier(ThrowingSupplier<Optional<S>, E> valueSupplier) {
             this.optionalSupplier = (ThrowingSupplier) valueSupplier;
             return (ValueBuilder<?, S, E>) this;
         }
@@ -587,7 +586,7 @@ public class Manager {
 
         @Override
         public <L extends Collection<S>, S extends T, E extends Exception> ValueBuilder<L, S, E>
-                collectionSupplier(Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
+        collectionSupplier(Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
             this.collectionSupplier = (ThrowingSupplier<C, X>) collectionSupplier;
             return (ValueBuilder<L, S, E>) this;
         }

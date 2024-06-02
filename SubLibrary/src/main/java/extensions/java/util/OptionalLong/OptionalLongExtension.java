@@ -24,9 +24,9 @@ public class OptionalLongExtension {
      * @throws X exception type of the throwing Function
      */
     public static <X extends Exception> OptionalLong map(@This OptionalLong optional, ThrowingUnaryOperator<Long, X> function) throws X {
-        if(optional.isPresent()){
+        if (optional.isPresent()) {
             Long value = function.apply(optional.getAsLong());
-            if(value != null){
+            if (value != null) {
                 return OptionalLong.of(value);
             }
         }
@@ -44,7 +44,7 @@ public class OptionalLongExtension {
      * @return the result of the function wrapped in an @{link Optional} if the value is present, otherwise an empty {@code Optional}
      * @throws X exception type of the throwing Function
      */
-    public static <T, X extends Exception> Optional<T> mapToObj(@This OptionalLong optional, ThrowingFunction<Long,T,  X> function) throws X {
+    public static <T, X extends Exception> Optional<T> mapToObj(@This OptionalLong optional, ThrowingFunction<Long, T, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsLong())) : Optional.empty();
     }
 

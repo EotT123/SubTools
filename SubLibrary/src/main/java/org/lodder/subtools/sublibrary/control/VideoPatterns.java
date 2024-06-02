@@ -55,7 +55,7 @@ public class VideoPatterns {
     public enum AudioEncoding implements VideoPatternEnumIntf {
         DD5_1("dd5.1", "dd5-1");
 
-       private final String[] values;
+        private final String[] values;
 
         AudioEncoding(String... values) {
             this.values = values;

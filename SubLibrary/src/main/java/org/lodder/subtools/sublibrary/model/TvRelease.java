@@ -5,12 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalInt;
 
-import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
 
 @Getter
 @Setter
@@ -141,7 +140,7 @@ public class TvRelease extends Release {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + ": " + this.getName() + " s" + this.getSeason() + " e"
-                + this.getEpisodeNumbers().toString() + " " + this.getQuality() + " " + this.getReleaseGroup();
+               + this.getEpisodeNumbers().toString() + " " + this.getQuality() + " " + this.getReleaseGroup();
     }
 
     @Override

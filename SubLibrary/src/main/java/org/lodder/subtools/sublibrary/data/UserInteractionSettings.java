@@ -2,10 +2,9 @@ package org.lodder.subtools.sublibrary.data;
 
 import java.util.List;
 
-import org.lodder.subtools.sublibrary.control.VideoPatterns;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.sublibrary.control.VideoPatterns;
 
 @RequiredArgsConstructor
 @Getter

@@ -111,9 +111,9 @@ public class ImdbAdapter {
         return userInteractionHandler
                 .selectFromList(
                         providerSerieIds.stream().sorted(Comparator
-                                .comparing((ProviderSerieId providerSerieId) -> providerSerieId.getName().replaceAll("[^A-Za-z]", "")
-                                        .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
-                                .thenComparing(ProviderSerieId::getName))
+                                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.getName().replaceAll("[^A-Za-z]", "")
+                                                .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
+                                        .thenComparing(ProviderSerieId::getName))
                                 .toList(),
                         Messages.getString("Prompter.SelectImdbMatchForSerie").formatted(title),
                         getProviderName(),

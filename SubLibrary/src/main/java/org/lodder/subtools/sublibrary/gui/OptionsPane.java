@@ -1,14 +1,12 @@
 package org.lodder.subtools.sublibrary.gui;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import javax.swing.JOptionPane;
-
-import java.awt.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

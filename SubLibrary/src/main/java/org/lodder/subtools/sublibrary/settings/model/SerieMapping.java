@@ -53,7 +53,7 @@ public class SerieMapping implements Serializable { // implements SerieMappingIn
     public boolean matches(String serieName) {
         String serieNameFormatted = formatName(serieName);
         return getFormattedName().contains(serieNameFormatted)
-                || (serieNameFormatted.contains(getFormattedName()) && getFormattedName().length() > 3);
+               || (serieNameFormatted.contains(getFormattedName()) && getFormattedName().length() > 3);
     }
 
     public boolean exactMatch(String serieName) {

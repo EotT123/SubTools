@@ -2,13 +2,12 @@ package org.lodder.subtools.sublibrary.data.omdb;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
 import org.w3c.dom.Element;
-
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 class OmdbApi {

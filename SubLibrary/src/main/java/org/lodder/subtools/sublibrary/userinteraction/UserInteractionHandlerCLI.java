@@ -5,15 +5,14 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.util.prompter.PrompterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor

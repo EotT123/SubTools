@@ -3,10 +3,9 @@ package org.lodder.subtools.sublibrary.data.omdb.model;
 import java.io.Serial;
 import java.io.Serializable;
 
-import org.lodder.subtools.sublibrary.data.ReleaseDBIntf;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.sublibrary.data.ReleaseDBIntf;
 
 @Getter
 @RequiredArgsConstructor
