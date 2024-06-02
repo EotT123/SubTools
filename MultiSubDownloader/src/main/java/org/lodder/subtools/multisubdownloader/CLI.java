@@ -76,7 +76,7 @@ public class CLI {
         this.subtitleSelection = line.hasCliOption(CliOption.SELECTION);
         this.verboseProgress = line.hasCliOption(CliOption.VERBOSE_PROGRESS);
         this.dryRun = line.hasCliOption(CliOption.DRY_RUN);
-        Messages.setLanguage(language);
+        Messages.language = language;
     }
 
     public void run() {

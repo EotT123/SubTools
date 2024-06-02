@@ -105,20 +105,20 @@ public class ImdbAdapter {
         }
         if (!userInteractionHandler.getSettings().isOptionsConfirmProviderMapping() && providerSerieIds.size() == 1) {
             // found single exact match
-            return OptionalInt.of(Integer.parseInt(providerSerieIds.iterator().next().getId()));
+            return OptionalInt.of(Integer.parseInt(providerSerieIds.iterator().next().id));
         }
         String formattedTitle = title.replaceAll("[^A-Za-z]", "");
         return userInteractionHandler
                 .selectFromList(
                         providerSerieIds.stream().sorted(Comparator
-                                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.getName().replaceAll("[^A-Za-z]", "")
+                                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.name.replaceAll("[^A-Za-z]", "")
                                                 .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
                                         .thenComparing(ProviderSerieId::getName))
                                 .toList(),
                         Messages.getString("Prompter.SelectImdbMatchForSerie").formatted(title),
                         getProviderName(),
                         ProviderSerieId::getName)
-                .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.getId()));
+                .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.id));
     }
 
     private OptionalInt promptUserToEnterImdbId(String title, int year) {
@@ -126,7 +126,7 @@ public class ImdbAdapter {
                 Messages.getString("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
     }
 
-    public synchronized static ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
+    public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
         if (instance == null) {
             instance = new ImdbAdapter(manager, userInteractionHandler);
         }

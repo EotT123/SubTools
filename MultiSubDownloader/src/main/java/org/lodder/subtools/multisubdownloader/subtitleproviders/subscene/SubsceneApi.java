@@ -89,7 +89,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     public List<SubsceneSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language)
             throws SubsceneException {
-        return getManager().valueBuilder().memoryCache()
+        return manager.valueBuilder().memoryCache()
                 .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().getName(), providerSerieId.getProviderId(), season, episode, language))
                 .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
                     setLanguageWithCookie(language);
@@ -151,7 +151,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
     }
 
     private void addCookie(String cookieName, String cookieValue) {
-        getManager().storeCookies("subscene.com", Map.of(cookieName, cookieValue));
+        manager.storeCookies("subscene.com", Map.of(cookieName, cookieValue));
     }
 
     @Override

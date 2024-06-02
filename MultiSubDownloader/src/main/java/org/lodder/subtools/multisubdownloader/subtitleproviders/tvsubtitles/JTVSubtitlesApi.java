@@ -35,7 +35,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     public List<ProviderSerieId> getUrisForSerieName(String serieName) throws TvSubtitlesException {
         try {
-            return getManager().postBuilder()
+            return manager.postBuilder()
                     .url(DOMAIN + "/search.php")
                     .addData("qs", serieName)
                     .postAsJsoupDocument()
@@ -55,7 +55,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
     }
 
     private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language) throws TvSubtitlesException {
-        return getManager().valueBuilder()
+        return manager.valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s".formatted(getSubtitleSource().name(), episodeUrl, language))
                 .collectionSupplier(TVsubtitlesSubtitleDescriptor.class, () -> {
@@ -117,7 +117,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
     }
 
     private Optional<String> getEpisodeUrl(String showUrl, int season, int episode) throws TvSubtitlesException {
-        return getManager().valueBuilder()
+        return manager.valueBuilder()
                 .memoryCache()
                 .key("%s-episodeUrl-%s-%s-%s".formatted(getSubtitleSource().name(), showUrl, season, episode))
                 .optionalSupplier(() -> {

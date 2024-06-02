@@ -52,7 +52,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
     public void login(String username, String password) throws Addic7edException {
         try {
-            getManager().postBuilder()
+            manager.postBuilder()
                     .url(DOMAIN + "/dologin.php")
                     .addData("username", username)
                     .addData("password", password)
@@ -75,7 +75,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
             String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
             List<ProviderSerieId> providerSerieIdsFormatted = providerSerieIds.stream().filter(providerId -> {
-                String formattedSerieName = providerId.getName().replaceAll("[^A-Za-z]", "");
+                String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
                 return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
                        StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
             }).toList();
@@ -98,7 +98,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
     public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode, Language language)
             throws Addic7edException {
-        return getManager().valueBuilder()
+        return manager.valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), addic7edSerieMapping.getProviderId(), season, episode,
                         language))
@@ -118,9 +118,9 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
                     String title = null;
 
-                    Elements elTitel = doc.get().getElementsByClass("titulo");
-                    if (elTitel.size() == 1) {
-                        Matcher matcher = TITLE_PATTERN.matcher(elTitel.get(0).html());
+                    Elements elTitle = doc.get().getElementsByClass("titulo");
+                    if (elTitle.size() == 1) {
+                        Matcher matcher = TITLE_PATTERN.matcher(elTitle.get(0).html());
                         if (matcher.matches()) {
                             title = matcher.group(1);
                         }
@@ -209,7 +209,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
     private Optional<Document> getContent(String url, Predicate<String> emptyResultPredicate) throws Addic7edException {
         try {
-            if (!speedy && !getManager().valueBuilder().cacheType(CacheType.MEMORY).key(url).isPresent()) {
+            if (!speedy && !manager.valueBuilder().cacheType(CacheType.MEMORY).key(url).isPresent()) {
                 // if (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION) {
                 // LOGGER.info("RateLimit is reached for ADDIC7ed, please wait {} seconds", RATEDURATION);
                 // }

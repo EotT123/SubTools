@@ -124,7 +124,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
                 .sorted(Comparator
                         .comparing((SubSceneSerieId serieId) -> serieId.getSeason() == 0)
                         .thenComparing(serieId -> {
-                            Matcher matcher = yearPattern.matcher(serieId.getName());
+                            Matcher matcher = yearPattern.matcher(serieId.name);
                             return matcher.find() ? Integer.parseInt(matcher.group()) : 0;
                         }, Comparator.reverseOrder())
                         .thenComparing(SubSceneSerieId::getSeason, Comparator.reverseOrder()))
@@ -161,11 +161,11 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
 
     @Override
     public String providerSerieIdToDisplayString(SubSceneSerieId providerSerieId) {
-        if (providerSerieId.getId().endsWith("-season")) {
+        if (providerSerieId.id.endsWith("-season")) {
             OptionalInt season = IntStream.rangeClosed(1, 100)
-                    .filter(i -> providerSerieId.getId().endsWith("-%s-season".formatted(SubsceneApi.getOrdinalName(i).toLowerCase()))).findAny();
+                    .filter(i -> providerSerieId.id.endsWith("-${SubsceneApi.getOrdinalName(i).toLowerCase()}-season")).findAny();
             if (season.isPresent()) {
-                return "%s (%s %s)".formatted(providerSerieId.getName(), Messages.getString("App.Season"), season.getAsInt());
+                return "${providerSerieId.name} (${Messages.getString(\"App.Season\")} ${season.getAsInt()})";
             }
         }
         return providerSerieId.getName();

@@ -132,6 +132,6 @@ public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescript
 
     @Override
     public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.getName();
+        return providerSerieId.name;
     }
 }

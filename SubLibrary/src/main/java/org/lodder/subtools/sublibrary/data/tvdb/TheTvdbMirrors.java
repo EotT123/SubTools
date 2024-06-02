@@ -13,7 +13,7 @@ import org.w3c.dom.Node;
 
 /**
  * @author lodder
- * <a href="http://code.google.com/p/moviejukebox/">Source</a>
+ *         <a href="http://code.google.com/p/moviejukebox/">Source</a>
  */
 public class TheTvdbMirrors {
 
@@ -35,16 +35,15 @@ public class TheTvdbMirrors {
         synchronized (this) {
             manager.getPageContentBuilder()
                     .url("http://www.thetvdb.com/api/" + apikey + "/mirrors.xml")
-                    .getAsDocument().ifPresent(doc -> {
-                        doc.getElementsByTagName("Mirror").stream()
-                                .filter(nMirror -> nMirror.getNodeType() == Node.ELEMENT_NODE)
-                                .map(Element.class::cast)
-                                .forEach(eMirror -> {
-                                    String url = XMLHelper.getStringTagValue("mirrorpath", eMirror);
-                                    int typeMask = XMLHelper.getIntTagValue("typemask", eMirror);
-                                    addMirror(typeMask, url);
-                                });
-                    });
+                    .getAsDocument().ifPresent(doc ->
+                            doc.getElementsByTagName("Mirror").stream()
+                                    .filter(nMirror -> nMirror.getNodeType() == Node.ELEMENT_NODE)
+                                    .map(Element.class::cast)
+                                    .forEach(eMirror -> {
+                                        String url = XMLHelper.getStringTagValue("mirrorpath", eMirror);
+                                        int typeMask = XMLHelper.getIntTagValue("typemask", eMirror);
+                                        addMirror(typeMask, url);
+                                    }));
 
         }
     }

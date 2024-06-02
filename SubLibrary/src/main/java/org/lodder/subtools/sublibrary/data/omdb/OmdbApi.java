@@ -3,7 +3,6 @@ package org.lodder.subtools.sublibrary.data.omdb;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
@@ -17,9 +16,9 @@ class OmdbApi {
     public Optional<OmdbDetails> getMovieDetails(int imdbId) throws OmdbException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-moviedetails-%s".formatted("OMDB", imdbId))
+                .key("OMDB-moviedetails-$imdbId")
                 .optionalSupplier(() -> {
-                    final String url = "http://www.omdbapi.com/?i=tt" + StringUtils.leftPad(String.valueOf(imdbId), 7, "0") + "&plot=short&r=xml";
+                    final String url = "http://www.omdbapi.com/?i=tt${String.format(\"%07d\", imdbId)}&plot=short&r=xml";
                     try {
                         return manager.getPageContentBuilder()
                                 .url(url)

@@ -24,7 +24,7 @@ record ImdbSearchIdApi(Manager manager) {
     public Set<ProviderSerieId> getImdbIdOnImdb(String title, Integer year) throws ImdbSearchIdException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-imdbid-imdb-%s-%s".formatted("IMDB", title, year))
+                .key("IMDB-imdbid-imdb-$title-$year")
                 .collectionSupplier(ProviderSerieId.class, () -> {
 
                     StringBuilder sb = new StringBuilder("https://www.imdb.com/find?q=");
@@ -49,7 +49,7 @@ record ImdbSearchIdApi(Manager manager) {
     public Set<ProviderSerieId> getImdbIdOnYahoo(String title, Integer year) throws ImdbSearchIdException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-imdbid-yahoo-%s-%s".formatted("IMDB", title, year))
+                .key("IMDB-imdbid-yahoo-$title-$year")
                 .collectionSupplier(ProviderSerieId.class, () -> {
                     StringBuilder sb = new StringBuilder("http://search.yahoo.com/search;_ylt=A1f4cfvx9C1I1qQAACVjAQx.?p=");
                     sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
@@ -79,7 +79,7 @@ record ImdbSearchIdApi(Manager manager) {
     public Set<ProviderSerieId> getImdbIdOnGoogle(String title, Integer year) throws ImdbSearchIdException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-imdbid-google-%s-%s".formatted("IMDB", title, year))
+                .key("IMDB-imdbid-google-$title-$year")
                 .collectionSupplier(ProviderSerieId.class, () -> {
                     StringBuilder sb = new StringBuilder("http://www.google.com/search?q=");
                     sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));

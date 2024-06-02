@@ -180,7 +180,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
         SerieMapping serieMapping;
         if (!getUserInteractionSettings().isOptionsConfirmProviderMapping() && providerSerieIds.size() == 1) {
-            serieMapping = new SerieMapping(serieName, providerSerieIds.get(0).getId(), providerSerieIds.get(0).getName(), seasonToUse);
+            serieMapping = new SerieMapping(serieName, providerSerieIds.get(0).id, providerSerieIds.get(0).name, seasonToUse);
         } else {
             ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = getManager().valueBuilder()
                     .cacheType(CacheType.MEMORY)
@@ -216,7 +216,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 return Optional.empty();
             }
             // create a serieMapping for the selected value
-            serieMapping = new SerieMapping(serieName, uriForSerie.get().getId(), uriForSerie.get().getName(), seasonToUse);
+            serieMapping = new SerieMapping(serieName, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
         }
         if (tvdbIdOptional.isPresent()) {
             tvdbIdValueBuilder.get().value(serieMapping).store();

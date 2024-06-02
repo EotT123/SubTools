@@ -1,9 +1,11 @@
 package org.lodder.subtools.sublibrary.control;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * <a href="http://rosettacode.org/wiki/Roman_numerals/Decode#Java_2">Source</a>
  */
-
+@UtilityClass
 public class Roman {
     private static int decodeSingle(char letter) {
         return switch (letter) {

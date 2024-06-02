@@ -84,6 +84,10 @@
 			<artifactId>manifold-ext-rt</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>systems.manifold</groupId>
+			<artifactId>manifold-props-rt</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
@@ -136,6 +140,16 @@
 						<path>
 							<groupId>systems.manifold</groupId>
 							<artifactId>manifold-ext</artifactId>
+							<version>${manifold.version}</version>
+						</path>
+						<path>
+							<groupId>systems.manifold</groupId>
+							<artifactId>manifold-props</artifactId>
+							<version>${manifold.version}</version>
+						</path>
+						<path>
+							<groupId>systems.manifold</groupId>
+							<artifactId>manifold-strings</artifactId>
 							<version>${manifold.version}</version>
 						</path>
 					</annotationProcessorPaths>

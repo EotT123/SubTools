@@ -153,8 +153,8 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void savePreferenceSettings() {
-        if (Messages.getLanguage() != cbxLanguage.getSelectedItem()) {
-            Messages.setLanguage(cbxLanguage.getSelectedItem());
+        if (Messages.language != cbxLanguage.getSelectedItem()) {
+            Messages.language = cbxLanguage.getSelectedItem();
             gui.redraw();
         }
         List<Path> defaultIncomingFolders = defaultIncomingFoldersList.stream().map(LabelPanel::getObject).toList();

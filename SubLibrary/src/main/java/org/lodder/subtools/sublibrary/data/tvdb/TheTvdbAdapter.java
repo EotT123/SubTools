@@ -61,7 +61,7 @@ public class TheTvdbAdapter {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
         ValueBuilderIsPresentIntf<Serializable> valueBuilder = manager.valueBuilder()
                 .cacheType(CacheType.DISK)
-                .key("%s-tvdbSerie-%s".formatted(getProviderName(), encodedSerieName));
+                .key("$providerName-tvdbSerie-$encodedSerieName");
         if (valueBuilder.isPresent() && (!valueBuilder.isTemporaryObject() || !valueBuilder.isExpiredTemporary())) {
             return valueBuilder.returnType(TheTvdbSerie.class).getOptional();
         }
@@ -80,14 +80,14 @@ public class TheTvdbAdapter {
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");
             Comparator<TheTvdbSerie> comparator = Comparator
-                    .comparing((TheTvdbSerie s) -> formattedSerieName.equalsIgnoreCase(s.getSerieName().replaceAll("[^A-Za-z]", "")),
+                    .comparing((TheTvdbSerie s) -> formattedSerieName.equalsIgnoreCase(s.serieName.replaceAll("[^A-Za-z]", "")),
                             Comparator.reverseOrder())
                     .thenComparing(TheTvdbSerie::getFirstAired, Comparator.reverseOrder());
             try {
                 tvdbSerie = userInteractionHandler
                         .selectFromList(serieIds.stream().sorted(comparator).toList(),
                                 Messages.getString("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
-                                getProviderName(), s -> "%s (%s)".formatted(s.getSerieName(), s.getFirstAired()))
+                                getProviderName(), s -> "${s.serieName} (${s.firstAired})")
                         .orElseMap(() -> askUserToEnterTvdbId(serieName).mapToOptionalObj(id -> getApi().getSerie(id, null)));
             } catch (TheTvdbException e) {
                 tvdbSerie = Optional.empty();
@@ -103,8 +103,8 @@ public class TheTvdbAdapter {
             valueBuilder.optionalValue(tvdbSerie).store();
             manager.valueBuilder()
                     .cacheType(CacheType.DISK)
-                    .key("%s-serieId-%s".formatted(getProviderName(), encodedSerieName))
-                    .optionalValue(tvdbSerie.map(tvdbS -> new SerieMapping(serieName, tvdbS.getId(), tvdbS.getSerieName())))
+                    .key("$providerName-serieId-$encodedSerieName")
+                    .optionalValue(tvdbSerie.map(tvdbS -> new SerieMapping(serieName, tvdbS.id, tvdbS.serieName)))
                     .storeTempNullValue()
                     .store();
         }
@@ -119,8 +119,8 @@ public class TheTvdbAdapter {
                     try {
                         return getApi().getEpisode(tvdbId, season, episode, Language.ENGLISH);
                     } catch (TheTvdbException e) {
-                        LOGGER.error("API %s getEpisode for serie id [%s] %s (%s)".formatted(getProviderName(), tvdbId,
-                                TvRelease.formatSeasonEpisode(season, episode), e.getMessage()), e);
+                        LOGGER.error("API $providerName getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
+                                TvRelease.formatSeasonEpisode(season, episode)), e);
                         return Optional.empty();
                     }
                 }).storeTempNullValue().getOptional();
@@ -135,15 +135,15 @@ public class TheTvdbAdapter {
     }
 
     private OptionalInt askUserToEnterTvdbId(String showName) {
-        LOGGER.error("Unknown serie name in tvdb: " + showName);
-        String tvdbidString = JOptionPane.showInputDialog(null, "Enter tvdb id for serie " + showName);
+        LOGGER.error("Unknown serie name in tvdb: $showName");
+        String tvdbidString = JOptionPane.showInputDialog(null, "Enter tvdb id for serie $showName");
         if (tvdbidString == null) {
             return OptionalInt.empty();
         }
         try {
             return OptionalInt.of(Integer.parseInt(tvdbidString));
         } catch (NumberFormatException e) {
-            LOGGER.error("Invalid tvdb id: " + tvdbidString);
+            LOGGER.error("Invalid tvdb id: $tvdbidString");
             return askUserToEnterTvdbId(showName);
         }
     }

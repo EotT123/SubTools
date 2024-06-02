@@ -2,10 +2,10 @@ package org.lodder.subtools.sublibrary.cache;
 
 import java.util.function.Function;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.jodah.typetools.TypeResolver;
-import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
 public class TypedDiskCache<K, V> extends DiskCache<K, V> {
 
@@ -13,12 +13,20 @@ public class TypedDiskCache<K, V> extends DiskCache<K, V> {
     private final Function<String, K> toObjectMapperKey;
     private final Function<V, String> toStringMapperValue;
     private final Function<String, V> toObjectMapperValue;
-    @SuppressWarnings("unchecked")
-    private final LazySupplier<Class<K>> keyType =
-            new LazySupplier<>(() -> (Class<K>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[0]);
-    @SuppressWarnings("unchecked")
-    private final LazySupplier<Class<V>> valueType =
-            new LazySupplier<>(() -> (Class<V>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[1]);
+//    @SuppressWarnings("unchecked")
+//    private final LazySupplier<Class<K>> keyType =
+//            new LazySupplier<>(() -> (Class<K>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[0]);
+//    @override @val(Protected) Class<K> dbKeyType = keyType.get();
+//    @SuppressWarnings("unchecked")
+//    private final LazySupplier<Class<V>> valueType =
+//            new LazySupplier<>(() -> (Class<V>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[1]);
+//
+//    @override @val(Protected) Class<V> dbValueType = valueType.get();
+
+    @Getter(lazy = true) @SuppressWarnings("unchecked")
+    private final Class<K>  dbKeyType = (Class<K>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[0];
+    @Getter(lazy = true) @SuppressWarnings("unchecked")
+    private final Class<V>  dbValueType = (Class<V>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[1];
 
     @SuppressWarnings("rawtypes")
     public static DiskCacheBuilderToStringMapperKeyIntf cacheBuilder() {
@@ -123,15 +131,4 @@ public class TypedDiskCache<K, V> extends DiskCache<K, V> {
     protected Object cacheObjectToDiskObject(CacheObject<V> value) {
         return value.toString(toStringMapperValue);
     }
-
-    @Override
-    protected Class<K> getDbKeyType() {
-        return keyType.get();
-    }
-
-    @Override
-    protected Class<V> getDbValueType() {
-        return valueType.get();
-    }
-
 }

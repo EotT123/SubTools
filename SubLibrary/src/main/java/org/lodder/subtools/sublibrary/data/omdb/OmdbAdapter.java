@@ -2,8 +2,6 @@ package org.lodder.subtools.sublibrary.data.omdb;
 
 import java.util.Optional;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
@@ -13,7 +11,6 @@ import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Getter(value = AccessLevel.PROTECTED)
 public class OmdbAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OmdbAdapter.class);
@@ -44,17 +41,17 @@ public class OmdbAdapter {
         try {
             return manager.valueBuilder()
                     .cacheType(CacheType.DISK)
-                    .key("%S-movieDetails-%s".formatted(getProviderName(), imdbId))
+                    .key("$providerName-movieDetails-$imdbId")
                     .optionalSupplier(() -> getApi().getMovieDetails(imdbId))
                     .storeTempNullValue()
                     .getOptional();
         } catch (Exception e) {
-            LOGGER.error("API %s getMovieDetails for id [%s] (%s)".formatted(getProviderName(), imdbId, e.getMessage()), e);
+            LOGGER.error("API $providerName getMovieDetails for id [$imdbId] (${e.getMessage()})", e);
             return Optional.empty();
         }
     }
 
-    public synchronized static OmdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
+    public static synchronized OmdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
         if (instance == null) {
             instance = new OmdbAdapter(manager, userInteractionHandler);
         }

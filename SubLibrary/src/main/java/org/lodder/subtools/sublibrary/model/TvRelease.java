@@ -36,8 +36,7 @@ public class TvRelease extends Release {
     }
 
     public static String formatSeasonEpisode(int season, int episode) {
-        return "S%sE%s".formatted(StringUtils.leftPad(String.valueOf(season), 2, "0"),
-                StringUtils.leftPad(String.valueOf(episode), 2, "0"));
+        return "S%02dE%02d".formatted(season, episode);
     }
 
     public interface TvReleaseBuilderShowName {
@@ -126,7 +125,7 @@ public class TvRelease extends Release {
     }
 
     public void updateTvdbEpisodeInfo(TheTvdbEpisode tvdbEpisode) {
-        this.title = tvdbEpisode.getEpisodeName(); // update to reflect correct episode title
+        this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
     }
 
     public OptionalInt getTvdbId() {

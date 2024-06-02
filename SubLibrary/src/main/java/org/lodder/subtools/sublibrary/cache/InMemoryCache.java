@@ -1,17 +1,17 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.io.Serializable;
 import java.util.function.Predicate;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.val;
 
-@Getter(value = AccessLevel.PROTECTED)
 public class InMemoryCache<K, V> extends Cache<K, V> {
 
-    private final Long timeToLive;
+    @val(Protected) Long timeToLive;
 
     protected InMemoryCache(Long timeToLiveSeconds, Long timerIntervalSeconds, Integer maxItems) {
         super(maxItems);
@@ -79,6 +79,7 @@ public class InMemoryCache<K, V> extends Cache<K, V> {
                 try {
                     Thread.sleep(timerInterval);
                 } catch (InterruptedException ignored) {
+                    //ignore
                 }
                 cleanup();
             }
@@ -93,9 +94,8 @@ public class InMemoryCache<K, V> extends Cache<K, V> {
     }
 
     public void cleanup(Predicate<K> keyFilter) {
-        synchronized (getCacheMap()) {
-            getCacheMap().entrySet()
-                    .removeIf(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) && entry.getValue().isExpired(timeToLive));
+        synchronized (cacheMap) {
+            cacheMap.entrySet().removeIf(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) && entry.getValue().isExpired(timeToLive));
             Thread.yield();
         }
     }

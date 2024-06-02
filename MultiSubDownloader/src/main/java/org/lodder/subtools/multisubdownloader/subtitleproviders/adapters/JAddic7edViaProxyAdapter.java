@@ -122,7 +122,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
         }
         return serieIds.stream()
                 .sorted(Comparator
-                        .comparing(n -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.getName().replaceAll("[^A-Za-z]", ""))))
+                        .comparing(n -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
                 .toList();
     }
 
@@ -138,7 +138,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
 
     @Override
     public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.getName();
+        return providerSerieId.name;
     }
 
     @Getter

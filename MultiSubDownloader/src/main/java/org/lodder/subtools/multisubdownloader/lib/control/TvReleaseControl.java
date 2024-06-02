@@ -44,9 +44,9 @@ public class TvReleaseControl extends ReleaseControl {
 
     private void processTvdb() throws ReleaseControlException {
         jtvdba.getSerie(tvRelease.getName()).ifPresentOrThrow(tvdbSerie -> {
-            tvRelease.setTvdbId(tvdbSerie.getId());
-            tvRelease.setOriginalName(tvdbSerie.getSerieName());
-            jtvdba.getEpisode(tvdbSerie.getId(), tvRelease.getSeason(), tvRelease.getEpisodeNumbers().get(0))
+            tvRelease.setTvdbId(tvdbSerie.id);
+            tvRelease.setOriginalName(tvdbSerie.serieName);
+            jtvdba.getEpisode(tvdbSerie.id, tvRelease.getSeason(), tvRelease.getEpisodeNumbers().get(0))
                     .ifPresentOrThrow(
                             tvRelease::updateTvdbEpisodeInfo,
                             () -> new ReleaseControlException("Season %s Episode %s not found, check file".formatted(tvRelease.getSeason(),
@@ -57,7 +57,7 @@ public class TvReleaseControl extends ReleaseControl {
     private void processSpecial() throws ReleaseControlException {
         jtvdba.getSerie(tvRelease.getName()).ifPresentOrThrow(tvdbSerie -> {
             tvRelease.setTvdbId(tvdbSerie.getId());
-            tvRelease.setOriginalName(tvdbSerie.getSerieName());
+            tvRelease.setOriginalName(tvdbSerie.serieName);
             if (getSettings().getProcessEpisodeSource() == SettingsProcessEpisodeSource.TVDB) {
                 jtvdba.getEpisode(tvdbSerie.getId(), tvRelease.getSeason(), tvRelease.getEpisodeNumbers().get(0))
                         .ifPresent(tvRelease::updateTvdbEpisodeInfo);

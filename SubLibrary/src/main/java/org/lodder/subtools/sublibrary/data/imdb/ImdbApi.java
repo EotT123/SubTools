@@ -3,7 +3,6 @@ package org.lodder.subtools.sublibrary.data.imdb;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
@@ -17,9 +16,9 @@ public class ImdbApi {
     public Optional<ImdbDetails> getMovieDetails(int imdbId) throws ImdbException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-moviedetails-%s".formatted("IMDB", imdbId))
+                .key("IMDB-moviedetails-$imdbId")
                 .optionalSupplier(() -> {
-                    final String url = "%s/title/tt%s/releaseinfo".formatted(DOMAIN, StringUtils.leftPad(String.valueOf(imdbId), 7, "0"));
+                    final String url = "$DOMAIN/title/tt${String.format(\"%07d\", imdbId)}/releaseinfo";
                     try {
                         org.jsoup.nodes.Element element = manager.getPageContentBuilder()
                                 .url(url)

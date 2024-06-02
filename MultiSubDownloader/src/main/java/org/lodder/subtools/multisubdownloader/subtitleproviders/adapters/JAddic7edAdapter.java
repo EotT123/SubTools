@@ -125,7 +125,7 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
     @Override
     public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season) throws Addic7edException {
         return getApi().getProviderId(serieName).stream()
-                .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.getName().replaceAll("[^A-Za-z]", ""))))
+                .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
                 .toList();
     }
 
@@ -136,6 +136,6 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
 
     @Override
     public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.getName();
+        return providerSerieId.name;
     }
 }

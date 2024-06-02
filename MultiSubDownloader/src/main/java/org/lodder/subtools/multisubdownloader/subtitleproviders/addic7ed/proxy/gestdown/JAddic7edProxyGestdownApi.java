@@ -48,7 +48,7 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
     }
 
     public Set<Subtitle> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language) throws ApiException {
-        return getManager().valueBuilder()
+        return manager.valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.getProviderId(), season, episode, language))
                 .collectionSupplier(Subtitle.class, () -> {

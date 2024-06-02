@@ -35,7 +35,7 @@ public class TheTvdbApi {
     public List<TheTvdbSerie> getSeries(String serieName, Language language) throws TheTvdbException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-series-%s-%s".formatted("TVDB", serieName, language))
+                .key("TVDB-series-$serieName-$language")
                 .collectionSupplier(TheTvdbSerie.class, () -> {
                     String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
                     try {
@@ -70,7 +70,7 @@ public class TheTvdbApi {
     public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode, Language language) throws TheTvdbException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-episode-%s-%s-%s-%s".formatted("TVDB", tvdbId, season, episode, language))
+                .key("TVDB-episode-$tvdbId-$season-$episode-$language")
                 .optionalSupplier(() -> {
                     try {
                         Response<EpisodesResponse> response =
@@ -90,44 +90,44 @@ public class TheTvdbApi {
     }
 
     private TheTvdbSerie seriesToTVDBSerie(Series serie, Language lang) {
-        TheTvdbSerie TheTVDBSerie = new TheTvdbSerie();
+        TheTvdbSerie theTVDBSerie = new TheTvdbSerie();
 
-        TheTVDBSerie.setId(serie.id);
-        TheTVDBSerie.setAirsDayOfWeek(serie.airsDayOfWeek);
-        TheTVDBSerie.setAirsTime(serie.airsTime);
-        TheTVDBSerie.setContentRating(serie.rating);
-        TheTVDBSerie.setFirstAired(serie.firstAired);
-        TheTVDBSerie.setGenres(serie.genre);
-        TheTVDBSerie.setImdbId(serie.imdbId);
-        TheTVDBSerie.setLanguage(lang);
-        TheTVDBSerie.setNetwork(serie.network);
-        // TheTVDBSerie.setOverview(serie.overview);
-        TheTVDBSerie.setRating(serie.rating);
-        TheTVDBSerie.setRuntime(serie.runtime);
-        // TheTVDBSerie.setSerieId(toString(serie.id));
-        TheTVDBSerie.setSerieName(serie.seriesName);
-        TheTVDBSerie.setStatus(serie.status);
+        theTVDBSerie.id = serie.id;
+        theTVDBSerie.airsDayOfWeek = serie.airsDayOfWeek;
+        theTVDBSerie.airsTime = serie.airsTime;
+        theTVDBSerie.contentRating = serie.rating;
+        theTVDBSerie.firstAired = serie.firstAired;
+        theTVDBSerie.genres = serie.genre;
+        theTVDBSerie.imdbId = serie.imdbId;
+        theTVDBSerie.language = lang;
+        theTVDBSerie.network = serie.network;
+        // theTVDBSerie.overview = serie.overview;
+        theTVDBSerie.rating = serie.rating;
+        theTVDBSerie.runtime = serie.runtime;
+        // theTVDBSerie.serieId = toString(serie.id);
+        theTVDBSerie.serieName = serie.seriesName;
+        theTVDBSerie.status = serie.status;
 
-        return TheTVDBSerie;
+        return theTVDBSerie;
     }
 
     private TheTvdbEpisode episodeToTVDBEpisode(Episode episode, Language lang) {
         TheTvdbEpisode tvdbEpisode = new TheTvdbEpisode();
 
-        tvdbEpisode.setId(toString(episode.id));
-        tvdbEpisode.setDvdEpisodeNumber(toString(episode.dvdEpisodeNumber));
-        tvdbEpisode.setDvdSeason(toString(episode.dvdSeason));
-        tvdbEpisode.setEpisodeName(episode.episodeName);
-        tvdbEpisode.setEpisodeNumber(episode.airedEpisodeNumber);
-        tvdbEpisode.setFirstAired(episode.firstAired);
-        tvdbEpisode.setLanguage(lang);
+        tvdbEpisode.id = toString(episode.id);
+        tvdbEpisode.dvdEpisodeNumber = toString(episode.dvdEpisodeNumber);
+        tvdbEpisode.dvdSeason = toString(episode.dvdSeason);
+        tvdbEpisode.episodeName = episode.episodeName;
+        tvdbEpisode.episodeNumber = episode.airedEpisodeNumber;
+        tvdbEpisode.firstAired = episode.firstAired;
+        tvdbEpisode.language = lang;
         // tvdbEpisode.setOverview(episode.language.overview);
-        tvdbEpisode.setSeasonNumber(episode.airedSeason);
-        tvdbEpisode.setAbsoluteNumber(toString(episode.absoluteNumber));
-        tvdbEpisode.setLastUpdated(toString(episode.lastUpdated));
-        tvdbEpisode.setSeasonId(toString(episode.airedSeasonID));
-        tvdbEpisode.setAirsAfterSeason(0);
-        tvdbEpisode.setAirsBeforeEpisode(0);
+        tvdbEpisode.seasonNumber = episode.airedSeason;
+        tvdbEpisode.absoluteNumber = toString(episode.absoluteNumber);
+        tvdbEpisode.lastUpdated = toString(episode.lastUpdated);
+        tvdbEpisode.seasonId = toString(episode.airedSeasonID);
+        tvdbEpisode.airsAfterSeason = 0;
+        tvdbEpisode.airsBeforeEpisode = 0;
 
         return tvdbEpisode;
     }

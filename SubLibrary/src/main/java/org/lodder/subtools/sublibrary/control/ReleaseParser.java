@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 
 public class ReleaseParser {
 
-    private NamedMatcher namedMatcher;
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
+    private NamedMatcher namedMatcher;
 
     public final Release parse(Path file) throws ReleaseParseException {
         String folderName = file.getParent() != null ? file.getParent().getFileName().toString() : "";
@@ -35,7 +35,7 @@ public class ReleaseParser {
                 }
             }
         }
-        throw new ReleaseParseException("Unknown format, can't be parsed: " + file.toAbsolutePath());
+        throw new ReleaseParseException("Unknown format, can't be parsed: ${file.toAbsolutePath()}");
     }
 
     private Release parsePatternResult(Path file, String fileParseName) throws ReleaseParseException {

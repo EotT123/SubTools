@@ -126,9 +126,9 @@ public class JTVsubtitlesAdapter extends AbstractAdapter<TVsubtitlesSubtitleDesc
         Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
         return getApi().getUrisForSerieName(serieName).stream()
                 .sorted(Comparator.comparing(
-                        (ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.getName().replaceAll("[^A-Za-z]", "")))
+                        (ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
                         .thenComparing((ProviderSerieId providerSerieId) -> {
-                            Matcher matcher = yearPatter.matcher(providerSerieId.getName());
+                            Matcher matcher = yearPatter.matcher(providerSerieId.name);
                             if (matcher.find()) {
                                 return Integer.parseInt(matcher.group(2));
                             }
@@ -144,6 +144,6 @@ public class JTVsubtitlesAdapter extends AbstractAdapter<TVsubtitlesSubtitleDesc
 
     @Override
     public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.getName();
+        return providerSerieId.name;
     }
 }

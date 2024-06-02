@@ -9,22 +9,20 @@ import java.util.regex.Pattern;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 
 @ToString
-@Setter
-@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 class TemporaryCacheObject<T> implements CacheObject<T>, Serializable {
 
     @Serial
     private static final long serialVersionUID = -152474119228350222L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
-    private final long created;
-    private final long timeToLive;
-    private T value;
+    @override @val long created;
+    @val long timeToLive;
+    @override @val T value;
 
     protected TemporaryCacheObject(long timeToLive, T value) {
         this.created = System.currentTimeMillis();
@@ -65,6 +63,6 @@ class TemporaryCacheObject<T> implements CacheObject<T>, Serializable {
 
     @Override
     public long getAge() {
-        return getCreated();
+        return created;
     }
 }

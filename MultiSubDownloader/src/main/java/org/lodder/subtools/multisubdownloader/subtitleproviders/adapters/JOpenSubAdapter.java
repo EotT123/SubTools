@@ -162,7 +162,7 @@ public class JOpenSubAdapter
             throws OpenSubtitlesException {
         return getApi().getProviderSerieIds(serieName).stream()
                 .sorted(Comparator.comparing(
-                        (OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.getName().replaceAll("[^A-Za-z]", "")))
+                        (OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
                         .thenComparing(OpensubtitleSerieId::getYear, Comparator.reverseOrder()))
                 .toList();
     }
@@ -174,6 +174,6 @@ public class JOpenSubAdapter
 
     @Override
     public String providerSerieIdToDisplayString(OpensubtitleSerieId providerSerieId) {
-        return "%s (%s)".formatted(providerSerieId.getName(), providerSerieId.getYear());
+        return "${providerSerieId.name} (${providerSerieId.getYear()})";
     }
 }

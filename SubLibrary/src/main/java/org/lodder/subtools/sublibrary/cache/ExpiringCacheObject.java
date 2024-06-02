@@ -9,22 +9,22 @@ import java.util.regex.Pattern;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 
 @ToString
-@Setter
-@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 class ExpiringCacheObject<T> implements CacheObject<T>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 3852086993086134232L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|lastAccessed:(.*?)|value:(.*)");
-    private final long created;
-    private long lastAccessed = System.currentTimeMillis();
-    private T value;
+
+    @override @val long created;
+    @var long lastAccessed = System.currentTimeMillis();
+    @override @var T value;
 
     protected ExpiringCacheObject(T value) {
         this.created = System.currentTimeMillis();
@@ -43,7 +43,7 @@ class ExpiringCacheObject<T> implements CacheObject<T>, Serializable {
 
     @Override
     public String toString(Function<T, String> valueToStringMapper) {
-        return "created:%s|lastAccessed:%s|value:%s".formatted(created, lastAccessed, valueToStringMapper.apply(value));
+        return "created:$created|lastAccessed:$lastAccessed|value:${valueToStringMapper.apply(value)}";
     }
 
     public static <T> Optional<CacheObject<T>> fromString(String string, Function<String, T> valueToObjectMapper) {
@@ -59,6 +59,6 @@ class ExpiringCacheObject<T> implements CacheObject<T>, Serializable {
 
     @Override
     public long getAge() {
-        return getLastAccessed();
+        return lastAccessed;
     }
 }

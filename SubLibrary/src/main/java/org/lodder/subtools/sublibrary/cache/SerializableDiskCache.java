@@ -1,18 +1,18 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.io.Serializable;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 
 public class SerializableDiskCache<K extends Serializable, V extends Serializable> extends DiskCache<K, V> {
 
-    @Getter(value = AccessLevel.PROTECTED)
-    private final Class<K> dbKeyType;
-    @Getter(value = AccessLevel.PROTECTED)
-    private final Class<V> dbValueType;
+    @override @val(Protected) Class<K> dbKeyType;
+    @override @val(Protected) Class<V> dbValueType;
 
     @SuppressWarnings("rawtypes")
     public static DiskCacheBuilderKeyTypeIntf cacheBuilder() {

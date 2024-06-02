@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,18 +12,14 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.pivovarit.function.ThrowingSupplier;
-import lombok.AccessLevel;
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.tuple.Pair;
 
-@Getter(value = AccessLevel.PROTECTED)
 public abstract class Cache<K, V> {
 
-    private final Map<K, CacheObject<V>> cacheMap;
-    private final Integer maxItems;
+    @val(Protected) Map<K, CacheObject<V>> cacheMap;
 
     protected Cache(Integer maxItems) {
-        this.maxItems = maxItems;
         this.cacheMap = maxItems != null ? new LRUMap<>(maxItems) : new HashMap<>();
     }
 
@@ -52,42 +50,29 @@ public abstract class Cache<K, V> {
                 return Optional.empty();
             } else {
                 obj.updateLastAccessed();
-                return Optional.ofNullable(obj.getValue());
+                return Optional.ofNullable(obj.value);
             }
         }
     }
 
     public boolean isTemporaryObject(K key) {
         synchronized (cacheMap) {
-            CacheObject<V> obj = cacheMap.get(key);
-            if (obj == null) {
-                return false;
-            } else {
-                return obj instanceof TemporaryCacheObject<?>;
-            }
+            return  cacheMap.get(key) instanceof TemporaryCacheObject<?>;
         }
     }
 
     public boolean isTemporaryExpired(K key) {
         synchronized (cacheMap) {
             CacheObject<V> obj = cacheMap.get(key);
-            if (obj == null) {
-                return false;
-            } else {
-                return obj instanceof TemporaryCacheObject<?> tempCacheObject && tempCacheObject.isExpired();
-            }
+            return obj instanceof TemporaryCacheObject<?> tempCacheObject && tempCacheObject.isExpired();
         }
     }
 
     public OptionalLong getTemporaryTimeToLive(K key) {
         synchronized (cacheMap) {
             CacheObject<V> obj = cacheMap.get(key);
-            if (obj == null) {
-                return OptionalLong.empty();
-            } else {
-                return obj instanceof TemporaryCacheObject<?> tempCacheObject ? OptionalLong.of(tempCacheObject.getTimeToLive())
-                        : OptionalLong.empty();
-            }
+            return obj instanceof TemporaryCacheObject<?> tempCacheObject ? OptionalLong.of(tempCacheObject.timeToLive)
+                    : OptionalLong.empty();
         }
     }
 
@@ -111,7 +96,7 @@ public abstract class Cache<K, V> {
             return null;
         } else {
             obj.updateLastAccessed();
-            return obj.getValue();
+            return obj.value;
         }
 
     }
@@ -134,7 +119,7 @@ public abstract class Cache<K, V> {
 
     public List<Pair<K, V>> getEntries(Predicate<K> keyFilter) {
         synchronized (cacheMap) {
-            return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), entry.getValue().getValue())).toList();
+            return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), entry.getValue().value)).toList();
         }
     }
 

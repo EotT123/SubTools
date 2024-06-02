@@ -3,15 +3,14 @@ package org.lodder.subtools.sublibrary.data;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.PageContentBuilderCacheTypeIntf;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class Html {
-    @Getter
-    private final Manager manager;
+    @val Manager manager;
     private final String userAgent;
 
     public Html(Manager manager) {

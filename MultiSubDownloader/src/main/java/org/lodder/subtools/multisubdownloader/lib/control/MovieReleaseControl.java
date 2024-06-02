@@ -45,7 +45,7 @@ public class MovieReleaseControl extends ReleaseControl {
             }
             movieDetails.ifPresentOrElse(info -> {
                 movieRelease.setYear(info.year());
-                movieRelease.setName(info.getName());
+                movieRelease.setName(info.name);
             }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info {}", movieRelease));
         }
     }
