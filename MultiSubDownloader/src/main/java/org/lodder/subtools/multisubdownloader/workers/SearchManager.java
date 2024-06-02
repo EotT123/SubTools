@@ -8,6 +8,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.ScoreCalculator;
@@ -18,12 +23,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 @RequiredArgsConstructor
 public class SearchManager implements Cancelable {

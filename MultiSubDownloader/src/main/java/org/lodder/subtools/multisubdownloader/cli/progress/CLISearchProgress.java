@@ -1,12 +1,11 @@
 package org.lodder.subtools.multisubdownloader.cli.progress;
 
+import dnl.utils.text.table.TextTable;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.gui.dialog.progress.search.SearchProgressTableModel;
 import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.model.Release;
-
-import dnl.utils.text.table.TextTable;
 
 public class CLISearchProgress extends CLIProgress<CLISearchProgress> implements SearchProgressListener {
 

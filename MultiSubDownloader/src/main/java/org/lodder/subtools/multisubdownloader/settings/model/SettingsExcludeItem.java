@@ -4,9 +4,8 @@ import java.nio.file.Path;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.lodder.subtools.sublibrary.util.NamedPattern;
-
 import lombok.Getter;
+import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 @Deprecated(since = "Settings version 6")
 @Getter

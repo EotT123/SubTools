@@ -2,10 +2,9 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exc
 
 import java.io.Serial;
 
+import lombok.experimental.StandardException;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-
-import lombok.experimental.StandardException;
 
 @StandardException
 public class TvSubtitlesException extends SubtitlesProviderException {

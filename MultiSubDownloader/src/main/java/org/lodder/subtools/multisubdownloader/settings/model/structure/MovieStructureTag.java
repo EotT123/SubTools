@@ -1,10 +1,9 @@
 package org.lodder.subtools.multisubdownloader.settings.model.structure;
 
-import org.lodder.subtools.multisubdownloader.Messages;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.multisubdownloader.Messages;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

@@ -45,8 +45,8 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     private static final Predicate<Exception> RETRY_PREDICATE =
             exception -> (exception instanceof HttpClientException httpClientException
-                    && (httpClientException.getResponseCode() == 409 || httpClientException.getResponseCode() == 429))
-                    || (exception instanceof ManagerException managerException && managerException.getMessage().contains("409 Conflict"));
+                          && (httpClientException.getResponseCode() == 409 || httpClientException.getResponseCode() == 429))
+                         || (exception instanceof ManagerException managerException && managerException.getMessage().contains("409 Conflict"));
 
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
@@ -104,7 +104,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
                                         .setUploader(row.select(".a5 > a").text().trim())
                                         .setComment(row.select(".a6 > div").text().trim()))
                                 .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null
-                                        && subDescriptor.getSeasonEpisode().getEpisodes().stream().anyMatch(ep -> ep == episode))
+                                                         && subDescriptor.getSeasonEpisode().getEpisodes().stream().anyMatch(ep -> ep == episode))
                                 .toList();
                     } catch (Exception e) {
                         throw new SubsceneException(e);

@@ -7,6 +7,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JPodnapisiAdapter;
 import org.lodder.subtools.sublibrary.Manager;
+
 public class PodnapisiServiceProvider implements ServiceProvider {
     @Override
     public int getPriority() {

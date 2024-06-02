@@ -18,12 +18,12 @@ public class KeywordFilter extends SubtitleFilter {
         if (subtitle.getQuality().isEmpty()) {
             subtitle.setQuality(ReleaseParser.getQualityKeyword(subtitle.getFileName()));
         }
-        if(!checkKeywordSubtitleMatch(subtitle, keywordsFile)){
+        if (!checkKeywordSubtitleMatch(subtitle, keywordsFile)) {
             return false;
         }
-         LOGGER.debug("getSubtitlesFiltered: found KEYWORD match [{}] ", subtitle.getFileName());
-         subtitle.setSubtitleMatchType(SubtitleMatchType.KEYWORD);
-         return true;
+        LOGGER.debug("getSubtitlesFiltered: found KEYWORD match [{}] ", subtitle.getFileName());
+        subtitle.setSubtitleMatchType(SubtitleMatchType.KEYWORD);
+        return true;
     }
 
 }

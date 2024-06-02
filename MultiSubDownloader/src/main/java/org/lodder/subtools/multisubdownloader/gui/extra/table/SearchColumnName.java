@@ -6,10 +6,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.lodder.subtools.multisubdownloader.Messages;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.multisubdownloader.Messages;
 
 @RequiredArgsConstructor
 public enum SearchColumnName implements CustomColumnName {

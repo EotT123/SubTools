@@ -161,7 +161,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         private final Manager manager;
 
         void setMappingType(MappingType mappingType) {
-            setDataVector(null, new String[] { mappingType.getNameColumn(), mappingType.getMappingColumn(), mappingType.getProviderNameColumn() });
+            setDataVector(null, new String[]{ mappingType.getNameColumn(), mappingType.getMappingColumn(), mappingType.getProviderNameColumn() });
             Arrays.stream(mappingType.getSelectionForKeyPrefixList())
                     .flatMap(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix).stream()
                             .map(serieMappingPair -> {
@@ -193,10 +193,10 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         GridBagLayout gbl_contentPanel = new GridBagLayout();
-        gbl_contentPanel.columnWidths = new int[] { 0, 0 };
-        gbl_contentPanel.rowHeights = new int[] { 0, 40, 0 };
-        gbl_contentPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gbl_contentPanel.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+        gbl_contentPanel.columnWidths = new int[]{ 0, 0 };
+        gbl_contentPanel.rowHeights = new int[]{ 0, 40, 0 };
+        gbl_contentPanel.columnWeights = new double[]{ 1.0, Double.MIN_VALUE };
+        gbl_contentPanel.rowWeights = new double[]{ 0.0, 1.0, Double.MIN_VALUE };
         contentPanel.setLayout(gbl_contentPanel);
         {
             JPanel selectionPane = new JPanel();

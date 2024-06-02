@@ -60,7 +60,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         }
 
         private ScrollTable(String header, Stream<E> items) {
-            this.table = new JTable(new DefaultTableModel(new String[] { header }, 1));
+            this.table = new JTable(new DefaultTableModel(new String[]{ header }, 1));
             this.scrollPane = new JScrollPane().withViewPort(table);
             this.model = (DefaultTableModel) table.getModel();
             model.removeRow(0);
@@ -71,7 +71,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         }
 
         public void addItem(E item) {
-            model.addRow(new Object[] { item });
+            model.addRow(new Object[]{ item });
         }
 
         public int getSelectedRow() {
@@ -132,7 +132,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
         @Override
         public Component[] getComponents() {
-            return new Component[] { scrollPane, table };
+            return new Component[]{ scrollPane, table };
         }
 
         @Override

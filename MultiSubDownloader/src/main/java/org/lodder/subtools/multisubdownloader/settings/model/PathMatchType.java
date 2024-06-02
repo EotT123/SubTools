@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 
 import lombok.Getter;
 

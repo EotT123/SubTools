@@ -1,8 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
-import org.opensubtitles.invoker.ApiException;
-
 import com.pivovarit.function.ThrowingSupplier;
+import org.opensubtitles.invoker.ApiException;
 
 public abstract class OpenSubtitlesExecuter {
 

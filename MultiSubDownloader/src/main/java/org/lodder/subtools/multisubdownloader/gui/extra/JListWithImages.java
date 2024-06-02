@@ -128,7 +128,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         }
 
         private static ImageIcon resizeIcon(ImageIcon icon, int width, int height) {
-            return new ImageIcon( icon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH));
+            return new ImageIcon(icon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH));
         }
     }
 }

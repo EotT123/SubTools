@@ -23,8 +23,8 @@ public class SubtitleFiltering {
 
     public boolean excludeSubtitle(Subtitle subtitle, Release release) {
         return excludeSubtitleHearingImpaired(subtitle, release)
-                || excludeSubtitleKeywordMatch(subtitle, release)
-                || excludeSubtitleExactMatch(subtitle, release);
+               || excludeSubtitleKeywordMatch(subtitle, release)
+               || excludeSubtitleExactMatch(subtitle, release);
     }
 
     private boolean excludeSubtitleHearingImpaired(Subtitle subtitle, Release release) {
@@ -33,7 +33,7 @@ public class SubtitleFiltering {
 
     private boolean excludeSubtitleKeywordMatch(Subtitle subtitle, Release release) {
         return settings.isOptionSubtitleKeywordMatch() &&
-                (keyword.excludeSubtitle(release, subtitle) || releaseGroup.excludeSubtitle(release, subtitle));
+               (keyword.excludeSubtitle(release, subtitle) || releaseGroup.excludeSubtitle(release, subtitle));
     }
 
     private boolean excludeSubtitleExactMatch(Subtitle subtitle, Release release) {

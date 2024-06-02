@@ -116,8 +116,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void checkUpdate(final boolean forceUpdateCheck) {
         UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
         Optional<String> updateUrl = (forceUpdateCheck && u.isNewVersionAvailable())
-                || (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.getSettings().getUpdateCheckPeriod())
-                        && u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : Optional.empty();
+                                     || (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.getSettings().getUpdateCheckPeriod())
+                                         && u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : Optional.empty();
         if (updateUrl.isPresent()) {
             final JEditorPane editorPane = new JEditorPane();
             editorPane.setPreferredSize(new Dimension(800, 50));
@@ -125,7 +125,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             editorPane.setContentType("text/html");
 
             editorPane.setText("<html>" + Messages.getString("UpdateAppAvailable") + "!: </br><A HREF="
-                    + updateUrl.get() + ">" + updateUrl.get() + "</a></html>");
+                               + updateUrl.get() + ">" + updateUrl.get() + "</a></html>");
 
             editorPane.addHyperlinkListener(hyperlinkEvent -> {
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED && Desktop.isDesktopSupported()) {
@@ -158,10 +158,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
         setBounds(100, 100, 925, 680);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         final GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[] { 448, 0 };
-        gridBagLayout.rowHeights = new int[] { 0, 125, 15, 0 };
-        gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gridBagLayout.rowWeights = new double[] { 1.0, 1.0, 0.0, Double.MIN_VALUE };
+        gridBagLayout.columnWidths = new int[]{ 448, 0 };
+        gridBagLayout.rowHeights = new int[]{ 0, 125, 15, 0 };
+        gridBagLayout.columnWeights = new double[]{ 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[]{ 1.0, 1.0, 0.0, Double.MIN_VALUE };
         getContentPane().setLayout(gridBagLayout);
 
         JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);

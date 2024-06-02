@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
-import javax.swing.JPanel;
-
+import javax.swing.*;
 import java.io.Serial;
 
 import lombok.Getter;

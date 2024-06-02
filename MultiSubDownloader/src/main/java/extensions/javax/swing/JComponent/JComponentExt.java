@@ -13,22 +13,22 @@ import manifold.ext.rt.api.This;
 @Extension
 public class JComponentExt {
 
-    public static @Self JComponent  withEnabled(@This JComponent component, boolean enabled) {
+    public static @Self JComponent withEnabled(@This JComponent component, boolean enabled) {
         component.setEnabled(enabled);
         return component;
     }
 
-    public static @Self JComponent  withEnabled(@This JComponent component) {
+    public static @Self JComponent withEnabled(@This JComponent component) {
         withEnabled(component, true);
         return component;
     }
 
-    public static @Self JComponent  withDisabled(@This JComponent component) {
+    public static @Self JComponent withDisabled(@This JComponent component) {
         withEnabled(component, false);
         return component;
     }
 
-    public static <S extends Container> @Self JComponent  addTo(@This JComponent child, S parent) {
+    public static <S extends Container> @Self JComponent addTo(@This JComponent child, S parent) {
         parent.add(child);
         return child;
     }
@@ -39,7 +39,7 @@ public class JComponentExt {
     }
 
     public static void setEnabledRecursive(@This JComponent component, boolean enabled) {
-       ComponentExt.setRecursive(component, c -> c.setEnabled(enabled));
+        ComponentExt.setRecursive(component, c -> c.setEnabled(enabled));
     }
 
     public static @Self JComponent enabledRecursive(@This JComponent component, boolean enabled) {

@@ -1,8 +1,7 @@
 package org.lodder.subtools.multisubdownloader.settings.model.structure;
 
-import org.lodder.subtools.multisubdownloader.Messages;
-
 import lombok.Getter;
+import org.lodder.subtools.multisubdownloader.Messages;
 
 @Getter
 public enum SerieStructureTag implements StructureTag {

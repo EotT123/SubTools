@@ -4,10 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.lodder.subtools.sublibrary.Language;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.sublibrary.Language;
 
 @Getter
 @RequiredArgsConstructor

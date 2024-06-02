@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.settings.model;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,15 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.ExtensionMethod;
 
 @Getter
 @Setter

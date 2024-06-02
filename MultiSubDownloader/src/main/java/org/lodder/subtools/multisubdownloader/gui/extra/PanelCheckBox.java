@@ -1,18 +1,10 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
-import java.io.Serial;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.LayoutManager;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.io.Serial;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

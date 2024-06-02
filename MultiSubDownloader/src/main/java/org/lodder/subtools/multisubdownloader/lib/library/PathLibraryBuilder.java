@@ -3,6 +3,8 @@ package org.lodder.subtools.multisubdownloader.lib.library;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
@@ -13,9 +15,6 @@ import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 public class PathLibraryBuilder extends LibraryBuilder {
 

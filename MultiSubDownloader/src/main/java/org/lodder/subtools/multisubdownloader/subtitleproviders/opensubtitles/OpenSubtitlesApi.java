@@ -70,7 +70,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         try {
             return manager.getPageContentBuilder()
                     .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                            + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
+                         + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
                     .userAgent("")
                     .cacheType(CacheType.MEMORY)
                     .retries(1)

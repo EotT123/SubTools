@@ -19,7 +19,7 @@ public class AbstractButtonExt {
         return abstractButton;
     }
 
-    public static  @Self AbstractButton withActionListener(@This AbstractButton abstractButton, Runnable listener) {
+    public static @Self AbstractButton withActionListener(@This AbstractButton abstractButton, Runnable listener) {
         withActionListener(abstractButton, arg -> listener.run());
         return abstractButton;
     }
@@ -39,7 +39,7 @@ public class AbstractButtonExt {
         return abstractButton;
     }
 
-    public static  @Self AbstractButton withActionCommand(@This AbstractButton abstractButton, String actionCommand) {
+    public static @Self AbstractButton withActionCommand(@This AbstractButton abstractButton, String actionCommand) {
         abstractButton.getModel().setActionCommand(actionCommand);
         return abstractButton;
     }

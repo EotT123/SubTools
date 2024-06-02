@@ -1,6 +1,6 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.Serial;
 
 /**

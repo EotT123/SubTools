@@ -1,5 +1,9 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.AiTranslatedEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.ForeignPartsOnlyEnum;
@@ -17,11 +21,6 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.opensubtitles.api.SubtitlesApi;
 import org.opensubtitles.invoker.ApiClient;
 import org.opensubtitles.model.Subtitles200Response;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 @Accessors(fluent = true, chain = true)
 @Getter

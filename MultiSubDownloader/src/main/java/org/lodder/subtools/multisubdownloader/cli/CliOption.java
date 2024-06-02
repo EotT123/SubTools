@@ -1,9 +1,8 @@
 package org.lodder.subtools.multisubdownloader.cli;
 
-import org.lodder.subtools.multisubdownloader.Messages;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.multisubdownloader.Messages;
 
 @Getter
 @RequiredArgsConstructor

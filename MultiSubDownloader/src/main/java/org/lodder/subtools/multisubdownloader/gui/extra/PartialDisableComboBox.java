@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- *
  * @author <a href="http://vetruvet.blogspot.com/2011/03/jcombobox-with-disabled-items.html">author</a>
  */
 public class PartialDisableComboBox<T> extends JComboBox<T> {

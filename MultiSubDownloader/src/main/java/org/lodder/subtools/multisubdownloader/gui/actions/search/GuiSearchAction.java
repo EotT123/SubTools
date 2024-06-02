@@ -2,6 +2,9 @@ package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
@@ -18,10 +21,6 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
 
 @Getter(value = AccessLevel.PROTECTED)
 public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction {

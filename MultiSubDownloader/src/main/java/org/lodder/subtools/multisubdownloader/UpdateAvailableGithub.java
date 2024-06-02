@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
@@ -21,8 +22,6 @@ import org.lodder.subtools.sublibrary.Manager.ValueBuilderIsPresentIntf;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class UpdateAvailableGithub {

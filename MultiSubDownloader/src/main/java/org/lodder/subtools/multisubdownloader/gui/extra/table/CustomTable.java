@@ -33,7 +33,7 @@ public class CustomTable extends ZebraJTable {
     public void hideColumn(SearchColumnName searchColumnName) {
         int columnId = getColumnIdByName(searchColumnName);
         if (columnId > -1) {
-            columnSettings.put(searchColumnName, new int[] {
+            columnSettings.put(searchColumnName, new int[]{
                     getColumnModel().getColumn(columnId).getMaxWidth(),
                     getColumnModel().getColumn(columnId).getMinWidth(),
                     getColumnModel().getColumn(columnId).getPreferredWidth() });
@@ -63,7 +63,7 @@ public class CustomTable extends ZebraJTable {
         int columnId = getColumnIdByName(searchColumnName);
         if (columnId > -1) {
             return getColumnModel().getColumn(columnId).getMinWidth() == 0
-                    && getColumnModel().getColumn(columnId).getPreferredWidth() == 0;
+                   && getColumnModel().getColumn(columnId).getPreferredWidth() == 0;
         }
         return true;
     }

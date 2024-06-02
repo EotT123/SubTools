@@ -29,7 +29,7 @@ public abstract class LibraryBuilder {
 
     protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers, boolean leadingZero) {
         if (structure.contains(tag.getLabel())) {
-            String afterLabel =StringUtils.substringAfter(structure, tag.getLabel());
+            String afterLabel = StringUtils.substringAfter(structure, tag.getLabel());
             String separator = StringUtils.isNotEmpty(afterLabel) ? afterLabel.substring(0, 1) : "";
             if ("%".equals(separator)) {
                 separator = "";

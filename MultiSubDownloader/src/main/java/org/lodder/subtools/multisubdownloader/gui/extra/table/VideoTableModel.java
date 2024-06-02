@@ -47,7 +47,7 @@ public class VideoTableModel extends DefaultTableModel {
     private UserInteractionHandler userInteractionHandler;
 
     private VideoTableModel(List<SearchColumnName> searchColumnNames) {
-        super(new Object[][] {}, searchColumnNames.stream().map(SearchColumnName::getColumnName).toArray(String[]::new));
+        super(new Object[][]{}, searchColumnNames.stream().map(SearchColumnName::getColumnName).toArray(String[]::new));
         this.columnTypes = searchColumnNames.stream().map(SearchColumnName::getC).toArray(Class<?>[]::new);
         this.columnEditables = searchColumnNames.stream().map(SearchColumnName::isEditable).toArray(Boolean[]::new);
     }
@@ -121,7 +121,7 @@ public class VideoTableModel extends DefaultTableModel {
         private int calculateSubsFound() {
             return userInteractionHandler != null
                     ? userInteractionHandler.getAutomaticSelection(release.getMatchingSubs()).size()
-                    :  release.getMatchingSubCount();
+                    : release.getMatchingSubCount();
         }
 
         public int updateSubsFound() {

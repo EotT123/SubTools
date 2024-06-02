@@ -206,8 +206,8 @@ public class StructureFilePanel extends JPanel {
 
         public boolean hasValidSettings() {
             return languageComponentsMap.values().stream().allMatch(LanguageComponents::hasValidValue)
-                    && languageComponentsMap.values().stream().map(LanguageComponents::getLanguage).distinct().count() == languageComponentsMap
-                            .size();
+                   && languageComponentsMap.values().stream().map(LanguageComponents::getLanguage).distinct().count() == languageComponentsMap
+                    .size();
         }
 
         private Stream<LanguageComponents> getLanguageComponentsForLanguageStream(Language language) {
@@ -245,7 +245,7 @@ public class StructureFilePanel extends JPanel {
 
     public boolean hasValidSettings() {
         return !isVisible()
-                || (txtFileStructure.hasValidValue()
-                        && (!chkIncludeLanguageCode.isSelected() || languageMapping.hasValidSettings()));
+               || (txtFileStructure.hasValidValue()
+                   && (!chkIncludeLanguageCode.isSelected() || languageMapping.hasValidSettings()));
     }
 }

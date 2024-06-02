@@ -1,9 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.jcomponent.jpopupmenu;
 
-import javax.swing.JPopupMenu;
-
-import java.awt.Component;
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.io.Serial;
 
 public class MyPopupMenu extends JPopupMenu {

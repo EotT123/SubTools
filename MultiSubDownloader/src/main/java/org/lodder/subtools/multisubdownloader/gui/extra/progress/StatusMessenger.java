@@ -23,7 +23,7 @@ public enum StatusMessenger implements Messenger {
     @Override
     public void message(String message) {
         synchronized (statusMessengers) {
-            statusMessengers.forEach(sm ->  sm.message(message));
+            statusMessengers.forEach(sm -> sm.message(message));
         }
     }
 }

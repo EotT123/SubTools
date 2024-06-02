@@ -19,7 +19,7 @@ public class SearchProgressTableModel extends DefaultTableModel {
         this.setColumnIdentifiers(new String[]{
                 Messages.getString("SearchProgressTableModel.Source"),
                 Messages.getString("SearchProgressTableModel.Queue"),
-                Messages.getString("SearchProgressTableModel.Release")});
+                Messages.getString("SearchProgressTableModel.Release") });
     }
 
     public void update(String source, int queue, String release) {
@@ -42,7 +42,7 @@ public class SearchProgressTableModel extends DefaultTableModel {
     private void createRow(String source, int queue, String release) {
         this.rowMap.put(source, this.getRowCount());
 
-        Object[] row = {source, queue, release};
+        Object[] row = { source, queue, release };
         this.addRow(row);
     }
 }

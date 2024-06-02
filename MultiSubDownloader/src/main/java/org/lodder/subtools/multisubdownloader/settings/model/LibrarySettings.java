@@ -5,13 +5,12 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
-import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
-import org.lodder.subtools.sublibrary.Language;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
+import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
+import org.lodder.subtools.sublibrary.Language;
 
 @Getter
 @Setter

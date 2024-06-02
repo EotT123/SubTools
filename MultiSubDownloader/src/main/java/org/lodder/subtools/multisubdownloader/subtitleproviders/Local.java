@@ -76,8 +76,8 @@ public class Local implements SubtitleProvider {
             try {
                 Release release = vfp.parse(fileSub);
                 if ((release.getVideoType() == VideoType.EPISODE)
-                        && (((TvRelease) release).getSeason() == tvRelease.getSeason() && Utils.containsAll(
-                                ((TvRelease) release).getEpisodeNumbers(), tvRelease.getEpisodeNumbers()))) {
+                    && (((TvRelease) release).getSeason() == tvRelease.getSeason() && Utils.containsAll(
+                        ((TvRelease) release).getEpisodeNumbers(), tvRelease.getEpisodeNumbers()))) {
 
                     TvReleaseControl epCtrl = new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
                     epCtrl.process();

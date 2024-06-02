@@ -2,6 +2,10 @@ package org.lodder.subtools.multisubdownloader.actions;
 
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -18,11 +22,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter(value = AccessLevel.PROTECTED)

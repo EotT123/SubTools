@@ -1,14 +1,13 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.opensubtitles.api.DownloadApi;
 import org.opensubtitles.invoker.ApiClient;
 import org.opensubtitles.model.Download200Response;
 import org.opensubtitles.model.DownloadRequest;
-
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 @Accessors(fluent = true, chain = true)
 @Setter

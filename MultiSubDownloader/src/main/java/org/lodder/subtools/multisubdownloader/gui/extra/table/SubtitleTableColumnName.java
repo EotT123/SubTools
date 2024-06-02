@@ -3,11 +3,10 @@ package org.lodder.subtools.multisubdownloader.gui.extra.table;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import org.lodder.subtools.multisubdownloader.Messages;
-import org.lodder.subtools.sublibrary.model.Subtitle;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.multisubdownloader.Messages;
+import org.lodder.subtools.sublibrary.model.Subtitle;
 
 @RequiredArgsConstructor
 public enum SubtitleTableColumnName implements CustomColumnName {

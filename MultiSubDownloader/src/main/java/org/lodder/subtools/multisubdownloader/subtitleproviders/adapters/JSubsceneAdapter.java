@@ -151,7 +151,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
 
     private String getSeasonEpisodeString(int season, int episode) {
         return "S" + org.apache.commons.lang3.StringUtils.leftPad(String.valueOf(season), 2, "0") + "E"
-                + org.apache.commons.lang3.StringUtils.leftPad(String.valueOf(episode), 2, "0");
+               + org.apache.commons.lang3.StringUtils.leftPad(String.valueOf(episode), 2, "0");
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.actions;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.SubtitleComparator;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -10,8 +11,6 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class UserInteractionHandlerAction {
@@ -51,7 +50,7 @@ public class UserInteractionHandlerAction {
                 if (settings.isOptionsAlwaysConfirm()) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (release.getMatchingSubs().size() == 1
-                        && release.getMatchingSubs().get(0).getSubtitleMatchType() == SubtitleMatchType.EXACT) {
+                           && release.getMatchingSubs().get(0).getSubtitleMatchType() == SubtitleMatchType.EXACT) {
                     LOGGER.debug("determineWhatSubtitleDownload: Exact Match");
                     return List.of(release.getMatchingSubs().get(0));
                 } else if (release.getMatchingSubs().size() > 1) {

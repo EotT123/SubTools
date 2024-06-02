@@ -1,10 +1,9 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model;
 
-import org.lodder.subtools.sublibrary.Language;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.lodder.subtools.sublibrary.Language;
 
 /**
  * Created by IntelliJ IDEA.

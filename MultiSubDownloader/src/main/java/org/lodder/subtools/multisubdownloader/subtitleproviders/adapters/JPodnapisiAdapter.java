@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.JPodnapisiApi;
@@ -25,9 +26,6 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 
 @Getter
 public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {

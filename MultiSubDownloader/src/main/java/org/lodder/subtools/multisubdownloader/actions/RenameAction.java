@@ -36,7 +36,7 @@ public class RenameAction {
         };
         LOGGER.trace("rename: filename [{}]", filename);
 
-        
+
         Path newDir = switch (librarySettings.getLibraryAction()) {
             case MOVE, MOVEANDRENAME -> PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
             case RENAME, NOTHING -> release.getPath();

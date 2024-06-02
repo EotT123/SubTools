@@ -15,6 +15,8 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.IntStream;
 
+import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
@@ -34,15 +36,12 @@ import org.lodder.subtools.sublibrary.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-
 @ExtensionMethod({ Files.class })
 public class SettingsControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);
     private static final String BACKING_STORE_AVAIL = "BackingStoreAvail";
-    
+
     private final Manager manager;
     private final Preferences preferences;
     @Getter
@@ -352,7 +351,7 @@ public class SettingsControl {
 
     public void migrateSettingsV7ToV8() {
         if (settings.isLoginOpenSubtitlesEnabled()
-                && !OpenSubtitlesApi.isValidCredentials(settings.getLoginOpenSubtitlesUsername(), settings.getLoginOpenSubtitlesPassword())) {
+            && !OpenSubtitlesApi.isValidCredentials(settings.getLoginOpenSubtitlesUsername(), settings.getLoginOpenSubtitlesPassword())) {
             settings.setLoginOpenSubtitlesEnabled(false);
             LOGIN_OPEN_SUBTITLES_ENABLED.store(this, preferences);
         }

@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 import javax.swing.*;
 import java.io.Serial;
 
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;

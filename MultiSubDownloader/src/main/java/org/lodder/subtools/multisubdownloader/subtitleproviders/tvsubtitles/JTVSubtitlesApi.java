@@ -54,7 +54,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                 .orElseGet(Set::of);
     }
 
-    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language)     throws TvSubtitlesException {
+    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language) throws TvSubtitlesException {
         return getManager().valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s".formatted(getSubtitleSource().name(), episodeUrl, language))

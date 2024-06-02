@@ -2,9 +2,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
 
 import java.io.Serial;
 
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
-
 import lombok.Getter;
+import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 
 @Getter
 public class SubSceneSerieId extends ProviderSerieId {

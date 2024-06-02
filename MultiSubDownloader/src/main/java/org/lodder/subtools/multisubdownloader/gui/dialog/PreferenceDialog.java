@@ -98,10 +98,10 @@ public class PreferenceDialog extends MultiSubDialog {
 
     private void testAndSaveValues() {
         if (pnlGeneral.hasValidSettings() &&
-                pnlEpisodeLibrary.hasValidSettings() &&
-                pnlMovieLibrary.hasValidSettings() &&
-                pnlOptions.hasValidSettings() &&
-                pnlSerieSources.hasValidSettings()) {
+            pnlEpisodeLibrary.hasValidSettings() &&
+            pnlMovieLibrary.hasValidSettings() &&
+            pnlOptions.hasValidSettings() &&
+            pnlSerieSources.hasValidSettings()) {
             pnlGeneral.savePreferenceSettings();
             pnlEpisodeLibrary.savePreferenceSettings();
             pnlMovieLibrary.savePreferenceSettings();

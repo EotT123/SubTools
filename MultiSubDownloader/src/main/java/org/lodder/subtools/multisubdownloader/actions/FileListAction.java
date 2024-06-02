@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class FileListAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);
-    private static final  String SUBTITLE_EXTENSION = "srt";
+    private static final String SUBTITLE_EXTENSION = "srt";
 
     private final Settings settings;
     private IndexingProgressListener indexingProgressListener;
