@@ -17,7 +17,7 @@ public class ReleaseGroupFilter extends SubtitleFilter {
         if (subtitle.getReleaseGroup().isEmpty()) {
             subtitle.setReleaseGroup(ReleaseParser.extractReleasegroup(subtitle.getFileName(), subtitle.getFileName().endsWith(".srt")));
         }
-        if (!StringUtils.containsAnyIgnoreCase(subtitle.getReleaseGroup(), release.getReleaseGroup(), subtitle.getReleaseGroup())) {
+        if (!StringUtils.containsAnyIgnoreCase(subtitle.getReleaseGroup(), release.releaseGroup, subtitle.getReleaseGroup())) {
             return false;
         }
         LOGGER.debug("getSubtitlesFiltered: found KEYWORD based TEAM match [{}] ", subtitle.getFileName());

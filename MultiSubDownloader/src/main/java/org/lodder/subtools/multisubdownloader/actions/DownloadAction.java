@@ -41,7 +41,7 @@ public class DownloadAction {
     }
 
     public void download(Release release, Subtitle subtitle) throws IOException, ManagerException {
-        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.getFileName(), release.getFileName());
+        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.getFileName(), release.fileName);
         download(release, subtitle, 0);
     }
 
@@ -82,7 +82,7 @@ public class DownloadAction {
 
         if (success) {
             if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {
-                Path oldLocationFile = release.getPath().resolve(release.getFileName());
+                Path oldLocationFile = release.getPath().resolve(release.fileName);
                 if (oldLocationFile.exists()) {
                     LOGGER.info("Moving/Renaming [{}] to folder [{}] this might take a while... ", videoFileName, path);
                     oldLocationFile.moveToDir(path);

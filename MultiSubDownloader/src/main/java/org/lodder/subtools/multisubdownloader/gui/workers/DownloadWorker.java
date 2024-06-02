@@ -63,7 +63,7 @@ public class DownloadWorker extends SwingWorker<Void, String> implements Cancela
                     progress = 1;
                 }
                 setProgress(progress);
-                publish(selectedShow.getFileName());
+                publish(selectedShow.fileName);
                 List<Subtitle> selection = userInteractionHandlerAction.subtitleSelection(selectedShow, true);
                 try {
                     for (int j = 0; j < selection.size(); j++) {

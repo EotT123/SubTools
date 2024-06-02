@@ -138,8 +138,7 @@ public class TvRelease extends Release {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + this.getName() + " s" + this.getSeason() + " e"
-               + this.getEpisodeNumbers().toString() + " " + this.getQuality() + " " + this.getReleaseGroup();
+        return "${getClass().getSimpleName()}: $name s$season e$episodeNumbers $quality $releaseGroup";
     }
 
     @Override

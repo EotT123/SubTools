@@ -6,16 +6,14 @@ import java.util.OptionalInt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
+import manifold.ext.props.rt.api.var;
 
-@Getter
-@Setter
 public class MovieRelease extends Release {
 
-    private String name;
-    private Integer year;
-    private int imdbId;
-    private int tvdbId;
+    @var String name;
+    @var Integer year;
+    @Getter @Setter private int imdbId;
+    @Getter @Setter private int tvdbId;
 
     public interface MovieReleaseBuilderName {
         MovieReleaseBuilderOther name(String name);
@@ -63,7 +61,7 @@ public class MovieRelease extends Release {
     }
 
     public String getImdbIdAsString() {
-        return "tt" + StringUtils.leftPad(String.valueOf(imdbId), 7, "0");
+        return "tt" + String.format("%07d", imdbId);
     }
 
     public OptionalInt getTvdbId() {
@@ -76,11 +74,11 @@ public class MovieRelease extends Release {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + this.getName() + " " + this.getQuality() + " " + this.getReleaseGroup();
+        return "${getClass().getSimpleName()}: $name ${quality} ${releaseGroup}";
     }
 
     @Override
     public String getReleaseDescription() {
-        return getName();
+        return name;
     }
 }

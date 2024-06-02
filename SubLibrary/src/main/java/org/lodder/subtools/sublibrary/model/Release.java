@@ -6,17 +6,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 
-@Getter
 public abstract class Release extends Video {
 
-    private final Set<Subtitle> matchingSubs = new HashSet<>();
-    private final Path path;
-    private final String quality;
-    private final String description;
-    private final String releaseGroup;
+    @val Set<Subtitle> matchingSubs = new HashSet<>();
+    @val Path path;
+    @val String quality;
+    @val String description;
+    @val String releaseGroup;
 
     public void addMatchingSub(Subtitle sub) {
         matchingSubs.add(sub);
@@ -47,19 +46,19 @@ public abstract class Release extends Video {
     }
 
     public String getExtension() {
-        return StringUtils.substringAfterLast(getFileName(), ".");
+        return StringUtils.substringAfterLast(fileName, ".");
     }
 
     public boolean hasExtension(String extension) {
-        return StringUtils.endsWith(getFileName(), "." + extension);
+        return StringUtils.endsWith(fileName, "." + extension);
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + this.getFileName() + " " + this.getQuality();
+        return "${getClass().getSimpleName()}: $fileName $quality";
     }
 
     public String getReleaseDescription() {
-        return getFileName();
+        return fileName;
     }
 }

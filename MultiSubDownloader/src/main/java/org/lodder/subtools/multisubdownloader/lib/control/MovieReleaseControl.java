@@ -31,7 +31,7 @@ public class MovieReleaseControl extends ReleaseControl {
 
     @Override
     public void process() throws ReleaseControlException {
-        if (StringUtils.isBlank(movieRelease.getName())) {
+        if (StringUtils.isBlank(movieRelease.name)) {
             throw new ReleaseControlException("Unable to extract/find title, check file", movieRelease);
         } else {
             int imdbId = imdbAdapter.getImdbId(movieRelease.getName(), movieRelease.getYear())
@@ -44,8 +44,8 @@ public class MovieReleaseControl extends ReleaseControl {
                 movieDetails = movieRelease.getImdbId().mapToObj(omdbAdapter::getMovieDetails).orElseGet(Optional::empty);
             }
             movieDetails.ifPresentOrElse(info -> {
-                movieRelease.setYear(info.year());
-                movieRelease.setName(info.name);
+                movieRelease.year = info.year();
+                movieRelease.name = info.name;
             }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info {}", movieRelease));
         }
     }

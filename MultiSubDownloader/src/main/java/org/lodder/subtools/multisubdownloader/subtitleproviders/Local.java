@@ -115,7 +115,7 @@ public class Local implements SubtitleProvider {
         Set<Subtitle> listFoundSubtitles = new HashSet<>();
         ReleaseParser releaseParser = new ReleaseParser();
 
-        String filter = movieRelease.getName();
+        String filter = movieRelease.name;
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {

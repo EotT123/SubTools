@@ -42,9 +42,7 @@ public class SelectDialog extends MultiSubDialog {
 
     private void initialize() {
         getContentPane().setLayout(new MigLayout("", "[1000px:n,grow,fill]", "[][::100px,fill][grow]"));
-        JLabel lblNewLabel =
-                new JLabel(Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease")
-                           + release.getFileName());
+        JLabel lblNewLabel = new JLabel(Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileName);
         getContentPane().add(lblNewLabel, "cell 0 0");
         {
             JScrollPane scrollPane = new JScrollPane();

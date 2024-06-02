@@ -33,9 +33,9 @@ public class SortWeight {
         replaceReservedKeywords(release, defaultWeights);
 
         /* get a list of tags */
-        List<String> tags = ReleaseParser.getQualityKeyWords(release.getQuality());
-        if (StringUtils.isNotBlank(release.getReleaseGroup())) {
-            tags.add(release.getReleaseGroup().toLowerCase());
+        List<String> tags = ReleaseParser.getQualityKeyWords(release.quality);
+        if (StringUtils.isNotBlank(release.releaseGroup)) {
+            tags.add(release.releaseGroup.toLowerCase());
         }
 
         /* only store tags for which we have a weight defined */

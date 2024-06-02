@@ -137,12 +137,12 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
                 filename = replace(filename, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.getEpisodeNumbers().get(0), true));
                 filename = replace(filename, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.getEpisodeNumbers().get(0), false));
                 filename = replace(filename, SerieStructureTag.TITLE, tvRelease.getTitle());
-                filename = replace(filename, SerieStructureTag.QUALITY, release.getQuality());
-                filename = replace(filename, SerieStructureTag.DESCRIPTION, release.getDescription());
+                filename = replace(filename, SerieStructureTag.QUALITY, release.quality);
+                filename = replace(filename, SerieStructureTag.DESCRIPTION, release.description);
 
-                filename += "." + release.getExtension();
+                filename += "." + release.extension;
             } else {
-                filename = release.getFileName();
+                filename = release.fileName;
             }
             filename = filename.removeIllegalWindowsChars();
             if (replaceSpace) {
@@ -150,7 +150,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
             }
             return Path.of(filename);
         } else {
-            return Path.of(release.getFileName());
+            return Path.of(release.fileName);
         }
     }
 
@@ -159,13 +159,13 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     }
 
     public String buildSubtitle(Release release, String filename, Language language, Integer version) {
-        final String extension = "." + release.getExtension();
+        final String extension = "." + release.extension;
         if (version != null) {
-            filename = filename.substring(0, filename.indexOf(extension)) + "-v" + version + "." + release.getExtension();
+            filename = filename.substring(0, filename.indexOf(extension)) + "-v$version.${release.extension}";
         }
         if (includeLanguageCode) {
             String langCode = language == null ? "" : languageTags.getOrDefault(language, language.getLangCode());
-            filename = changeExtension(filename, !"".equals(langCode) ? ".%s.srt".formatted(langCode) : ".srt");
+            filename = changeExtension(filename, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
         } else {
             filename = changeExtension(filename, ".srt");
         }

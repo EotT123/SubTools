@@ -106,9 +106,9 @@ class SubtitleFilteringTest {
     private Release createRelease(String filename, String releasegroup) {
         Release release = mock(Release.class);
 
-        when(release.getFileName()).thenReturn(filename);
-        when(release.getExtension()).thenReturn("mkv");
-        when(release.getReleaseGroup()).thenReturn(releasegroup);
+        when(release.fileName).thenReturn(filename);
+        when(release.extension).thenReturn("mkv");
+        when(release.releaseGroup).thenReturn(releasegroup);
 
         return release;
     }

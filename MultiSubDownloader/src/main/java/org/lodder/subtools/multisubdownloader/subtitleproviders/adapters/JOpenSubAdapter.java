@@ -101,7 +101,7 @@ public class JOpenSubAdapter
     @Override
     public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<org.opensubtitles.model.Subtitle> subtitles, Language language) {
         return subtitles.stream().map(org.opensubtitles.model.Subtitle::getAttributes)
-                .filter(attributes -> movieRelease.getYear() == attributes.getFeatureDetails().getYear().intValue())
+                .filter(attributes -> movieRelease.year == attributes.getFeatureDetails().getYear().intValue())
                 .flatMap(attributes -> attributes.getFiles().stream().map(file -> createSubtitle(file, attributes)))
                 .collect(Collectors.toSet());
     }

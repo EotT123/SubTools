@@ -53,8 +53,8 @@ class ScoreCalculatorTest {
     private SortWeight createWeights(String quality, String group) {
         // Arrested.Development.S01E01.DVDRip.XviD-MEDiEVAL
         Release release = mock(Release.class);
-        when(release.getQuality()).thenReturn(quality);
-        when(release.getReleaseGroup()).thenReturn(group);
+        when(release.quality).thenReturn(quality);
+        when(release.releaseGroup).thenReturn(group);
 
         HashMap<String, Integer> definedWeights = new HashMap<>();
         definedWeights.put("hdtv", 2);

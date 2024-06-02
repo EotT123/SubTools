@@ -21,7 +21,7 @@ class GroupReplacerTest {
     @Test
     void test_it_replaces_the_keyword_group_to_a_releasename() throws Exception {
         Release release = mock(Release.class);
-        when(release.getReleaseGroup()).thenReturn("Acme");
+        when(release.releaseGroup).thenReturn("Acme");
 
         HashMap<String, Integer> definedWeights = new HashMap<>();
         definedWeights.put("%GROUP%", 5);
@@ -38,7 +38,7 @@ class GroupReplacerTest {
     @Test
     void testEmptyWeights() throws Exception {
         Release release = mock(Release.class);
-        when(release.getReleaseGroup()).thenReturn("Acme");
+        when(release.releaseGroup).thenReturn("Acme");
 
         HashMap<String, Integer> definedWeights = new HashMap<>();
 

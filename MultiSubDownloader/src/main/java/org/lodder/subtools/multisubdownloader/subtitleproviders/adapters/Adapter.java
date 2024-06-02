@@ -50,8 +50,8 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     @Override
     default Set<Subtitle> searchSubtitles(MovieRelease movieRelease, Language language) {
         Set<T> subtitles = new HashSet<>();
-        if (StringUtils.isNotBlank(movieRelease.getFileName())) {
-            Path file = movieRelease.getPath().resolve(movieRelease.getFileName());
+        if (StringUtils.isNotBlank(movieRelease.fileName)) {
+            Path file = movieRelease.getPath().resolve(movieRelease.fileName);
             if (file.exists()) {
                 try {
                     subtitles.addAll(searchMovieSubtitlesWithHash(OpenSubtitlesHasher.computeHash(file), language));
@@ -59,7 +59,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                     LOGGER.error("Error calculating file hash", e);
                 } catch (Exception e) {
                     LOGGER.error("API %s searchSubtitles using file hash for movie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                            movieRelease.getName(), e.getMessage()), e);
+                            movieRelease.name, e.getMessage()), e);
                 }
             }
         }
@@ -68,15 +68,15 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 subtitles.addAll(searchMovieSubtitlesWithId(imdbId, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                        imdbId, movieRelease.getName(), e.getMessage()), e);
+                        imdbId, movieRelease.name, e.getMessage()), e);
             }
         });
         if (subtitles.isEmpty()) {
             try {
-                subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.getName(), movieRelease.getYear(), language));
+                subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using title for movie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                        movieRelease.getName(), e.getMessage()), e);
+                        movieRelease.name, e.getMessage()), e);
             }
         }
         return convertToSubtitles(movieRelease, subtitles, language);

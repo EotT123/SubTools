@@ -15,8 +15,8 @@ class SortWeightTest {
     void test_it_generates_weights_for_release() throws Exception {
         // Arrested.Development.S01E01.DVDRip.XviD-MEDiEVAL
         Release release = mock(Release.class);
-        when(release.getQuality()).thenReturn("DVDRip XviD");
-        when(release.getReleaseGroup()).thenReturn("MEDiEVAL");
+        when(release.quality).thenReturn("DVDRip XviD");
+        when(release.releaseGroup).thenReturn("MEDiEVAL");
 
         HashMap<String, Integer> definedWeights = new HashMap<>();
         definedWeights.put("dvdrip", 2);

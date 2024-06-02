@@ -15,7 +15,7 @@ public abstract class SubtitleFilter {
     }
 
     protected String getReleaseName(Release release) {
-        return release.getFileName() == null ? "" : release.getFileName().toLowerCase().replace("." + release.getExtension(), "");
+        return release.fileName == null ? "" : release.fileName.toLowerCase().replace("." + release.extension, "");
     }
 
     protected boolean checkKeywordSubtitleMatch(Subtitle subtitle, String keywordsFile) {

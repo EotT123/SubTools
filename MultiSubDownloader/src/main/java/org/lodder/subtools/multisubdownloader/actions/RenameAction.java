@@ -52,7 +52,7 @@ public class RenameAction {
         }
         LOGGER.trace("rename: newDir [{}]", newDir);
 
-        Path file = release.getPath().resolve(release.getFileName());
+        Path file = release.getPath().resolve(release.fileName);
 
         try {
             if (librarySettings.hasLibraryAction(LibraryActionType.MOVE) || librarySettings.hasLibraryAction(LibraryActionType.MOVEANDRENAME)) {

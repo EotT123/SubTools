@@ -104,7 +104,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
                                         .setUploader(row.select(".a5 > a").text().trim())
                                         .setComment(row.select(".a6 > div").text().trim()))
                                 .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null
-                                                         && subDescriptor.getSeasonEpisode().getEpisodes().stream().anyMatch(ep -> ep == episode))
+                                                         && subDescriptor.getSeasonEpisode().episodes.stream().anyMatch(ep -> ep == episode))
                                 .toList();
                     } catch (Exception e) {
                         throw new SubsceneException(e);

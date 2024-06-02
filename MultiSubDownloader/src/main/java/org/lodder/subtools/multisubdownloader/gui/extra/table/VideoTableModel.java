@@ -101,12 +101,12 @@ public class VideoTableModel extends DefaultTableModel {
                     if (release instanceof TvRelease tvRelease) {
                         yield tvRelease.getOriginalName();
                     } else if (release instanceof MovieRelease movieRelease) {
-                        yield movieRelease.getName();
+                        yield movieRelease.name;
                     } else {
                         throw new IllegalArgumentException("Unexpected release type: " + release.getClass());
                     }
                 }
-                case FILENAME -> release.getFileName();
+                case FILENAME -> release.fileName;
                 case FOUND -> calculateSubsFound();
                 case SELECT -> false;
                 case OBJECT -> release;

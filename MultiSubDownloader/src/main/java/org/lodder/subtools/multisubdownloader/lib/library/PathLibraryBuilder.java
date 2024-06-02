@@ -140,8 +140,8 @@ public class PathLibraryBuilder extends LibraryBuilder {
         folder = replace(folder, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.getEpisodeNumbers().get(0), true));
         folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.getEpisodeNumbers().get(0), false));
         folder = replace(folder, SerieStructureTag.TITLE, tvRelease.getTitle());
-        folder = replace(folder, SerieStructureTag.QUALITY, tvRelease.getQuality());
-        folder = replace(folder, SerieStructureTag.DESCRIPTION, tvRelease.getDescription());
+        folder = replace(folder, SerieStructureTag.QUALITY, tvRelease.quality);
+        folder = replace(folder, SerieStructureTag.DESCRIPTION, tvRelease.description);
         if (replaceSpace) {
             folder = folder.replace(' ', replacingSpaceChar);
         }
@@ -152,9 +152,9 @@ public class PathLibraryBuilder extends LibraryBuilder {
     private Path buildMovie(MovieRelease movieRelease) {
         String folder = structure;
 
-        folder = replace(folder, MovieStructureTag.MOVIE_TITLE, movieRelease.getName().removeIllegalWindowsChars());
-        folder = replace(folder, MovieStructureTag.YEAR, Integer.toString(movieRelease.getYear()));
-        folder = replace(folder, MovieStructureTag.QUALITY, movieRelease.getQuality());
+        folder = replace(folder, MovieStructureTag.MOVIE_TITLE, movieRelease.name.removeIllegalWindowsChars());
+        folder = replace(folder, MovieStructureTag.YEAR, Integer.toString(movieRelease.year));
+        folder = replace(folder, MovieStructureTag.QUALITY, movieRelease.quality);
         if (replaceSpace) {
             folder = folder.replace(' ', replacingSpaceChar);
         }
