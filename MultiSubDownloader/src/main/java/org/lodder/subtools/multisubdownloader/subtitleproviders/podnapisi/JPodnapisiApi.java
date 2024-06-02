@@ -32,7 +32,6 @@ import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 @RequiredArgsConstructor
 public class JPodnapisiApi implements SubtitleApi {
 
-    public static final int maxAge = 90;
     private static final String DOMAIN = "https://www.podnapisi.net";
     private final Manager manager;
     private final String userAgent;
@@ -95,7 +94,7 @@ public class JPodnapisiApi implements SubtitleApi {
         try {
             return manager.getPageContentBuilder().url(url).userAgent(getUserAgent()).cacheType(CacheType.MEMORY).retries(1)
                     .retryPredicate(e -> e instanceof HttpClientException httpClientException && httpClientException.getResponseCode() >= 500
-                            && httpClientException.getResponseCode() < 600)
+                                         && httpClientException.getResponseCode() < 600)
                     .retryWait(5).getAsJsoupDocument();
         } catch (Exception e) {
             throw new PodnapisiException(e);

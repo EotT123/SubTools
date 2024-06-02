@@ -39,9 +39,10 @@ import org.slf4j.LoggerFactory;
 @ExtensionMethod({ Files.class })
 public class App {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+
     private static SettingsControl prefCtrl;
     private static Splash splash;
-    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws ReflectiveOperationException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

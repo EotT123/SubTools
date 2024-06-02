@@ -11,6 +11,7 @@ public class SubSceneSerieId extends ProviderSerieId {
 
     @Serial
     private static final long serialVersionUID = 5858875211782260667L;
+
     private final int season;
 
     public SubSceneSerieId(String name, String id, int season) {

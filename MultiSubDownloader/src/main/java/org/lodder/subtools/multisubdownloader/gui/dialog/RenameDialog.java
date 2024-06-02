@@ -39,9 +39,11 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     private final VideoLibraryPanel pnlLibrary;
     private final MyTextFieldPath txtFolder;
     private final JCheckBox chkRecursive;
+
     private ProgressDialog progressDialog;
 
     public RenameDialog(JFrame frame, Settings settings, VideoType videoType, String title, Manager manager,

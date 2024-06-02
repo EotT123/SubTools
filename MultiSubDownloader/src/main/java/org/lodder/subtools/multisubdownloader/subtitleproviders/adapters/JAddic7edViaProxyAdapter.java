@@ -11,6 +11,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.pivovarit.function.ThrowingSupplier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.gestdown.invoker.ApiException;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.JAddic7edProxyGestdownApi;
@@ -24,16 +27,11 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pivovarit.function.ThrowingSupplier;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
-
 @Getter
 public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, ProviderSerieId, ApiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edViaProxyAdapter.class);
+
     private final JAddic7edProxyGestdownApi jaapi;
 
     public JAddic7edViaProxyAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {

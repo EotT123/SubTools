@@ -17,7 +17,6 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
     private static final long serialVersionUID = -5458593307643063563L;
 
     private final SettingsControl settingsCtrl;
-
     private final JCheckBox chkAlwaysConfirm;
     private final JCheckBox chkMinScoreSelection;
     private final JSlider sldMinScoreSelection;

@@ -18,7 +18,6 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
     private static final long serialVersionUID = -1498846730946617177L;
 
     private final LibrarySettings librarySettings;
-
     private final JCheckBox chkBackupSubtitle;
     private final MyTextFieldPath txtBackupSubtitlePath;
     private final JCheckBox chkBackupUseSourceFileName;

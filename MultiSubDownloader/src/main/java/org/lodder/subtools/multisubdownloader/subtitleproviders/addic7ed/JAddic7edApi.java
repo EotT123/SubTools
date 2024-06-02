@@ -29,14 +29,13 @@ import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
-import lombok.experimental.ExtensionMethod;
-
 public class JAddic7edApi extends Html implements SubtitleApi {
 
     private static final long RATEDURATION = 1; // seconds
+    
     private static final String DOMAIN = "https://www.addic7ed.com";
-    private final static Pattern TITLE_PATTERN = Pattern.compile(".*? - [0-9]+x[0-9]+ - (.*)");
-    private final static Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: ([0-9]+).([0-9])+");
+    private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - [0-9]+x[0-9]+ - (.*)");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: ([0-9]+).([0-9])+");
     private final boolean speedy;
     private LocalDateTime lastRequest = LocalDateTime.now();
 
@@ -78,7 +77,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
             List<ProviderSerieId> providerSerieIdsFormatted = providerSerieIds.stream().filter(providerId -> {
                 String formattedSerieName = providerId.getName().replaceAll("[^A-Za-z]", "");
                 return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
-                        StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
+                       StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
             }).toList();
             return !providerSerieIdsFormatted.isEmpty() ? providerSerieIdsFormatted : providerSerieIds;
         } catch (Exception e) {
@@ -162,7 +161,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
                                 // incomplete not wanted
                                 if ((lang != null && td.toString().toLowerCase().contains("completed"))
-                                        && td.html().toLowerCase().contains("% completed")) {
+                                    && td.html().toLowerCase().contains("% completed")) {
                                     lang = null;
                                 }
 
@@ -200,8 +199,8 @@ public class JAddic7edApi extends Html implements SubtitleApi {
     public boolean isDuplicate(List<Addic7edSubtitleDescriptor> lSubtitles, Addic7edSubtitleDescriptor sub) {
         return lSubtitles.stream()
                 .anyMatch(s -> s.getLanguage() == sub.getLanguage()
-                        && StringUtils.equals(s.getUrl(), sub.getUrl())
-                        && StringUtils.equals(s.getVersion(), sub.getVersion()));
+                               && StringUtils.equals(s.getUrl(), sub.getUrl())
+                               && StringUtils.equals(s.getVersion(), sub.getVersion()));
     }
 
     private Optional<Document> getContent(String url) throws Addic7edException {

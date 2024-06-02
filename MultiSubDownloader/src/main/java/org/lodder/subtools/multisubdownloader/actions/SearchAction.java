@@ -28,14 +28,14 @@ import lombok.RequiredArgsConstructor;
 @Getter(value = AccessLevel.PROTECTED)
 public abstract class SearchAction implements Runnable, Cancelable, SearchHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
+
     private final Manager manager;
     private final @NonNull Settings settings;
     private final @NonNull SubtitleProviderStore subtitleProviderStore;
     private StatusListener statusListener;
     private SearchManager searchManager;
     private List<Release> releases;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
     @Override
     public void run() {

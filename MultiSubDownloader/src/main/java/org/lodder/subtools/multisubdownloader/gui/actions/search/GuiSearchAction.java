@@ -34,7 +34,7 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
     private final SearchProgressListener searchProgressListener;
     private final UserInteractionHandlerGUI userInteractionHandler;
 
-    public GuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
+    GuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
             GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
         super(manager, settings, subtitleProviderStore);
         this.mainWindow = mainWindow;

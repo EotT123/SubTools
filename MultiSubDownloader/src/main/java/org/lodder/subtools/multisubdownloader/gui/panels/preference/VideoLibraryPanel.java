@@ -26,13 +26,12 @@ public abstract class VideoLibraryPanel extends JPanel implements PreferencePane
 
     @Getter
     private final LibrarySettings librarySettings;
-
-    protected final StructureFolderPanel pnlStructureFolder;
-    protected final StructureFilePanel pnlStructureFile;
     private final MyComboBox<LibraryActionType> cbxLibraryAction;
     private final JCheckBox chkUseTVDBNaming;
     private final PartialDisableComboBox<LibraryOtherFileActionType> cbxLibraryOtherFileAction;
     private final SubtitleBackupPanel pnlBackup;
+    protected final StructureFolderPanel pnlStructureFolder;
+    protected final StructureFilePanel pnlStructureFile;
 
     public VideoLibraryPanel(LibrarySettings librarySettings, VideoType videoType, Manager manager, boolean renameMode,
             UserInteractionHandler userInteractionHandler) {

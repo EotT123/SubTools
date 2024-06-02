@@ -1,27 +1,21 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import javax.swing.*;
+import javax.swing.table.*;
+import java.awt.event.ActionListener;
 import java.io.Serial;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.table.DefaultTableModel;
-
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SearchColumnName;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 
-import java.awt.event.ActionListener;
-
-import net.miginfocom.swing.MigLayout;
-
 public class ResultPanel extends JPanel {
 
     @Serial
     private static final long serialVersionUID = 2368028332402129899L;
+
     private JButton btnMove;
     private JButton btnSelectAll;
     private JScrollPane scrollPane;

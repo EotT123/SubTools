@@ -13,7 +13,7 @@ import org.lodder.subtools.multisubdownloader.actions.FileListAction;
 import org.lodder.subtools.multisubdownloader.actions.UserInteractionHandlerAction;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.cli.actions.CliSearchAction;
-import org.lodder.subtools.multisubdownloader.cli.progress.CLIFileindexerProgress;
+import org.lodder.subtools.multisubdownloader.cli.progress.CLIFileIndexerProgress;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLISearchProgress;
 import org.lodder.subtools.multisubdownloader.exceptions.CliException;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -31,8 +31,6 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.experimental.ExtensionMethod;
 
 public class CLI {
 
@@ -104,7 +102,7 @@ public class CLI {
                     .createWithSettings(settings)
                     .manager(manager)
                     .subtitleProviderStore((SubtitleProviderStore) app.make("SubtitleProviderStore"))
-                    .indexingProgressListener(new CLIFileindexerProgress().verbose(verboseProgress))
+                    .indexingProgressListener(new CLIFileIndexerProgress().verbose(verboseProgress))
                     .searchProgressListener(new CLISearchProgress().verbose(verboseProgress))
                     .cli(this)
                     .fileListAction(new FileListAction(this.settings))

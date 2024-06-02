@@ -27,7 +27,6 @@ public class PreferenceDialog extends MultiSubDialog {
 
     private final SettingsControl settingsCtrl;
     private final Emitter eventEmitter;
-
     private final GeneralPanel pnlGeneral;
     private final EpisodeLibraryPanel pnlEpisodeLibrary;
     private final MovieLibraryPanel pnlMovieLibrary;

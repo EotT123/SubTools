@@ -11,7 +11,6 @@ public class KeywordFilter extends SubtitleFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordFilter.class);
 
-
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {
         String keywordsFile = ReleaseParser.getQualityKeyword(getReleaseName(release));

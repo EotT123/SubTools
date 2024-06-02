@@ -19,9 +19,7 @@ public class ArrowButton extends JButton {
      * any of {@link SwingConstants#NORTH}, {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or {@link SwingConstants#EAST}
      */
     private int direction;
-
     private int arrowCount;
-
     private int arrowSize;
 
     public ArrowButton(int direction, int arrowCount, int arrowSize) {

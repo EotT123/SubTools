@@ -32,7 +32,6 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
     private final GUI gui;
     private final SettingsControl settingsCtrl;
-
     private final MyComboBox<Language> cbxLanguage;
     private final JListWithImages<Path> defaultIncomingFoldersList;
     private final JListWithImages<PathOrRegex> excludeList;

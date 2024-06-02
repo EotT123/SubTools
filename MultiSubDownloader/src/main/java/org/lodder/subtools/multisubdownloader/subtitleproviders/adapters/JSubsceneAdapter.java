@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor, SubSceneSerieId, SubsceneException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSubsceneAdapter.class);
+
     private static LazySupplier<SubsceneApi> api;
 
     public JSubsceneAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {

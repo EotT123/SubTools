@@ -6,17 +6,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.pivovarit.function.ThrowingSupplier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.pivovarit.function.ThrowingSupplier;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @param <T>
@@ -27,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception> implements Adapter<T, S, X>, SubtitleProvider {
-    Logger LOGGER = LoggerFactory.getLogger(AbstractAdapter.class);
+
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 

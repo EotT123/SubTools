@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Getter;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -29,14 +30,12 @@ import org.opensubtitles.model.SubtitleAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-
 @Getter
 public class JOpenSubAdapter
         extends AbstractAdapter<org.opensubtitles.model.Subtitle, OpensubtitleSerieId, OpenSubtitlesException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JOpenSubAdapter.class);
+
     private static LazySupplier<OpenSubtitlesApi> osApi;
 
     public JOpenSubAdapter(boolean isLoginEnabled, String username, String password, Manager manager,

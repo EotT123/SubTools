@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.nodes.Document;
@@ -34,16 +36,11 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
-
 public class SubsceneApi extends Html implements SubtitleApi {
 
-    private static final int RATEDURATION_SHORT = 1; // seconds
-    private static final int RATEDURATION_LONG = 5; // seconds
+    private static final int RATE_DURATION_SHORT = 1; // seconds
+    private static final int RATE_DURATION_LONG = 5; // seconds
     private static final String DOMAIN = "https://subscene.com";
-    // private static final String SERIE_URL_PREFIX = DOMAIN + "/subtitles/";
     private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
 
     private static final Predicate<Exception> RETRY_PREDICATE =
@@ -124,10 +121,10 @@ public class SubsceneApi extends Html implements SubtitleApi {
     }
 
     private Document getJsoupDocument(String url) throws ManagerException {
-        while (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION_SHORT) {
+        while (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATE_DURATION_SHORT) {
             sleepSeconds(1);
         }
-        Document document = super.getHtml(url).retries(1).retryPredicate(RETRY_PREDICATE).retryWait(RATEDURATION_LONG).getAsJsoupDocument();
+        Document document = super.getHtml(url).retries(1).retryPredicate(RETRY_PREDICATE).retryWait(RATE_DURATION_LONG).getAsJsoupDocument();
         lastRequest = LocalDateTime.now();
         return document;
     }

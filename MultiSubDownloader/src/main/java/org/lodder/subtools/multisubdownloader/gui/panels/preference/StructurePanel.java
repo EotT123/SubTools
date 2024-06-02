@@ -13,6 +13,7 @@ public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel
 
     @Serial
     private static final long serialVersionUID = 7507970016496546514L;
+
     @Getter(value = AccessLevel.PROTECTED)
     private final JButton btnBuildStructure;
     @Getter(value = AccessLevel.PROTECTED)

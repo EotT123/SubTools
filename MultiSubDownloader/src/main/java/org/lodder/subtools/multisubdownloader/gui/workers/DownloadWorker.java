@@ -28,12 +28,12 @@ import org.slf4j.LoggerFactory;
  */
 public class DownloadWorker extends SwingWorker<Void, String> implements Cancelable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadWorker.class);
+
     private final CustomTable table;
     private final Settings settings;
     private final DownloadAction downloadAction;
     private final UserInteractionHandlerAction userInteractionHandlerAction;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadWorker.class);
 
     public DownloadWorker(CustomTable table, Settings settings, Manager manager, GUI gui) {
         this.table = table;

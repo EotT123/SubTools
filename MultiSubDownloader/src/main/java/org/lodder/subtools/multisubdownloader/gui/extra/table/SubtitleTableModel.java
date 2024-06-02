@@ -15,7 +15,7 @@ public class SubtitleTableModel extends DefaultTableModel {
     @Serial
     private static final long serialVersionUID = 4205143311042280620L;
 
-    private final static SubtitleTableColumnName[] COLUMNS =
+    private static final SubtitleTableColumnName[] COLUMNS =
             Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED).toArray(SubtitleTableColumnName[]::new);
 
     public SubtitleTableModel(Object[][] data, String[] columnNames) {
@@ -24,7 +24,7 @@ public class SubtitleTableModel extends DefaultTableModel {
 
     public static SubtitleTableModel getDefaultSubtitleTableModel() {
         String[] columnNames = Arrays.stream(COLUMNS).map(SubtitleTableColumnName::getColumnName).toArray(String[]::new);
-        return new SubtitleTableModel(new Object[][] {}, columnNames);
+        return new SubtitleTableModel(new Object[][]{}, columnNames);
     }
 
     public void addRow(Subtitle subtitle) {

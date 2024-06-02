@@ -12,13 +12,14 @@ import org.slf4j.LoggerFactory;
 
 public class SearchWorker extends Thread {
 
-    protected final SubtitleProvider provider;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
+
     private final SearchManager scheduler;
+    protected final SubtitleProvider provider;
     private boolean busy = false;
     private boolean isInterrupted = false;
     private Release release;
     private Set<Subtitle> subtitles;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
 
     public SearchWorker(SubtitleProvider provider, SearchManager scheduler) {
         this.provider = provider;

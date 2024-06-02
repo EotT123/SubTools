@@ -14,7 +14,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 
-public class MyPasswordField extends JPasswordField implements MypasswordFieldOthersIntf {
+public class MyPasswordField extends JPasswordField implements MyPasswordFieldOthersIntf {
 
     @Serial
     private static final long serialVersionUID = -3002009544577141751L;

@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
@@ -32,11 +31,13 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
 
     @Serial
     private static final long serialVersionUID = -5174968778375028124L;
+
     private final VideoType videoType;
     private final StructureType structureType;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
     private final Function<String, ? extends LibraryBuilder> libraryBuilder;
+
     private JTextField txtStructure;
     private JLabel lblPreview;
     private TvRelease tvRelease;

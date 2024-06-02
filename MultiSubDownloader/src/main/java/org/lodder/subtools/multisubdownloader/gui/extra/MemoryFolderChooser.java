@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class MemoryFolderChooser {
 
-    private final JFileChooser chooser;
     private static MemoryFolderChooser instance;
+    private final JFileChooser chooser;
     private File memory;
 
     private MemoryFolderChooser() {

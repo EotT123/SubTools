@@ -40,14 +40,15 @@ import lombok.experimental.ExtensionMethod;
 @ExtensionMethod({ Files.class })
 public class SettingsControl {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);
+    private static final String BACKING_STORE_AVAIL = "BackingStoreAvail";
+    
     private final Manager manager;
     private final Preferences preferences;
     @Getter
     private Settings settings;
     @Getter
     private State state;
-    private static final String BACKING_STORE_AVAIL = "BackingStoreAvail";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);
 
     public SettingsControl(Manager manager) {
         if (!backingStoreAvailable()) {

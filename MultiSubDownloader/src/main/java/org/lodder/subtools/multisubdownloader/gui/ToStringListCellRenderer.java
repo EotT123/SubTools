@@ -1,19 +1,16 @@
 package org.lodder.subtools.multisubdownloader.gui;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.function.Function;
-
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-
-import org.lodder.subtools.multisubdownloader.Messages;
-
-import java.awt.Component;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.multisubdownloader.Messages;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ToStringListCellRenderer<T> implements ListCellRenderer<T> {
+
     private final ListCellRenderer originalRenderer;
     private final Function<T, String> toStringMapper;
 

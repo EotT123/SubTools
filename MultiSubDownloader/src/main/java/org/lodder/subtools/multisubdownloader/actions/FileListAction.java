@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import extensions.java.nio.file.Path.PathExt;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
@@ -19,20 +20,18 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RequiredArgsConstructor
 @ExtensionMethod({ Files.class })
 public class FileListAction {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);
+    private static final  String SUBTITLE_EXTENSION = "srt";
+
+    private final Settings settings;
     private IndexingProgressListener indexingProgressListener;
     private int progressFileIndex;
     private int progressFilesTotal;
-    private final Settings settings;
-    private final static String subtitleExtension = "srt";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);
-
-    public FileListAction(Settings settings) {
-        this.settings = settings;
-    }
 
     public List<Path> getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
         LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]", dir, recursive, language,
@@ -115,7 +114,7 @@ public class FileListAction {
         String extension = file.getExtension();
         Optional<String> subtitleNameOptional = VideoPatterns.EXTENSIONS.stream()
                 .filter(extension::equals)
-                .map(x -> file.changeExtension(subtitleExtension))
+                .map(x -> file.changeExtension(SUBTITLE_EXTENSION))
                 .findAny();
 
         if (subtitleNameOptional.isEmpty()) {
@@ -126,7 +125,7 @@ public class FileListAction {
         if (f.exists()) {
             return true;
         } else {
-            String subtitleExtensionWithDot = "." + subtitleExtension;
+            String subtitleExtensionWithDot = "." + SUBTITLE_EXTENSION;
 
             Set<String> langCodes = new HashSet<>();
             langCodes.add(language.getLangCode());
@@ -135,7 +134,7 @@ public class FileListAction {
             if (!StringUtils.isBlank(customLangCode)) {
                 langCodes.add(customLangCode);
             }
-            List<String> filters = langCodes.stream().map(word -> word + "." + subtitleExtension).toList();
+            List<String> filters = langCodes.stream().map(word -> word + "." + SUBTITLE_EXTENSION).toList();
             String subtitleNameWithoutExtension = subtitleName.replace(subtitleExtensionWithDot, "");
             return file.getParent().list().map(PathExt::getFileNameAsString).filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
                     .anyMatch(fileName -> fileName.contains(subtitleNameWithoutExtension));

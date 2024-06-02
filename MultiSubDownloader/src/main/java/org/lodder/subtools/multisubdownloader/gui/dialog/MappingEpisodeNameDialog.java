@@ -17,7 +17,6 @@ import java.util.function.Function;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lodder.subtools.multisubdownloader.Messages;
@@ -35,14 +34,15 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     private final JPanel contentPanel = new JPanel();
-    private JTable table;
     private final Manager manager;
     private final MappingTableModel mappingTableModel;
     private final SubtitleProviderStore subtitleProviderStore;
     private final UserInteractionHandlerGUI userInteractionHandler;
-    private Optional<SubtitleProvider> selectedSubtitleProvider;
     private final JButton btnAddCustomMapping;
+    private JTable table;
+    private Optional<SubtitleProvider> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
     /**

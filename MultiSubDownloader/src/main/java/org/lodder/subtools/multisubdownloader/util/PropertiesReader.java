@@ -6,8 +6,8 @@ import java.util.Properties;
 
 public class PropertiesReader {
 
-    private final Properties properties;
     private static PropertiesReader propertiesReaderInstance;
+    private final Properties properties;
 
     public PropertiesReader() throws IOException {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("properties-from-pom.properties")) {

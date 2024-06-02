@@ -12,9 +12,9 @@ import org.lodder.subtools.sublibrary.Manager;
 
 public class LocalServiceProvider implements ServiceProvider {
 
+    private UserInteractionHandler userInteractionHandler;
     protected Container app;
     protected SubtitleProvider subtitleProvider;
-    private UserInteractionHandler userInteractionHandler;
 
     @Override
     public int getPriority() {

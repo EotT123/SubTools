@@ -19,11 +19,11 @@ import org.slf4j.LoggerFactory;
 
 public class ReleaseFactory {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
+
     private final ReleaseParser releaseParser;
     private final Settings settings;
     private final Manager manager;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
     public ReleaseFactory(Settings settings, Manager manager) {
         this.releaseParser = new ReleaseParser();

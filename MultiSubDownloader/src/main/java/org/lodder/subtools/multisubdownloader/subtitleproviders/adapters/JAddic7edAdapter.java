@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor, ProviderSerieId, Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edAdapter.class);
+
     private static LazySupplier<JAddic7edApi> jaapi;
 
     public JAddic7edAdapter(boolean isLoginEnabled, String username, String password, boolean speedy, Manager manager,

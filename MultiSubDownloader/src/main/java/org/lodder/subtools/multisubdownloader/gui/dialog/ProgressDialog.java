@@ -15,10 +15,12 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
 
     @Serial
     private static final long serialVersionUID = -2320149791421648965L;
+
+    private final Cancelable worker;
+
     @Getter
     private JProgressBar progressBar;
     private JLabel label;
-    private final Cancelable worker;
 
     public ProgressDialog(JFrame frame, Cancelable sft) {
         super(frame, Messages.getString("ProgressDialog.Title"), false);

@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 public class CliSearchAction extends SearchAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);
+    
     private final @NonNull CLI cli;
     private final @NonNull FileListAction fileListAction;
     @Getter

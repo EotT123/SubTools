@@ -19,6 +19,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf {
 
     private static final long serialVersionUID = 1L;
+
     private final SettingsControl settingsCtrl;
     private final ScrollTable<Source> unusedPatternsTable;
     private final ScrollTable<Source> usedPatternsTable;

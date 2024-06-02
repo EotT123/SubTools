@@ -41,6 +41,7 @@ public class VideoTableModel extends DefaultTableModel {
     private final Class<?>[] columnTypes;
     private final Boolean[] columnEditables;
     private final Map<Release, Row> rowMap = new LinkedHashMap<>();
+
     private boolean showOnlyFound = false;
     @Setter
     private UserInteractionHandler userInteractionHandler;

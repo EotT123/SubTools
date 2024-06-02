@@ -1,9 +1,9 @@
 package org.lodder.subtools.multisubdownloader.gui.workers;
 
+import javax.swing.*;
 import java.util.List;
 
-import javax.swing.SwingWorker;
-
+import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
@@ -18,8 +18,6 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.RequiredArgsConstructor;
-
 /**
  * Created by IntelliJ IDEA. User: lodder Date: 4/12/11 Time: 8:52 AM To change this template use
  * Path | Settings | Path Templates.
@@ -27,12 +25,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenameWorker.class);
+
     private final CustomTable table;
     private final Settings settings;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RenameWorker.class);
 
     @Override
     protected Void doInBackground() {

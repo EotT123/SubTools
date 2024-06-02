@@ -23,11 +23,11 @@ import org.slf4j.LoggerFactory;
 @RequiredArgsConstructor
 public class RenameAction {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenameAction.class);
+
     private final LibrarySettings librarySettings;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RenameAction.class);
 
     public void rename(Path f, Release release) {
         String filename = switch (librarySettings.getLibraryAction()) {

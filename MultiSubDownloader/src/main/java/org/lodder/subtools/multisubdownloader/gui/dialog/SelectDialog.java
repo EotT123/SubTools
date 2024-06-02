@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import lombok.experimental.ExtensionMethod;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
@@ -21,9 +20,11 @@ public class SelectDialog extends MultiSubDialog {
 
     @Serial
     private static final long serialVersionUID = -4092909537478305235L;
-    private List<Integer> selectedSubtitleIdxs;
+
     private final List<Subtitle> subtitles;
     private final Release release;
+
+    private List<Integer> selectedSubtitleIdxs;
     private CustomTable customTable;
 
     /**

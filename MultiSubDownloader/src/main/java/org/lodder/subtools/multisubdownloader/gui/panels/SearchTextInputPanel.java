@@ -12,11 +12,12 @@ public class SearchTextInputPanel extends InputPanel {
 
     @Serial
     private static final long serialVersionUID = 7030171360517948253L;
+
     private MyComboBox<VideoSearchType> cbxVideoType;
+    private JTextField txtInputVideoName;
     protected JTextField txtInputSeason;
     protected JTextField txtInputEpisode;
     protected JTextField txtQualityVersion;
-    private JTextField txtInputVideoName;
 
     public SearchTextInputPanel() {
         super();

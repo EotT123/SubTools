@@ -27,6 +27,7 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
 
     private static final String DOMAIN = "https://api.gestdown.info";
+
     private final TvShowsApi tvShowsApi;
     private final SubtitlesApi subtitlesApi;
 

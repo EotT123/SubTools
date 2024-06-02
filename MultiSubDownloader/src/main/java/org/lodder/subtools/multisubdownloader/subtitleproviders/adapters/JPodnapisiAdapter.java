@@ -33,6 +33,7 @@ import lombok.experimental.ExtensionMethod;
 public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPodnapisiAdapter.class);
+
     private static LazySupplier<JPodnapisiApi> jpapi;
 
     public JPodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {

@@ -32,8 +32,8 @@ public class StructureFilePanel extends JPanel {
 
     @Serial
     private static final long serialVersionUID = -5458593307643063563L;
-    private final LibrarySettings librarySettings;
 
+    private final LibrarySettings librarySettings;
     private final MyTextFieldString txtFileStructure;
     private final JCheckBox chkReplaceSpace;
     private final MyComboBox<Character> cbxReplaceSpaceChar;

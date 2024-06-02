@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -8,15 +9,13 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.lodder.subtools.sublibrary.util.NamedPattern;
-
-import java.awt.Image;
-
 import lombok.Getter;
+import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 public class PathOrRegex implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Getter
     private final String value;
     @Getter

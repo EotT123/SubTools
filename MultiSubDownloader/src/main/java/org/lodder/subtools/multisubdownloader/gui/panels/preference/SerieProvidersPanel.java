@@ -2,15 +2,11 @@ package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
 import static java.util.function.Predicate.*;
 
+import javax.swing.*;
 import java.io.Serial;
 import java.nio.file.Path;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
+import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
@@ -23,12 +19,11 @@ import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.PathMatchType;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
 
-import net.miginfocom.swing.MigLayout;
-
 public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
     private static final long serialVersionUID = -5458593307643063563L;
+
     private final SettingsControl settingsCtrl;
     private final JCheckBox chkSourceAddic7ed;
     private final JCheckBox chkUserAddic7edLogin;

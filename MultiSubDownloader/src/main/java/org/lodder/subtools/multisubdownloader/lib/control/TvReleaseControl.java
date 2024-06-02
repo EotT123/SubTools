@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 
 public class TvReleaseControl extends ReleaseControl {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
+
     private final TheTvdbAdapter jtvdba;
     private final TvRelease tvRelease;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
 
     public TvReleaseControl(TvRelease tvRelease, Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
         super(settings, manager);

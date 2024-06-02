@@ -23,8 +23,8 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
 
     @Serial
     private static final long serialVersionUID = 3476596236588408382L;
-    private final LibrarySettings librarySettings;
 
+    private final LibrarySettings librarySettings;
     private final MyTextFieldPath txtLibraryFolder;
     private final MyTextFieldString txtFolderStructure;
     private final JCheckBox chkRemoveEmptyFolder;
