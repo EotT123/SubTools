@@ -90,13 +90,13 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
     @Override
     public Set<Addic7edSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language) throws Addic7edException {
         return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.getEpisodeNumbers().stream()
+                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
-                                return getApi().getSubtitles(providerSerieId, tvRelease.getSeason(), episode, language).stream();
+                                return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                             } catch (Addic7edException e) {
                                 LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.getSeason(), episode),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }
@@ -115,7 +115,7 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
                         .language(sub.getLanguage())
                         .quality(ReleaseParser.getQualityKeyword(sub.getTitle() + " " + sub.getVersion()))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleasegroup(sub.getTitle() + " " + sub.getVersion(),
+                        .releaseGroup(ReleaseParser.extractReleaseGroup(sub.getTitle() + " " + sub.getVersion(),
                                 (sub.getTitle() + " " + sub.getVersion()).endsWith(".srt")))
                         .uploader(sub.getUploader())
                         .hearingImpaired(false))

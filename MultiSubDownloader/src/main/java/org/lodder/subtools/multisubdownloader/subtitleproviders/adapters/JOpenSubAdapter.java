@@ -109,19 +109,19 @@ public class JOpenSubAdapter
     @Override
     public Set<org.opensubtitles.model.Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language) throws OpenSubtitlesException {
         return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.getEpisodeNumbers().stream()
+                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
                                 return getApi().searchSubtitles()
                                         .query(providerSerieId.getName())
-                                        .season(tvRelease.getSeason())
+                                        .season(tvRelease.season)
                                         .episode(episode)
                                         .language(language)
                                         .searchSubtitles()
                                         .getData().stream();
                             } catch (OpenSubtitlesException e) {
                                 LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.getSeason(), episode),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }
@@ -132,11 +132,10 @@ public class JOpenSubAdapter
 
     @Override
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<org.opensubtitles.model.Subtitle> subtitles, Language language) {
-        String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.getName(), "[^A-Za-z]", ""));
-        String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.getOriginalName(), "[^A-Za-z]", ""));
+        String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
+        String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName, "[^A-Za-z]", ""));
         return subtitles.stream().map(org.opensubtitles.model.Subtitle::getAttributes)
                 .flatMap(attributes -> attributes.getFiles().stream()
-                        .filter(file -> file.getFileName() != null)
                         .filter(file -> {
                             String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
                             return subFileName.contains(name) || (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
@@ -152,7 +151,7 @@ public class JOpenSubAdapter
                 .language(Language.fromIdOptional(attributes.getLanguage()).orElse(null))
                 .quality(ReleaseParser.getQualityKeyword(file.getFileName()))
                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleasegroup(file.getFileName(), file.getFileName().endsWith(".srt")))
+                .releaseGroup(ReleaseParser.extractReleaseGroup(file.getFileName(), file.getFileName().endsWith(".srt")))
                 .uploader(attributes.getUploader().getName())
                 .hearingImpaired(attributes.isHearingImpaired());
     }

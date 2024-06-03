@@ -26,7 +26,7 @@ public class ReleaseParser {
     public final Release parse(Path file) throws ReleaseParseException {
         String folderName = file.getParent() != null ? file.getParent().getFileName().toString() : "";
 
-        for (String fileParseName : List.of(file.getFileName().toString(), folderName)) {
+        for (String fileParseName : List.of(file.fileName.toString(), folderName)) {
             for (NamedPattern np : VideoPatterns.COMPILED_PATTERNS) {
                 namedMatcher = np.matcher(fileParseName);
                 if (namedMatcher.find()) {
@@ -64,7 +64,7 @@ public class ReleaseParser {
                     .file(file)
                     .year(year)
                     .description(description)
-                    .releaseGroup(extractReleasegroup(file.getFileName().toString(), true))
+                    .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
                     .quality(getQualityKeyword(fileParseName))
                     .build();
         }
@@ -135,7 +135,7 @@ public class ReleaseParser {
                 .episodes(episodeNumbers)
                 .file(file)
                 .description(PathExt.withoutExtension(description))
-                .releaseGroup(extractReleasegroup(file.getFileName().toString(), true))
+                .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
                 .special(isSpecialEpisode(seasonNumber, episodeNumbers))
                 .quality(getQualityKeyword(fileParseName))
                 .build();
@@ -185,12 +185,12 @@ public class ReleaseParser {
         while (m.find()) {
             keywords.add(m.group(0));
         }
-        LOGGER.trace("getQualityKeyWords: keyswords: {}", keywords);
+        LOGGER.trace("getQualityKeyWords: keywords: {}", keywords);
         return keywords;
     }
 
-    public static String extractReleasegroup(final String fileName, boolean hasExtension) {
-        LOGGER.trace("extractReleasegroup: name: {} , hasExtension: {}", fileName, hasExtension);
+    public static String extractReleaseGroup(final String fileName, boolean hasExtension) {
+        LOGGER.trace("extractReleaseGroup: name: {} , hasExtension: {}", fileName, hasExtension);
         Pattern releaseGroupPattern;
         if (hasExtension) {
             releaseGroupPattern = Pattern.compile("-([\\w]+).[\\w]+$");
@@ -203,7 +203,7 @@ public class ReleaseParser {
             releaseGroup = matcher.group(1);
         }
 
-        LOGGER.trace("extractReleasegroup: release group: {}", releaseGroup);
+        LOGGER.trace("extractReleaseGroup: release group: {}", releaseGroup);
         return releaseGroup;
     }
 
@@ -211,6 +211,6 @@ public class ReleaseParser {
         if (season == 0) {
             return true;
         }
-        return episodeNumbers.size() == 1 && episodeNumbers.get(0) == 0;
+        return episodeNumbers.size() == 1 && episodeNumbers.first == 0;
     }
 }

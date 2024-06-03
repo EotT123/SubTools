@@ -5,30 +5,29 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalInt;
 
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
 
-@Getter
-@Setter
 public class TvRelease extends Release {
 
     // parsed from the filename
-    private final String name;
-    private String title;
-    private final int season;
-    private int tvdbId;
-    private final List<Integer> episodeNumbers;
+    @val String name;
+    @val List<Integer> episodeNumbers;
+    @val int season;
+    @var String title;
+    @var int tvdbId;
     // tvdb name
-    private String originalName;
-    private boolean special;
+    @var String originalName;
+    @val boolean special;
     // custom name which can be used to search subtitle providers
-    private String customName;
+    @val String customName;
 
     public String getNameWithSeasonEpisode() {
-        return formatName(name, season, episodeNumbers.isEmpty() ? -1 : episodeNumbers.get(0));
+        return formatName(name, season, episodeNumbers.isEmpty() ? -1 : firstEpisodeNumber);
     }
 
     public static String formatName(String serieName, int season, int episode) {
@@ -112,8 +111,7 @@ public class TvRelease extends Release {
     }
 
     private TvRelease(Path file, String description, String releaseGroup, String quality, String name, String originalName, String customName,
-            String title, int season,
-            List<Integer> episodeNumbers, boolean special) {
+            String title, int season, List<Integer> episodeNumbers, boolean special) {
         super(VideoType.EPISODE, file, description, releaseGroup, quality);
         this.name = name;
         this.title = title;
@@ -128,12 +126,12 @@ public class TvRelease extends Release {
         this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
     }
 
-    public OptionalInt getTvdbId() {
+    public OptionalInt getTvdbIdOptional() {
         return tvdbId == 0 ? OptionalInt.empty() : OptionalInt.of(tvdbId);
     }
 
     public int getFirstEpisodeNumber() {
-        return episodeNumbers.get(0);
+        return episodeNumbers.first;
     }
 
     @Override
@@ -147,6 +145,6 @@ public class TvRelease extends Release {
     }
 
     public String getDisplayName() {
-        return StringUtils.isNotBlank(getOriginalName()) ? getOriginalName() : getName();
+        return StringUtils.defaultIfBlank(originalName, name);
     }
 }

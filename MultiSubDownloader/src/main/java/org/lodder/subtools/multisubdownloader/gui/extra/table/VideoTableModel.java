@@ -99,7 +99,7 @@ public class VideoTableModel extends DefaultTableModel {
             this.rowObject = SHOW_COLUMNS.stream().map(searchColumn -> switch (searchColumn) {
                 case RELEASE -> {
                     if (release instanceof TvRelease tvRelease) {
-                        yield tvRelease.getOriginalName();
+                        yield tvRelease.originalName;
                     } else if (release instanceof MovieRelease movieRelease) {
                         yield movieRelease.name;
                     } else {
@@ -110,10 +110,10 @@ public class VideoTableModel extends DefaultTableModel {
                 case FOUND -> calculateSubsFound();
                 case SELECT -> false;
                 case OBJECT -> release;
-                case SEASON -> release instanceof TvRelease tvRelease ? tvRelease.getSeason() : null;
-                case EPISODE -> release instanceof TvRelease tvRelease ? tvRelease.getEpisodeNumbers().get(0) : null;
-                case TYPE -> release.getVideoType();
-                case TITLE -> release instanceof TvRelease tvRelease ? tvRelease.getTitle() : null;
+                case SEASON -> release instanceof TvRelease tvRelease ? tvRelease.season : null;
+                case EPISODE -> release instanceof TvRelease tvRelease ? tvRelease.firstEpisodeNumber : null;
+                case TYPE -> release.videoType;
+                case TITLE -> release instanceof TvRelease tvRelease ? tvRelease.title : null;
                 default -> throw new IllegalArgumentException("Unexpected value: " + searchColumn);
             }).collect(Collectors.toCollection(Vector::new));
         }

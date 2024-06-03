@@ -50,9 +50,9 @@ public class UserInteractionHandlerAction {
                 if (settings.optionsAlwaysConfirm) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (release.getMatchingSubs().size() == 1
-                           && release.getMatchingSubs().get(0).subtitleMatchType == SubtitleMatchType.EXACT) {
+                           && release.getMatchingSubs().first.subtitleMatchType == SubtitleMatchType.EXACT) {
                     LOGGER.debug("determineWhatSubtitleDownload: Exact Match");
-                    return List.of(release.getMatchingSubs().get(0));
+                    return List.of(release.getMatchingSubs().first);
                 } else if (release.getMatchingSubs().size() > 1) {
                     LOGGER.debug("determineWhatSubtitleDownload: Multiple subs detected");
 
@@ -61,7 +61,7 @@ public class UserInteractionHandlerAction {
                     shortlist.forEach(release::addMatchingSub);
                     // automatic selection results in 1 result
                     if (shortlist.size() == 1) {
-                        return List.of(release.getMatchingSubs().get(0));
+                        return List.of(release.getMatchingSubs().first);
                     }
                     // nothing match the minimum automatic selection value
                     if (shortlist.isEmpty()) {
@@ -78,7 +78,7 @@ public class UserInteractionHandlerAction {
                     }
                 } else if (release.getMatchingSubs().size() == 1) {
                     LOGGER.debug("determineWhatSubtitleDownload: only one sub taking it!!!!");
-                    return List.of(release.getMatchingSubs().get(0));
+                    return List.of(release.getMatchingSubs().first);
                 }
             }
             LOGGER.debug("determineWhatSubtitleDownload: No subs found for  [{}]", release.fileName);

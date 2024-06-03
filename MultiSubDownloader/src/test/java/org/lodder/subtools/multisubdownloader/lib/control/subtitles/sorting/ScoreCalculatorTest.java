@@ -12,7 +12,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 class ScoreCalculatorTest {
 
     @Test
-    void test_it_calculates_the_score_for_subtitle() throws Exception {
+    void test_it_calculates_the_score_for_subtitle() {
         SortWeight weights = createWeights("DVDRip XviD", "MEDiEVAL");
 
         ScoreCalculator calculator = new ScoreCalculator(weights);

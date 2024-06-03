@@ -95,9 +95,9 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         try {
             return convertToSubtitles(tvRelease, searchSerieSubtitles(tvRelease, language), language);
         } catch (Exception e) {
-            String displayName = StringUtils.defaultIfBlank(tvRelease.getOriginalName(), tvRelease.getName());
+            String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                    TvRelease.formatName(displayName, tvRelease.getSeason(), tvRelease.getFirstEpisodeNumber()), e.getMessage()), e);
+                    TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisodeNumber), e.getMessage()), e);
             return Set.of();
         }
     }
@@ -110,7 +110,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
     @Override
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X {
-        if (StringUtils.isNotBlank(tvRelease.getCustomName())) {
+        if (StringUtils.isNotBlank(tvRelease.customName)) {
             return getProviderSerieId(tvRelease, TvRelease::getOriginalName, TvRelease::getCustomName);
         } else {
             Optional<SerieMapping> providerSerieId = getProviderSerieId(tvRelease, TvRelease::getOriginalName);
@@ -124,8 +124,8 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, Function<TvRelease, String> nameFunction,
             Function<TvRelease, String> customNameFunction) throws X {
-        return getProviderSerieId(nameFunction.apply(tvRelease), customNameFunction.apply(tvRelease), tvRelease.getDisplayName(),
-                tvRelease.getSeason(), tvRelease.getTvdbId());
+        return getProviderSerieId(nameFunction.apply(tvRelease), customNameFunction.apply(tvRelease), tvRelease.displayName,
+                tvRelease.season, tvRelease.getTvdbIdOptional());
     }
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String displayName, int season,
@@ -180,7 +180,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
         SerieMapping serieMapping;
         if (!getUserInteractionSettings().isOptionsConfirmProviderMapping && providerSerieIds.size() == 1) {
-            serieMapping = new SerieMapping(serieName, providerSerieIds.get(0).id, providerSerieIds.get(0).name, seasonToUse);
+            serieMapping = new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
         } else {
             ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = getManager().valueBuilder()
                     .cacheType(CacheType.MEMORY)

@@ -84,13 +84,13 @@ public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescript
     @Override
     public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language) throws PodnapisiException {
         return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.getEpisodeNumbers().stream()
+                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
-                                return getApi().getSerieSubtitles(providerSerieId, tvRelease.getSeason(), episode, language).stream();
+                                return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                             } catch (PodnapisiException e) {
                                 LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.getSeason(), episode),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }
@@ -113,7 +113,7 @@ public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescript
                         .language(language)
                         .quality(ReleaseParser.getQualityKeyword(ossd.getReleaseString()))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleasegroup(ossd.getReleaseString(),
+                        .releaseGroup(ReleaseParser.extractReleaseGroup(ossd.getReleaseString(),
                                 StringUtils.endsWith(ossd.getReleaseString(), ".srt")))
                         .uploader(ossd.getUploaderName())
                         .hearingImpaired(ossd.isHearingImpaired()))

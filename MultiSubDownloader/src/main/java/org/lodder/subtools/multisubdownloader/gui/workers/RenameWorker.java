@@ -52,10 +52,10 @@ public class RenameWorker extends SwingWorker<Void, String> implements Cancelabl
                 setProgress(progress);
 
                 RenameAction renameAction = null;
-                if (selectedShow.getVideoType() == VideoType.EPISODE) {
+                if (selectedShow.videoType == VideoType.EPISODE) {
                     LOGGER.debug("Treat as EPISODE");
                     renameAction = new RenameAction(settings.episodeLibrarySettings, manager, userInteractionHandler);
-                } else if (selectedShow.getVideoType() == VideoType.MOVIE) {
+                } else if (selectedShow.videoType == VideoType.MOVIE) {
                     LOGGER.debug("Treat as MOVIE");
                     renameAction = new RenameAction(settings.movieLibrarySettings, manager, userInteractionHandler);
                 }

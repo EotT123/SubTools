@@ -1,14 +1,12 @@
 package org.lodder.subtools.sublibrary.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import manifold.ext.props.rt.api.val;
 
-@Getter @Setter
 public abstract class Video {
 
-    private final VideoType videoType;
+    @val VideoType videoType;
 
-    public Video(VideoType videoType) {
+    Video(VideoType videoType) {
         this.videoType = videoType;
     }
 }

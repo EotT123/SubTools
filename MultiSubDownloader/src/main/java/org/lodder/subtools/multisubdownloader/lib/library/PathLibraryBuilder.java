@@ -131,15 +131,15 @@ public class PathLibraryBuilder extends LibraryBuilder {
     private Path buildEpisode(TvRelease tvRelease) {
         String folder = structure;
 
-        folder = folder.replace(SerieStructureTag.SHOW_NAME.getLabel(), getShowName(tvRelease.getName())).removeIllegalWindowsChars();
+        folder = folder.replace(SerieStructureTag.SHOW_NAME.getLabel(), getShowName(tvRelease.name)).removeIllegalWindowsChars();
         // order is important!
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.getEpisodeNumbers(), true);
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.getEpisodeNumbers(), false);
-        folder = replace(folder, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.getSeason(), true));
-        folder = replace(folder, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.getSeason(), false));
-        folder = replace(folder, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.getEpisodeNumbers().get(0), true));
-        folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.getEpisodeNumbers().get(0), false));
-        folder = replace(folder, SerieStructureTag.TITLE, tvRelease.getTitle());
+        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers, true);
+        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers, false);
+        folder = replace(folder, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
+        folder = replace(folder, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
+        folder = replace(folder, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
+        folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
+        folder = replace(folder, SerieStructureTag.TITLE, tvRelease.title);
         folder = replace(folder, SerieStructureTag.QUALITY, tvRelease.quality);
         folder = replace(folder, SerieStructureTag.DESCRIPTION, tvRelease.description);
         if (replaceSpace) {

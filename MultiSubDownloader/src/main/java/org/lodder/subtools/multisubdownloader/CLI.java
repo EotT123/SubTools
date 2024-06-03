@@ -91,7 +91,7 @@ public class CLI {
             try {
                 this.download(release);
             } catch (Exception e) {
-                LOGGER.error("Error while downloading subtitle for %s (%s)".formatted(release.getReleaseDescription(), e.getMessage()), e);
+                LOGGER.error("Error while downloading subtitle for ${release.releaseDescription} (%${e.getMessage()})", e);
             }
         }
     }
@@ -138,7 +138,7 @@ public class CLI {
                 try {
                     downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
                 } catch (IOException | ManagerException e) {
-                    LOGGER.error("Error while downloading subtitle for %s (%s)".formatted(release.getReleaseDescription(), e.getMessage()), e);
+                    LOGGER.error("Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})", e);
                 }
             });
         }

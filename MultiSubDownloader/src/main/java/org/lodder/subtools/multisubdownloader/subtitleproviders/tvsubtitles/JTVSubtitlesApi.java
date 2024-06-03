@@ -75,7 +75,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                                 String filename = null, rip = null, title = null, author = null;
                                 Elements subtitlePageTableDoc = subtitlePageDoc.getElementsByClass("subtitle1");
                                 if (subtitlePageTableDoc.size() == 1) {
-                                    for (Element item : subtitlePageTableDoc.get(0).getElementsByTag("tr")) {
+                                    for (Element item : subtitlePageTableDoc.first.getElementsByTag("tr")) {
                                         Elements row = item.getElementsByTag("td");
                                         if (row.size() != 3) {
                                             continue;

@@ -33,10 +33,10 @@ public class DownloadAction {
     private final UserInteractionHandler userInteractionHandler;
 
     public void download(Release release, Subtitle subtitle, Integer version) throws IOException, ManagerException {
-        switch (release.getVideoType()) {
+        switch (release.videoType) {
             case EPISODE -> download(release, subtitle, settings.episodeLibrarySettings, version);
             case MOVIE -> download(release, subtitle, settings.movieLibrarySettings, version);
-            default -> throw new IllegalArgumentException("Unexpected value: " + release.getVideoType());
+            default -> throw new IllegalArgumentException("Unexpected value: " + release.videoType);
         }
     }
 
@@ -74,8 +74,8 @@ public class DownloadAction {
                 success = manager.store(url, subFile);
                 LOGGER.debug("doDownload file was [{}] ", success);
             } catch (SubtitlesProviderException e) {
-                LOGGER.error("Error while getting url for [%s] for subtitle provider [%s] (%s)".formatted(release.getReleaseDescription(),
-                        e.getSubtitleProvider(), e.getMessage()), e);
+                LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
+                             "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
                 throw new RuntimeException(e);
             }
         }

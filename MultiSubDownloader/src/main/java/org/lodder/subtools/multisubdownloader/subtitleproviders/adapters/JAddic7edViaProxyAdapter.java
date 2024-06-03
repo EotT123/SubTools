@@ -79,18 +79,18 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
     @Override
     public Set<Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language) throws ApiException {
         return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.getEpisodeNumbers().stream()
+                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
-                                return new ExecuteCall<>(() -> getApi().getSubtitles(providerSerieId, tvRelease.getSeason(), episode, language))
+                                return new ExecuteCall<>(() -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language))
                                         .message("getSubtitles: [%s]".formatted(
-                                                TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.getSeason(), episode)))
+                                                TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode)))
                                         .retryWhenHttpCode(ReturnCode.REFRESHING)
                                         .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                                         .execute().stream();
                             } catch (ApiException e) {
                                 LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.getSeason(), episode),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }

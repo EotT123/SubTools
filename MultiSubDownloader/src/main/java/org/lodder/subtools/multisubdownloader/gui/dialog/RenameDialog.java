@@ -154,7 +154,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
                         Release release = releaseFactory.createRelease(file, userInteractionHandler);
                         if (release != null) {
                             publish(release.fileName);
-                            if (release.getVideoType() == videoType) {
+                            if (release.videoType == videoType) {
                                 renameAction.rename(file, release);
                             }
                         }

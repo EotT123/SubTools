@@ -16,17 +16,17 @@ import org.lodder.subtools.sublibrary.model.VideoType;
 class ReleaseParserTest {
 
     @Test
-    void testReleaseGroup() throws Exception {
-        String releaseGroup = ReleaseParser.extractReleasegroup("The.Following.S03E01.HDTV.XviD-AFG", false);
+    void testReleaseGroup() {
+        String releaseGroup = ReleaseParser.extractReleaseGroup("The.Following.S03E01.HDTV.XviD-AFG", false);
         assertThat(releaseGroup).isEqualTo("AFG");
 
-        releaseGroup = ReleaseParser.extractReleasegroup("The.Following.S03E01.HDTV.XviD-AFG", true);
+        releaseGroup = ReleaseParser.extractReleaseGroup("The.Following.S03E01.HDTV.XviD-AFG", true);
         assertThat(releaseGroup).isEqualTo("A");
 
-        releaseGroup = ReleaseParser.extractReleasegroup("The.Following.S03E01.HDTV.XviD-AFG.srt", false);
-        assertThat(releaseGroup).isEqualTo("");
+        releaseGroup = ReleaseParser.extractReleaseGroup("The.Following.S03E01.HDTV.XviD-AFG.srt", false);
+        assertThat(releaseGroup).isEmpty();
 
-        releaseGroup = ReleaseParser.extractReleasegroup("The.Following.S03E01.HDTV.XviD-AFG.srt", true);
+        releaseGroup = ReleaseParser.extractReleaseGroup("The.Following.S03E01.HDTV.XviD-AFG.srt", true);
         assertThat(releaseGroup).isEqualTo("AFG");
     }
 
@@ -56,7 +56,7 @@ class ReleaseParserTest {
         Path file = Path.of("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv");
         Release release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.EPISODE);
+        assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
         assertThat(release.extension).isEqualTo("mkv");
         assertThat(release.fileName).isEqualTo("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv");
         assertThat(release.releaseGroup).isEqualTo("DIMENSION");
@@ -64,29 +64,29 @@ class ReleaseParserTest {
 
         TvRelease tvrelease = (TvRelease) release;
 
-        assertThat(tvrelease.getSeason()).isEqualTo(10);
-        assertThat(tvrelease.getEpisodeNumbers().size()).isEqualTo(1);
-        assertThat((int) tvrelease.getEpisodeNumbers().get(0)).isEqualTo(12);
+        assertThat(tvrelease.season).isEqualTo(10);
+        assertThat(tvrelease.episodeNumbers).hasSize(1);
+        assertThat(tvrelease.firstEpisodeNumber).isEqualTo(12);
 
         file = Path.of("S04E02 - White Collar - Most Wanted.mkv");
         release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.EPISODE);
+        assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
         assertThat(release.extension).isEqualTo("mkv");
         assertThat(release.fileName).isEqualTo("S04E02 - White Collar - Most Wanted.mkv");
-        assertThat(release.releaseGroup).isEqualTo("");
-        assertThat(release.quality).isEqualTo("");
+        assertThat(release.releaseGroup).isEmpty();
+        assertThat(release.quality).isEmpty();
 
         tvrelease = (TvRelease) release;
 
-        assertThat(tvrelease.getSeason()).isEqualTo(4);
-        assertThat(tvrelease.getEpisodeNumbers().size()).isEqualTo(1);
-        assertThat((int) tvrelease.getEpisodeNumbers().get(0)).isEqualTo(2);
+        assertThat(tvrelease.season).isEqualTo(4);
+        assertThat(tvrelease.episodeNumbers).hasSize(1);
+        assertThat(tvrelease.firstEpisodeNumber).isEqualTo(2);
 
         file = Path.of("Spartacus.Gods.of.The.Arena.Pt.I.720p.HDTV.X264-DIMENSION.mkv");
         release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.EPISODE);
+        assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
         assertThat(release.extension).isEqualTo("mkv");
         assertEquals(release.fileName, "Spartacus.Gods.of.The.Arena.Pt.I.720p.HDTV.X264-DIMENSION.mkv");
         assertThat(release.releaseGroup).isEqualTo("DIMENSION");
@@ -94,14 +94,14 @@ class ReleaseParserTest {
 
         tvrelease = (TvRelease) release;
 
-        assertThat(tvrelease.getSeason()).isEqualTo(1);
-        assertThat(tvrelease.getEpisodeNumbers().size()).isEqualTo(1);
-        assertThat((int) tvrelease.getEpisodeNumbers().get(0)).isEqualTo(1);
+        assertThat(tvrelease.season).isEqualTo(1);
+        assertThat(tvrelease.episodeNumbers).hasSize(1);
+        assertThat(tvrelease.firstEpisodeNumber).isEqualTo(1);
 
         file = Path.of("hawaii.five-0.2010.410.hdtv-lol.mp4");
         release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.EPISODE);
+        assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
         assertThat(release.extension).isEqualTo("mp4");
         assertThat(release.fileName).isEqualTo("hawaii.five-0.2010.410.hdtv-lol.mp4");
         assertThat(release.releaseGroup).isEqualTo("lol");
@@ -109,14 +109,14 @@ class ReleaseParserTest {
 
         tvrelease = (TvRelease) release;
 
-        assertThat(tvrelease.getSeason()).isEqualTo(4);
-        assertThat(tvrelease.getEpisodeNumbers().size()).isEqualTo(1);
-        assertThat((int) tvrelease.getEpisodeNumbers().get(0)).isEqualTo(10);
+        assertThat(tvrelease.season).isEqualTo(4);
+        assertThat(tvrelease.episodeNumbers).hasSize(1);
+        assertThat(tvrelease.firstEpisodeNumber).isEqualTo(10);
 
         file = Path.of("Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv");
         release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.EPISODE);
+        assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
         assertThat(release.extension).isEqualTo("mkv");
         assertThat(release.fileName).isEqualTo("Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv");
         assertThat(release.releaseGroup).isEqualTo("DIMENSION");
@@ -124,14 +124,14 @@ class ReleaseParserTest {
 
         tvrelease = (TvRelease) release;
 
-        assertThat(tvrelease.getSeason()).isEqualTo(10);
-        assertThat(tvrelease.getEpisodeNumbers().size()).isEqualTo(2);
-        assertThat((int) tvrelease.getEpisodeNumbers().get(0)).isEqualTo(1);
-        assertThat((int) tvrelease.getEpisodeNumbers().get(1)).isEqualTo(2);
+        assertThat(tvrelease.season).isEqualTo(10);
+        assertThat(tvrelease.episodeNumbers).hasSize(2);
+        assertThat(tvrelease.firstEpisodeNumber).isEqualTo(1);
+        assertThat(tvrelease.episodeNumbers.get(1)).isEqualTo(2);
     }
 
     @Test
-    void testReleaseParseExceptionMessage() throws ReleaseParseException {
+    void testReleaseParseExceptionMessage() {
         Path file = Path.of("exceptiontesting.mkv");
 
         assertThatExceptionOfType(ReleaseParseException.class)
@@ -146,7 +146,7 @@ class ReleaseParserTest {
         Path file = Path.of("Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv");
         Release release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.MOVIE);
+        assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
         assertThat(release.extension).isEqualTo("mkv");
         assertThat(release.fileName).isEqualTo("Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv");
         assertThat(release.releaseGroup).isEqualTo("AMIABLE");
@@ -160,7 +160,7 @@ class ReleaseParserTest {
         file = Path.of("The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv");
         release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.MOVIE);
+        assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
         assertThat(release.extension).isEqualTo("mkv");
         assertThat(release.fileName).isEqualTo("The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv");
         assertThat(release.releaseGroup).isEqualTo("SPARKS");
@@ -174,10 +174,9 @@ class ReleaseParserTest {
         file = Path.of("The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv");
         release = releaseparser.parse(file);
 
-        assertThat(release.getVideoType()).isEqualTo(VideoType.MOVIE);
+        assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
         assertThat(release.extension).isEqualTo("mkv");
-        assertEquals(release.getFileName(),
-                "The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv");
+        assertEquals(release.getFileName(), "The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv");
         assertThat(release.releaseGroup).isEqualTo("GECKOS");
         assertThat(release.quality).isEqualTo("720p bluray x264");
 

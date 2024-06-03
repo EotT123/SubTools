@@ -66,22 +66,22 @@ public class Local implements SubtitleProvider {
         ReleaseParser vfp = new ReleaseParser();
 
         String filter;
-        if (tvRelease.getOriginalName().length() > 0) {
-            filter = tvRelease.getOriginalName().replaceAll("[^A-Za-z]", "").trim();
+        if (tvRelease.originalName.length() > 0) {
+            filter = tvRelease.originalName.replaceAll("[^A-Za-z]", "").trim();
         } else {
-            filter = tvRelease.getName().replaceAll("[^A-Za-z]", "").trim();
+            filter = tvRelease.name.replaceAll("[^A-Za-z]", "").trim();
         }
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 Release release = vfp.parse(fileSub);
-                if ((release.getVideoType() == VideoType.EPISODE)
-                    && (((TvRelease) release).getSeason() == tvRelease.getSeason() && Utils.containsAll(
-                        ((TvRelease) release).getEpisodeNumbers(), tvRelease.getEpisodeNumbers()))) {
+                if ((release.videoType == VideoType.EPISODE)
+                    && (((TvRelease) release).season == tvRelease.season && Utils.containsAll(
+                        ((TvRelease) release).episodeNumbers, tvRelease.episodeNumbers))) {
 
                     TvReleaseControl epCtrl = new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
                     epCtrl.process();
-                    if (((TvRelease) release).getTvdbId().equals(tvRelease.getTvdbId())) {
+                    if (((TvRelease) release).tvdbIdOptional.equals(tvRelease.tvdbIdOptional)) {
                         Language detectedLang = DetectLanguage.execute(fileSub);
                         if (detectedLang == language) {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
@@ -92,7 +92,7 @@ public class Local implements SubtitleProvider {
                                             .language(language)
                                             .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
                                             .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                            .releaseGroup(ReleaseParser.extractReleasegroup(fileSub.getFileNameAsString(), true))
+                                            .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.getFileNameAsString(), true))
                                             .uploader(fileSub.toAbsolutePath().toString())
                                             .hearingImpaired(false));
                         }
@@ -120,7 +120,7 @@ public class Local implements SubtitleProvider {
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 Release release = releaseParser.parse(fileSub);
-                if (release.getVideoType() == VideoType.MOVIE) {
+                if (release.videoType == VideoType.MOVIE) {
                     MovieReleaseControl movieCtrl = new MovieReleaseControl((MovieRelease) release, settings, manager, userInteractionHandler);
                     movieCtrl.process();
                     if (((MovieRelease) release).getImdbId().equals(movieRelease.getImdbId())) {
@@ -134,7 +134,7 @@ public class Local implements SubtitleProvider {
                                             .language(language) // TODO previously: language(""). This was not correct?
                                             .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
                                             .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                            .releaseGroup(ReleaseParser.extractReleasegroup(fileSub.getFileNameAsString(), true))
+                                            .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.getFileNameAsString(), true))
                                             .uploader(fileSub.toAbsolutePath().toString())
                                             .hearingImpaired(false));
                         }

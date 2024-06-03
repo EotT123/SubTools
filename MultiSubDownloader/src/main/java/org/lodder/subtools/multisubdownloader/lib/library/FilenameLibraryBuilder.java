@@ -129,14 +129,14 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
             if (release instanceof TvRelease tvRelease && StringUtils.isNotBlank(structure)) {
                 filename = structure;
                 // order is important!
-                filename = replace(filename, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.getName()));
-                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_LONG, tvRelease.getEpisodeNumbers(), true);
-                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_SHORT, tvRelease.getEpisodeNumbers(), false);
-                filename = replace(filename, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.getSeason(), true));
-                filename = replace(filename, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.getSeason(), false));
-                filename = replace(filename, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.getEpisodeNumbers().get(0), true));
-                filename = replace(filename, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.getEpisodeNumbers().get(0), false));
-                filename = replace(filename, SerieStructureTag.TITLE, tvRelease.getTitle());
+                filename = replace(filename, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
+                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers, true);
+                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers, false);
+                filename = replace(filename, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
+                filename = replace(filename, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
+                filename = replace(filename, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
+                filename = replace(filename, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
+                filename = replace(filename, SerieStructureTag.TITLE, tvRelease.title);
                 filename = replace(filename, SerieStructureTag.QUALITY, release.quality);
                 filename = replace(filename, SerieStructureTag.DESCRIPTION, release.description);
 

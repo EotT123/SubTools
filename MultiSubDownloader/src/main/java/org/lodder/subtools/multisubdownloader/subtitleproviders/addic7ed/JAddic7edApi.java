@@ -109,7 +109,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                             URLEncoder.encode(addic7edSerieMapping.getProviderName().replace(" ", "_"), UTF_8),
                             season,
                             episode,
-                            languageIds.size() == 1 ? languageIds.get(0).getId() : LanguageId.ALL.getId());
+                            languageIds.size() == 1 ? languageIds.first.getId() : LanguageId.ALL.getId());
 
                     Optional<Document> doc = getContent(url);
                     if (doc.isEmpty()) {
@@ -120,7 +120,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
                     Elements elTitle = doc.get().getElementsByClass("titulo");
                     if (elTitle.size() == 1) {
-                        Matcher matcher = TITLE_PATTERN.matcher(elTitle.get(0).html());
+                        Matcher matcher = TITLE_PATTERN.matcher(elTitle.first.html());
                         if (matcher.matches()) {
                             title = matcher.group(1);
                         }
@@ -141,7 +141,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                         Elements classesNewsTitle = block.getElementsByClass("NewsTitle");
                         Elements classesNewsDate = block.getElementsByClass("newsDate").select("td[colspan=3]");
                         if (classesNewsTitle.size() == 1 && classesNewsDate.size() == 1) {
-                            Matcher m = VERSION_PATTERN.matcher(classesNewsTitle.get(0).text().trim());
+                            Matcher m = VERSION_PATTERN.matcher(classesNewsTitle.first.text().trim());
                             if (!m.matches()) {
                                 break;
                             } else {
@@ -168,7 +168,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                                 Elements downloadElements = td.getElementsByClass("buttonDownload");
                                 if (lang != null && downloadElements.size() > 0) {
                                     if (downloadElements.size() == 1) {
-                                        download = DOMAIN + downloadElements.get(0).attr("href");
+                                        download = DOMAIN + downloadElements.first.attr("href");
                                     }
                                     if (downloadElements.size() == 2) {
                                         download = DOMAIN + downloadElements.get(1).attr("href");

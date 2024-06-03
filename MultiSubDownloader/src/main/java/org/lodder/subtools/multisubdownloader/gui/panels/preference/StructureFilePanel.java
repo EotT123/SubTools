@@ -200,7 +200,7 @@ public class StructureFilePanel extends JPanel {
                 return;
             }
 
-            Border border = componentList.size() > 1 ? ERROR_BORDER : getDefaultBorder(componentList.get(0));
+            Border border = componentList.size() > 1 ? ERROR_BORDER : getDefaultBorder(componentList.first);
             componentList.forEach(components -> components.cmbLanguage.setBorder(border));
         }
 

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class Release extends Video {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
-    @val Path path;
+    @val Path filePath;
     @val String quality;
     @val String description;
     @val String releaseGroup;
@@ -29,20 +29,20 @@ public abstract class Release extends Video {
         return matchingSubsSet.size();
     }
 
-    protected Release(VideoType videoFileType, Path path, String description, String releaseGroup, String quality) {
+    protected Release(VideoType videoFileType, Path filePath, String description, String releaseGroup, String quality) {
         super(videoFileType);
-        this.path = path;
+        this.filePath = filePath;
         this.description = description;
         this.releaseGroup = releaseGroup;
         this.quality = quality;
     }
 
     public String getFileName() {
-        return path != null ? path.getFileName().toString() : null;
+        return filePath != null ? filePath.getFileName().toString() : null;
     }
 
     public Path getPath() {
-        return path != null ? path.getParent() : null;
+        return filePath != null ? filePath.getParent() : null;
     }
 
     public String getExtension() {

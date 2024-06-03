@@ -91,13 +91,13 @@ public class JTVsubtitlesAdapter extends AbstractAdapter<TVsubtitlesSubtitleDesc
     @Override
     public Set<TVsubtitlesSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language) throws TvSubtitlesException {
         return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.getEpisodeNumbers().stream()
+                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
-                                return getApi().getSubtitles(providerSerieId, tvRelease.getSeason(), episode, language).stream();
+                                return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                             } catch (TvSubtitlesException e) {
                                 LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.getSeason(), episode),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }
@@ -115,7 +115,7 @@ public class JTVsubtitlesAdapter extends AbstractAdapter<TVsubtitlesSubtitleDesc
                         .language(language)
                         .quality(ReleaseParser.getQualityKeyword(sub.getFilename() + " " + sub.getRip()))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleasegroup(sub.getFilename(), StringUtils.endsWith(sub.getFilename(), ".srt")))
+                        .releaseGroup(ReleaseParser.extractReleaseGroup(sub.getFilename(), StringUtils.endsWith(sub.getFilename(), ".srt")))
                         .uploader(sub.getAuthor())
                         .hearingImpaired(false))
                 .collect(Collectors.toSet());
