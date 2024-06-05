@@ -3,7 +3,6 @@ package org.lodder.subtools.sublibrary.model;
 import java.nio.file.Path;
 import java.util.OptionalInt;
 
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.var;
@@ -12,8 +11,8 @@ public class MovieRelease extends Release {
 
     @var String name;
     @var Integer year;
-    @Getter @Setter private int imdbId;
-    @Getter @Setter private int tvdbId;
+    @Setter private int imdbId;
+    @Setter private int tvdbId;
 
     public interface MovieReleaseBuilderName {
         MovieReleaseBuilderOther name(String name);
