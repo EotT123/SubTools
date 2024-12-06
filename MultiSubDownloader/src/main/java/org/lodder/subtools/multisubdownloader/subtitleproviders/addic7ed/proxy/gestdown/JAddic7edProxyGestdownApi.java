@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import extensions.java.lang.String.StringExt;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.gestdown.api.SubtitlesApi;
 import org.gestdown.api.TvShowsApi;
 import org.gestdown.invoker.ApiException;
@@ -30,6 +32,7 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
 
     private final TvShowsApi tvShowsApi;
     private final SubtitlesApi subtitlesApi;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
 
     public JAddic7edProxyGestdownApi(Manager manager) {
         super(manager);
@@ -51,7 +54,7 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
             throws ApiException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.providerId,
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId,
                         season, episode, language))
                 .collectionSupplier(Subtitle.class, () -> {
                     Set<Subtitle> results = new HashSet<>();
@@ -84,10 +87,5 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
 
     public String getDownloadUrl(String subtitleId) {
         return DOMAIN + subtitleId;
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.ADDIC7ED;
     }
 }

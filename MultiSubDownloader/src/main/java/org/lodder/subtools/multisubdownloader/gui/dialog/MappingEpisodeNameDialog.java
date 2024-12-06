@@ -153,22 +153,20 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         @val Manager manager;
 
         void setMappingType(MappingType mappingType) {
-            setDataVector(null, new String[]{ mappingType.getNameColumn(), mappingType.getMappingColumn(),
-                    mappingType.getProviderNameColumn() });
-            Arrays.stream(mappingType.getSelectionForKeyPrefixList())
+            setDataVector(null, new String[]{ mappingType.nameColumn, mappingType.mappingColumn,
+                    mappingType.providerNameColumn });
+            Arrays.stream(mappingType.selectionForKeyPrefixList)
                     .flatMap(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
                             .stream()
                             .map(serieMappingPair -> {
                                 SerieMapping serieMapping = serieMappingPair.getValue();
-                                String name = serieMapping.name;
                                 String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
-                                String providerName = serieMapping.providerName;
                                 if (providerId.contains("/")) {
                                     providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
                                 }
                                 providerId = providerId.replace(".html", "");
-                                return new Row(serieMappingPair.getKey(), name, providerId, providerName, serieMapping,
-                                        selectionForKeyPrefix);
+                                return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
+                                        serieMapping.providerName, serieMapping, selectionForKeyPrefix);
                             }))
                     .sorted(Comparator.comparing(
                             row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :

@@ -83,7 +83,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                                 .execute()
                                 .stream();
                     } catch (ApiException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                                 TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                                 e.getMessage()), e);
                         return Stream.empty();

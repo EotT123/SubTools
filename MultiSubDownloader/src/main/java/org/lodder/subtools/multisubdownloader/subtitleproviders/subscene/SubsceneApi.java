@@ -18,6 +18,8 @@ import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.nodes.Document;
@@ -55,6 +57,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
     private boolean selectedIncludeHearingImpaired;
 
     private LocalDateTime lastRequest = LocalDateTime.now();
+    @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
 
     public SubsceneApi(Manager manager) {
         super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
@@ -98,7 +101,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
             Language language) throws SubsceneException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name, providerSerieId.providerId, season,
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name, providerSerieId.providerId, season,
                         episode, language))
                 .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
                     setLanguageWithCookie(language);
@@ -115,8 +118,8 @@ public class SubsceneApi extends Html implements SubtitleApi {
                                         .setUploader(row.select(".a5 > a").text().trim())
                                         .setComment(row.select(".a6 > div").text().trim()))
                                 .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
-                                                         subDescriptor.getSeasonEpisode().episodes.stream()
-                                                                 .anyMatch(ep -> ep == episode))
+                                        subDescriptor.getSeasonEpisode().episodes.stream()
+                                                .anyMatch(ep -> ep == episode))
                                 .toList();
                     } catch (Exception e) {
                         throw new SubsceneException(e);
@@ -169,11 +172,6 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     private void addCookie(String cookieName, String cookieValue) {
         manager.storeCookies("subscene.com", Map.of(cookieName, cookieValue));
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.SUBSCENE;
     }
 
     private static final Map<Language, Integer> SUBSCENE_LANGS =

@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,6 +30,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
     private static final String SERIE_URL_PREFIX = DOMAIN + "/";
+    @val @override SubtitleSource subtitleSource = SubtitleSource.TVSUBTITLES;
 
     public JTVSubtitlesApi(Manager manager) {
         super(manager);
@@ -59,7 +62,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
             throws TvSubtitlesException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s".formatted(getSubtitleSource().name(), episodeUrl, language))
+                .key("%s-subtitles-%s-%s".formatted(subtitleSource.name(), episodeUrl, language))
                 .collectionSupplier(TVsubtitlesSubtitleDescriptor.class, () -> {
                     Set<TVsubtitlesSubtitleDescriptor> lSubtitles = new HashSet<>();
                     try {
@@ -124,7 +127,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
     private Optional<String> getEpisodeUrl(String showUrl, int season, int episode) throws TvSubtitlesException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-episodeUrl-%s-%s-%s".formatted(getSubtitleSource().name(), showUrl, season, episode))
+                .key("%s-episodeUrl-%s-%s-%s".formatted(subtitleSource.name(), showUrl, season, episode))
                 .optionalSupplier(() -> {
                     try {
                         String formattedSeasonEpisode =
@@ -138,17 +141,12 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                                         .map(element -> formattedSeasonEpisode.equals(element.text()))
                                         .orElse(false))
                                 .map(element -> DOMAIN + "/" +
-                                                element.select("td").get(1).selectFirst("a").attr("href"))
+                                        element.select("td").get(1).selectFirst("a").attr("href"))
                                 .findAny();
                     } catch (Exception e) {
                         throw new TvSubtitlesException(e);
                     }
                 })
                 .getOptional();
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.TVSUBTITLES;
     }
 }

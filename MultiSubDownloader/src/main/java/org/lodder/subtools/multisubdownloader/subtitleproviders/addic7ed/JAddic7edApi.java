@@ -13,6 +13,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,6 +40,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: ([0-9]+).([0-9])+");
     private final boolean speedy;
     private LocalDateTime lastRequest = LocalDateTime.now();
+    @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
 
     public JAddic7edApi(boolean speedy, Manager manager) {
         super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
@@ -79,7 +82,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
             List<ProviderSerieId> providerSerieIdsFormatted = providerSerieIds.stream().filter(providerId -> {
                 String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
                 return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
-                       StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
+                        StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
             }).toList();
             return !providerSerieIdsFormatted.isEmpty() ? providerSerieIdsFormatted : providerSerieIds;
         } catch (Exception e) {
@@ -103,7 +106,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
             throws Addic7edException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(),
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(),
                         addic7edSerieMapping.providerId, season, episode,
                         language))
                 .collectionSupplier(Addic7edSubtitleDescriptor.class, () -> {
@@ -165,7 +168,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
                                 // incomplete not wanted
                                 if ((lang != null && td.toString().toLowerCase().contains("completed"))
-                                    && td.html().toLowerCase().contains("% completed")) {
+                                        && td.html().toLowerCase().contains("% completed")) {
                                     lang = null;
                                 }
 
@@ -203,8 +206,8 @@ public class JAddic7edApi extends Html implements SubtitleApi {
     public boolean isDuplicate(List<Addic7edSubtitleDescriptor> lSubtitles, Addic7edSubtitleDescriptor sub) {
         return lSubtitles.stream()
                 .anyMatch(s -> s.getLanguage() == sub.getLanguage()
-                               && StringUtils.equals(s.getUrl(), sub.getUrl())
-                               && StringUtils.equals(s.getVersion(), sub.getVersion()));
+                        && StringUtils.equals(s.getUrl(), sub.getUrl())
+                        && StringUtils.equals(s.getVersion(), sub.getVersion()));
     }
 
     private Optional<Document> getContent(String url) throws Addic7edException {
@@ -232,10 +235,5 @@ public class JAddic7edApi extends Html implements SubtitleApi {
         } catch (Exception e) {
             throw new Addic7edException(e);
         }
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.ADDIC7ED;
     }
 }

@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import lombok.RequiredArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
@@ -33,6 +35,7 @@ public class JPodnapisiApi implements SubtitleApi {
     private final Manager manager;
     private final String userAgent;
     private LocalDateTime nextCheck;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.PODNAPISI;
 
     public Optional<ProviderSerieId> getPodnapisiShowName(String showName) throws PodnapisiException {
         String url = DOMAIN + "/sl/ppodnapisi/search?sK=" + showName.trim().toLowerCase().urlEncode();
@@ -60,7 +63,7 @@ public class JPodnapisiApi implements SubtitleApi {
             throws PodnapisiException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.providerId,
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId,
                         season, episode, language))
                 .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
                     try {
@@ -99,8 +102,8 @@ public class JPodnapisiApi implements SubtitleApi {
         try {
             return manager.getPageContentBuilder().url(url).userAgent(userAgent).cacheType(CacheType.MEMORY).retries(1)
                     .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
-                                         httpClientException.getResponseCode() >= 500
-                                         && httpClientException.getResponseCode() < 600)
+                            httpClientException.getResponseCode() >= 500
+                            && httpClientException.getResponseCode() < 600)
                     .retryWait(5).getAsJsoupDocument();
         } catch (Exception e) {
             throw new PodnapisiException(e);
@@ -123,11 +126,6 @@ public class JPodnapisiApi implements SubtitleApi {
                 .imdb(getText.apply(elem.selectFirst("imdb")))
                 .omdb(getText.apply(elem.selectFirst("omdb")))
                 .build();
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.PODNAPISI;
     }
 
     private Language languageIdToLanguage(String languageId) {

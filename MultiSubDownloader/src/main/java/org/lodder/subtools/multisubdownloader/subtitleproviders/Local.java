@@ -42,16 +42,12 @@ public class Local implements SubtitleProvider {
     private final Settings settings;
     private final UserInteractionHandler userInteractionHandler;
     @val @override Manager manager;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.LOCAL;
 
     public Local(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
         this.settings = settings;
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.LOCAL;
     }
 
     private List<Path> getPossibleSubtitles(String filter) {
@@ -173,7 +169,7 @@ public class Local implements SubtitleProvider {
 
     @Override
     public String getProviderName() {
-        return getSubtitleSource().name();
+        return subtitleSource.name();
     }
 
     @Override

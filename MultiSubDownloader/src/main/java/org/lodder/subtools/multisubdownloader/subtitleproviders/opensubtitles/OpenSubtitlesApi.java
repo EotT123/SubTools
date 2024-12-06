@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
@@ -20,9 +21,10 @@ import org.opensubtitles.model.LoginRequest;
 
 public class OpenSubtitlesApi implements SubtitleApi {
 
-    private static final String APIKEY = "lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";
+    private static final String APIKEY = "3IlyaP0KNv6QmJ1gOBX8IXwzD1P9b8c0";//"lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";
     private static final ApiClient API_CLIENT;
     @val Manager manager;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.OPENSUBTITLES;
 
     static {
         API_CLIENT = new ApiClient();
@@ -71,7 +73,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         try {
             return manager.getPageContentBuilder()
                     .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                         + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
+                            + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
                     .userAgent("")
                     .cacheType(CacheType.MEMORY)
                     .retries(1)
@@ -87,10 +89,5 @@ public class OpenSubtitlesApi implements SubtitleApi {
         } catch (Exception e) {
             throw new OpenSubtitlesException(e);
         }
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.OPENSUBTITLES;
     }
 }

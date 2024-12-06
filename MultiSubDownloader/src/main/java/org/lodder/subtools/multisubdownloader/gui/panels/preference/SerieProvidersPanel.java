@@ -72,8 +72,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
             // OPENSUBTITLES
             this.chkSourceOpenSubtitles = new JCheckBox("OpenSubtitles");
-            this.chkUserOpenSubtitlesLogin =
-                    new JCheckBox(getText("PreferenceDialog.UseOpenSubtitlesLogin"));
+            this.chkUserOpenSubtitlesLogin = new JCheckBox(getText("PreferenceDialog.UseOpenSubtitlesLogin"));
             PanelCheckBox.checkbox(chkSourceOpenSubtitles).panelOnNewLine().addTo(titlePanel, "wrap")
                     .addComponent(PanelCheckBox.checkbox(chkUserOpenSubtitlesLogin).panelOnNewLine()
                             .panelLayout(new MigLayout("insets 0, novisualpadding")).build()
