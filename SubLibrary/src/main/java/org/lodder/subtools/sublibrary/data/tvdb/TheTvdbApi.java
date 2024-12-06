@@ -12,8 +12,6 @@ import com.uwetrottmann.thetvdb.entities.EpisodesResponse;
 import com.uwetrottmann.thetvdb.entities.Series;
 import com.uwetrottmann.thetvdb.entities.SeriesResponse;
 import com.uwetrottmann.thetvdb.entities.SeriesResultsResponse;
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TheTvdbException;
@@ -23,7 +21,6 @@ import retrofit2.Response;
 
 public class TheTvdbApi {
 
-    @Getter(value = AccessLevel.PRIVATE)
     private final Manager manager;
     private final TheTvdb theTvdb;
 
@@ -37,13 +34,18 @@ public class TheTvdbApi {
                 .memoryCache()
                 .key("TVDB-series-$serieName-$language")
                 .collectionSupplier(TheTvdbSerie.class, () -> {
-                    String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
+                    String encodedSerieName =
+                            URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
                     try {
                         Response<SeriesResultsResponse> response =
-                                theTvdb.search().series(encodedSerieName, null, null, null, language == null ? null : language.getLangCode())
+                                theTvdb.search()
+                                        .series(encodedSerieName, null, null, null,
+                                                language == null ? null : language.getLangCode())
                                         .execute();
                         if (response.isSuccessful()) {
-                            return response.body().data.stream().map(series -> seriesToTVDBSerie(series, language)).toList();
+                            return response.body().data.stream()
+                                    .map(series -> seriesToTVDBSerie(series, language))
+                                    .toList();
                         }
                         return List.of();
                     } catch (IOException e) {
@@ -67,20 +69,25 @@ public class TheTvdbApi {
         }
     }
 
-    public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode, Language language) throws TheTvdbException {
+    public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode, Language language)
+            throws TheTvdbException {
         return manager.valueBuilder()
                 .memoryCache()
                 .key("TVDB-episode-$tvdbId-$season-$episode-$language")
                 .optionalSupplier(() -> {
                     try {
                         Response<EpisodesResponse> response =
-                                theTvdb.series().episodesQuery(tvdbId, null, season, episode, null, null, null, null, null,
-                                        language == null ? null : language.getLangCode()).execute();
+                                theTvdb.series()
+                                        .episodesQuery(tvdbId, null, season, episode, null, null, null, null, null,
+                                                language == null ? null : language.getLangCode())
+                                        .execute();
                         if (response.isSuccessful()) {
                             if (response.body().data == null) {
                                 return Optional.empty();
                             }
-                            return response.body().data.stream().map(serie -> episodeToTVDBEpisode(serie, language)).findFirst();
+                            return response.body().data.stream()
+                                    .map(serie -> episodeToTVDBEpisode(serie, language))
+                                    .findFirst();
                         }
                         throw new TheTvdbException(response.errorBody().string());
                     } catch (IOException e) {

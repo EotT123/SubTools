@@ -5,17 +5,19 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 
 public interface UserInteractionHandler {
 
-    UserInteractionSettingsIntf getSettings();
+    @val UserInteractionSettingsIntf settings;
 
     boolean confirm(String message, String title);
 
     Optional<String> selectFromList(Collection<String> options, String message, String title);
 
-    <T> Optional<T> selectFromList(Collection<T> options, String message, String title, Function<T, String> toStringMapper);
+    <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
+            Function<T, String> toStringMapper);
 
     <T> Optional<T> choice(Collection<T> options, String message, String title);
 

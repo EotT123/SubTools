@@ -105,7 +105,7 @@ public class ImdbAdapter {
                     e.getMessage()), e);
             return OptionalInt.empty();
         }
-        if (!userInteractionHandler.getSettings().isOptionsConfirmProviderMapping && providerSerieIds.size() == 1) {
+        if (!userInteractionHandler.getSettings().optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
             // found single exact match
             return OptionalInt.of(Integer.parseInt(providerSerieIds.iterator().next().id));
         }

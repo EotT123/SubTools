@@ -3,11 +3,13 @@ package org.lodder.subtools.sublibrary.cache;
 import java.util.Optional;
 import java.util.function.Function;
 
+import manifold.ext.props.rt.api.val;
+
 public interface CacheObject<T> {
 
-    long getCreated();
-
-    T getValue();
+    @val long created;
+    @val T value;
+    @val long age;
 
     void updateLastAccessed();
 
@@ -20,12 +22,12 @@ public interface CacheObject<T> {
         if (cacheObject.isPresent()) {
             return cacheObject.get();
         }
-        Optional<TemporaryCacheObject<T>> temporaryCacheObject = TemporaryCacheObject.fromString(string, valueToObjectMapper);
+        Optional<TemporaryCacheObject<T>> temporaryCacheObject =
+                TemporaryCacheObject.fromString(string, valueToObjectMapper);
         if (temporaryCacheObject.isPresent()) {
             return temporaryCacheObject.get();
         }
         throw new IllegalStateException("Could not parse value: " + string);
     }
 
-    long getAge();
 }

@@ -8,6 +8,7 @@ public class SubtitlesProviderInitException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = -2959483164333075297L;
+    
     @val String providerName;
 
     public SubtitlesProviderInitException(String providerName, Throwable e) {

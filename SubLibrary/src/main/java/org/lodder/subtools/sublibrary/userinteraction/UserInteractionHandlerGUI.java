@@ -7,18 +7,18 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.gui.InputPane;
 import org.lodder.subtools.sublibrary.gui.OptionsPane;
 
-@Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserInteractionHandlerGUI implements UserInteractionHandler {
 
-    private final UserInteractionSettingsIntf settings;
-    private final JFrame frame;
+    @val @override UserInteractionSettingsIntf settings;
+    @val JFrame frame;
 
     @Override
     public Optional<String> selectFromList(Collection<String> options, String message, String title) {
@@ -26,11 +26,18 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> selectFromList(Collection<T> options, String message, String title, Function<T, String> toStringMapper) {
+    public <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
+            Function<T, String> toStringMapper) {
         if (options.isEmpty()) {
             return Optional.empty();
         }
-        return OptionsPane.options(options).toStringMapper(toStringMapper).title(title).message(message).defaultOption().parent(frame).prompt();
+        return OptionsPane.options(options)
+                .toStringMapper(toStringMapper)
+                .title(title)
+                .message(message)
+                .defaultOption()
+                .parent(frame)
+                .prompt();
     }
 
     @Override
@@ -39,10 +46,14 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> choice(Collection<T> options, String message, String title, Function<T, String> toStringMapper) {
-        String[] optionsAsStrings = options.stream().map(Objects.requireNonNullElseGet(toStringMapper, () -> String::valueOf)).toArray(String[]::new);
+    public <T> Optional<T> choice(Collection<T> options, String message, String title,
+            Function<T, String> toStringMapper) {
+        String[] optionsAsStrings = options.stream()
+                .map(Objects.requireNonNullElseGet(toStringMapper, () -> String::valueOf))
+                .toArray(String[]::new);
         int selection =
-                JOptionPane.showOptionDialog(frame, message, title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsAsStrings,
+                JOptionPane.showOptionDialog(frame, message, title, JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE, null, optionsAsStrings,
                         optionsAsStrings[0]);
         return selection == JOptionPane.CLOSED_OPTION ? Optional.empty() : options.stream().skip(selection).findFirst();
     }
@@ -55,7 +66,12 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
 
     @Override
     public Optional<String> enter(String title, String message, String errorMessage, Predicate<String> validator) {
-        return InputPane.create().title(title).message(message).errorMessage(errorMessage).validator(validator).prompt();
+        return InputPane.create()
+                .title(title)
+                .message(message)
+                .errorMessage(errorMessage)
+                .validator(validator)
+                .prompt();
     }
 
     public void message(String message, String title) {

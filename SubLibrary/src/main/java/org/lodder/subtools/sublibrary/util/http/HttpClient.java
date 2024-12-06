@@ -44,7 +44,7 @@ public class HttpClient {
         URLConnection conn = url.openConnection();
         cookieManager.setCookies(conn);
 
-        if (userAgent != null && userAgent.length() > 0) {
+        if (userAgent != null && !userAgent.isEmpty()) {
             conn.setRequestProperty("user-agent", userAgent);
         }
 
@@ -73,7 +73,8 @@ public class HttpClient {
                 conn.setRequestProperty("user-agent", userAgent);
             }
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("Content-Length", String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length));
+            conn.setRequestProperty("Content-Length",
+                    String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length));
             conn.setUseCaches(false);
             conn.setDoInput(true);
             conn.setDoOutput(true);
@@ -107,7 +108,8 @@ public class HttpClient {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
         boolean success = true;
 
-        try (InputStream in = url.getFile().endsWith(".gz") ? new GZIPInputStream(url.openStream()) : getInputStream(url)) {
+        try (InputStream in = url.getFile().endsWith(".gz") ? new GZIPInputStream(url.openStream()) :
+                getInputStream(url)) {
             byte[] data = in.readAllBytes();
             in.close();
 
@@ -122,7 +124,8 @@ public class HttpClient {
                     LOGGER.error("Download problem: Addic7ed Daily Download count exceeded!");
                     success = false;
                 } else {
-                    Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+                    Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+                            StandardOpenOption.WRITE);
                 }
             }
         } catch (Exception e) {
@@ -151,7 +154,8 @@ public class HttpClient {
                 } else {
                     String protocol = url.getProtocol();
                     String host = conn.getURL().getHost();
-                    url = new URI("%s://%s/%s".formatted(protocol, host, conn.getHeaderField("Location").trim().replace(" ", "%20"))).toURL();
+                    url = new URI("%s://%s/%s".formatted(protocol, host,
+                            conn.getHeaderField("Location").trim().replace(" ", "%20"))).toURL();
                 }
                 return getInputStream(url);
             }
@@ -163,14 +167,16 @@ public class HttpClient {
     }
 
     public static boolean isUrl(String str) {
-        Pattern urlPattern = Pattern.compile("((https?|ftp|gopher|telnet|file):((//)|(\\\\\\\\))+[\\\\w\\\\d:#@%/;$()~_?\\\\+-=\\\\\\\\\\\\.&]*)",
+        Pattern urlPattern = Pattern.compile(
+                "((https?|ftp|gopher|telnet|file):((//)|(\\\\\\\\))+[\\\\w\\\\d:#@%/;$()~_?\\\\+-=\\\\\\\\\\\\.&]*)",
                 Pattern.CASE_INSENSITIVE);
         Matcher matcher = urlPattern.matcher(str);
         return matcher.find();
     }
 
     public String downloadText(String url) throws IOException {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(new URI(url).toURL().openStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader in = new BufferedReader(
+                new InputStreamReader(new URI(url).toURL().openStream(), StandardCharsets.UTF_8))) {
             return in.lines().collect(Collectors.joining());
         } catch (URISyntaxException e) {
             throw new IOException(e.getMessage(), e);

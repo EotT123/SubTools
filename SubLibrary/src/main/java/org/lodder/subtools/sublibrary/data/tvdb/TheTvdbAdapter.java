@@ -10,8 +10,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -28,7 +26,6 @@ import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Getter(value = AccessLevel.PROTECTED)
 public class TheTvdbAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheTvdbAdapter.class);
@@ -75,7 +72,7 @@ public class TheTvdbAdapter {
         }
         if (serieIds.isEmpty()) {
             tvdbSerie = Optional.empty();
-        } else if (!userInteractionHandler.getSettings().isOptionsConfirmProviderMapping && serieIds.size() == 1) {
+        } else if (!userInteractionHandler.getSettings().optionsConfirmProviderMapping && serieIds.size() == 1) {
             tvdbSerie = Optional.of(serieIds.first);
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");

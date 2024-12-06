@@ -162,10 +162,10 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                             .stream()
                             .map(serieMappingPair -> {
                                 SerieMapping serieMapping = serieMappingPair.getValue();
-                                String name = serieMapping.getName();
+                                String name = serieMapping.name;
                                 String providerId =
-                                        serieMapping.getProviderId() == null ? "" : serieMapping.getProviderId();
-                                String providerName = serieMapping.getProviderName();
+                                        serieMapping.providerId == null ? "" : serieMapping.providerId;
+                                String providerName = serieMapping.providerName;
                                 if (providerId.contains("/")) {
                                     providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
                                 }
@@ -174,8 +174,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                         selectionForKeyPrefix);
                             }))
                     .sorted(Comparator.comparing(
-                            row -> row.serieMapping == null || row.serieMapping.getProviderName() == null ? "zzz" :
-                                    row.serieMapping.getName()))
+                            row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
+                                    row.serieMapping.name))
                     .forEach(this::addRow);
         }
 

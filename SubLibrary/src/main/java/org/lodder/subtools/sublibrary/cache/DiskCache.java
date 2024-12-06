@@ -27,7 +27,7 @@ import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public sealed abstract class DiskCache<K, V> extends Cache<K, V> permits SerializableDiskCache, TypedDiskCache {
+public abstract sealed class DiskCache<K, V> extends Cache<K, V> permits SerializableDiskCache, TypedDiskCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskCache.class);
     private static final Object LOCK = new Object();

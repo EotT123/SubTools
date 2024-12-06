@@ -18,14 +18,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.function.Function;
+import java.util.function.LongUnaryOperator;
 import java.util.function.Predicate;
 
 import com.pivovarit.function.ThrowingSupplier;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.Nothing;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -43,13 +45,12 @@ import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.xml.XMLHelper;
 import org.w3c.dom.Document;
 
-@Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class Manager {
 
-    private final HttpClient httpClient;
-    private final InMemoryCache inMemoryCache;
-    private final DiskCache diskCache;
+    @val HttpClient httpClient;
+    @val InMemoryCache inMemoryCache;
+    @val DiskCache diskCache;
 
     public boolean store(String downloadLink, Path file) throws ManagerException {
         try {
@@ -433,7 +434,7 @@ public class Manager {
             extends ValueBuilderGetValueIntf<T, X> {
         ValueBuilderGetValueIntf<T, X> timeToLive(long seconds);
 
-        ValueBuilderGetValueIntf<T, X> timeToLiveFunction(Function<Long, Long> timeToLiveFunction);
+        ValueBuilderGetValueIntf<T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
     }
 
     public interface ValueBuilderGetValueIntf<T, X extends Exception> extends ValueBuilderStoreIntf<X> {
@@ -449,7 +450,7 @@ public class Manager {
             extends ValueBuilderGetOptionalIntf<T, X> {
         ValueBuilderGetOptionalIntf<T, X> timeToLive(long seconds);
 
-        ValueBuilderGetOptionalIntf<T, X> timeToLiveFunction(Function<Long, Long> timeToLiveFunction);
+        ValueBuilderGetOptionalIntf<T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
     }
 
     public interface ValueBuilderGetOptionalIntf<T, X extends Exception> extends ValueBuilderStoreIntf<X> {
@@ -467,7 +468,7 @@ public class Manager {
             extends ValueBuilderGetOptionalIntIntf<X> {
         ValueBuilderGetOptionalIntIntf<X> timeToLive(long seconds);
 
-        ValueBuilderGetOptionalIntIntf<X> timeToLiveFunction(Function<Long, Long> timeToLiveFunction);
+        ValueBuilderGetOptionalIntIntf<X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
     }
 
     public interface ValueBuilderGetOptionalIntIntf<X extends Exception> extends ValueBuilderStoreIntf<X> {
@@ -483,7 +484,7 @@ public class Manager {
     // extends ValueBuilderGetCollectionIntf<C, T, X> {
     // ValueBuilderGetCollectionIntf<C, T, X> timeToLive(long seconds);
     //
-    // ValueBuilderGetCollectionIntf<C, T, X> timeToLiveFunction(Function<Long, Long> timeToLiveFunction);
+    // ValueBuilderGetCollectionIntf<C, T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
     // }
 
     public interface ValueBuilderGetCollectionIntf<C extends Collection<T>, T, X extends Exception>
@@ -530,11 +531,11 @@ public class Manager {
         private Predicate<String> keyFilter;
         @Setter(value = AccessLevel.NONE) private Long timeToLive;
         @Setter(value = AccessLevel.NONE) private boolean storeTempNullValue;
-        private Function<Long, Long> timeToLiveFunction;
+        private LongUnaryOperator timeToLiveFunction;
 
         //
         // @Override
-        // public ValueBuilder<C, T, X> timeToLiveFunction(Function<Long, Long> timeToLiveFunction) {
+        // public ValueBuilder<C, T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction) {
         // this.timeToLiveFunction = timeToLiveFunction;
         // return this;
         // }
@@ -932,7 +933,7 @@ public class Manager {
 
         private long calculateTtl() {
             return getTemporaryTimeToLive().mapToObj(
-                            v -> timeToLiveFunction != null ? timeToLiveFunction.apply(v) : v * 2)
+                            v -> timeToLiveFunction != null ? timeToLiveFunction.applyAsLong(v) : v * 2)
                     .orElseGet(() -> timeToLive != null ? timeToLive : MILLISECONDS.convert(1, DAYS));
         }
     }

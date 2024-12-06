@@ -2,24 +2,24 @@ package org.lodder.subtools.sublibrary.settings.model;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import io.gsonfire.annotations.PostDeserialize;
-import lombok.Getter;
 import lombok.ToString;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 
-@Getter
 @ToString
 public class SerieMapping implements Serializable { // implements SerieMappingIntf {
 
     @Serial
     private static final long serialVersionUID = 6551798252915028805L;
-    private static final Function<String, String> NAME_FORMATTER = name -> name.replaceAll("[^A-Za-z]", "");
-    private final String name;
-    private final String providerId;
-    private final String providerName;
-    private final int season;
-    private transient String formattedName;
+    private static final UnaryOperator<String> NAME_FORMATTER = n -> n.replaceAll("[^A-Za-z]", "");
+    @val String name;
+    @val String providerId;
+    @val String providerName;
+    @val int season;
+    @var transient String formattedName;
 
     public SerieMapping(String name, int providerId, String providerName) {
         this(name, providerId, providerName, 0);
@@ -39,11 +39,7 @@ public class SerieMapping implements Serializable { // implements SerieMappingIn
 
     @PostDeserialize
     public void postDeserializeLogic() {
-        formattedName = getName().replaceAll("[^A-Za-z]", "");
-    }
-
-    public static Function<String, String> getNameFormatter() {
-        return NAME_FORMATTER;
+        formattedName = name.replaceAll("[^A-Za-z]", "");
     }
 
     public static String formatName(String name) {
@@ -52,11 +48,11 @@ public class SerieMapping implements Serializable { // implements SerieMappingIn
 
     public boolean matches(String serieName) {
         String serieNameFormatted = formatName(serieName);
-        return getFormattedName().contains(serieNameFormatted)
-               || (serieNameFormatted.contains(getFormattedName()) && getFormattedName().length() > 3);
+        return formattedName.contains(serieNameFormatted)
+               || (serieNameFormatted.contains(formattedName) && formattedName.length() > 3);
     }
 
     public boolean exactMatch(String serieName) {
-        return getFormattedName().equalsIgnoreCase(formatName(serieName));
+        return formattedName.equalsIgnoreCase(formatName(serieName));
     }
 }

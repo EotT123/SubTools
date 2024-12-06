@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 @UtilityClass
@@ -20,27 +20,25 @@ public class VideoPatterns {
     public interface VideoPatternEnumIntf {
     }
 
-    @Getter
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     public enum Quality implements VideoPatternEnumIntf {
         Q1080P("1080p"),
         Q1080I("1080i"),
         Q720P("720p"),
         Q480P("480p");
 
-        private final String value;
+        @val String value;
 
         public static Stream<String> getValuesStream() {
             return Arrays.stream(Quality.values()).map(Quality::getValue);
         }
     }
 
-    @Getter
     public enum VideoEncoding implements VideoPatternEnumIntf {
         X264("x264", "h264"),
         X265("x265", "h265");
 
-        private final String[] values;
+        @val String[] values;
 
         VideoEncoding(String... values) {
             this.values = values;
@@ -51,11 +49,10 @@ public class VideoPatterns {
         }
     }
 
-    @Getter
     public enum AudioEncoding implements VideoPatternEnumIntf {
         DD5_1("dd5.1", "dd5-1");
 
-        private final String[] values;
+        @val String[] values;
 
         AudioEncoding(String... values) {
             this.values = values;
@@ -66,7 +63,6 @@ public class VideoPatterns {
         }
     }
 
-    @Getter
     public enum Source implements VideoPatternEnumIntf {
         HDTV(false, "hdtv"),
         DVDRIP(false, "dvdrip"),
@@ -87,11 +83,12 @@ public class VideoPatterns {
         static final Map<String, Source> VALUE_MAP = new HashMap<>();
 
         static {
-            Arrays.stream(Source.values()).forEach(source -> Arrays.stream(source.getValues()).forEach(value -> VALUE_MAP.put(value, source)));
+            Arrays.stream(Source.values())
+                    .forEach(source -> Arrays.stream(source.values).forEach(value -> VALUE_MAP.put(value, source)));
         }
 
-        final boolean manyDifferentSources;
-        final String[] values;
+        @val boolean manyDifferentSources;
+        @val String[] values;
 
         Source(boolean manyDifferentSources, String... values) {
             this.manyDifferentSources = manyDifferentSources;
@@ -107,7 +104,7 @@ public class VideoPatterns {
         }
 
         public boolean isTypeForValue(String value) {
-            return Arrays.stream(getValues()).map(String::toLowerCase).anyMatch(value::equals);
+            return Arrays.stream(values).map(String::toLowerCase).anyMatch(value::equals);
         }
 
         @Override
@@ -116,8 +113,7 @@ public class VideoPatterns {
         }
     }
 
-    @Getter
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     public enum VideoExtensions {
         MKV("mkv"),
         MP4("mp4"),
@@ -126,7 +122,7 @@ public class VideoPatterns {
         TS("ts"),
         M4V("m4v");
 
-        private final String value;
+        @val String value;
     }
 
     private static final Set<String> QUALITY_KEYWORDS_SET = Set.of("hdtv", "dvdrip", "bluray",
@@ -141,45 +137,64 @@ public class VideoPatterns {
     private static final String[] PATTERNS = {
             // example:
             // Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv
-            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<romanepisode>[I|V|X]+)[. ](?<year>19\\d{2}|20\\d{2})" +
+            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<romanepisode>[I|V|X]+)[. ]" +
+            "(?<year>19\\d{2}|20\\d{2})" +
             "(?<description>['\\w\\s:&()!.,_-]+)",
-            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<romanepisode>[I|V|X]+)[. ](?<year>19\\d{2}|20\\d{2})" +
+            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<romanepisode>[I|V|X]+)[. ]" +
+            "(?<year>19\\d{2}|20\\d{2})" +
             "(?<description>['\\w\\s:&()!.,_-]+)",
             // The.Hunger.Games.Mockingjay.Part.1..2014.720p.BluRay.x264-SPARKS.mkv
-            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<partnumber>[\\d]{1})[. ](?<year>19\\d{2}|20\\d{2})" +
+            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<partnumber>[\\d]{1})[. ]" +
+            "(?<year>19\\d{2}|20\\d{2})" +
             "(?<description>['\\w\\s:&()!.,_-]+)",
-            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<partnumber>[\\d]{1})[. ](?<year>19\\d{2}|20\\d{2})" +
+            "(?<moviename>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<partnumber>[\\d]{1})[. ]" +
+            "(?<year>19\\d{2}|20\\d{2})" +
             "(?<description>['\\w\\s:&()!.,_-]+)",
             // serie
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumberstart>[\\d]{1,2})" +
-            "(?<episodebetween>[XxEe][\\d]{1,2})*[XxEe](?<episodenumberend>[\\d]{1,2})(?<description>['\\w\\s:&()!.,_-]+)",
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumber>[\\d]{1,3})(?<description>['\\w\\s:&()" +
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}" +
+            "(?<episodenumberstart>[\\d]{1,2})" +
+            "(?<episodebetween>[XxEe][\\d]{1,2})*[XxEe](?<episodenumberend>[\\d]{1,2})(?<description>['\\w\\s:&()!.," +
+            "_-]+)",
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumber>[\\d]{1," +
+            "3})(?<description>['\\w\\s:&()" +
             "!.,_-]+)",
             // sXeX - Serienaam - Titel ex: S04E02 - White Collar - Most Wanted.mkv
-            "[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumberstart>[\\d]{1,2})(?<episodebetween>[XxEe][\\d]{1,2})*[XxEe]" +
-            "(?<episodenumberend>[\\d]{1,2})\\s?+-?\\s?+(?<seriesname>['\\w\\s:&()!.,_]+)\\s?+-?\\s?+(?<description>['\\w\\s:&()!.,_]+)",
-            "[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumber>[\\d]{1,2})\\s?+-?\\s?+(?<seriesname>['\\w\\s:&()!.,_]+)\\s?+-?\\s?+" +
+            "[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumberstart>[\\d]{1,2})" +
+            "(?<episodebetween>[XxEe][\\d]{1,2})*[XxEe]" +
+            "(?<episodenumberend>[\\d]{1,2})\\s?+-?\\s?+(?<seriesname>['\\w\\s:&()!.,_]+)\\s?+-?\\s?+" +
+            "(?<description>['\\w\\s:&()!.,_]+)",
+            "[Ss. _](?<seasonnumber>[\\d]{1,2})[XxEe]{1,2}(?<episodenumber>[\\d]{1,2})\\s?+-?\\s?+" +
+            "(?<seriesname>['\\w\\s:&()!.,_]+)\\s?+-?\\s?+" +
             "(?<description>['\\w\\s:&()!.,_]+)",
             // example: hawaii.five-0.2010.410.hdtv-lol.mp4
             // example:
             // Spartacus.Gods.of.The.Arena.Pt.I.720p.HDTV.X264-DIMENSION.mkv
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<romanepisode>[I|V|X]+)(?<description>['\\w\\s:&()!.,_-]+)",
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<romanepisode>[I|V|X]+)(?<description>['\\w\\s:&()!.,_-]+)",
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<episodenumber>[\\d]{1,2})(?<description>['\\w\\s:&()!.,_-]+)",
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<episodenumber>[\\d]{1,2})(?<description>['\\w\\s:&()!.,_-]+)",
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<romanepisode>[I|V|X]+)" +
+            "(?<description>['\\w\\s:&()!.,_-]+)",
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<romanepisode>[I|V|X]+)" +
+            "(?<description>['\\w\\s:&()!.,_-]+)",
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)(?<episodenumber>[\\d]{1,2})" +
+            "(?<description>['\\w\\s:&()!.,_-]+)",
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)(?<part>Pt|Part|pt|part|Ep)[.](?<episodenumber>[\\d]{1,2})" +
+            "(?<description>['\\w\\s:&()!.,_-]+)",
             // example hawaii.five-0.2010.410.hdtv-lol.mp4
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)[. ](?<year>19\\d{2}|20\\d{2})[. ](?<season_episode>[\\d]{3,4})[. ](?<description>['\\w\\s:&()!.," +
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)[. ](?<year>19\\d{2}|20\\d{2})[. ](?<season_episode>[\\d]{3,4})[. ]" +
+            "(?<description>['\\w\\s:&()!.," +
             "_-]+)",
             // format movietitle.year
-            "(?<moviename>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}(?<year>19\\d{2}|20\\d{2})(?<description>['\\w\\s:&()!.,_-]+)",
+            "(?<moviename>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}(?<year>19\\d{2}|20\\d{2})(?<description>['\\w\\s:&()" +
+            "!.,_-]+)",
             // format episode.0101.title
             // format episode.101.title
             // exclude format movietitle.720p
-            "(?<seriesname>['\\w\\s:&()!.,_-]+)[. ](?<season_episode>[\\d]{3,4})[. ](?<description>['\\w\\s:&()!.,_-]+)",
+            "(?<seriesname>['\\w\\s:&()!.,_-]+)[. ](?<season_episode>[\\d]{3,4})[. ](?<description>['\\w\\s:&()!.," +
+            "_-]+)",
             // format (2-11) Joey and the High School Friend
-            "[(](?<seasonnumber>[\\d]{1,2})[-](?<episodenumber>[\\d]{1,2})[) ](?<seriesname>['\\w\\s:&()!.,_-]+)[ ]and(?<description>['\\w\\s:&()!" +
+            "[(](?<seasonnumber>[\\d]{1,2})[-](?<episodenumber>[\\d]{1,2})[) ](?<seriesname>['\\w\\s:&()!.,_-]+)[ " +
+            "]and(?<description>['\\w\\s:&()!" +
             ".,_-]+)",
-            "[(](?<seasonnumber>[\\d]{1,2})[-](?<episodenumber>[\\d]{1,2})[) ](?<seriesname>['\\w\\s:&()!.,_-]+)[ ]And(?<description>['\\w\\s:&()!" +
+            "[(](?<seasonnumber>[\\d]{1,2})[-](?<episodenumber>[\\d]{1,2})[) ](?<seriesname>['\\w\\s:&()!.,_-]+)[ " +
+            "]And(?<description>['\\w\\s:&()!" +
             ".,_-]+)",
             // take the rest and treat as movie
             "(?<moviename>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}[720P|1080P](?<description>['\\w\\s:&()!.,_-]+)"
@@ -191,11 +206,14 @@ public class VideoPatterns {
 
     public static final List<String> QUALITY_KEYWORDS = List.of();
     // Stream.concat(QUALITY_KEYWORDS_SET.stream(),
-    // new Generex(QUALITY_KEYWORDS_REGEX_SET.stream().collect(Collectors.joining("|"))).getAllMatchedStrings().stream()).toList();
+    // new Generex(QUALITY_KEYWORDS_REGEX_SET.stream().collect(Collectors.joining("|"))).getAllMatchedStrings()
+    // .stream()).toList();
 
     private static final String QUALITY_KEYWORDS_REGEX =
-            Stream.concat(QUALITY_KEYWORDS_SET.stream(), QUALITY_KEYWORDS_REGEX_SET.stream()).collect(Collectors.joining("|", "(", ")"));
+            Stream.concat(QUALITY_KEYWORDS_SET.stream(), QUALITY_KEYWORDS_REGEX_SET.stream())
+                    .collect(Collectors.joining("|", "(", ")"));
 
-    public static final Pattern QUALITY_KEYWORDS_REGEX_PATTERN = Pattern.compile(QUALITY_KEYWORDS_REGEX, Pattern.CASE_INSENSITIVE);
+    public static final Pattern QUALITY_KEYWORDS_REGEX_PATTERN =
+            Pattern.compile(QUALITY_KEYWORDS_REGEX, Pattern.CASE_INSENSITIVE);
 
 }

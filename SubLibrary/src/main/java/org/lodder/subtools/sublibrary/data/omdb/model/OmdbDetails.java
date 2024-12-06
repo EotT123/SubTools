@@ -11,6 +11,7 @@ import org.lodder.subtools.sublibrary.data.ReleaseDBIntf;
 public class OmdbDetails implements ReleaseDBIntf, Serializable {
     @Serial
     private static final long serialVersionUID = 7701770682134890544L;
+    
     @val String title;
     @val int year;
 
