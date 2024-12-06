@@ -30,7 +30,7 @@ public interface SubtitleProvider {
      * @return The name of the SubtitleProvider
      */
     default String getName() {
-        return getSubtitleSource().getName();
+        return getSubtitleSource().name;
     }
 
     /**
@@ -55,9 +55,9 @@ public interface SubtitleProvider {
     }
 
     default void clearCache() {
-        getManager().clearExpiredCacheBuilder()
+        manager.clearExpiredCacheBuilder()
                 .cacheType(CacheType.DISK)
-                .keyFilter((String k) -> k.startsWith(getProviderName() + "-"))
+                .keyFilter((String k) -> k.startsWith(providerName + "-"))
                 .clear();
     }
 

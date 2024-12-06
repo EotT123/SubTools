@@ -14,6 +14,6 @@ public class SubsceneException extends SubtitlesProviderException {
 
     @Override
     public String getSubtitleProvider() {
-        return SubtitleSource.SUBSCENE.getName();
+        return SubtitleSource.SUBSCENE.name;
     }
 }

@@ -14,6 +14,6 @@ public class TvSubtitlesException extends SubtitlesProviderException {
 
     @Override
     public String getSubtitleProvider() {
-        return SubtitleSource.TVSUBTITLES.getName();
+        return SubtitleSource.TVSUBTITLES.name;
     }
 }

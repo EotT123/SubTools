@@ -47,16 +47,21 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
                 .map(showDto -> new ProviderSerieId(showDto.getName(), showDto.getId().toString())).toList();
     }
 
-    public Set<Subtitle> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language) throws ApiException {
+    public Set<Subtitle> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language)
+            throws ApiException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.getProviderId(), season, episode, language))
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.providerId,
+                        season, episode, language))
                 .collectionSupplier(Subtitle.class, () -> {
                     Set<Subtitle> results = new HashSet<>();
-                    SubtitleSearchResponse response = subtitlesApi.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.getName(),
-                            UUID.fromString(providerSerieId.getProviderId()), season, episode);
-                    response.getMatchingSubtitles().stream()
-                            .filter(SubtitleDto::isCompleted).map(sub -> mapToSubtitle(sub, response.getEpisode(), language))
+                    SubtitleSearchResponse response =
+                            subtitlesApi.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.getName(),
+                                    UUID.fromString(providerSerieId.providerId), season, episode);
+                    response.getMatchingSubtitles()
+                            .stream()
+                            .filter(SubtitleDto::isCompleted)
+                            .map(sub -> mapToSubtitle(sub, response.getEpisode(), language))
                             .forEach(results::add);
                     return results;
                 }).getCollection();
@@ -66,7 +71,9 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
         return Subtitle.downloadSource(getDownloadUrl(sub.getDownloadUri()))
                 .subtitleSource(getSubtitleSource())
                 .fileName(StringExt
-                        .removeIllegalFilenameChars("%s - %s - %s".formatted(episodedto.getShow(), episodedto.getTitle(), sub.getVersion())))
+                        .removeIllegalFilenameChars(
+                                "%s - %s - %s".formatted(episodedto.getShow(), episodedto.getTitle(),
+                                        sub.getVersion())))
                 .language(language)
                 .quality(ReleaseParser.getQualityKeyword(episodedto.getTitle() + " " + sub.getVersion()))
                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)

@@ -14,6 +14,6 @@ public class OpenSubtitlesException extends SubtitlesProviderException {
 
     @Override
     public String getSubtitleProvider() {
-        return SubtitleSource.OPENSUBTITLES.getName();
+        return SubtitleSource.OPENSUBTITLES.name;
     }
 }

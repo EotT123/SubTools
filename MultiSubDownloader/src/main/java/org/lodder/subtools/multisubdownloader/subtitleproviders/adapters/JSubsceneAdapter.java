@@ -93,23 +93,17 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
     @Override
     public Set<SubsceneSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
             throws SubsceneException {
-        return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
-                        .flatMap(episode -> {
-                            try {
-                                return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language)
-                                        .stream();
-                            } catch (SubsceneException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(
-                                        getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season,
-                                                episode),
-                                        e.getMessage()), e);
-                                return Stream.empty();
-                            }
-                        })
-                        .collect(Collectors.toSet()))
-                .orElseGet(Set::of);
+        return getProviderSerieId(tvRelease).map(
+                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                    try {
+                        return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
+                    } catch (SubsceneException e) {
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                                e.getMessage()), e);
+                        return Stream.empty();
+                    }
+                }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
@@ -122,11 +116,13 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
             default -> 4;
         };
         Pattern yearPattern = Pattern.compile("(\\d\\d\\d\\d)");
-        return getApi().getSubSceneSerieNames(serieName).entrySet().stream()
+        return getApi().getSubSceneSerieNames(serieName)
+                .entrySet()
+                .stream()
                 .sorted(Comparator.comparingInt(entry -> providerTypeFunction.applyAsInt(entry.getKey())))
-                .map(Entry::getValue).flatMap(List::stream)
-                .sorted(Comparator
-                        .comparing((SubSceneSerieId serieId) -> serieId.getSeason() == 0)
+                .map(Entry::getValue)
+                .flatMap(List::stream)
+                .sorted(Comparator.comparing((SubSceneSerieId serieId) -> serieId.getSeason() == 0)
                         .thenComparing(serieId -> {
                             Matcher matcher = yearPattern.matcher(serieId.name);
                             return matcher.find() ? Integer.parseInt(matcher.group()) : 0;

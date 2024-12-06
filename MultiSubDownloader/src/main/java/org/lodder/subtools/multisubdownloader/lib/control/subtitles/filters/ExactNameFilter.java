@@ -18,7 +18,7 @@ public final class ExactNameFilter extends SubtitleFilter {
 
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {
-        Pattern p = patterns.computeIfAbsent(getReleaseName(release), k ->
+        Pattern p = patterns.computeIfAbsent(getReleaseName(release), _ ->
                 Pattern.compile(getReleaseName(release).replace(" ", "[. ]"), Pattern.CASE_INSENSITIVE));
         if (p.matcher(subtitle.fileName.toLowerCase().replace(".srt", "")).matches()) {
             LOGGER.debug("getSubtitlesFiltered: found EXACT match [{}] ", subtitle.fileName);

@@ -107,22 +107,19 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
     }
 
     public void loadPreferenceSettings() {
-        txtLibraryFolder.setObject(librarySettings.getLibraryFolder());
-        txtFolderStructure.setText(librarySettings.getLibraryFolderStructure());
-        chkRemoveEmptyFolder.setSelected(librarySettings.isLibraryRemoveEmptyFolders());
-        chkReplaceSpace.setSelected(librarySettings.isLibraryFolderReplaceSpace());
-        cbxReplaceSpaceChar.setSelectedItem(librarySettings.getLibraryFolderReplacingSpaceChar());
+        txtLibraryFolder.setObject(librarySettings.libraryFolder);
+        txtFolderStructure.setText(librarySettings.libraryFolderStructure);
+        chkRemoveEmptyFolder.setSelected(librarySettings.libraryRemoveEmptyFolders);
+        chkReplaceSpace.setSelected(librarySettings.libraryFolderReplaceSpace);
+        cbxReplaceSpaceChar.setSelectedItem(librarySettings.libraryFolderReplacingSpaceChar;
     }
 
     public void savePreferenceSettings() {
-        librarySettings
-                .setLibraryFolder(txtLibraryFolder.getObject())
-                .setLibraryFolderStructure(txtFolderStructure.getText())
-                .setLibraryRemoveEmptyFolders(chkRemoveEmptyFolder.isSelected())
-                .setLibraryFolderReplaceSpace(chkReplaceSpace.isSelected())
-                // if (pnlStructureFolder.isReplaceSpaceSelected()) {
-                .setLibraryFolderReplacingSpaceChar(cbxReplaceSpaceChar.getSelectedItem());
-        // }
+        librarySettings.libraryFolder = txtLibraryFolder.getObject();
+        librarySettings.libraryFolderStructure = txtFolderStructure.getText();
+        librarySettings.libraryRemoveEmptyFolders = chkRemoveEmptyFolder.isSelected();
+        librarySettings.libraryFolderReplaceSpace = chkReplaceSpace.isSelected();
+        librarySettings.libraryFolderReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedItem();
     }
 
     @Override

@@ -54,11 +54,11 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
         }
 
         public @Self ExecuteCall<T, X> handleException(Function<X, T> exceptionFunction) {
-            return handleException(e -> true, exceptionFunction);
+            return handleException(_ -> true, exceptionFunction);
         }
 
         public @Self ExecuteCall<T, X> handleException(Supplier<T> supplier) {
-            return handleException(e -> true, e -> supplier.get());
+            return handleException(_ -> true, _ -> supplier.get());
         }
 
         public @Self ExecuteCall<T, X> retries(int retries) {

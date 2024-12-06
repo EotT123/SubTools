@@ -60,12 +60,12 @@ public class JPodnapisiApi implements SubtitleApi {
             throws PodnapisiException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.getProviderId(),
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.providerId,
                         season, episode, language))
                 .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
                     try {
                         StringBuilder url = new StringBuilder(DOMAIN + "/sl/ppodnapisi/search?sK=")
-                                .append(URLEncoder.encode(providerSerieId.getProviderId().trim().toLowerCase(),
+                                .append(URLEncoder.encode(providerSerieId.providerId.trim().toLowerCase(),
                                         StandardCharsets.UTF_8));
                         if (PODNAPISI_LANGS.containsKey(language)) {
                             url.append("&sJ=").append(PODNAPISI_LANGS.get(language));

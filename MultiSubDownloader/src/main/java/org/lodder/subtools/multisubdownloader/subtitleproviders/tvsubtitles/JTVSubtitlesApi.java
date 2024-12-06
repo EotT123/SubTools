@@ -51,7 +51,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     public Set<TVsubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
             Language language) throws TvSubtitlesException {
-        return getEpisodeUrl(SERIE_URL_PREFIX + providerSerieId.getProviderId(), season, episode).mapThrowing(
+        return getEpisodeUrl(SERIE_URL_PREFIX + providerSerieId.providerId, season, episode).mapThrowing(
                 (String episodeUrl) -> getSubtitles(episodeUrl, language)).orElseGet(Set::of);
     }
 
@@ -64,7 +64,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                     Set<TVsubtitlesSubtitleDescriptor> lSubtitles = new HashSet<>();
                     try {
                         Document searchEpisodeDoc =
-                                this.getHtml(episodeUrl.replace(".html", "-" + language.getLangCode() + ".html"))
+                                this.getHtml(episodeUrl.replace(".html", "-" + language.langCode + ".html"))
                                         .cacheType(CacheType.NONE)
                                         .getAsJsoupDocument();
                         Elements searchEpisodes = searchEpisodeDoc.select(".left_articles > a");

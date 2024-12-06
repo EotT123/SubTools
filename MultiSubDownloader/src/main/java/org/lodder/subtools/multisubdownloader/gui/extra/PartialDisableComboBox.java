@@ -26,7 +26,8 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
             private static final long serialVersionUID = -2774241371293899669L;
 
             @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 boolean disabled = index >= 0 && index < itemsState.size() && !itemsState.get(index);
                 c.setEnabled(!disabled);
@@ -100,5 +101,9 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
             throw new IllegalArgumentException("Item Index out of Bounds!");
         }
         return index;
+    }
+
+    public T getSelectedItem() {
+        return (T) super.getSelectedItem();
     }
 }

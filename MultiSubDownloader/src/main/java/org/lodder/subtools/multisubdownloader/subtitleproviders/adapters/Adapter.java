@@ -42,7 +42,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     Logger LOGGER = LoggerFactory.getLogger(Adapter.class);
 
     default UserInteractionSettingsIntf getUserInteractionSettings() {
-        return getUserInteractionHandler().getSettings();
+        return getUserInteractionHandler().settings;
     }
 
     UserInteractionHandler getUserInteractionHandler();
@@ -59,7 +59,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                     LOGGER.error("Error calculating file hash", e);
                 } catch (Exception e) {
                     LOGGER.error("API %s searchSubtitles using file hash for movie [%s] (%s)".formatted(
-                            getSubtitleSource().getName(), movieRelease.name, e.getMessage()), e);
+                            getSubtitleSource().name, movieRelease.name, e.getMessage()), e);
                 }
             }
         }
@@ -68,15 +68,16 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 subtitles.addAll(searchMovieSubtitlesWithId(imdbId, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(
-                        getSubtitleSource().getName(), imdbId, movieRelease.name, e.getMessage()), e);
+                        getSubtitleSource().name, imdbId, movieRelease.name, e.getMessage()), e);
             }
         });
         if (subtitles.isEmpty()) {
             try {
                 subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
             } catch (Exception e) {
-                LOGGER.error("API %s searchSubtitles using title for movie [%s] (%s)".formatted(
-                        getSubtitleSource().getName(), movieRelease.name, e.getMessage()), e);
+                LOGGER.error(
+                        "API %s searchSubtitles using title for movie [%s] (%s)".formatted(getSubtitleSource().name,
+                                movieRelease.name, e.getMessage()), e);
             }
         }
         return convertToSubtitles(movieRelease, subtitles, language);
@@ -96,7 +97,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             return convertToSubtitles(tvRelease, searchSerieSubtitles(tvRelease, language), language);
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
-            LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
+            LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
                             TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisodeNumber),
                             e.getMessage()),
                     e);
@@ -139,8 +140,9 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
             int season, OptionalInt tvdbIdOptional) throws X {
         Supplier<ValueBuilderIsPresentIntf<Serializable>> tvdbIdValueBuilder = () -> tvdbIdOptional.mapToObj(
-                tvdbId -> getManager().valueBuilder().cacheType(CacheType.DISK)
-                        .key("%s-serieName-tvdbId:%s-%s".formatted(getProviderName(), tvdbId,
+                tvdbId -> manager.valueBuilder()
+                        .cacheType(CacheType.DISK)
+                        .key("%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId,
                                 useSeasonForSerieId() ? season : -1))).orElseThrow();
         if (tvdbIdOptional.isPresent() && tvdbIdValueBuilder.get().isPresent()) {
             // if value using the tvdbId is present, return it
@@ -150,9 +152,9 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             return Optional.empty();
         }
         int seasonToUse = useSeasonForSerieId() ? season : 0;
-        ValueBuilderIsPresentIntf<Serializable> serieNameValueBuilder = getManager().valueBuilder()
+        ValueBuilderIsPresentIntf<Serializable> serieNameValueBuilder = manager.valueBuilder()
                 .cacheType(CacheType.DISK)
-                .key("%s-serieName-name:%s-%s".formatted(getProviderName(), serieName.toLowerCase(), seasonToUse));
+                .key("%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
 
         if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameValueBuilder.isPresent()) {
             if (serieNameValueBuilder.isTemporaryObject()) {
@@ -173,23 +175,23 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             // if no provider serie id's could be found, store a temporary null value with expiration time of 1 day
             // (so the provider isn't contacted every time this method is being called)
             // If a temporary expired value was already found, persist the null value with a doubled expiration time
-            serieNameValueBuilder
-                    .value(new SerieMapping(serieName, null, null, seasonToUse))
+            serieNameValueBuilder.value(new SerieMapping(serieName, null, null, seasonToUse))
                     .storeTempNullValue()
-                    .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
+                    .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
+                            .map(v -> v * 2)
                             .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
                     .storeAsTempValue();
             return Optional.empty();
         }
 
         SerieMapping serieMapping;
-        if (!getUserInteractionSettings().isOptionsConfirmProviderMapping && providerSerieIds.size() == 1) {
+        if (!getUserInteractionSettings().optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
             serieMapping =
                     new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
         } else {
-            ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = getManager().valueBuilder()
+            ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = manager.valueBuilder()
                     .cacheType(CacheType.MEMORY)
-                    .key("%s-serieName-prev-results:%s-%s".formatted(getProviderName(), displayName.toLowerCase(),
+                    .key("%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(),
                             seasonToUse));
 
             boolean previousResultsPresent = previousResultsValueBuilder.isPresent();
@@ -205,7 +207,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                                 Messages.getString("SelectDialog.SelectSerieNameForNameWithSeason")
                                         .formatted(displayName, seasonToUse) :
                                 Messages.getString("SelectDialog.SelectSerieNameForName").formatted(displayName),
-                        getProviderName(), this::providerSerieIdToDisplayString);
+                        providerName, this::providerSerieIdToDisplayString);
             }
             if (uriForSerie.isEmpty()) {
                 if (serieNameToSearchFor.equals(serieName)) {
@@ -213,7 +215,8 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                     // or the doubled previously temporary value (if present)
                     serieNameValueBuilder.value(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse))
                             .storeTempNullValue()
-                            .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
+                            .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
+                                    .map(v -> v * 2)
                                     .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
                             .storeAsTempValue();
                     previousResultsValueBuilder.collectionValue(providerSerieIds).store();

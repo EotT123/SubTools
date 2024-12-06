@@ -168,20 +168,18 @@ public class StructureFilePanel extends JPanel {
     }
 
     public void loadPreferenceSettings() {
-        txtFileStructure.setText(librarySettings.getLibraryFilenameStructure());
-        chkReplaceSpace.setSelected(librarySettings.isLibraryFilenameReplaceSpace());
-        cbxReplaceSpaceChar.setSelectedItem(librarySettings.getLibraryFilenameReplacingSpaceChar());
-        chkIncludeLanguageCode.setSelected(librarySettings.isLibraryIncludeLanguageCode());
-        librarySettings.getLangCodeMap().forEach(this::addLanguage);
+        txtFileStructure.setText(librarySettings.libraryFilenameStructure);
+        chkReplaceSpace.setSelected(librarySettings.libraryFilenameReplaceSpace);
+        cbxReplaceSpaceChar.setSelectedItem(librarySettings.libraryFilenameReplacingSpaceChar);
+        chkIncludeLanguageCode.setSelected(librarySettings.libraryIncludeLanguageCode);
+        librarySettings.langCodeMap.forEach(this::addLanguage);
     }
 
     public void savePreferenceSettings() {
-        librarySettings
-                .setLibraryFilenameStructure(txtFileStructure.getText())
-                .setLibraryFilenameReplaceSpace(chkReplaceSpace.isSelected())
-                .setLibraryFilenameReplacingSpaceChar(cbxReplaceSpaceChar.getSelectedItem())
-                .setLibraryIncludeLanguageCode(chkIncludeLanguageCode.isSelected())
-                .setLangCodeMap(languageMapping.toSettingsMap());
+        librarySettings.libraryFilenameStructure = txtFileStructure.getText();
+        librarySettings.libraryFilenameReplaceSpace = chkReplaceSpace.isSelected();
+        librarySettings.libraryFilenameReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedItem();
+        librarySettings.langCodeMap = languageMapping.toSettingsMap();
     }
 
     private static class LanguageMapping {

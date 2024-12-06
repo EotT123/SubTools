@@ -14,6 +14,6 @@ public class Addic7edException extends SubtitlesProviderException {
 
     @Override
     public String getSubtitleProvider() {
-        return SubtitleSource.ADDIC7ED.getName();
+        return SubtitleSource.ADDIC7ED.name;
     }
 }

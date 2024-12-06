@@ -85,23 +85,18 @@ public class JPodnapisiAdapter
     @Override
     public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
             throws PodnapisiException {
-        return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
-                        .flatMap(episode -> {
-                            try {
-                                return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language)
-                                        .stream();
-                            } catch (PodnapisiException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(
-                                        getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season,
-                                                episode),
-                                        e.getMessage()), e);
-                                return Stream.empty();
-                            }
-                        })
-                        .collect(Collectors.toSet()))
-                .orElseGet(Set::of);
+        return getProviderSerieId(tvRelease).map(
+                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                    try {
+                        return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language)
+                                .stream();
+                    } catch (PodnapisiException e) {
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                                e.getMessage()), e);
+                        return Stream.empty();
+                    }
+                }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
@@ -112,17 +107,17 @@ public class JPodnapisiAdapter
 
     private Set<Subtitle> buildListSubtitles(Language language, Collection<PodnapisiSubtitleDescriptor> lSubtitles) {
         return lSubtitles.stream()
-                .filter(ossd -> StringUtils.isNotBlank(ossd.getReleaseString()))
-                .map(ossd -> Subtitle.downloadSource(ossd.getUrl())
+                .filter(ossd -> StringUtils.isNotBlank(ossd.releaseString))
+                .map(ossd -> Subtitle.downloadSource(ossd.url)
                         .subtitleSource(getSubtitleSource())
-                        .fileName(ossd.getReleaseString())
+                        .fileName(ossd.releaseString)
                         .language(language)
-                        .quality(ReleaseParser.getQualityKeyword(ossd.getReleaseString()))
+                        .quality(ReleaseParser.getQualityKeyword(ossd.releaseString))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleaseGroup(ossd.getReleaseString(),
-                                StringUtils.endsWith(ossd.getReleaseString(), ".srt")))
-                        .uploader(ossd.getUploaderName())
-                        .hearingImpaired(ossd.isHearingImpaired()))
+                        .releaseGroup(ReleaseParser.extractReleaseGroup(ossd.releaseString,
+                                StringUtils.endsWith(ossd.releaseString, ".srt")))
+                        .uploader(ossd.uploaderName)
+                        .hearingImpaired(ossd.hearingImpaired))
                 .collect(Collectors.toSet());
     }
 

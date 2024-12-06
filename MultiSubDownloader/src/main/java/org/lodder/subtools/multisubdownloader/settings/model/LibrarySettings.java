@@ -5,34 +5,29 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.var;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.sublibrary.Language;
 
-@Getter
-@Setter
-@Accessors(chain = true)
 public class LibrarySettings {
 
-    private String libraryFilenameStructure = "";
-    private String libraryFolderStructure = "";
-    private Path libraryFolder;
-    private boolean libraryFilenameReplaceSpace;
-    private boolean libraryFolderReplaceSpace;
-    private boolean libraryIncludeLanguageCode;
-    private boolean libraryRemoveEmptyFolders;
-    private boolean libraryUseTVDBNaming;
-    private LibraryActionType libraryAction = LibraryActionType.NOTHING;
-    private LibraryOtherFileActionType libraryOtherFileAction = LibraryOtherFileActionType.NOTHING;
-    private Character libraryFilenameReplacingSpaceChar;
-    private Character libraryFolderReplacingSpaceChar;
-    private boolean libraryBackupSubtitle;
-    private boolean libraryBackupUseWebsiteFileName;
-    private Path libraryBackupSubtitlePath;
-    private Map<Language, String> langCodeMap = new LinkedHashMap<>();
+    @var String libraryFilenameStructure = "";
+    @var String libraryFolderStructure = "";
+    @var Path libraryFolder;
+    @var boolean libraryFilenameReplaceSpace;
+    @var boolean libraryFolderReplaceSpace;
+    @var boolean libraryIncludeLanguageCode;
+    @var boolean libraryRemoveEmptyFolders;
+    @var boolean libraryUseTVDBNaming;
+    @var LibraryActionType libraryAction = LibraryActionType.NOTHING;
+    @var LibraryOtherFileActionType libraryOtherFileAction = LibraryOtherFileActionType.NOTHING;
+    @var Character libraryFilenameReplacingSpaceChar;
+    @var Character libraryFolderReplacingSpaceChar;
+    @var boolean libraryBackupSubtitle;
+    @var boolean libraryBackupUseWebsiteFileName;
+    @var Path libraryBackupSubtitlePath;
+    @var Map<Language, String> langCodeMap = new LinkedHashMap<>();
 
     public boolean hasLibraryAction(LibraryActionType libraryAction) {
         return this.libraryAction == libraryAction;

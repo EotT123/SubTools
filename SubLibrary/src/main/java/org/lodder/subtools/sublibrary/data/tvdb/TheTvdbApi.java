@@ -40,7 +40,7 @@ public class TheTvdbApi {
                         Response<SeriesResultsResponse> response =
                                 theTvdb.search()
                                         .series(encodedSerieName, null, null, null,
-                                                language == null ? null : language.getLangCode())
+                                                language == null ? null : language.langCode)
                                         .execute();
                         if (response.isSuccessful()) {
                             return response.body().data.stream()
@@ -58,7 +58,7 @@ public class TheTvdbApi {
         try {
             Response<SeriesResponse> response =
                     theTvdb.series()
-                            .series(tvdbId, language == null ? null : language.getLangCode())
+                            .series(tvdbId, language == null ? null : language.langCode)
                             .execute();
             if (response.isSuccessful()) {
                 return Optional.of(seriesToTVDBSerie(response.body().data, language));
@@ -79,7 +79,7 @@ public class TheTvdbApi {
                         Response<EpisodesResponse> response =
                                 theTvdb.series()
                                         .episodesQuery(tvdbId, null, season, episode, null, null, null, null, null,
-                                                language == null ? null : language.getLangCode())
+                                                language == null ? null : language.langCode)
                                         .execute();
                         if (response.isSuccessful()) {
                             if (response.body().data == null) {

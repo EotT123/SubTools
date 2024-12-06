@@ -104,13 +104,13 @@ public class JAddic7edApi extends Html implements SubtitleApi {
         return manager.valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(),
-                        addic7edSerieMapping.getProviderId(), season, episode,
+                        addic7edSerieMapping.providerId, season, episode,
                         language))
                 .collectionSupplier(Addic7edSubtitleDescriptor.class, () -> {
                     List<LanguageId> languageIds = LanguageId.forLanguage(language);
                     String url = "%s/serie/%s/%s/%s/%s".formatted(
                             DOMAIN,
-                            URLEncoder.encode(addic7edSerieMapping.getProviderName().replace(" ", "_"), UTF_8),
+                            URLEncoder.encode(addic7edSerieMapping.providerName.replace(" ", "_"), UTF_8),
                             season,
                             episode,
                             languageIds.size() == 1 ? languageIds.first.id : LanguageId.ALL.id);

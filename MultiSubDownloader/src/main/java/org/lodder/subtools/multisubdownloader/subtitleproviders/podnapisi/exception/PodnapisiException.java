@@ -14,6 +14,6 @@ public class PodnapisiException extends SubtitlesProviderException {
 
     @Override
     public String getSubtitleProvider() {
-        return SubtitleSource.PODNAPISI.getName();
+        return SubtitleSource.PODNAPISI.name;
     }
 }

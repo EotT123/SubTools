@@ -40,12 +40,12 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     public static FilenameLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
             UserInteractionHandler userInteractionHandler) {
         return FilenameLibraryBuilder.builder()
-                .structure(librarySettings.getLibraryFolderStructure())
-                .replaceSpace(librarySettings.isLibraryFolderReplaceSpace())
-                .replacingSpaceChar(librarySettings.getLibraryFolderReplacingSpaceChar())
-                .includeLanguageCode(librarySettings.isLibraryIncludeLanguageCode())
-                .languageTags(librarySettings.getLangCodeMap())
-                .useTvdbName(librarySettings.isLibraryUseTVDBNaming())
+                .structure(librarySettings.libraryFolderStructure)
+                .replaceSpace(librarySettings.libraryFolderReplaceSpace)
+                .replacingSpaceChar(librarySettings.libraryFolderReplacingSpaceChar)
+                .includeLanguageCode(librarySettings.libraryIncludeLanguageCode)
+                .languageTags(librarySettings.langCodeMap)
+                .useTvdbName(librarySettings.libraryUseTVDBNaming)
                 .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
                 .rename(librarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME))
                 .build();

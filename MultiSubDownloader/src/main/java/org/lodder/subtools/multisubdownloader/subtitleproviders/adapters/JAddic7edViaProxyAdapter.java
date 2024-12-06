@@ -78,38 +78,31 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
 
     @Override
     public Set<Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language) throws ApiException {
-        return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
-                        .flatMap(episode -> {
-                            try {
-                                return new ExecuteCall<>(
-                                        () -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode,
-                                                language))
-                                        .message("getSubtitles: [%s]".formatted(
-                                                TvRelease.formatName(providerSerieId.getProviderName(),
-                                                        tvRelease.season, episode)))
-                                        .retryWhenHttpCode(ReturnCode.REFRESHING)
-                                        .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                                        .execute().stream();
-                            } catch (ApiException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(
-                                        getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season,
-                                                episode),
-                                        e.getMessage()), e);
-                                return Stream.empty();
-                            }
-                        })
-                        .collect(Collectors.toSet()))
-                .orElseGet(Set::of);
+        return getProviderSerieId(tvRelease).map(
+                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                    try {
+                        return new ExecuteCall<>(() -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode,
+                                language)).message("getSubtitles: [%s]".formatted(
+                                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode)))
+                                .retryWhenHttpCode(ReturnCode.REFRESHING)
+                                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                                .execute()
+                                .stream();
+                    } catch (ApiException e) {
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                                e.getMessage()), e);
+                        return Stream.empty();
+                    }
+                }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
     public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
             throws ApiException {
-        List<ProviderSerieId> serieIds =
-                tvdbIdOptional.mapToObj(tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId))
-                        .message("getProviderSerieName: [%s]".formatted(tvdbId))
+        List<ProviderSerieId> serieIds = tvdbIdOptional.mapToObj(
+                tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId)).message(
+                                "getProviderSerieName: [%s]".formatted(tvdbId))
                         .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                         .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
                             LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(getProviderName(), tvdbId));
@@ -118,8 +111,8 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                         .execute()).orElseGet(List::of);
 
         if (serieIds.isEmpty()) {
-            serieIds = new ExecuteCall<>(() -> getApi().getProviderSerieName(serieName))
-                    .message("getProviderSerieName: [%s]".formatted(serieName))
+            serieIds = new ExecuteCall<>(() -> getApi().getProviderSerieName(serieName)).message(
+                            "getProviderSerieName: [%s]".formatted(serieName))
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
                         LOGGER.info("API %s - Could not find serie name [%s]".formatted(getProviderName(), serieName));
@@ -128,9 +121,8 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                     .execute();
         }
         return serieIds.stream()
-                .sorted(Comparator
-                        .comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
-                                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
+                .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
+                        .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
                 .toList();
     }
 
@@ -152,9 +144,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
     @Getter
     @RequiredArgsConstructor
     private enum ReturnCode {
-        NOT_FOUND(404),
-        RATE_LIMIT_REACHED(429),
-        REFRESHING(423);
+        NOT_FOUND(404), RATE_LIMIT_REACHED(429), REFRESHING(423);
 
         final int code;
 

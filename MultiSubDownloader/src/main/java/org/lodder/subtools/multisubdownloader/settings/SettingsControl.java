@@ -181,27 +181,23 @@ public class SettingsControl {
         // }
 
         EPISODE_LIBRARY_FOLDER_STRUCTURE.load(this, preferences);
-        settings.episodeLibrarySettings
-                .setLibraryFolderStructure(
-                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
+        settings.episodeLibrarySettings.libraryFolderStructure =
+                migrateLibraryStructureV0(settings.episodeLibrarySettings.libraryFolderStructure);
         EPISODE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
 
         EPISODE_LIBRARY_FILENAME_STRUCTURE.load(this, preferences);
-        settings.episodeLibrarySettings
-                .setLibraryFilenameStructure(
-                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
+        settings.episodeLibrarySettings.libraryFilenameStructure =
+                migrateLibraryStructureV0(settings.episodeLibrarySettings.libraryFilenameStructure);
         EPISODE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         MOVIE_LIBRARY_FOLDER_STRUCTURE.load(this, preferences);
-        settings.episodeLibrarySettings
-                .setLibraryFolderStructure(
-                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
+        settings.episodeLibrarySettings.libraryFolderStructure =
+                migrateLibraryStructureV0(settings.episodeLibrarySettings.libraryFolderStructure);
         MOVIE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
 
         MOVIE_LIBRARY_FILENAME_STRUCTURE.load(this, preferences);
-        settings.episodeLibrarySettings
-                .setLibraryFilenameStructure(
-                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
+        settings.episodeLibrarySettings.libraryFilenameStructure =
+                migrateLibraryStructureV0(settings.episodeLibrarySettings.libraryFilenameStructure);
         MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         try {
@@ -220,22 +216,20 @@ public class SettingsControl {
 
     @SuppressWarnings("deprecation")
     public void migrateSettingsV1ToV2() {
-        settings.episodeLibrarySettings
-                .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(
-                        preferences.get(EPISODE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
+        settings.episodeLibrarySettings.libraryOtherFileAction =
+                LibraryOtherFileActionType.fromString(preferences.get(EPISODE_LIBRARY_OTHER_FILE_ACTION.getKey(), ""));
         EPISODE_LIBRARY_OTHER_FILE_ACTION.store(this, preferences);
 
-        settings.movieLibrarySettings
-                .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(
-                        preferences.get(MOVIE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
+        settings.movieLibrarySettings.libraryOtherFileAction =
+                LibraryOtherFileActionType.fromString(preferences.get(MOVIE_LIBRARY_OTHER_FILE_ACTION.getKey(), ""));
         MOVIE_LIBRARY_OTHER_FILE_ACTION.store(this, preferences);
 
-        settings.episodeLibrarySettings
-                .setLibraryAction(LibraryActionType.fromString(preferences.get(EPISODE_LIBRARY_ACTION.getKey(), "")));
+        settings.episodeLibrarySettings.libraryAction =
+                LibraryActionType.fromString(preferences.get(EPISODE_LIBRARY_ACTION.getKey(), ""));
         EPISODE_LIBRARY_ACTION.store(this, preferences);
 
-        settings.movieLibrarySettings
-                .setLibraryAction(LibraryActionType.fromString(preferences.get(MOVIE_LIBRARY_ACTION.getKey(), "")));
+        settings.movieLibrarySettings.libraryAction =
+                LibraryActionType.fromString(preferences.get(MOVIE_LIBRARY_ACTION.getKey(), ""));
         MOVIE_LIBRARY_ACTION.store(this, preferences);
 
         settings.settingsVersion = 2;
@@ -284,12 +278,10 @@ public class SettingsControl {
     public void migrateSettingsV4ToV5() {
         Arrays.stream(MappingType.ADDIC7ED_PROXY.getSelectionForKeyPrefixList())
                 .forEach(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
-                        .forEach(serieMappingPair -> {
-                            manager.valueBuilder()
-                                    .cacheType(CacheType.DISK)
-                                    .key(serieMappingPair.getKey())
-                                    .remove();
-                        }));
+                        .forEach(serieMappingPair -> manager.valueBuilder()
+                                .cacheType(CacheType.DISK)
+                                .key(serieMappingPair.getKey())
+                                .remove()));
         settings.settingsVersion = 5;
         SETTINGS_VERSION.store(this, preferences);
     }
@@ -327,7 +319,7 @@ public class SettingsControl {
             String value = preferences.get(label, null);
             preferences.remove(label);
             if (StringUtils.isNotBlank(value)) {
-                librarySettings.getLangCodeMap().put(language, value.trim());
+                librarySettings.langCodeMap.put(language, value.trim());
             }
         };
         consumer.accept("EpisodeLibraryDefaultNlText", Language.DUTCH, settings.episodeLibrarySettings);
@@ -340,21 +332,21 @@ public class SettingsControl {
 
         if (settings.episodeLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME,
                 LibraryActionType.MOVEANDRENAME)) {
-            if (StringUtils.isBlank(settings.episodeLibrarySettings.getLibraryFilenameStructure())) {
-                settings.movieLibrarySettings.setLibraryFilenameStructure("%SHOW NAME%%SEPARATOR%%Season %S%");
+            if (StringUtils.isBlank(settings.episodeLibrarySettings.libraryFilenameStructure)) {
+                settings.movieLibrarySettings.libraryFilenameStructure = "%SHOW NAME%%SEPARATOR%%Season %S%";
                 MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
                 EPISODE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
             }
-            if (StringUtils.isBlank(settings.episodeLibrarySettings.getLibraryFolderStructure())) {
-                settings.movieLibrarySettings.setLibraryFolderStructure("%SHOW NAME%.S%SS%E%EE%.%TITLE%");
+            if (StringUtils.isBlank(settings.episodeLibrarySettings.libraryFolderStructure)) {
+                settings.movieLibrarySettings.libraryFolderStructure = "%SHOW NAME%.S%SS%E%EE%.%TITLE%";
                 EPISODE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
             }
         }
 
         if (settings.movieLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME,
                 LibraryActionType.MOVEANDRENAME)) {
-            if (StringUtils.isBlank(settings.movieLibrarySettings.getLibraryFilenameStructure())) {
-                settings.movieLibrarySettings.setLibraryFilenameStructure("%MOVIE TITLE% (%YEAR%)");
+            if (StringUtils.isBlank(settings.movieLibrarySettings.libraryFilenameStructure)) {
+                settings.movieLibrarySettings.libraryFilenameStructure = "%MOVIE TITLE% (%YEAR%)";
                 MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
             }
         }
@@ -364,9 +356,9 @@ public class SettingsControl {
     }
 
     public void migrateSettingsV7ToV8() {
-        if (settings.loginOpenSubtitlesEnabled
-            && !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername,
-                settings.loginOpenSubtitlesPassword)) {
+        if (settings.loginOpenSubtitlesEnabled &&
+            !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername,
+                    settings.loginOpenSubtitlesPassword)) {
             settings.loginOpenSubtitlesEnabled = false;
             LOGIN_OPEN_SUBTITLES_ENABLED.store(this, preferences);
         }
@@ -408,8 +400,11 @@ public class SettingsControl {
     }
 
     private void migrateDatabaseV1ToV2() {
-        List<Pair<String, SerieMapping>> entries = manager.valueBuilder().cacheType(CacheType.DISK)
-                .keyFilter(k -> k.startsWith("SUBSCENE-serieName-")).returnType(SerieMapping.class).getEntries();
+        List<Pair<String, SerieMapping>> entries = manager.valueBuilder()
+                .cacheType(CacheType.DISK)
+                .keyFilter(k -> k.startsWith("SUBSCENE-serieName-"))
+                .returnType(SerieMapping.class)
+                .getEntries();
         List<Pair<String, SerieMapping>> editedEntries = entries.stream().map(pair -> {
             int lastIndexOfDash = pair.getKey().lastIndexOf("-");
             int season;
@@ -418,9 +413,9 @@ public class SettingsControl {
             } catch (NumberFormatException e) {
                 season = -1;
             }
-            String name = pair.getValue().getName();
-            String providerId = pair.getValue().getProviderId();
-            String providerName = pair.getValue().getProviderName();
+            String name = pair.getValue().name;
+            String providerId = pair.getValue().providerId;
+            String providerName = pair.getValue().providerName;
             SerieMapping serieMapping = new SerieMapping(name, providerId, providerName, season);
             System.out.println(serieMapping);
             return Pair.of(pair.getKey(), serieMapping);

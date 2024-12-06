@@ -91,38 +91,32 @@ public class JTVsubtitlesAdapter
     @Override
     public Set<TVsubtitlesSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
             throws TvSubtitlesException {
-        return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
-                        .flatMap(episode -> {
-                            try {
-                                return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language)
-                                        .stream();
-                            } catch (TvSubtitlesException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(
-                                        getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season,
-                                                episode),
-                                        e.getMessage()), e);
-                                return Stream.empty();
-                            }
-                        })
-                        .collect(Collectors.toSet()))
-                .orElseGet(Set::of);
+        return getProviderSerieId(tvRelease).map(
+                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                    try {
+                        return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
+                    } catch (TvSubtitlesException e) {
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                                e.getMessage()), e);
+                        return Stream.empty();
+                    }
+                }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<TVsubtitlesSubtitleDescriptor> subtitles,
             Language language) {
         return subtitles.stream()
-                .map(sub -> Subtitle.downloadSource(sub.getUrl())
+                .map(sub -> Subtitle.downloadSource(sub.url)
                         .subtitleSource(getSubtitleSource())
-                        .fileName(sub.getFilename())
+                        .fileName(sub.filename)
                         .language(language)
-                        .quality(ReleaseParser.getQualityKeyword(sub.getFilename() + " " + sub.getRip()))
+                        .quality(ReleaseParser.getQualityKeyword(sub.filename + " " + sub.rip))
                         .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleaseGroup(sub.getFilename(),
-                                StringUtils.endsWith(sub.getFilename(), ".srt")))
-                        .uploader(sub.getAuthor())
+                        .releaseGroup(ReleaseParser.extractReleaseGroup(sub.filename,
+                                StringUtils.endsWith(sub.filename, ".srt")))
+                        .uploader(sub.author)
                         .hearingImpaired(false))
                 .collect(Collectors.toSet());
     }
@@ -131,10 +125,10 @@ public class JTVsubtitlesAdapter
     public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
             throws TvSubtitlesException {
         Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
-        return getApi().getUrisForSerieName(serieName).stream()
-                .sorted(Comparator.comparing(
-                                (ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
-                                        .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
+        return getApi().getUrisForSerieName(serieName)
+                .stream()
+                .sorted(Comparator.comparing((ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
                         .thenComparing((ProviderSerieId providerSerieId) -> {
                             Matcher matcher = yearPatter.matcher(providerSerieId.name);
                             if (matcher.find()) {

@@ -41,7 +41,8 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
         if (jaapi == null) {
             jaapi = new LazySupplier<>(() -> {
                 try {
-                    return isLoginEnabled ? new JAddic7edApi(username, password, speedy, manager) : new JAddic7edApi(speedy, manager);
+                    return isLoginEnabled ? new JAddic7edApi(username, password, speedy, manager) :
+                            new JAddic7edApi(speedy, manager);
                 } catch (Exception e) {
                     throw new SubtitlesProviderInitException(getProviderName(), e);
                 }
@@ -82,31 +83,31 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<Addic7edSubtitleDescriptor> subtitles, Language language) {
+    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<Addic7edSubtitleDescriptor> subtitles,
+            Language language) {
         // TODO implement this
         return Set.of();
     }
 
     @Override
-    public Set<Addic7edSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language) throws Addic7edException {
-        return getProviderSerieId(tvRelease)
-                .map(providerSerieId -> tvRelease.episodeNumbers.stream()
-                        .flatMap(episode -> {
-                            try {
-                                return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                            } catch (Addic7edException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
-                                        e.getMessage()), e);
-                                return Stream.empty();
-                            }
-                        })
-                        .collect(Collectors.toSet()))
-                .orElseGet(Set::of);
+    public Set<Addic7edSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
+            throws Addic7edException {
+        return getProviderSerieId(tvRelease).map(
+                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                    try {
+                        return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
+                    } catch (Addic7edException e) {
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                                e.getMessage()), e);
+                        return Stream.empty();
+                    }
+                }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<Addic7edSubtitleDescriptor> subtitles, Language language) {
+    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<Addic7edSubtitleDescriptor> subtitles,
+            Language language) {
         return subtitles.stream()
                 .filter(sub -> language == sub.getLanguage())
                 .map(sub -> Subtitle.downloadSource(sub.getUrl())
@@ -123,9 +124,12 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season) throws Addic7edException {
-        return getApi().getProviderId(serieName).stream()
-                .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
+    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+            throws Addic7edException {
+        return getApi().getProviderId(serieName)
+                .stream()
+                .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
+                        .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
                 .toList();
     }
 

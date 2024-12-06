@@ -37,12 +37,12 @@ public class PathLibraryBuilder extends LibraryBuilder {
     public static PathLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
             UserInteractionHandler userInteractionHandler) {
         return PathLibraryBuilder.builder()
-                .structure(librarySettings.getLibraryFolderStructure())
-                .replaceSpace(librarySettings.isLibraryFolderReplaceSpace())
-                .replacingSpaceChar(librarySettings.getLibraryFolderReplacingSpaceChar())
-                .useTvdbName(librarySettings.isLibraryUseTVDBNaming())
+                .structure(librarySettings.libraryFolderStructure)
+                .replaceSpace(librarySettings.libraryFolderReplaceSpace)
+                .replacingSpaceChar(librarySettings.libraryFolderReplacingSpaceChar)
+                .useTvdbName(librarySettings.libraryUseTVDBNaming)
                 .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
-                .libraryFolder(librarySettings.getLibraryFolder())
+                .libraryFolder(librarySettings.libraryFolder)
                 .move(librarySettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVEANDRENAME))
                 .build();
     }

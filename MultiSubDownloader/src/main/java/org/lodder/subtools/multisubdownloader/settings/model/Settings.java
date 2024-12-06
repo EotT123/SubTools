@@ -68,10 +68,10 @@ public class Settings implements UserInteractionSettingsIntf {
         Map<String, Integer> sortWeightsTemp = new HashMap<>();
         sortWeightsTemp.put("%GROUP%", 5);
         VideoPatterns.Source.values().stream()
-                .forEach(source -> source.getValues().stream()
-                        .forEach(keyword -> sortWeightsTemp.put(keyword, source.isManyDifferentSources() ? 1 : 2)));
+                .forEach(source -> source.values.stream()
+                        .forEach(keyword -> sortWeightsTemp.put(keyword, source.manyDifferentSources ? 1 : 2)));
         VideoPatterns.AudioEncoding.values().stream()
-                .forEach(encoding -> encoding.getValues().stream().forEach(keyword -> sortWeightsTemp.put(keyword, 2)));
+                .forEach(encoding -> encoding.values.stream().forEach(keyword -> sortWeightsTemp.put(keyword, 2)));
         this.sortWeights = Collections.unmodifiableMap(sortWeightsTemp);
     }
 
@@ -83,12 +83,12 @@ public class Settings implements UserInteractionSettingsIntf {
         return !defaultIncomingFolders.isEmpty();
     }
 
-    public boolean isSerieSource(SubtitleSource sbtitleSource) {
+    public boolean isSerieSource(SubtitleSource subtitleSource) {
         // TODO: dynamically inject SubtitleProvider to settings
-        return switch (sbtitleSource) {
+        return switch (subtitleSource) {
             case ADDIC7ED -> serieSourceAddic7ed;
             case OPENSUBTITLES -> serieSourceOpensubtitles;
-            case PODNAPISI ->serieSourcePodnapisi;
+            case PODNAPISI -> serieSourcePodnapisi;
             case TVSUBTITLES -> serieSourceTvSubtitles;
             case LOCAL -> serieSourceLocal;
             case SUBSCENE -> serieSourceSubscene;
