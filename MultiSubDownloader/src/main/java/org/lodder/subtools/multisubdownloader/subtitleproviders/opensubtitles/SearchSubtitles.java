@@ -103,6 +103,6 @@ public class SearchSubtitles extends OpenSubtitlesExecuter {
     }
 
     private String getValue(ParamIntf param) {
-        return param == null ? null : param.getValue();
+        return param == null ? null : param.value;
     }
 }

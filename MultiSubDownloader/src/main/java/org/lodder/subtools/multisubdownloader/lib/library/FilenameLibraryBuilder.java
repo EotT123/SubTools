@@ -121,29 +121,30 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     @Override
     public Path build(Release release) {
         if (rename) {
-            String filename;
-            if (release instanceof TvRelease tvRelease && StringUtils.isNotBlank(structure)) {
-                filename = structure;
-                // order is important!
-                filename = replace(filename, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
-                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_LONG,
-                        tvRelease.episodeNumbers, true);
-                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_SHORT,
-                        tvRelease.episodeNumbers, false);
-                filename = replace(filename, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
-                filename = replace(filename, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
-                filename = replace(filename, SerieStructureTag.EPISODE_LONG,
-                        formattedNumber(tvRelease.firstEpisodeNumber, true));
-                filename = replace(filename, SerieStructureTag.EPISODE_SHORT,
-                        formattedNumber(tvRelease.firstEpisodeNumber, false));
-                filename = replace(filename, SerieStructureTag.TITLE, tvRelease.title);
-                filename = replace(filename, SerieStructureTag.QUALITY, release.quality);
-                filename = replace(filename, SerieStructureTag.DESCRIPTION, release.description);
+            String filename = switch (release) {
+                case TvRelease tvRelease when StringUtils.isNotBlank(structure) -> {
+                    String fName = structure;
+                    // order is important!
+                    fName = replace(fName, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
+                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG,
+                            tvRelease.episodeNumbers, true);
+                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT,
+                            tvRelease.episodeNumbers, false);
+                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
+                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
+                    fName = replace(fName, SerieStructureTag.EPISODE_LONG,
+                            formattedNumber(tvRelease.firstEpisodeNumber, true));
+                    fName = replace(fName, SerieStructureTag.EPISODE_SHORT,
+                            formattedNumber(tvRelease.firstEpisodeNumber, false));
+                    fName = replace(fName, SerieStructureTag.TITLE, tvRelease.title);
+                    fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
+                    fName = replace(fName, SerieStructureTag.DESCRIPTION, release.description);
 
-                filename += "." + release.extension;
-            } else {
-                filename = release.fileName;
-            }
+                    fName += "." + release.extension;
+                    yield fName;
+                }
+                default -> release.fileName;
+            };
             filename = filename.removeIllegalWindowsChars();
             if (replaceSpace) {
                 filename = filename.replace(' ', replacingSpaceChar);

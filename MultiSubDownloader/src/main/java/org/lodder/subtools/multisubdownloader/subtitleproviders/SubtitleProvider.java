@@ -41,11 +41,10 @@ public interface SubtitleProvider {
      */
     default Set<Subtitle> search(Release release, Language language) {
         try {
-            if (release instanceof MovieRelease movieRelease) {
-                return this.searchSubtitles(movieRelease, language);
-            } else if (release instanceof TvRelease tvRelease) {
-                return this.searchSubtitles(tvRelease, language);
-            }
+            return switch (release) {
+                case MovieRelease movieRelease -> this.searchSubtitles(movieRelease, language);
+                case TvRelease tvRelease -> this.searchSubtitles(tvRelease, language);
+            };
         } catch (Exception e) {
             LoggerFactory.getLogger(SubtitleProvider.class)
                     .error("Error in %s API: %s".formatted(getName(), e.getMessage()), e);

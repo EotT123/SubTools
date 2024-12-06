@@ -78,8 +78,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     .userAgent("")
                     .cacheType(CacheType.MEMORY)
                     .retries(1)
-                    .retryPredicate(
-                            exception -> exception instanceof HttpClientException e && e.getResponseCode() == 429)
+                    .retryPredicate(exc -> exc instanceof HttpClientException e && e.getResponseCode() == 429)
                     .retryWait(5)
                     .getAsJsonArray()
                     .stream()
