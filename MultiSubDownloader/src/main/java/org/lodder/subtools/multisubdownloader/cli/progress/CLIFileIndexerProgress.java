@@ -66,6 +66,6 @@ public class CLIFileIndexerProgress extends CLIProgress implements IndexingProgr
             System.out.println();
         }
 
-        this.printProgBar(this.getProgress());
+        this.printProgBar(this.progress);
     }
 }

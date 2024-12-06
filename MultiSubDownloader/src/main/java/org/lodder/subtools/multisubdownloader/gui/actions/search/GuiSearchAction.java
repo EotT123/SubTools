@@ -52,12 +52,12 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
     }
 
     protected P getInputPanel() {
-        return this.searchPanel.getInputPanel();
+        return this.searchPanel.inputPanel;
     }
 
     @Override
     protected Language getLanguage() {
-        return this.searchPanel.getInputPanel().getSelectedLanguage();
+        return this.searchPanel.inputPanel.getSelectedLanguage();
     }
 
     @Override
@@ -66,15 +66,15 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
             return;
         }
 
-        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
         if (model.getRowCount() > 0) {
-            searchPanel.getResultPanel().enableButtons();
+            searchPanel.resultPanel.enableButtons();
         }
 
-        if (this.searchManager.getProgress() == 100) {
+        if (this.searchManager.progress == 100) {
             this.searchProgressListener.completed();
-            searchPanel.getInputPanel().enableSearchButton();
+            searchPanel.inputPanel.enableSearchButton();
         }
     }
 }

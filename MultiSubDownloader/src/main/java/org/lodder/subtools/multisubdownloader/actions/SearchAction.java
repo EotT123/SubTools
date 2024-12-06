@@ -33,7 +33,7 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
     @get(Protected) @set(Private) StatusListener statusListener;
     @get(Protected) @set(Private) SearchManager searchManager;
     @get(Protected) @set(Private) List<Release> releases;
-    @get(Protected) Language language;
+    @get(Protected) abstract Language language;
     abstract @get(Protected) IndexingProgressListener indexingProgressListener;
     abstract @get(Protected) UserInteractionHandler userInteractionHandler;
     abstract @get(Protected) SearchProgressListener searchProgressListener;

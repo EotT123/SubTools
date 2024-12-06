@@ -96,7 +96,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
             throws ApiException {
         List<ProviderSerieId> serieIds = tvdbIdOptional.mapToObj(
                 tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId)).message(
-                                "getProviderSerieName: [%s]".formatted(tvdbId))
+                                "getProviderSerieName: [$tvdbId]")
                         .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                         .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
                             LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(providerName, tvdbId));
@@ -106,7 +106,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
 
         if (serieIds.isEmpty()) {
             serieIds = new ExecuteCall<>(() -> getApi().getProviderSerieName(serieName)).message(
-                            "getProviderSerieName: [%s]".formatted(serieName))
+                            "getProviderSerieName: [$serieName]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
                         LOGGER.info("API %s - Could not find serie name [%s]".formatted(providerName, serieName));
@@ -154,20 +154,24 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
         }
 
         public ExecuteCall<T> retryWhenHttpCode(ReturnCode returnCode) {
-            return super.retryWhenException(e -> returnCode.isSameCode(e.getCode()));
+            super.retryWhenException(e -> returnCode.isSameCode(e.getCode()));
+            return this;
         }
 
         public ExecuteCall<T> handleHttpCode(ReturnCode returnCode, Function<ApiException, T> function) {
-            return super.handleException(e -> returnCode.isSameCode(e.getCode()), function);
+            super.handleException(e -> returnCode.isSameCode(e.getCode()), function);
+            return this;
         }
 
         public ExecuteCall<T> handleHttpCode(ReturnCode returnCode, Supplier<T> supplier) {
-            return super.handleException(e -> returnCode.isSameCode(e.getCode()), supplier);
+            super.handleException(e -> returnCode.isSameCode(e.getCode()), supplier);
+            return this;
         }
 
         @Override
         public ExecuteCall<T> handleException(Supplier<T> suppliers) {
-            return super.handleException(_ -> true, suppliers);
+            super.handleException(_ -> true, suppliers);
+            return this;
         }
     }
 }

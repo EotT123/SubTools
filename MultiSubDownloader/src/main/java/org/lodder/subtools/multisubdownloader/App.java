@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
@@ -7,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 import ch.qos.logback.classic.Level;
@@ -161,13 +162,13 @@ public class App {
         }
         DiskCache<String, Serializable> diskCache =
                 SerializableDiskCache.cacheBuilder().keyType(String.class).valueType(Serializable.class)
-                        .timeToLive(TimeUnit.SECONDS.convert(500, TimeUnit.DAYS))
+                        .timeToLive(SECONDS.convert(500, DAYS))
                         .maxItems(2500)
                         .build();
 
         InMemoryCache<String, Serializable> inMemoryCache =
                 InMemoryCache.builder().keyType(String.class).valueType(Serializable.class)
-                        .timeToLive(TimeUnit.SECONDS.convert(10, TimeUnit.MINUTES))
+                        .timeToLive(SECONDS.convert(10, MINUTES))
                         .timerInterval(100L)
                         .maxItems(500)
                         .build();

@@ -85,7 +85,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
     @Override
     public void onFound(Release release, List<Subtitle> subtitles) {
-        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
         List<Subtitle> filteredSubtitles = filtering != null ?
                 subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
@@ -106,7 +106,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
         boolean recursive = inputPanel.isRecursiveSelected();
         boolean overwriteExistingSubtitles = inputPanel.isForceOverwrite();
 
-        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
         model.clearTable();
 
         /* get a list of video files */

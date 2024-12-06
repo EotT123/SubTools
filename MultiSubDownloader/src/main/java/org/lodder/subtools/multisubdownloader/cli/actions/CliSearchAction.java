@@ -198,7 +198,7 @@ public class CliSearchAction extends SearchAction {
         subtitles.stream()
                 .filter(subtitle -> filtering.useSubtitle(subtitle, release))
                 .forEach(release::addMatchingSub);
-        if (searchManager.getProgress() < 100) {
+        if (searchManager.progress < 100) {
             return;
         }
         LOGGER.debug("found files for doDownload [{}]", releases.size());
