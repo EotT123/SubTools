@@ -26,8 +26,8 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     private final boolean rename;
 
     private FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-            boolean includeLanguageCode,
-            Map<Language, String> languageTags, boolean useTvdb, TheTvdbAdapter tvdbAdapter, boolean rename) {
+            boolean includeLanguageCode, Map<Language, String> languageTags, boolean useTvdb,
+            TheTvdbAdapter tvdbAdapter, boolean rename) {
         super(useTvdb, tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
@@ -93,16 +93,11 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
 
     @Setter
     @Accessors(chain = true, fluent = true)
-    public static class FilenameLibraryBuilderBuilder implements
-            FilenameLibraryBuilderStructureIntf,
-            FilenameLibraryBuilderReplaceSpaceIntf,
-            FilenameLibraryBuilderReplaceSpaceCharIntf,
-            FilenameLibraryBuilderIncludeLanguageCodeIntf,
-            FilenameLibraryBuilderLanguageTagIntf,
-            FilenameLibraryBuilderUseTvdbNameIntf,
-            FilenameLibraryBuilderTvdbAdapterIntf,
-            FilenameLibraryBuilderRenameIntf,
-            FilenameLibraryBuilderBuildIntf {
+    public static class FilenameLibraryBuilderBuilder
+            implements FilenameLibraryBuilderStructureIntf, FilenameLibraryBuilderReplaceSpaceIntf,
+            FilenameLibraryBuilderReplaceSpaceCharIntf, FilenameLibraryBuilderIncludeLanguageCodeIntf,
+            FilenameLibraryBuilderLanguageTagIntf, FilenameLibraryBuilderUseTvdbNameIntf,
+            FilenameLibraryBuilderTvdbAdapterIntf, FilenameLibraryBuilderRenameIntf, FilenameLibraryBuilderBuildIntf {
         private String structure;
 
         private boolean replaceSpace;
@@ -119,8 +114,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
         @Override
         public FilenameLibraryBuilder build() {
             return new FilenameLibraryBuilder(structure, replaceSpace, replacingSpaceChar, includeLanguageCode,
-                    languageTags, useTvdbName,
-                    tvdbAdapter, rename);
+                    languageTags, useTvdbName, tvdbAdapter, rename);
         }
     }
 

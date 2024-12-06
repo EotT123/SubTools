@@ -9,9 +9,10 @@ import java.util.Set;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 
-public abstract sealed class Release extends Video permits MovieRelease, TvRelease {
+public abstract sealed class Release permits MovieRelease, TvRelease {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
+    @val VideoType videoType;
     @val Path filePath;
     @val String quality;
     @val String description;
@@ -29,8 +30,8 @@ public abstract sealed class Release extends Video permits MovieRelease, TvRelea
         return matchingSubsSet.size();
     }
 
-    protected Release(VideoType videoFileType, Path filePath, String description, String releaseGroup, String quality) {
-        super(videoFileType);
+    protected Release(VideoType videoType, Path filePath, String description, String releaseGroup, String quality) {
+        this.videoType = videoType;
         this.filePath = filePath;
         this.description = description;
         this.releaseGroup = releaseGroup;

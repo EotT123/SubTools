@@ -33,10 +33,10 @@ public class ReleaseFactory {
 
     public Release createRelease(Path file, UserInteractionHandler userInteractionHandler) {
         try {
-            Release r = releaseParser.parse(file);
-            ReleaseControl releaseControl = switch (r.videoType) {
-                case EPISODE -> new TvReleaseControl((TvRelease) r, settings, manager, userInteractionHandler);
-                case MOVIE -> new MovieReleaseControl((MovieRelease) r, settings, manager, userInteractionHandler);
+            ReleaseControl releaseControl = switch (releaseParser.parse(file)) {
+                case TvRelease tvRelease -> new TvReleaseControl(tvRelease, settings, manager, userInteractionHandler);
+                case MovieRelease movieRelease -> new MovieReleaseControl(movieRelease, settings, manager,
+                        userInteractionHandler);
             };
             releaseControl.process();
             return releaseControl.videoFile;

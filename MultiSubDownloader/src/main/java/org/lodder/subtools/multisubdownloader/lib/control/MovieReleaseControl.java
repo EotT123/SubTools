@@ -35,9 +35,9 @@ public final class MovieReleaseControl extends ReleaseControl {
         if (StringUtils.isBlank(movieRelease.name)) {
             throw new ReleaseControlException("Unable to extract/find title, check file", movieRelease);
         } else {
-            movieRelease.imdbId = imdbAdapter.getImdbId(movieRelease.name, movieRelease.year)
+            movieRelease.setImdbId(imdbAdapter.getImdbId(movieRelease.name, movieRelease.year)
                     .orElseThrow(
-                            () -> new ReleaseControlException("Movie not found on IMDB, check file", movieRelease));
+                            () -> new ReleaseControlException("Movie not found on IMDB, check file", movieRelease)));
 
             Optional<? extends ReleaseDBIntf> movieDetails =
                     movieRelease.getImdbId().mapToObj(imdbAdapter::getMovieDetails).orElseGet(Optional::empty);

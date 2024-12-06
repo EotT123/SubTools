@@ -11,8 +11,8 @@ public final class MovieRelease extends Release {
 
     @var String name;
     @var Integer year;
-    @var int imdbId;
-    @var int tvdbId;
+    private int imdbId;
+    private int tvdbId;
 
     public interface MovieReleaseBuilderName {
         MovieReleaseBuilderOther name(String name);
@@ -60,15 +60,23 @@ public final class MovieRelease extends Release {
     }
 
     public String getImdbIdAsString() {
-        return "tt" + String.format("%07d", imdbId);
+        return String.format("tt%07d", imdbId);
     }
 
     public OptionalInt getTvdbId() {
         return tvdbId == 0 ? OptionalInt.empty() : OptionalInt.of(tvdbId);
     }
 
+    public void setTvdbId(int tvdbId) {
+        this.tvdbId = tvdbId;
+    }
+
     public OptionalInt getImdbId() {
         return imdbId == 0 ? OptionalInt.empty() : OptionalInt.of(imdbId);
+    }
+
+    public void setImdbId(int imdbId) {
+        this.imdbId = imdbId;
     }
 
     @Override

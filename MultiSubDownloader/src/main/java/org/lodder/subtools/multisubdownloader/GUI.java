@@ -1,5 +1,8 @@
 package org.lodder.subtools.multisubdownloader;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static org.lodder.subtools.multisubdownloader.gui.extra.table.SearchColumnName.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -123,9 +126,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
             editorPane.setEditable(false);
             editorPane.setContentType("text/html");
 
-            editorPane.setText(
-                    "<html>" + Messages.getText("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl.get() + ">" +
-                            updateUrl.get() + "</a></html>");
+            editorPane.setText("<html>" + getText("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl.get() + ">" +
+                    updateUrl.get() + "</a></html>");
 
             editorPane.addHyperlinkListener(hyperlinkEvent -> {
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED &&
@@ -140,7 +142,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, editorPane, ConfigProperties.getInstance().getProperty("name"),
                     JOptionPane.INFORMATION_MESSAGE);
         } else if (forceUpdateCheck) {
-            JOptionPane.showMessageDialog(this, Messages.getText("MainWindow.NoUpdateAvailable"),
+            JOptionPane.showMessageDialog(this, getText("MainWindow.NoUpdateAvailable"),
                     ConfigProperties.getInstance().getProperty("name"), JOptionPane.INFORMATION_MESSAGE);
         }
 
@@ -175,10 +177,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
         getContentPane().add(tabbedPane, gbcTabbedPane);
 
         createFileSearchPanel();
-        tabbedPane.addTab(Messages.getText("MainWindow.SearchOnFile"), null, pnlSearchFile, null);
+        tabbedPane.addTab(getText("MainWindow.SearchOnFile"), null, pnlSearchFile, null);
 
         createTextSearchPanel();
-        tabbedPane.addTab(Messages.getText("MainWindow.SearchOnName"), null, pnlSearchText, null);
+        tabbedPane.addTab(getText("MainWindow.SearchOnName"), null, pnlSearchText, null);
 
         pnlLogging = new LoggingPanel();
         final GridBagConstraints gbcPnlLogging = new GridBagConstraints();
@@ -210,26 +212,19 @@ public class GUI extends JFrame implements PropertyChangeListener {
         ExportImport exportImport = new ExportImport(manager, settingsControl, userInteractionHandler, this);
         menuBar = new Menu().withShowOnlyFound(settings.optionsShowOnlyFound)
                 .withFileQuitAction(this::close)
-                .withViewFilenameAction(
-                        () -> visibilityFunction.accept(SearchColumnName.FILENAME, menuBar.isViewFilenameSelected()))
-                .withViewTypeAction(
-                        () -> visibilityFunction.accept(SearchColumnName.TYPE, menuBar.isViewTypeSelected()))
-                .withViewTitleAction(
-                        () -> visibilityFunction.accept(SearchColumnName.TITLE, menuBar.isViewTitleSelected()))
-                .withViewSeasonAction(
-                        () -> visibilityFunction.accept(SearchColumnName.SEASON, menuBar.isViewSeasonSelected()))
-                .withViewEpisodeAction(
-                        () -> visibilityFunction.accept(SearchColumnName.EPISODE, menuBar.isViewEpisodeSelected()))
+                .withViewFilenameAction(() -> visibilityFunction.accept(FILENAME, menuBar.isViewFilenameSelected()))
+                .withViewTypeAction(() -> visibilityFunction.accept(TYPE, menuBar.isViewTypeSelected()))
+                .withViewTitleAction(() -> visibilityFunction.accept(TITLE, menuBar.isViewTitleSelected()))
+                .withViewSeasonAction(() -> visibilityFunction.accept(SEASON, menuBar.isViewSeasonSelected()))
+                .withViewEpisodeAction(() -> visibilityFunction.accept(EPISODE, menuBar.isViewEpisodeSelected()))
                 .withViewShowOnlyFoundAction(() -> {
                     settings.optionsShowOnlyFound = menuBar.isShowOnlyFound();
-                    ((VideoTableModel) pnlSearchFile.resultPanel.getTable().getModel()).setShowOnlyFound(
-                            menuBar.isShowOnlyFound());
+                    ((VideoTableModel) pnlSearchFile.resultPanel.getTable().getModel())
+                            .setShowOnlyFound(menuBar.isShowOnlyFound());
                 })
                 .withViewClearLogAction(() -> pnlLogging.setLogText(""))
-                .withEditRenameTVAction(
-                        () -> showRenameDialog.accept(VideoType.EPISODE, Messages.getText("Menu.RenameSerie")))
-                .withEditRenameMovieAction(
-                        () -> showRenameDialog.accept(VideoType.MOVIE, Messages.getText("Menu.RenameMovie")))
+                .withEditRenameTVAction(() -> showRenameDialog.accept(VideoType.EPISODE, getText("Menu.RenameSerie")))
+                .withEditRenameMovieAction(() -> showRenameDialog.accept(VideoType.MOVIE, getText("Menu.RenameMovie")))
                 .withEditPreferencesAction(
                         () -> new PreferenceDialog(self(), settingsControl, (Emitter) app.make("EventEmitter"), manager,
                                 userInteractionHandler).setVisible(true))
@@ -300,10 +295,9 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         resultPanel.setDownloadAction(_ -> download());
         resultPanel.setMoveAction(_ -> {
-            final int response =
-                    JOptionPane.showConfirmDialog(self(), Messages.getText("MainWindow.OnlyMoveToLibraryStructure"),
-                            Messages.getText("App.Confirm"), //$NON-NLS-2$
-                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            final int response = JOptionPane.showConfirmDialog(self(), getText("MainWindow.OnlyMoveToLibraryStructure"),
+                    getText("App.Confirm"), //$NON-NLS-2$
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (response == JOptionPane.YES_OPTION) {
                 rename();
             }
@@ -348,8 +342,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         visibilityConsumer.accept(SearchColumnName.EPISODE, screenSettings.hideEpisode,
                 menuBar::withViewEpisodeSelected);
-        visibilityConsumer.accept(SearchColumnName.FILENAME, screenSettings.hideFilename,
-                menuBar::withViewFileNameSelected);
+        visibilityConsumer.accept(FILENAME, screenSettings.hideFilename, menuBar::withViewFileNameSelected);
         visibilityConsumer.accept(SearchColumnName.SEASON, screenSettings.hideSeason, menuBar::withViewSeasonSelected);
         visibilityConsumer.accept(SearchColumnName.TYPE, screenSettings.hideType, menuBar::withViewTypeSelected);
         visibilityConsumer.accept(SearchColumnName.TITLE, screenSettings.hideTitle, menuBar::withViewTitleSelected);
@@ -357,7 +350,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void initPopupMenu() {
         popupMenu = new MyPopupMenu();
-        JMenuItem menuItem = new JMenuItem(Messages.getText("App.Copy"));
+        JMenuItem menuItem = new JMenuItem(getText("App.Copy"));
         menuItem.addActionListener(_ -> {
             final CustomTable t = (CustomTable) popupMenu.getInvoker();
             final DefaultTableModel model = (DefaultTableModel) t.getModel();
@@ -392,9 +385,9 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     private void showAbout() {
-        String version = ConfigProperties.getInstance().getProperty(Messages.getText("MainWindow.Version"));
+        String version = ConfigProperties.getInstance().getProperty(getText("MainWindow.Version"));
         StringBuilder sb = new StringBuilder();
-        sb.append(Messages.getText("MainWindow.CurrentVersion")).append(": ").append(version);
+        sb.append(getText("MainWindow.CurrentVersion")).append(": ").append(version);
         if (version.contains("-SNAPSHOT")) {
             sb.append(" (%s)".formatted(PropertiesReader.getProperty("build.timestamp")));
         }
@@ -404,9 +397,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     protected void rename() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
-        RenameWorker renameWorker =
-                new RenameWorker(customTable, settingsControl.settings, (Manager) this.app.make("Manager"),
-                        userInteractionHandler);
+        RenameWorker renameWorker = new RenameWorker(customTable, settingsControl.settings,
+                (Manager) this.app.make("Manager"), userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
         pnlSearchFile.resultPanel.enableButtons();
         progressDialog = new ProgressDialog(this, renameWorker);
@@ -427,7 +419,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void downloadText() {
         MemoryFolderChooser.getInstance()
-                .selectDirectory(getContentPane(), Messages.getText("MainWindow.SelectFolder"))
+                .selectDirectory(getContentPane(), getText("MainWindow.SelectFolder"))
                 .ifPresent(path -> {
                     CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
                     final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
@@ -447,17 +439,15 @@ public class GUI extends JFrame implements PropertyChangeListener {
                                 if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
                                     subtitle.file.copyToDir(path);
                                 } else {
-                                    Manager manager = (Manager) this.app.make("Manager");
                                     String url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url :
                                             subtitle.urlSupplier.get();
-                                    manager.store(url, path.resolve(filename));
+                                    ((Manager) this.app.make("Manager")).store(url, path.resolve(filename));
                                 }
                             } catch (IOException | ManagerException e) {
                                 LOGGER.error("downloadText", e);
                             } catch (SubtitlesProviderException e) {
-                                LOGGER.error(
-                                        "Error while getting url for [%s] for subtitle provider [%s] (%s)".formatted(
-                                                filename, e.getSubtitleProvider(), e.getMessage()), e);
+                                LOGGER.error("Error while getting url for [%s] for subtitle provider [%s] (%s)"
+                                        .formatted(filename, e.getSubtitleProvider(), e.getMessage()), e);
                                 throw new RuntimeException(e);
                             }
                         }
@@ -477,7 +467,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void selectIncomingFolder() {
         MemoryFolderChooser.getInstance()
-                .selectDirectory(self(), Messages.getText("MainWindow.SelectFolder"))
+                .selectDirectory(self(), getText("MainWindow.SelectFolder"))
                 .map(Path::toAbsolutePath)
                 .map(Path::toString)
                 .ifPresent(pnlSearchFileInput::setIncomingPath);
@@ -492,7 +482,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             } else {
                 final int progress = downloadWorker.getProgress();
                 progressDialog.updateProgress(progress);
-                StatusMessenger.instance.message(Messages.getText("MainWindow.StatusDownload"));
+                StatusMessenger.instance.message(getText("MainWindow.StatusDownload"));
             }
         } else if (event.getSource() instanceof RenameWorker renameWorker) {
             if (renameWorker.isDone()) {
@@ -501,7 +491,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             } else {
                 final int progress = renameWorker.getProgress();
                 progressDialog.updateProgress(progress);
-                StatusMessenger.instance.message(Messages.getText("MainWindow.StatusRename"));
+                StatusMessenger.instance.message(getText("MainWindow.StatusRename"));
             }
         }
     }
@@ -516,7 +506,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void storeScreenSettings() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
         settingsControl.settings.screenSettings.hideEpisode = customTable.isHideColumn(SearchColumnName.EPISODE);
-        settingsControl.settings.screenSettings.hideFilename = customTable.isHideColumn(SearchColumnName.FILENAME);
+        settingsControl.settings.screenSettings.hideFilename = customTable.isHideColumn(FILENAME);
         settingsControl.settings.screenSettings.hideSeason = customTable.isHideColumn(SearchColumnName.SEASON);
         settingsControl.settings.screenSettings.hideTitle = customTable.isHideColumn(SearchColumnName.TITLE);
         settingsControl.settings.screenSettings.hideType = customTable.isHideColumn(SearchColumnName.TYPE);

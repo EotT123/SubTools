@@ -57,11 +57,11 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
         this.libraryBuilder = filenameLibraryBuilder;
-        initializeUi();
+        initializeUI();
         generateVideoFiles();
     }
 
-    private void initializeUi() {
+    private void initializeUI() {
         setBounds(100, 100, 600, 300);
         setMinimumSize(new Dimension(600, 300));
         Container panel = getContentPane().layout(new MigLayout("insets 10, nogrid"));
@@ -93,8 +93,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
                 .addComponent(
                         new JButton(Messages.getText("App.OK")).defaultButtonFor(getRootPane()).actionListener(_ -> {
                             setVisible(false);
-                            dispose(); // this is needed to dispose the dialog and return the control to the
-                            // window
+                            dispose(); // this is needed to dispose the dialog and return the control to the window
                         }).actionCommand("OK"))
                 .addComponent(new JButton(Messages.getText("App.Cancel")).actionListener(_ -> {
                     setVisible(false);

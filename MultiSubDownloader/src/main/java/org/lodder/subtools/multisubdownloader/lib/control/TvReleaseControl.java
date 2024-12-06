@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
@@ -18,6 +20,7 @@ public final class TvReleaseControl extends ReleaseControl {
 
     private final TheTvdbAdapter jtvdba;
     private final TvRelease tvRelease;
+    @val @override Release videoFile = tvRelease;
 
     public TvReleaseControl(TvRelease tvRelease, Settings settings, Manager manager,
             UserInteractionHandler userInteractionHandler) {
@@ -62,10 +65,5 @@ public final class TvReleaseControl extends ReleaseControl {
                         .ifPresent(tvRelease::updateTvdbEpisodeInfo);
             }
         }).orElseThrow(() -> new ReleaseControlException("Show not found, check file", tvRelease));
-    }
-
-    @Override
-    public Release getVideoFile() {
-        return tvRelease;
     }
 }

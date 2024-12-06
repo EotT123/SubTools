@@ -59,7 +59,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                     LOGGER.error("Error calculating file hash", e);
                 } catch (Exception e) {
                     LOGGER.error("API %s searchSubtitles using file hash for movie [%s] (%s)".formatted(
-                            getSubtitleSource().name, movieRelease.name, e.getMessage()), e);
+                            subtitleSource.name, movieRelease.name, e.getMessage()), e);
                 }
             }
         }
@@ -68,16 +68,15 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 subtitles.addAll(searchMovieSubtitlesWithId(imdbId, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(
-                        getSubtitleSource().name, imdbId, movieRelease.name, e.getMessage()), e);
+                        subtitleSource.name, imdbId, movieRelease.name, e.getMessage()), e);
             }
         });
         if (subtitles.isEmpty()) {
             try {
                 subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
             } catch (Exception e) {
-                LOGGER.error(
-                        "API %s searchSubtitles using title for movie [%s] (%s)".formatted(getSubtitleSource().name,
-                                movieRelease.name, e.getMessage()), e);
+                LOGGER.error("API %s searchSubtitles using title for movie [%s] (%s)".formatted(subtitleSource.name,
+                        movieRelease.name, e.getMessage()), e);
             }
         }
         return convertToSubtitles(movieRelease, subtitles, language);
@@ -97,7 +96,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             return convertToSubtitles(tvRelease, searchSerieSubtitles(tvRelease, language), language);
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
-            LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+            LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                             TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisodeNumber),
                             e.getMessage()),
                     e);

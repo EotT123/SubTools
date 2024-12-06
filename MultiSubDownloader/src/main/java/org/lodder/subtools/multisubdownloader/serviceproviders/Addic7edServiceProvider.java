@@ -70,7 +70,7 @@ public class Addic7edServiceProvider implements ServiceProvider {
         Emitter emitter = (Emitter) app.make("EventEmitter");
 
         /* Listen for settings-change */
-        emitter.listen("providers.settings.change", event -> {
+        emitter.listen("providers.settings.change", _ -> {
             /* Change occurred, delete outdated provider from store */
             subtitleProviderStore.deleteProvider(subtitleProvider);
 
