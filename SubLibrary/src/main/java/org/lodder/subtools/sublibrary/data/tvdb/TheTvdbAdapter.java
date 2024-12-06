@@ -33,6 +33,7 @@ public class TheTvdbAdapter {
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
     private final LazySupplier<TheTvdbApi> jtvapi;
+    private final String providerName = "TVDB";
 
     private TheTvdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
@@ -41,13 +42,9 @@ public class TheTvdbAdapter {
             try {
                 return new TheTvdbApi(manager, "A1720D2DDFDCE82D");
             } catch (Exception e) {
-                throw new SubtitlesProviderInitException(getProviderName(), e);
+                throw new SubtitlesProviderInitException(providerName, e);
             }
         });
-    }
-
-    public String getProviderName() {
-        return "TVDB";
     }
 
     private TheTvdbApi getApi() {
@@ -72,7 +69,7 @@ public class TheTvdbAdapter {
         }
         if (serieIds.isEmpty()) {
             tvdbSerie = Optional.empty();
-        } else if (!userInteractionHandler.getSettings().optionsConfirmProviderMapping && serieIds.size() == 1) {
+        } else if (!userInteractionHandler.settings.optionsConfirmProviderMapping && serieIds.size() == 1) {
             tvdbSerie = Optional.of(serieIds.first);
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");
@@ -85,7 +82,7 @@ public class TheTvdbAdapter {
                 tvdbSerie = userInteractionHandler
                         .selectFromList(serieIds.stream().sorted(comparator).toList(),
                                 Messages.getString("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
-                                getProviderName(), s -> "${s.serieName} (${s.firstAired})");
+                                providerName, s -> "${s.serieName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
                     tvdbSerie = askUserToEnterTvdbId(serieName)
                             .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));
@@ -115,7 +112,7 @@ public class TheTvdbAdapter {
     public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode) {
         return manager.valueBuilder()
                 .cacheType(CacheType.DISK)
-                .key("%s-episode-%s-%s-%s".formatted(getProviderName(), tvdbId, season, episode))
+                .key("%s-episode-%s-%s-%s".formatted(providerName, tvdbId, season, episode))
                 .optionalSupplier(() -> {
                     try {
                         return getApi().getEpisode(tvdbId, season, episode, Language.ENGLISH);
@@ -129,7 +126,7 @@ public class TheTvdbAdapter {
 
     }
 
-    public synchronized static TheTvdbAdapter getInstance(Manager manager,
+    public static synchronized TheTvdbAdapter getInstance(Manager manager,
             UserInteractionHandler userInteractionHandler) {
         if (instance == null) {
             instance = new TheTvdbAdapter(manager, userInteractionHandler);

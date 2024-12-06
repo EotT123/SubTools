@@ -113,7 +113,7 @@ public class MyComboBox<E> extends JComboBox<E> {
     }
 
     public @Self MyComboBox<E> withItemListener(Runnable itemListener) {
-        return withItemListener(arg -> itemListener.run());
+        return withItemListener(_ -> itemListener.run());
     }
 
     public @Self MyComboBox<E> withSelectedItem(E item) {

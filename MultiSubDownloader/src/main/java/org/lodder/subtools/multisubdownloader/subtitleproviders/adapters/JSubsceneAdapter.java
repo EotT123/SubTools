@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.SubsceneApi;
@@ -37,6 +39,8 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
     private static final Logger LOGGER = LoggerFactory.getLogger(JSubsceneAdapter.class);
 
     private static LazySupplier<SubsceneApi> api;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
+    @val @override String providerName = subtitleSource.name();
 
     public JSubsceneAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -45,7 +49,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
                 try {
                     return new SubsceneApi(manager);
                 } catch (Exception e) {
-                    throw new SubtitlesProviderInitException(getProviderName(), e);
+                    throw new SubtitlesProviderInitException(providerName, e);
                 }
             });
         }
@@ -53,16 +57,6 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
 
     private SubsceneApi getApi() {
         return api.get();
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.SUBSCENE;
-    }
-
-    @Override
-    public String getProviderName() {
-        return getSubtitleSource().name();
     }
 
     @Override
@@ -98,7 +92,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
                     try {
                         return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                     } catch (SubsceneException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                                 TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                                 e.getMessage()), e);
                         return Stream.empty();
@@ -122,7 +116,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
                 .sorted(Comparator.comparingInt(entry -> providerTypeFunction.applyAsInt(entry.getKey())))
                 .map(Entry::getValue)
                 .flatMap(List::stream)
-                .sorted(Comparator.comparing((SubSceneSerieId serieId) -> serieId.getSeason() == 0)
+                .sorted(Comparator.comparing((SubSceneSerieId serieId) -> serieId.season == 0)
                         .thenComparing(serieId -> {
                             Matcher matcher = yearPattern.matcher(serieId.name);
                             return matcher.find() ? Integer.parseInt(matcher.group()) : 0;
@@ -140,7 +134,7 @@ public class JSubsceneAdapter extends AbstractAdapter<SubsceneSubtitleDescriptor
                 .filter(sub -> sub.getName()
                         .contains(getSeasonEpisodeString(tvRelease.season, tvRelease.firstEpisodeNumber)))
                 .map(sub -> Subtitle.downloadSource(sub.getUrlSupplier())
-                        .subtitleSource(getSubtitleSource())
+                        .subtitleSource(subtitleSource)
                         .fileName(sub.getName().removeIllegalFilenameChars())
                         .language(sub.getLanguage())
                         .quality(ReleaseParser.getQualityKeyword(sub.getName()))

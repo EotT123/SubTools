@@ -103,7 +103,7 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
         getContentPane().add(progressBar, "cell 0 1 2 1,grow");
 
         JButton btnStop = new JButton(Messages.getString("SearchProgressDialog.Stop"));
-        btnStop.addActionListener(arg0 -> searchAction.cancel(true));
+        btnStop.addActionListener(_ -> searchAction.cancel(true));
         getContentPane().add(btnStop, "cell 1 2,alignx left");
     }
 

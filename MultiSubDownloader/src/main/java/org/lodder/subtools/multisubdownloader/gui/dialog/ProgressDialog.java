@@ -54,7 +54,7 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
         getContentPane().add(progressBar, "cell 1 1,grow");
 
         JButton btnStop = new JButton("Stop!");
-        btnStop.addActionListener(arg0 -> worker.cancel(true));
+        btnStop.addActionListener(_ -> worker.cancel(true));
         getContentPane().add(btnStop, "cell 1 2 1 2,alignx left");
     }
 

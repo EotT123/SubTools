@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 import com.pivovarit.function.ThrowingSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.gestdown.invoker.ApiException;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.JAddic7edProxyGestdownApi;
@@ -33,20 +35,12 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edViaProxyAdapter.class);
 
     private final JAddic7edProxyGestdownApi jaapi;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
+    @val @override String providerName = subtitleSource.name() + "-GESTDOWN";
 
     public JAddic7edViaProxyAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         this.jaapi = new JAddic7edProxyGestdownApi(manager);
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.ADDIC7ED;
-    }
-
-    @Override
-    public String getProviderName() {
-        return getSubtitleSource().name() + "-GESTDOWN";
     }
 
     private JAddic7edProxyGestdownApi getApi() {
@@ -105,7 +99,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                                 "getProviderSerieName: [%s]".formatted(tvdbId))
                         .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                         .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                            LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(getProviderName(), tvdbId));
+                            LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(providerName, tvdbId));
                             return List.of();
                         })
                         .execute()).orElseGet(List::of);
@@ -115,7 +109,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                             "getProviderSerieName: [%s]".formatted(serieName))
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                        LOGGER.info("API %s - Could not find serie name [%s]".formatted(getProviderName(), serieName));
+                        LOGGER.info("API %s - Could not find serie name [%s]".formatted(providerName, serieName));
                         return List.of();
                     })
                     .execute();

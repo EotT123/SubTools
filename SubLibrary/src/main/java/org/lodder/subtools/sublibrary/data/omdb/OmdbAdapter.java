@@ -2,6 +2,7 @@ package org.lodder.subtools.sublibrary.data.omdb;
 
 import java.util.Optional;
 
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
@@ -17,6 +18,7 @@ public class OmdbAdapter {
     private static OmdbAdapter instance;
     private final Manager manager;
     private final LazySupplier<OmdbApi> omdpApi;
+    @val String providerName = "OMDB";
 
     private OmdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
@@ -24,13 +26,9 @@ public class OmdbAdapter {
             try {
                 return new OmdbApi(manager);
             } catch (Exception e) {
-                throw new SubtitlesProviderInitException(getProviderName(), e);
+                throw new SubtitlesProviderInitException(providerName, e);
             }
         });
-    }
-
-    public String getProviderName() {
-        return "OMDB";
     }
 
     private OmdbApi getApi() {

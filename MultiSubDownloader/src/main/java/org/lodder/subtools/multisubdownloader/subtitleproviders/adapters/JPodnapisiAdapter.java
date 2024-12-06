@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.JPodnapisiApi;
@@ -32,6 +34,8 @@ public class JPodnapisiAdapter
     private static final Logger LOGGER = LoggerFactory.getLogger(JPodnapisiAdapter.class);
 
     private static LazySupplier<JPodnapisiApi> jpapi;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.PODNAPISI;
+    @val @override String providerName = subtitleSource.name();
 
     public JPodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -40,7 +44,7 @@ public class JPodnapisiAdapter
                 try {
                     return new JPodnapisiApi(manager, "JBierSubDownloader");
                 } catch (Exception e) {
-                    throw new SubtitlesProviderInitException(getProviderName(), e);
+                    throw new SubtitlesProviderInitException(providerName, e);
                 }
             });
         }
@@ -48,16 +52,6 @@ public class JPodnapisiAdapter
 
     private JPodnapisiApi getApi() {
         return jpapi.get();
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.PODNAPISI;
-    }
-
-    @Override
-    public String getProviderName() {
-        return getSubtitleSource().name();
     }
 
     @Override
@@ -91,7 +85,7 @@ public class JPodnapisiAdapter
                         return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language)
                                 .stream();
                     } catch (PodnapisiException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                                 TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                                 e.getMessage()), e);
                         return Stream.empty();
@@ -109,7 +103,7 @@ public class JPodnapisiAdapter
         return lSubtitles.stream()
                 .filter(ossd -> StringUtils.isNotBlank(ossd.releaseString))
                 .map(ossd -> Subtitle.downloadSource(ossd.url)
-                        .subtitleSource(getSubtitleSource())
+                        .subtitleSource(subtitleSource)
                         .fileName(ossd.releaseString)
                         .language(language)
                         .quality(ReleaseParser.getQualityKeyword(ossd.releaseString))

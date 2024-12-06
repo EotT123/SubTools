@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 import extensions.java.lang.String.StringExt;
 import lombok.Getter;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.JAddic7edApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
@@ -34,6 +36,8 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edAdapter.class);
 
     private static LazySupplier<JAddic7edApi> jaapi;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
+    @val @override String providerName = subtitleSource.name();
 
     public JAddic7edAdapter(boolean isLoginEnabled, String username, String password, boolean speedy, Manager manager,
             UserInteractionHandler userInteractionHandler) {
@@ -44,7 +48,7 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
                     return isLoginEnabled ? new JAddic7edApi(username, password, speedy, manager) :
                             new JAddic7edApi(speedy, manager);
                 } catch (Exception e) {
-                    throw new SubtitlesProviderInitException(getProviderName(), e);
+                    throw new SubtitlesProviderInitException(providerName, e);
                 }
             });
         }
@@ -54,15 +58,6 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
         return jaapi.get();
     }
 
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.ADDIC7ED;
-    }
-
-    @Override
-    public String getProviderName() {
-        return getSubtitleSource().name();
-    }
 
     @Override
     public List<Addic7edSubtitleDescriptor> searchMovieSubtitlesWithHash(String hash, Language language) {
@@ -97,7 +92,7 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
                     try {
                         return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                     } catch (Addic7edException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                                 TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                                 e.getMessage()), e);
                         return Stream.empty();
@@ -111,7 +106,7 @@ public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor
         return subtitles.stream()
                 .filter(sub -> language == sub.getLanguage())
                 .map(sub -> Subtitle.downloadSource(sub.getUrl())
-                        .subtitleSource(getSubtitleSource())
+                        .subtitleSource(subtitleSource)
                         .fileName(StringExt.removeIllegalFilenameChars(sub.getTitle() + " " + sub.getVersion()))
                         .language(sub.getLanguage())
                         .quality(ReleaseParser.getQualityKeyword(sub.getTitle() + " " + sub.getVersion()))

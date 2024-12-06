@@ -17,20 +17,19 @@ import org.slf4j.LoggerFactory;
 
 public interface SubtitleProvider {
 
-    @val String providerName;
     @val Manager manager;
+    @val SubtitleSource subtitleSource;
+    @val String providerName;
 
     Set<Subtitle> searchSubtitles(TvRelease tvRelease, Language language);
 
     Set<Subtitle> searchSubtitles(MovieRelease movieRelease, Language language);
 
-    SubtitleSource getSubtitleSource();
-
     /**
      * @return The name of the SubtitleProvider
      */
     default String getName() {
-        return getSubtitleSource().name;
+        return subtitleSource.name;
     }
 
     /**

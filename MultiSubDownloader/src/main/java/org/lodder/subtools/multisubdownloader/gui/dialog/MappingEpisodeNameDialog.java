@@ -15,7 +15,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
@@ -63,14 +62,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
                 .stream()
-                .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.getProviderName()))
+                .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.providerName))
                 .findAny();
         btnAddCustomMapping.setEnabled(selectedSubtitleProvider.isPresent());
         mappingTableModel.setMappingType(mappingType);
         repaint();
     }
 
-    @Getter
     public enum MappingType {
         TVDB("TVDB", "TVDB",
                 new SelectionForKeyPrefix("", "TVDB-serieId-", k -> k.replace("-serieId-", "-tvdbSerie-"))),
@@ -92,12 +90,12 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
         public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<String, SerieMapping>>>
                 MAPPING_SUPPLIER;
-        private final String name;
-        private final String providerName;
-        private final String nameColumn;
-        private final String mappingColumn;
-        private final String providerNameColumn;
-        private final SelectionForKeyPrefix[] selectionForKeyPrefixList;
+        @val String name;
+        @val String providerName;
+        @val String nameColumn;
+        @val String mappingColumn;
+        @val String providerNameColumn;
+        @val SelectionForKeyPrefix[] selectionForKeyPrefixList;
 
         @Override
         public String toString() {
@@ -241,7 +239,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
             {
                 JButton btnDeleteSelectedRow = new JButton(Messages.getString("MappingEpisodeNameDialog.DeleteRow"));
-                btnDeleteSelectedRow.addActionListener(arg0 -> {
+                btnDeleteSelectedRow.addActionListener(_ -> {
                     int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                     MappingTableModel model = (MappingTableModel) table.getModel();
 

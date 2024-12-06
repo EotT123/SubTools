@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.Getter;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -37,6 +39,8 @@ public class JOpenSubAdapter
     private static final Logger LOGGER = LoggerFactory.getLogger(JOpenSubAdapter.class);
 
     private static LazySupplier<OpenSubtitlesApi> osApi;
+    @val @override SubtitleSource subtitleSource = SubtitleSource.OPENSUBTITLES;
+    @val @override String providerName = subtitleSource.name();
 
     public JOpenSubAdapter(boolean isLoginEnabled, String username, String password, Manager manager,
             UserInteractionHandler userInteractionHandler) {
@@ -50,7 +54,7 @@ public class JOpenSubAdapter
                         return new OpenSubtitlesApi(manager);
                     }
                 } catch (OpenSubtitlesException e) {
-                    throw new SubtitlesProviderInitException(getProviderName(), e);
+                    throw new SubtitlesProviderInitException(providerName, e);
                 }
             });
         }
@@ -58,16 +62,6 @@ public class JOpenSubAdapter
 
     private OpenSubtitlesApi getApi() {
         return osApi.get();
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.OPENSUBTITLES;
-    }
-
-    @Override
-    public String getProviderName() {
-        return getSubtitleSource().name();
     }
 
     @Override
@@ -113,7 +107,7 @@ public class JOpenSubAdapter
                                 .getData()
                                 .stream();
                     } catch (OpenSubtitlesException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().name,
+                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                                 TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                                 e.getMessage()), e);
                         return Stream.empty();
@@ -140,7 +134,7 @@ public class JOpenSubAdapter
             SubtitleAttributes attributes) {
         return Subtitle.downloadSource(
                         () -> getApi().downloadSubtitle().fileId(file.getFileId().intValue()).download().getLink())
-                .subtitleSource(getSubtitleSource())
+                .subtitleSource(subtitleSource)
                 .fileName(file.getFileName())
                 .language(Language.fromIdOptional(attributes.getLanguage()).orElse(null))
                 .quality(ReleaseParser.getQualityKeyword(file.getFileName()))
