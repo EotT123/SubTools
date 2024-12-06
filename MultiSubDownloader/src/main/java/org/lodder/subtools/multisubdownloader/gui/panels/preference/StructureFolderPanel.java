@@ -111,7 +111,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         txtFolderStructure.setText(librarySettings.libraryFolderStructure);
         chkRemoveEmptyFolder.setSelected(librarySettings.libraryRemoveEmptyFolders);
         chkReplaceSpace.setSelected(librarySettings.libraryFolderReplaceSpace);
-        cbxReplaceSpaceChar.setSelectedItem(librarySettings.libraryFolderReplacingSpaceChar;
+        cbxReplaceSpaceChar.setSelectedItem(librarySettings.libraryFolderReplacingSpaceChar);
     }
 
     public void savePreferenceSettings() {

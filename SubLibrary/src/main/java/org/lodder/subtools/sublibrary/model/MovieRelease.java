@@ -5,15 +5,14 @@ import java.util.OptionalInt;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.var;
 
 public final class MovieRelease extends Release {
 
     @var String name;
     @var Integer year;
-    @set int imdbId;
-    @set int tvdbId;
+    @var int imdbId;
+    @var int tvdbId;
 
     public interface MovieReleaseBuilderName {
         MovieReleaseBuilderOther name(String name);
