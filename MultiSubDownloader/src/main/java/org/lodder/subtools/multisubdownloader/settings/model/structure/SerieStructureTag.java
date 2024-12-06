@@ -9,7 +9,7 @@ public enum SerieStructureTag implements StructureTag {
     SHOW_NAME("%SHOW NAME%", "StructureBuilderDialog.NameTvShow"),
     TITLE("%TITLE%", "StructureBuilderDialog.EpisodeTitle"),
     EPISODE_LONG("%EE%", "StructureBuilderDialog.NumberOfEpisodeLeadingZero"),
-    EPISODES_LONG("%EEX%", "StructureBuilderDialog.NumberOfEpisodeLeadingZeroForMultipe"),
+    EPISODES_LONG("%EEX%", "StructureBuilderDialog.NumberOfEpisodeLeadingZeroForMultiple"),
     EPISODE_SHORT("%E%", "StructureBuilderDialog.NumberOfEpisodeWithoutLeadingZero"),
     EPISODES_SHORT("%EX%", "StructureBuilderDialog.NumberOfEpisodeLeadingZeroMultiple"),
     SEASON_LONG("%SS%", "StructureBuilderDialog.NumberOfSeasonLeading"),

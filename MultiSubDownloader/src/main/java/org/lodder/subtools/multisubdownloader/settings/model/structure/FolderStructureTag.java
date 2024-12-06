@@ -9,7 +9,7 @@ import org.lodder.subtools.multisubdownloader.Messages;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum FolderStructureTag implements StructureTag {
 
-    SEPARATOR("%SEPARATOR%", Messages.getString("StructureBuilderDialog.SystemdependendSeparator"));
+    SEPARATOR("%SEPARATOR%", Messages.getString("StructureBuilderDialog.SystemDependentSeparator"));
 
     @val @override String label;
     @val @override String description;

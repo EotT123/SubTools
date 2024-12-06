@@ -362,8 +362,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
             final CustomTable t = (CustomTable) popupMenu.getInvoker();
             final DefaultTableModel model = (DefaultTableModel) t.getModel();
 
-            int col = t.columnAtPoint(popupMenu.getClickLocation());
-            int row = t.rowAtPoint(popupMenu.getClickLocation());
+            int col = t.columnAtPoint(popupMenu.clickLocation);
+            int row = t.rowAtPoint(popupMenu.clickLocation);
 
             try {
                 StringSelection selection = new StringSelection((String) model.getValueAt(row, col));

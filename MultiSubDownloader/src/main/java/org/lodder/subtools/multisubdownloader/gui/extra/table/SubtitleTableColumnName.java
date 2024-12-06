@@ -14,7 +14,7 @@ public enum SubtitleTableColumnName implements CustomColumnName {
     FILENAME("SubtitleTableColumnName.Filename", String.class, false, Subtitle::getFileName),
     SOURCE("SubtitleTableColumnName.Source", String.class, false, Subtitle::getSubtitleSource),
     UPLOADER("SubtitleTableColumnName.Uploader", String.class, false, Subtitle::getUploader),
-    HEARINGIMPAIRED("SubtitleTableColumnName.hearingimpaired", Boolean.class, false, Subtitle::isHearingImpaired),
+    HEARINGIMPAIRED("SubtitleTableColumnName.hearingImpaired", Boolean.class, false, Subtitle::isHearingImpaired),
     QUALITY("SubtitleTableColumnName.Quality", String.class, false, Subtitle::getQuality),
     RELEASEGROUP("SubtitleTableColumnName.Releasegroup", String.class, false, Subtitle::getReleaseGroup);
 

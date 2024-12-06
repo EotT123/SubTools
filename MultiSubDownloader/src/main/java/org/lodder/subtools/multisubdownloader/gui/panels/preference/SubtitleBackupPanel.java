@@ -24,7 +24,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fillx, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titelPanel = TitlePanel.title(Messages.getString("PreferenceDialog.SubtitlesBackup"))
+        JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.SubtitlesBackup"))
                 .margin(0)
                 .padding(0)
                 .paddingLeft(20)
@@ -37,7 +37,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
                             this.chkBackupSubtitle = new JCheckBox(Messages.getString("PreferenceDialog" +
                                     ".BackupSubtitles")))
                     .panelOnNewLine()
-                    .addTo(titelPanel, "span, wrap, growx")
+                    .addTo(titlePanel, "span, wrap, growx")
                     .addComponent("split 3, shrink", new JLabel(Messages.getString("PreferenceDialog.Location")))
                     .addComponent("growx", txtBackupSubtitlePath)
                     .addComponent("shrink", new JButton(Messages.getString("App.Browse")).actionListener(
@@ -46,7 +46,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
                                     .ifPresent(txtBackupSubtitlePath::setObject)));
 
             chkBackupUseSourceFileName =
-                    new JCheckBox(Messages.getString("PreferenceDialog.IncludeSourceInFileName")).addTo(titelPanel);
+                    new JCheckBox(Messages.getString("PreferenceDialog.IncludeSourceInFileName")).addTo(titlePanel);
         }
 
         loadPreferenceSettings();
