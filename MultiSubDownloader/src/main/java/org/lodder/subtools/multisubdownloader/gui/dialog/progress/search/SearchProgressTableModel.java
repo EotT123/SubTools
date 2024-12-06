@@ -17,9 +17,9 @@ public class SearchProgressTableModel extends DefaultTableModel {
         super();
         this.setColumnCount(3);
         this.setColumnIdentifiers(new String[]{
-                Messages.getString("SearchProgressTableModel.Source"),
-                Messages.getString("SearchProgressTableModel.Queue"),
-                Messages.getString("SearchProgressTableModel.Release") });
+                Messages.getText("SearchProgressTableModel.Source"),
+                Messages.getText("SearchProgressTableModel.Queue"),
+                Messages.getText("SearchProgressTableModel.Release") });
     }
 
     public void update(String source, int queue, String release) {

@@ -124,7 +124,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             editorPane.setContentType("text/html");
 
             editorPane.setText(
-                    "<html>" + Messages.getString("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl.get() + ">" +
+                    "<html>" + Messages.getText("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl.get() + ">" +
                             updateUrl.get() + "</a></html>");
 
             editorPane.addHyperlinkListener(hyperlinkEvent -> {
@@ -140,7 +140,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             JOptionPane.showMessageDialog(this, editorPane, ConfigProperties.getInstance().getProperty("name"),
                     JOptionPane.INFORMATION_MESSAGE);
         } else if (forceUpdateCheck) {
-            JOptionPane.showMessageDialog(this, Messages.getString("MainWindow.NoUpdateAvailable"),
+            JOptionPane.showMessageDialog(this, Messages.getText("MainWindow.NoUpdateAvailable"),
                     ConfigProperties.getInstance().getProperty("name"), JOptionPane.INFORMATION_MESSAGE);
         }
 
@@ -175,10 +175,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
         getContentPane().add(tabbedPane, gbcTabbedPane);
 
         createFileSearchPanel();
-        tabbedPane.addTab(Messages.getString("MainWindow.SearchOnFile"), null, pnlSearchFile, null);
+        tabbedPane.addTab(Messages.getText("MainWindow.SearchOnFile"), null, pnlSearchFile, null);
 
         createTextSearchPanel();
-        tabbedPane.addTab(Messages.getString("MainWindow.SearchOnName"), null, pnlSearchText, null);
+        tabbedPane.addTab(Messages.getText("MainWindow.SearchOnName"), null, pnlSearchText, null);
 
         pnlLogging = new LoggingPanel();
         final GridBagConstraints gbcPnlLogging = new GridBagConstraints();
@@ -227,9 +227,9 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 })
                 .withViewClearLogAction(() -> pnlLogging.setLogText(""))
                 .withEditRenameTVAction(
-                        () -> showRenameDialog.accept(VideoType.EPISODE, Messages.getString("Menu.RenameSerie")))
+                        () -> showRenameDialog.accept(VideoType.EPISODE, Messages.getText("Menu.RenameSerie")))
                 .withEditRenameMovieAction(
-                        () -> showRenameDialog.accept(VideoType.MOVIE, Messages.getString("Menu.RenameMovie")))
+                        () -> showRenameDialog.accept(VideoType.MOVIE, Messages.getText("Menu.RenameMovie")))
                 .withEditPreferencesAction(
                         () -> new PreferenceDialog(self(), settingsControl, (Emitter) app.make("EventEmitter"), manager,
                                 userInteractionHandler).setVisible(true))
@@ -301,8 +301,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setDownloadAction(_ -> download());
         resultPanel.setMoveAction(_ -> {
             final int response =
-                    JOptionPane.showConfirmDialog(self(), Messages.getString("MainWindow.OnlyMoveToLibraryStructure"),
-                            Messages.getString("App.Confirm"), //$NON-NLS-2$
+                    JOptionPane.showConfirmDialog(self(), Messages.getText("MainWindow.OnlyMoveToLibraryStructure"),
+                            Messages.getText("App.Confirm"), //$NON-NLS-2$
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (response == JOptionPane.YES_OPTION) {
                 rename();
@@ -357,7 +357,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void initPopupMenu() {
         popupMenu = new MyPopupMenu();
-        JMenuItem menuItem = new JMenuItem(Messages.getString("App.Copy"));
+        JMenuItem menuItem = new JMenuItem(Messages.getText("App.Copy"));
         menuItem.addActionListener(_ -> {
             final CustomTable t = (CustomTable) popupMenu.getInvoker();
             final DefaultTableModel model = (DefaultTableModel) t.getModel();
@@ -392,9 +392,9 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     private void showAbout() {
-        String version = ConfigProperties.getInstance().getProperty(Messages.getString("MainWindow.Version"));
+        String version = ConfigProperties.getInstance().getProperty(Messages.getText("MainWindow.Version"));
         StringBuilder sb = new StringBuilder();
-        sb.append(Messages.getString("MainWindow.CurrentVersion")).append(": ").append(version);
+        sb.append(Messages.getText("MainWindow.CurrentVersion")).append(": ").append(version);
         if (version.contains("-SNAPSHOT")) {
             sb.append(" (%s)".formatted(PropertiesReader.getProperty("build.timestamp")));
         }
@@ -427,7 +427,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void downloadText() {
         MemoryFolderChooser.getInstance()
-                .selectDirectory(getContentPane(), Messages.getString("MainWindow.SelectFolder"))
+                .selectDirectory(getContentPane(), Messages.getText("MainWindow.SelectFolder"))
                 .ifPresent(path -> {
                     CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
                     final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
@@ -477,7 +477,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void selectIncomingFolder() {
         MemoryFolderChooser.getInstance()
-                .selectDirectory(self(), Messages.getString("MainWindow.SelectFolder"))
+                .selectDirectory(self(), Messages.getText("MainWindow.SelectFolder"))
                 .map(Path::toAbsolutePath)
                 .map(Path::toString)
                 .ifPresent(pnlSearchFileInput::setIncomingPath);
@@ -492,7 +492,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             } else {
                 final int progress = downloadWorker.getProgress();
                 progressDialog.updateProgress(progress);
-                StatusMessenger.instance.message(Messages.getString("MainWindow.StatusDownload"));
+                StatusMessenger.instance.message(Messages.getText("MainWindow.StatusDownload"));
             }
         } else if (event.getSource() instanceof RenameWorker renameWorker) {
             if (renameWorker.isDone()) {
@@ -501,7 +501,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             } else {
                 final int progress = renameWorker.getProgress();
                 progressDialog.updateProgress(progress);
-                StatusMessenger.instance.message(Messages.getString("MainWindow.StatusRename"));
+                StatusMessenger.instance.message(Messages.getText("MainWindow.StatusRename"));
             }
         }
     }

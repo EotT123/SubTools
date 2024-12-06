@@ -74,7 +74,7 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
     @Override
     protected void validate() throws SearchSetupException {
         if (getInputPanel().getReleaseName().isEmpty()) {
-            throw new SearchSetupException(Messages.getString("App.NoReleaseEntered"));
+            throw new SearchSetupException(Messages.getText("App.NoReleaseEntered"));
         }
     }
 

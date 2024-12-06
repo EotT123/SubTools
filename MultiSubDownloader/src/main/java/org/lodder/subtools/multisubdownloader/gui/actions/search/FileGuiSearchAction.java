@@ -79,7 +79,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     protected void validate() throws SearchSetupException {
         String path = getInputPanel().getIncomingPath();
         if ("".equals(path) && !this.settings.hasDefaultFolders()) {
-            throw new SearchSetupException(Messages.getString("App.NoFolderSelected"));
+            throw new SearchSetupException(Messages.getText("App.NoFolderSelected"));
         }
     }
 

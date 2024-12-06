@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.io.Serial;
 import java.nio.file.Files;
@@ -7,7 +9,6 @@ import java.nio.file.Files;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.PartialDisableComboBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
@@ -39,29 +40,26 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
 
         this.pnlBackup = renameMode ? null : new SubtitleBackupPanel(librarySettings).addTo(this, "wrap, span, growx");
 
-        JPanel performActionPanel = TitlePanel.title(Messages.getString("PreferenceDialog.PerformActions"))
-                .margin(0)
-                .padding(0)
-                .paddingLeft(20)
-                .addTo(this, "span, growx");
+        JPanel performActionPanel = TitlePanel.title(getText("PreferenceDialog.PerformActions"))
+                .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
         {
 
-            this.chkUseTVDBNaming = new JCheckBox(Messages.getString("PreferenceDialog.UseTvdbName")).visible(
+            this.chkUseTVDBNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
                     VideoType.EPISODE == videoType).addTo(performActionPanel, "hidemode 3, wrap");
 
-            new JLabel(Messages.getString("PreferenceDialog.ActionForShowFiles")).addTo(performActionPanel);
+            new JLabel(getText("PreferenceDialog.ActionForShowFiles")).addTo(performActionPanel);
             this.cbxLibraryAction = new MyComboBox<>(LibraryActionType.values()).withToMessageStringRenderer(
                     LibraryActionType::getMsgCode).addTo(performActionPanel, "wrap");
 
             this.pnlStructureFolder =
-                    new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler).addTo(
-                            performActionPanel, "hidemode 3, wrap, span, growx");
+                    new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
+                            .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
             this.pnlStructureFile =
-                    new StructureFilePanel(librarySettings, videoType, manager, userInteractionHandler).addTo(
-                            performActionPanel, "hidemode 3, wrap, span, growx");
+                    new StructureFilePanel(librarySettings, videoType, manager, userInteractionHandler)
+                            .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
 
             JLabel lblActionForOtherFiles =
-                    new JLabel(Messages.getString("PreferenceDialog.ActionForOtherFiles")).addTo(performActionPanel);
+                    new JLabel(getText("PreferenceDialog.ActionForOtherFiles")).addTo(performActionPanel);
             this.cbxLibraryOtherFileAction =
                     PartialDisableComboBox.of(LibraryOtherFileActionType.values()).addTo(performActionPanel);
 
@@ -143,7 +141,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     @Override
     public boolean hasValidSettings() {
         return pnlStructureFolder.hasValidSettings() && pnlStructureFile.hasValidSettings() &&
-               (pnlBackup == null || pnlBackup.hasValidSettings());
+                (pnlBackup == null || pnlBackup.hasValidSettings());
     }
 
 }

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.io.Serial;
 import java.nio.file.Path;
@@ -27,8 +29,7 @@ import org.lodder.subtools.sublibrary.Language;
 
 public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
-    @Serial
-    private static final long serialVersionUID = -5458593307643063563L;
+    @Serial private static final long serialVersionUID = -5458593307643063563L;
 
     private final GUI gui;
     private final SettingsControl settingsCtrl;
@@ -46,111 +47,116 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         this.gui = gui;
         this.settingsCtrl = settingsCtrl;
 
-        JPanel settingsPanel = TitlePanel.title(Messages.getString("PreferenceDialog.Settings"))
-                .padding(0).paddingLeft(20).useGrid().fillContents(false).addTo(this, "span, grow, wrap");
+        JPanel settingsPanel = TitlePanel.title(getText("PreferenceDialog.Settings"))
+                .padding(0).paddingLeft(20).useGrid().fillContents(false)
+                .addTo(this, "span, grow, wrap");
         {
 
-            {
-                new JLabel(Messages.getString("PreferenceDialog.Language")).addTo(settingsPanel);
+            // Language \\
 
-                this.cbxLanguage = new MyComboBox<>(Messages.getAvailableLanguages(), Language.class)
-                        .withToMessageStringRenderer(Language::getMsgCode)
-                        .addTo(settingsPanel, "wrap");
-            }
+            new JLabel(getText("PreferenceDialog.Language")).addTo(settingsPanel);
 
-            {
-                new JLabel(Messages.getString("PreferenceDialog.DefaultIncomingFolder")).addTo(settingsPanel,
-                        "aligny center, span 1 2");
+            this.cbxLanguage = new MyComboBox<>(Messages.getAvailableLanguages(), Language.class)
+                    .withToMessageStringRenderer(Language::getMsgCode)
+                    .addTo(settingsPanel, "wrap");
 
-                new JScrollPane()
-                        .viewportView(this.defaultIncomingFoldersList =
-                                JListWithImages.createForType(Path.class).distinctValues().build())
-                        .addTo(settingsPanel, "growx, span, wrap");
+            // Default Incoming Folder \\
 
-                new JButton(Messages.getString("PreferenceDialog.AddFolder"))
-                        .actionListener(
-                                () -> MemoryFolderChooser.getInstance()
-                                        .selectDirectory(settingsPanel,
-                                                Messages.getString("PreferenceDialog.SelectFolder"))
-                                        .map(Path::toAbsolutePath)
-                                        .filter(path -> !defaultIncomingFoldersList.contains(path))
-                                        .ifPresent(
-                                                path -> defaultIncomingFoldersList.addItem(PathMatchType.FOLDER.image,
-                                                        path)))
-                        .addTo(settingsPanel, "span, split 2");
+            new JLabel(getText("PreferenceDialog.DefaultIncomingFolder")).addTo(settingsPanel,
+                    "aligny center, span 1 2");
 
-                new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
-                        .actionListener(defaultIncomingFoldersList::removeSelectedItem)
-                        .addTo(settingsPanel, "wrap, gapbottom 10px");
-            }
-            {
-                new JLabel(Messages.getString("PreferenceDialog.ExcludeList")).addTo(settingsPanel,
-                        "aligny center, span 1 2");
+            new JScrollPane()
+                    .viewportView(this.defaultIncomingFoldersList =
+                            JListWithImages.createForType(Path.class).distinctValues().build())
+                    .addTo(settingsPanel, "growx, span, wrap");
 
-                new JScrollPane()
-                        .viewportView(this.excludeList =
-                                JListWithImages.createForType(PathOrRegex.class).distinctValues().build())
-                        .addTo(settingsPanel, "growx, span, wrap");
+            new JButton(getText("PreferenceDialog.AddFolder"))
+                    .actionListener(() -> MemoryFolderChooser.getInstance()
+                            .selectDirectory(settingsPanel, getText("PreferenceDialog.SelectFolder"))
+                            .map(Path::toAbsolutePath)
+                            .filter(path -> !defaultIncomingFoldersList.contains(path))
+                            .ifPresent(p -> defaultIncomingFoldersList.addItem(PathMatchType.FOLDER.image, p)))
+                    .addTo(settingsPanel, "span, split 2");
 
-                Consumer<PathMatchType> addExcludeItemConsumer = type -> {
-                    if (type == PathMatchType.FOLDER) {
-                        MemoryFolderChooser.getInstance()
-                                .selectDirectory(settingsPanel,
-                                        Messages.getString("PreferenceDialog.SelectExcludeFolder"))
-                                .map(Path::toAbsolutePath)
-                                .map(PathOrRegex::new)
-                                .ifPresent(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
-                    } else if (type == PathMatchType.REGEX) {
-                        String regex = JOptionPane.showInputDialog(Messages.getString("PreferenceDialog.EnterRegex"));
-                        if (StringUtils.isNotBlank(regex)) {
-                            excludeList.addItem(PathMatchType.REGEX.image, new PathOrRegex(regex));
-                        }
+            new JButton(getText("PreferenceDialog.DeleteFolder"))
+                    .actionListener(defaultIncomingFoldersList::removeSelectedItem)
+                    .addTo(settingsPanel, "wrap, gapbottom 10px");
+
+            // Exclude List \\
+
+            new JLabel(getText("PreferenceDialog.ExcludeList"))
+                    .addTo(settingsPanel, "aligny center, span 1 2");
+
+            new JScrollPane()
+                    .viewportView(this.excludeList =
+                            JListWithImages.createForType(PathOrRegex.class).distinctValues().build())
+                    .addTo(settingsPanel, "growx, span, wrap");
+
+            Consumer<PathMatchType> addExcludeItemConsumer = type -> {
+                if (type == PathMatchType.FOLDER) {
+                    MemoryFolderChooser.getInstance()
+                            .selectDirectory(settingsPanel, getText("PreferenceDialog.SelectExcludeFolder"))
+                            .map(Path::toAbsolutePath)
+                            .map(PathOrRegex::new)
+                            .ifPresent(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
+                } else if (type == PathMatchType.REGEX) {
+                    String regex = JOptionPane.showInputDialog(getText("PreferenceDialog.EnterRegex"));
+                    if (StringUtils.isNotBlank(regex)) {
+                        excludeList.addItem(PathMatchType.REGEX.image, new PathOrRegex(regex));
                     }
-                };
+                }
+            };
 
-                new JButton(Messages.getString("PreferenceDialog.AddFolder"))
-                        .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.FOLDER))
-                        .addTo(settingsPanel, "span, split 3");
+            new JButton(getText("PreferenceDialog.AddFolder"))
+                    .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.FOLDER))
+                    .addTo(settingsPanel, "span, split 3");
 
-                new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
-                        .actionListener(excludeList::removeSelectedItem)
-                        .addTo(settingsPanel);
+            new JButton(getText("PreferenceDialog.DeleteFolder"))
+                    .actionListener(excludeList::removeSelectedItem)
+                    .addTo(settingsPanel);
 
-                new JButton(Messages.getString("PreferenceDialog.RegexToevoegen"))
-                        .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.REGEX))
-                        .addTo(settingsPanel);
-            }
+            new JButton(getText("PreferenceDialog.RegexToevoegen"))
+                    .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.REGEX))
+                    .addTo(settingsPanel);
         }
 
         {
 
-            JPanel updatePanel = TitlePanel.title(Messages.getString("PreferenceDialog.Update"))
-                    .padding(0).paddingLeft(20).useGrid().fillContents(false).addTo(this, "span, grow, wrap");
-            {
-                new JLabel(Messages.getString("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
-                this.cbxUpdateCheckPeriod = new MyComboBox<>(UpdateCheckPeriod.values())
-                        .withToMessageStringRenderer(UpdateCheckPeriod::getLangCode)
-                        .addTo(updatePanel, "wrap");
-                new JLabel(Messages.getString("PreferenceDialog.UpdateType")).addTo(updatePanel);
-                this.cbxUpdateType = new MyComboBox<>(UpdateType.values())
-                        .withToMessageStringRenderer(UpdateType::getMsgCode).addTo(updatePanel);
-            }
+            JPanel updatePanel = TitlePanel.title(getText("PreferenceDialog.Update"))
+                    .padding(0)
+                    .paddingLeft(20)
+                    .useGrid()
+                    .fillContents(false)
+                    .addTo(this, "span, grow, wrap");
+
+            new JLabel(getText("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
+            this.cbxUpdateCheckPeriod = new MyComboBox<>(UpdateCheckPeriod.values()).withToMessageStringRenderer(
+                    UpdateCheckPeriod::getLangCode).addTo(updatePanel, "wrap");
+            new JLabel(getText("PreferenceDialog.UpdateType")).addTo(updatePanel);
+            this.cbxUpdateType =
+                    new MyComboBox<>(UpdateType.values()).withToMessageStringRenderer(UpdateType::getMsgCode)
+                            .addTo(updatePanel);
         }
 
         {
 
-            JPanel proxyPanel = TitlePanel.title(Messages.getString("PreferenceDialog.ConfigureProxy"))
-                    .padding(0).paddingLeft(20).fillContents(false).addTo(this, "span, grow");
+            JPanel proxyPanel = TitlePanel.title(getText("PreferenceDialog.ConfigureProxy"))
+                    .padding(0)
+                    .paddingLeft(20)
+                    .fillContents(false)
+                    .addTo(this, "span, grow");
 
             PanelCheckBox.checkbox(
-                            this.chkUseProxy = new JCheckBox(Messages.getString("PreferenceDialog.UseProxyServer")))
-                    .panelOnSameLine().panelLayout(new MigLayout("insets 0, fill")).leftGap(0).addTo(proxyPanel)
-                    .addComponent(new JLabel(Messages.getString("PreferenceDialog.Hostname")))
+                            this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")))
+                    .panelOnSameLine()
+                    .panelLayout(new MigLayout("insets 0, fill"))
+                    .leftGap(0)
+                    .addTo(proxyPanel)
+                    .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
                     .addComponent("wrap",
                             this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))
-                    .addComponent(new JLabel(Messages.getString("PreferenceDialog.Port")))
-                    .addComponent(
-                            this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
+                    .addComponent(new JLabel(getText("PreferenceDialog.Port")))
+                    .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
         }
 
         loadPreferenceSettings();

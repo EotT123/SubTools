@@ -30,7 +30,7 @@ public class SelectDialog extends MultiSubDialog {
      * Create the dialog.
      */
     public SelectDialog(JFrame frame, List<Subtitle> subtitles, Release release) {
-        super(frame, Messages.getString("SelectDialog.SelectCorrectSubtitle"), true);
+        super(frame, Messages.getText("SelectDialog.SelectCorrectSubtitle"), true);
         this.subtitles =
                 subtitles.stream().distinct().sorted(Comparator.comparing(Subtitle::getScore).reversed()).toList();
         this.release = release;
@@ -43,7 +43,7 @@ public class SelectDialog extends MultiSubDialog {
     private void initialize() {
         getContentPane().setLayout(new MigLayout("", "[1000px:n,grow,fill]", "[][::100px,fill][grow]"));
         JLabel lblNewLabel =
-                new JLabel(Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileName);
+                new JLabel(Messages.getText("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileName);
         getContentPane().add(lblNewLabel, "cell 0 0");
         {
             JScrollPane scrollPane = new JScrollPane();
@@ -54,20 +54,20 @@ public class SelectDialog extends MultiSubDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, "cell 0 2,grow");
 
-            new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane()).actionListener(() -> {
+            new JButton(Messages.getText("App.OK")).defaultButtonFor(getRootPane()).actionListener(() -> {
                 selectedSubtitleIdxs = getSelectedIdxs();
                 setVisible(false);
-            }).actionCommand(Messages.getString("App.OK")).addTo(buttonPane);
+            }).actionCommand(Messages.getText("App.OK")).addTo(buttonPane);
 
-            new JButton(Messages.getString("SelectDialog.Everything")).actionListener(() -> {
+            new JButton(Messages.getText("SelectDialog.Everything")).actionListener(() -> {
                 selectedSubtitleIdxs = IntStream.range(0, release.getMatchingSubs().size()).boxed().toList();
                 setVisible(false);
-            }).actionCommand(Messages.getString("App.All")).addTo(buttonPane);
+            }).actionCommand(Messages.getText("App.All")).addTo(buttonPane);
 
-            new JButton(Messages.getString("App.Cancel")).actionListener(() -> {
+            new JButton(Messages.getText("App.Cancel")).actionListener(() -> {
                 selectedSubtitleIdxs = List.of();
                 setVisible(false);
-            }).actionCommand(Messages.getString("App.Cancel")).addTo(buttonPane);
+            }).actionCommand(Messages.getText("App.Cancel")).addTo(buttonPane);
         }
     }
 

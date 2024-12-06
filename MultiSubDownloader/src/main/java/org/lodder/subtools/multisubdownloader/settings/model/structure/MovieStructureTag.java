@@ -9,10 +9,10 @@ import org.lodder.subtools.multisubdownloader.Messages;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum MovieStructureTag implements StructureTag {
 
-    MOVIE_TITLE("%MOVIE TITLE%", Messages.getString("StructureBuilderDialog.MovieName")),
-    QUALITY("%QUALITY%", Messages.getString("StructureBuilderDialog.QualityOfMovie")),
-    DESCRIPTION("%DESCRIPTION%", Messages.getString("StructureBuilderDialog.MovieDescription")),
-    YEAR("%YEAR%", Messages.getString("StructureBuilderDialog.MovieYear"));
+    MOVIE_TITLE("%MOVIE TITLE%", Messages.getText("StructureBuilderDialog.MovieName")),
+    QUALITY("%QUALITY%", Messages.getText("StructureBuilderDialog.QualityOfMovie")),
+    DESCRIPTION("%DESCRIPTION%", Messages.getText("StructureBuilderDialog.MovieDescription")),
+    YEAR("%YEAR%", Messages.getText("StructureBuilderDialog.MovieYear"));
 
     @val @override String label;
     @val @override String description;

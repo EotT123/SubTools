@@ -49,11 +49,11 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
      */
     public MappingEpisodeNameDialog(JFrame frame, final SettingsControl prefCtrl, Manager manager,
             SubtitleProviderStore subtitleProviderStore, UserInteractionHandlerGUI userInteractionHandler) {
-        super(frame, Messages.getString("MappingEpisodeNameDialog.Title"), true);
+        super(frame, Messages.getText("MappingEpisodeNameDialog.Title"), true);
         this.manager = manager;
         this.subtitleProviderStore = subtitleProviderStore;
         this.userInteractionHandler = userInteractionHandler;
-        this.btnAddCustomMapping = new JButton(Messages.getString("MappingEpisodeNameDialog.ChangeMapping"));
+        this.btnAddCustomMapping = new JButton(Messages.getText("MappingEpisodeNameDialog.ChangeMapping"));
         this.mappingTableModel = new MappingTableModel(manager);
         initialize();
     }
@@ -117,9 +117,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         MappingType(String name, String providerName, SelectionForKeyPrefix... selectionForKeyPrefixList) {
             this.name = name;
             this.providerName = providerName;
-            this.nameColumn = Messages.getString("MappingEpisodeNameDialog.SceneShowName");
-            this.mappingColumn = Messages.getString("MappingEpisodeNameDialog.ProviderId");
-            this.providerNameColumn = Messages.getString("MappingEpisodeNameDialog.ProviderName");
+            this.nameColumn = Messages.getText("MappingEpisodeNameDialog.SceneShowName");
+            this.mappingColumn = Messages.getText("MappingEpisodeNameDialog.ProviderId");
+            this.providerNameColumn = Messages.getText("MappingEpisodeNameDialog.ProviderName");
             this.selectionForKeyPrefixList = selectionForKeyPrefixList;
         }
     }
@@ -198,7 +198,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             JPanel selectionPane = new JPanel();
             contentPanel.add(selectionPane);
 
-            JLabel lblDefaultIncomingFolder = new JLabel(Messages.getString("MappingEpisodeNameDialog.SelectProvider"));
+            JLabel lblDefaultIncomingFolder = new JLabel(Messages.getText("MappingEpisodeNameDialog.SelectProvider"));
             selectionPane.add(lblDefaultIncomingFolder);
 
             JComboBox<MappingType> mappingTypeList = new JComboBox<>();
@@ -238,7 +238,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             buttonPane.setLayout(new MigLayout("", "[25px][50px][grow][50px][grow][50px][25px]", "[][25px,grow,fill]"));
 
             {
-                JButton btnDeleteSelectedRow = new JButton(Messages.getString("MappingEpisodeNameDialog.DeleteRow"));
+                JButton btnDeleteSelectedRow = new JButton(Messages.getText("MappingEpisodeNameDialog.DeleteRow"));
                 btnDeleteSelectedRow.addActionListener(_ -> {
                     int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                     MappingTableModel model = (MappingTableModel) table.getModel();
@@ -265,7 +265,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                     Row row = (Row) model.getDataVector().get(rowNbr);
                     String currentName = row.serieMapping.name;
 
-                    String message = Messages.getString("MappingEpisodeNameDialog.enterNewNameForSerie", currentName);
+                    String message = Messages.getText("MappingEpisodeNameDialog.enterNewNameForSerie", currentName);
                     selectedSubtitleProvider.ifPresent(
                             provider -> userInteractionHandler.enter(message, message).ifPresent(newName -> {
                                 TvRelease tvRelease = TvRelease.builder()
@@ -285,12 +285,12 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                         selectMappingType(selectedMappingType);
                                         table.getRowSorter().setSortKeys(sortKeys);
                                     }, () -> userInteractionHandler.message(
-                                            Messages.getString("MappingEpisodeNameDialog.NoResultsFoundForSerieName",
-                                                    newName), Messages.getString("App.Info")));
+                                            Messages.getText("MappingEpisodeNameDialog.NoResultsFoundForSerieName",
+                                                    newName), Messages.getText("App.Info")));
                                 } catch (Exception e) {
                                     userInteractionHandler.message(
-                                            Messages.getString("App.ErrorOccurred", e.getMessage()),
-                                            Messages.getString("App.Error"));
+                                            Messages.getText("App.ErrorOccurred", e.getMessage()),
+                                            Messages.getText("App.Error"));
                                 }
                             }));
                 });
@@ -298,9 +298,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             }
 
             {
-                new JButton(Messages.getString("App.Close")).defaultButtonFor(getRootPane())
+                new JButton(Messages.getText("App.Close")).defaultButtonFor(getRootPane())
                         .actionListener(() -> setVisible(false))
-                        .actionCommand(Messages.getString("App.Close"))
+                        .actionCommand(Messages.getText("App.Close"))
                         .addTo(buttonPane, "skip");
             }
         }

@@ -53,6 +53,6 @@ public abstract class InputPanel extends JPanel {
         cbxLanguage = new MyComboBox<>(Language.values())
                 .withToMessageStringRenderer(Language::getMsgCode);
 
-        btnSearch = new JButton(Messages.getString("InputPanel.SearchForSubtitles"));
+        btnSearch = new JButton(Messages.getText("InputPanel.SearchForSubtitles"));
     }
 }

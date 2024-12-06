@@ -1,10 +1,11 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
@@ -31,13 +32,13 @@ public class SearchTextInputPanel extends InputPanel {
     private void addComponentsToPanel() {
         this.add(cbxVideoType, "cell 1 0,growx");
         this.add(txtInputVideoName, "cell 2 0 5 1,growx");
-        this.add(new JLabel(Messages.getString("MainWindow.QualityVersion")), "cell 1 1,alignx trailing");
+        this.add(new JLabel(getText("MainWindow.QualityVersion")), "cell 1 1,alignx trailing");
         this.add(txtQualityVersion, "cell 2 1,growx");
-        this.add(new JLabel(Messages.getString("App.Season")), "cell 3 1,alignx trailing");
+        this.add(new JLabel(getText("App.Season")), "cell 3 1,alignx trailing");
         this.add(txtInputSeason, "cell 4 1,alignx left");
-        this.add(new JLabel(Messages.getString("App.Episode")), "cell 5 1,alignx trailing");
+        this.add(new JLabel(getText("App.Episode")), "cell 5 1,alignx trailing");
         this.add(txtInputEpisode, "cell 6 1,growx");
-        this.add(new JLabel(Messages.getString("MainWindow.SelectSubtitleLanguage")), "cell 1 2 3 1,alignx trailing");
+        this.add(new JLabel(getText("MainWindow.SelectSubtitleLanguage")), "cell 1 2 3 1,alignx trailing");
         this.add(getLanguageCbx(), "cell 4 2 2 1,growx");
         this.add(getSearchButton(), "cell 2 4 2 1");
     }
@@ -49,13 +50,9 @@ public class SearchTextInputPanel extends InputPanel {
     private void createComponents() {
         cbxVideoType = new MyComboBox<>(VideoSearchType.values())
                 .withToMessageStringRenderer(VideoSearchType::getMsgCode);
-
         txtInputVideoName = new JTextField().columns(10);
-
         txtQualityVersion = new JTextField().columns(10);
-
         txtInputSeason = new JTextField().columns(10);
-
         txtInputEpisode = new JTextField().columns(10);
     }
 

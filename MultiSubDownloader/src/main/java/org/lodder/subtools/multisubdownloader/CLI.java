@@ -63,7 +63,7 @@ public class CLI {
     private void checkUpdate(Manager manager) {
         UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
         if (u.shouldCheckForNewUpdate(settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
-            System.out.println(Messages.getString("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
+            System.out.println(Messages.getText("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
         }
     }
 
@@ -160,7 +160,7 @@ public class CLI {
             return Arrays.stream(Language.values())
                     .filter(lang -> lang.name().equalsIgnoreCase(languageString))
                     .findAny()
-                    .orElseThrow(() -> new CliException(Messages.getString("App.NoValidLanguage")));
+                    .orElseThrow(() -> new CliException(Messages.getText("App.NoValidLanguage")));
         } else {
             return Language.ENGLISH;
         }

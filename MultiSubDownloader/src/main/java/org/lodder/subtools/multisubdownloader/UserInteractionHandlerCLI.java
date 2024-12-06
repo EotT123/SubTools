@@ -43,12 +43,12 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
 
     @Override
     public List<Subtitle> selectSubtitles(Release release) {
-        System.out.printf("\n%s : %s%n", Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease"),
+        System.out.printf("\n%s : %s%n", Messages.getText("SelectDialog.SelectCorrectSubtitleThisRelease"),
                 release.fileName);
         return PrompterUtil
                 .getElementsFromList(release.getMatchingSubs())
                 .displayAsTable(createTableDisplayer())
-                .message(Messages.getString("SelectDialog.EnterListSelectedSubtitles"))
+                .message(Messages.getText("SelectDialog.EnterListSelectedSubtitles"))
                 .sort(Comparator.comparing(Subtitle::getScore))
                 .includeNull()
                 .prompt(prompter);

@@ -22,7 +22,7 @@ public enum SerieStructureTag implements StructureTag {
 
     SerieStructureTag(String label, String descriptionMessage) {
         this.label = label;
-        this.description = Messages.getString(descriptionMessage);
+        this.description = Messages.getText(descriptionMessage);
     }
 
 }

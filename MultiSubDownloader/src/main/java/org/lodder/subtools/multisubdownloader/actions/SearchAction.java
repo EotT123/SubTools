@@ -63,7 +63,7 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
 
         validate();
 
-        setStatusMessage(Messages.getString("SearchAction.StatusIndexing"));
+        setStatusMessage(Messages.getText("SearchAction.StatusIndexing"));
 
         this.releases = createReleases();
 
@@ -100,7 +100,7 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
         /* Tell the manager which releases to search. */
         this.releases.forEach(searchManager::addRelease);
 
-        setStatusMessage(Messages.getString("SearchAction.StatusSearching"));
+        setStatusMessage(Messages.getText("SearchAction.StatusSearching"));
 
         /* Tell the manager to start searching */
         this.searchManager.start();

@@ -20,7 +20,7 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
     private JLabel label;
 
     public ProgressDialog(JFrame frame, Cancelable sft) {
-        super(frame, Messages.getString("ProgressDialog.Title"), false);
+        super(frame, Messages.getText("ProgressDialog.Title"), false);
         worker = sft;
         StatusMessenger.instance.addListener(this);
         initializeUi();
@@ -29,7 +29,7 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
     }
 
     public ProgressDialog(Cancelable sft) {
-        super(Messages.getString("ProgressDialog.Title"), false);
+        super(Messages.getText("ProgressDialog.Title"), false);
         worker = sft;
         StatusMessenger.instance.addListener(this);
         initializeUi();

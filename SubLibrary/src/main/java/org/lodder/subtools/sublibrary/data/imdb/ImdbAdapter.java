@@ -115,7 +115,7 @@ public class ImdbAdapter {
                                                 .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
                                         .thenComparing(ProviderSerieId::getName))
                                 .toList(),
-                        Messages.getString("Prompter.SelectImdbMatchForSerie").formatted(title),
+                        Messages.getText("Prompter.SelectImdbMatchForSerie").formatted(title),
                         providerName,
                         ProviderSerieId::getName)
                 .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.id));
@@ -123,8 +123,8 @@ public class ImdbAdapter {
 
     private OptionalInt promptUserToEnterImdbId(String title, int year) {
         return userInteractionHandler.enter(providerName,
-                Messages.getString("Prompter.EnterImdbMatchForSerie").formatted(title),
-                Messages.getString("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
+                Messages.getText("Prompter.EnterImdbMatchForSerie").formatted(title),
+                Messages.getText("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {

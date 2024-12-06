@@ -1,13 +1,13 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
 import static java.util.function.Predicate.*;
+import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
 import java.io.Serial;
 import java.nio.file.Path;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -44,23 +44,23 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.settingsCtrl = settingsCtrl;
 
-        JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.SelectPreferredSources"))
+        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.SelectPreferredSources"))
                 .addTo(this, "span, grow");
 
         {
             // ADDIC7ED
             this.chkSourceAddic7ed = new JCheckBox("Addic7ed");
-            this.chkUserAddic7edLogin = new JCheckBox(Messages.getString("PreferenceDialog.UseAddic7edLogin"));
-            this.chkSourceAddic7edProxy = new JCheckBox(Messages.getString("PreferenceDialog.Proxy"));
+            this.chkUserAddic7edLogin = new JCheckBox(getText("PreferenceDialog.UseAddic7edLogin"));
+            this.chkSourceAddic7edProxy = new JCheckBox(getText("PreferenceDialog.Proxy"));
 
             PanelCheckBox.checkbox(chkSourceAddic7ed).panelOnNewLine().addTo(titlePanel, "wrap")
                     .addComponent("wrap", chkSourceAddic7edProxy)
                     .addComponent(PanelCheckBox.checkbox(chkUserAddic7edLogin).panelOnNewLine()
                             .panelLayout(new MigLayout("insets 0, novisualpadding")).build()
-                            .addComponent(new JLabel(Messages.getString("PreferenceDialog.Username")))
+                            .addComponent(new JLabel(getText("PreferenceDialog.Username")))
                             .addComponent("wrap", this.txtAddic7edUsername =
                                     MyTextFieldString.builder().requireValue().build().columns(20))
-                            .addComponent(new JLabel(Messages.getString("PreferenceDialog.Password")))
+                            .addComponent(new JLabel(getText("PreferenceDialog.Password")))
                             .addComponent(this.txtAddic7edPassword =
                                     MyPasswordField.builder().requireValue().build().columns(20)));
 
@@ -73,14 +73,14 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             // OPENSUBTITLES
             this.chkSourceOpenSubtitles = new JCheckBox("OpenSubtitles");
             this.chkUserOpenSubtitlesLogin =
-                    new JCheckBox(Messages.getString("PreferenceDialog.UseOpenSubtitlesLogin"));
+                    new JCheckBox(getText("PreferenceDialog.UseOpenSubtitlesLogin"));
             PanelCheckBox.checkbox(chkSourceOpenSubtitles).panelOnNewLine().addTo(titlePanel, "wrap")
                     .addComponent(PanelCheckBox.checkbox(chkUserOpenSubtitlesLogin).panelOnNewLine()
                             .panelLayout(new MigLayout("insets 0, novisualpadding")).build()
-                            .addComponent(new JLabel(Messages.getString("PreferenceDialog.Username")))
+                            .addComponent(new JLabel(getText("PreferenceDialog.Username")))
                             .addComponent("wrap", txtOpenSubtitlesUsername =
                                     MyTextFieldString.builder().requireValue().build().columns(20))
-                            .addComponent(new JLabel(Messages.getString("PreferenceDialog.Password")))
+                            .addComponent(new JLabel(getText("PreferenceDialog.Password")))
                             .addComponent(txtOpenSubtitlesPassword =
                                     MyPasswordField.builder().requireValue().build().columns(20)));
 
@@ -88,24 +88,26 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             this.chkSourceSubscene = new JCheckBox("Subscene").addTo(titlePanel, "wrap");
 
             // LOCAL
-            this.chkSourceLocal = new JCheckBox(Messages.getString("PreferenceDialog.Local"));
+            this.chkSourceLocal = new JCheckBox(getText("PreferenceDialog.Local"));
             JScrollPane scrLocalSources =
                     new JScrollPane().viewportView(this.localSourcesFoldersList =
                             JListWithImages.createForType(Path.class).distinctValues().build());
-            JButton btnBrowseLocalSources = new JButton(Messages.getString("PreferenceDialog.AddFolder"))
+            JButton btnBrowseLocalSources = new JButton(getText("PreferenceDialog.AddFolder"))
                     .actionListener(() -> MemoryFolderChooser.getInstance()
-                            .selectDirectory(this, Messages.getString("PreferenceDialog.SelectFolder"))
+                            .selectDirectory(this, getText("PreferenceDialog.SelectFolder"))
                             .map(Path::toAbsolutePath).filter(not(localSourcesFoldersList::contains))
-                            .ifPresent(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.getImage(), path)));
-            JButton btnRemoveLocalSources = new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
+                            .ifPresent(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.image, path)));
+            JButton btnRemoveLocalSources = new JButton(getText("PreferenceDialog.DeleteFolder"))
                     .actionListener(localSourcesFoldersList::removeSelectedItem);
 
             PanelCheckBox.checkbox(chkSourceLocal).panelOnNewLine().addTo(titlePanel)
                     .addComponent("aligny top, gapy 5px",
-                            new JLabel(Messages.getString("PreferenceDialog.LocalFolderWithSubtitles")))
-                    .addComponent("wrap", new JPanel(new MigLayout("insets 0", "[grow, nogrid]")).addComponent("split",
-                                    btnBrowseLocalSources)
-                            .addComponent("wrap", btnRemoveLocalSources).addComponent("wrap", scrLocalSources));
+                            new JLabel(getText("PreferenceDialog.LocalFolderWithSubtitles")))
+                    .addComponent("wrap",
+                            new JPanel(new MigLayout("insets 0", "[grow, nogrid]"))
+                                    .addComponent("split", btnBrowseLocalSources)
+                                    .addComponent("wrap", btnRemoveLocalSources)
+                                    .addComponent("wrap", scrLocalSources));
         }
 
         loadPreferenceSettings();

@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
@@ -35,55 +34,53 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.settingsCtrl = settingsCtrl;
 
-        TitlePanel.title(getString("PreferenceDialog.DownloadOptions"))
+        TitlePanel.title(getText("PreferenceDialog.DownloadOptions"))
                 .marginBottom(0)
                 .padding(0)
                 .paddingLeft(20)
                 .addTo(this, "span, grow, wrap")
                 .addComponent(this.chkAlwaysConfirm =
-                        new JCheckBox(Messages.getString("PreferenceDialog.CheckBeforeDownloading")), "wrap")
-                .addComponent("wrap, grow", //
-                        PanelCheckBox.checkbox(this.chkMinScoreSelection =
-                                        new JCheckBox(getString("PreferenceDialog.MinAutomaticScoreSelection")))
-                                .panelOnSameLine()
-                                .build()
-                                .addComponent(this.sldMinScoreSelection = new JSlider().minimum(0).maximum(100),
-                                        "wrap"))
-                .addComponent("wrap, grow",//
+                        new JCheckBox(getText("PreferenceDialog.CheckBeforeDownloading")), "wrap")
+                .addComponent("wrap, grow", PanelCheckBox.checkbox(this.chkMinScoreSelection =
+                                new JCheckBox(getText("PreferenceDialog.MinAutomaticScoreSelection")))
+                        .panelOnSameLine()
+                        .build()
+                        .addComponent(this.sldMinScoreSelection = new JSlider().minimum(0).maximum(100), "wrap"))
+                .addComponent("wrap, grow",
                         PanelCheckBox.checkbox(this.chkDefaultSelection =
-                                        new JCheckBox(getString("PreferenceDialog.DefaultSelection"), null, true))
+                                        new JCheckBox(getText("PreferenceDialog.DefaultSelection"), null, true))
                                 .panelOnNewLine()
                                 .build()
                                 .addComponent(this.pnlDefaultSelection = new DefaultSelectionPanel(settingsCtrl)));
 
-        TitlePanel.title(getString("PreferenceDialog.SearchFilter"))
+        TitlePanel.title(getText("PreferenceDialog.SearchFilter"))
                 .marginBottom(0)
                 .padding(0)
                 .paddingLeft(20)
                 .addTo(this, "span, grow, wrap")
                 .addComponent(
-                        this.chkSubtitleExactMethod = new JCheckBox(getString("PreferenceDialog.SearchFilterExact")),
+                        this.chkSubtitleExactMethod = new JCheckBox(getText("PreferenceDialog.SearchFilterExact")),
                         "wrap")
                 .addComponent(this.chkSubtitleKeywordMethod =
-                        new JCheckBox(getString("PreferenceDialog.SearchFilterKeyword")), "wrap")
+                        new JCheckBox(getText("PreferenceDialog.SearchFilterKeyword")), "wrap")
                 .addComponent(this.chkExcludeHearingImpaired =
-                        new JCheckBox(getString("PreferenceDialog.ExcludeHearingImpaired")));
+                        new JCheckBox(getText("PreferenceDialog.ExcludeHearingImpaired")));
 
-        TitlePanel.title(getString("PreferenceDialog.TableOptions"))
+        TitlePanel.title(getText("PreferenceDialog.TableOptions"))
                 .marginBottom(0)
                 .padding(0)
                 .paddingLeft(20)
                 .addTo(this, "span, grow, wrap")
-                .addComponent(this.chkOnlyFound = new JCheckBox(getString("PreferenceDialog.ShowOnlyFound")));
+                .addComponent(this.chkOnlyFound = new JCheckBox(getText("PreferenceDialog.ShowOnlyFound")));
 
-        TitlePanel.title(getString("PreferenceDialog.ErrorHandlingOption"))
+        TitlePanel.title(getText("PreferenceDialog.ErrorHandlingOption"))
                 .marginBottom(0)
                 .padding(0)
                 .paddingLeft(20)
                 .addTo(this, "span, grow, wrap")
-                .addComponent(this.chkStopOnSearchError = new JCheckBox(getString("PreferenceDialog.StopAfterError")));
+                .addComponent(this.chkStopOnSearchError = new JCheckBox(getText("PreferenceDialog.StopAfterError")));
 
-        TitlePanel.title(getString("PreferenceDialog.SerieDatabaseSource"))
+        TitlePanel.title(getText("PreferenceDialog.SerieDatabaseSource"))
                 .marginBottom(0)
                 .padding(0)
                 .paddingLeft(20)
@@ -91,7 +88,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                 .addComponent(this.cbxEpisodeProcessSource = MyComboBox.ofValues(SettingsProcessEpisodeSource.values()),
                         "wrap")
                 .addComponent(this.chkConfirmProviderMapping =
-                        new JCheckBox(getString("PreferenceDialog.ConfirmProviderMapping")));
+                        new JCheckBox(getText("PreferenceDialog.ConfirmProviderMapping")));
 
         loadPreferenceSettings();
     }

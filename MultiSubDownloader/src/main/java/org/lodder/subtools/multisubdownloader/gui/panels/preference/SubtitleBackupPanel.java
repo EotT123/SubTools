@@ -1,10 +1,11 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
@@ -24,29 +25,25 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fillx, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.SubtitlesBackup"))
-                .margin(0)
-                .padding(0)
-                .paddingLeft(20)
-                .addTo(this, "span, growx");
+        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.SubtitlesBackup"))
+                .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
 
         {
             this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().columns(20);
 
-            PanelCheckBox.checkbox(
-                            this.chkBackupSubtitle = new JCheckBox(Messages.getString("PreferenceDialog" +
-                                    ".BackupSubtitles")))
+            PanelCheckBox.checkbox(this.chkBackupSubtitle = new JCheckBox(getText("PreferenceDialog.BackupSubtitles")))
                     .panelOnNewLine()
                     .addTo(titlePanel, "span, wrap, growx")
-                    .addComponent("split 3, shrink", new JLabel(Messages.getString("PreferenceDialog.Location")))
+                    .addComponent("split 3, shrink", new JLabel(getText("PreferenceDialog.Location")))
                     .addComponent("growx", txtBackupSubtitlePath)
-                    .addComponent("shrink", new JButton(Messages.getString("App.Browse")).actionListener(
-                            l -> MemoryFolderChooser.getInstance()
-                                    .selectDirectory(this, Messages.getString("PreferenceDialog.SubtitleBackupFolder"))
-                                    .ifPresent(txtBackupSubtitlePath::setObject)));
+                    .addComponent("shrink",
+                            new JButton(getText("App.Browse"))
+                                    .actionListener(_ -> MemoryFolderChooser.getInstance()
+                                            .selectDirectory(this, getText("PreferenceDialog.SubtitleBackupFolder"))
+                                            .ifPresent(txtBackupSubtitlePath::setObject)));
 
             chkBackupUseSourceFileName =
-                    new JCheckBox(Messages.getString("PreferenceDialog.IncludeSourceInFileName")).addTo(titlePanel);
+                    new JCheckBox(getText("PreferenceDialog.IncludeSourceInFileName")).addTo(titlePanel);
         }
 
         loadPreferenceSettings();

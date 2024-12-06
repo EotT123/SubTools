@@ -1,10 +1,10 @@
 package org.lodder.subtools.multisubdownloader.gui;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.Serial;
-
-import org.lodder.subtools.multisubdownloader.Messages;
 
 public class Menu extends JMenuBar {
 
@@ -43,31 +43,31 @@ public class Menu extends JMenuBar {
     }
 
     private void createComponents() {
-        mnFile = new JMenu(Messages.getString("Menu.Path"));
-        mntmQuit = new JMenuItem(Messages.getString("App.Close"));
-        mnView = new JMenu(Messages.getString("Menu.View"));
-        mnSearchResults = new JMenu(Messages.getString("Menu.SearchResults"));
-        chckbxmntmFileName = new JCheckBoxMenuItem(Messages.getString("Menu.Filename"));
-        chckbxmntmType = new JCheckBoxMenuItem(Messages.getString("Menu.Type"));
-        chckbxmntmTitle = new JCheckBoxMenuItem(Messages.getString("Menu.Title"));
-        chckbxmntmSeason = new JCheckBoxMenuItem(Messages.getString("App.Season"));
-        chckbxmntmEpisode = new JCheckBoxMenuItem(Messages.getString("App.Episode"));
-        chckbxmntmShowOnlyFound = new JCheckBoxMenuItem(Messages.getString("Menu.OnlyShowFound"));
-        mntmClearLog = new JMenuItem(Messages.getString("Menu.EraseLogging"));
-        mntmRenameSerieFiles = new JMenuItem(Messages.getString("Menu.RenameSerie"));
-        mntmRenameMovieFiles = new JMenuItem(Messages.getString("Menu.RenameMovie"));
-        mntmPreferences = new JMenuItem(Messages.getString("Menu.Preferences"));
-        mnSerieNames = new JMenu(Messages.getString("Menu.SerieNames"));
-        mntmTranslateShowNames = new JMenuItem(Messages.getString("Menu.MappingTvdbScene"));
-        mnImportExport = new JMenu(Messages.getString("Menu.ImportExport"));
-        mnEdit = new JMenu(Messages.getString("App.Edit"));
-        mnHelp = new JMenu(Messages.getString("Menu.Help"));
-        mntmExportTranslate = new JMenuItem(Messages.getString("Menu.ExportMappingTvdbScene"));
-        mntmImportTranslate = new JMenuItem(Messages.getString("Menu.ImportMappingTvdbScene"));
-        mntmExportPreferences = new JMenuItem(Messages.getString("Menu.ExportPreferences"));
-        mntmImportPreferences = new JMenuItem(Messages.getString("Menu.ImportPreferences"));
-        mntmAbout = new JMenuItem(Messages.getString("Menu.About"));
-        mntmCheckForUpdate = new JMenuItem(Messages.getString("Menu.CheckForUpdate"));
+        mnFile = new JMenu(getText("Menu.Path"));
+        mntmQuit = new JMenuItem(getText("App.Close"));
+        mnView = new JMenu(getText("Menu.View"));
+        mnSearchResults = new JMenu(getText("Menu.SearchResults"));
+        chckbxmntmFileName = new JCheckBoxMenuItem(getText("Menu.Filename"));
+        chckbxmntmType = new JCheckBoxMenuItem(getText("Menu.Type"));
+        chckbxmntmTitle = new JCheckBoxMenuItem(getText("Menu.Title"));
+        chckbxmntmSeason = new JCheckBoxMenuItem(getText("App.Season"));
+        chckbxmntmEpisode = new JCheckBoxMenuItem(getText("App.Episode"));
+        chckbxmntmShowOnlyFound = new JCheckBoxMenuItem(getText("Menu.OnlyShowFound"));
+        mntmClearLog = new JMenuItem(getText("Menu.EraseLogging"));
+        mntmRenameSerieFiles = new JMenuItem(getText("Menu.RenameSerie"));
+        mntmRenameMovieFiles = new JMenuItem(getText("Menu.RenameMovie"));
+        mntmPreferences = new JMenuItem(getText("Menu.Preferences"));
+        mnSerieNames = new JMenu(getText("Menu.SerieNames"));
+        mntmTranslateShowNames = new JMenuItem(getText("Menu.MappingTvdbScene"));
+        mnImportExport = new JMenu(getText("Menu.ImportExport"));
+        mnEdit = new JMenu(getText("App.Edit"));
+        mnHelp = new JMenu(getText("Menu.Help"));
+        mntmExportTranslate = new JMenuItem(getText("Menu.ExportMappingTvdbScene"));
+        mntmImportTranslate = new JMenuItem(getText("Menu.ImportMappingTvdbScene"));
+        mntmExportPreferences = new JMenuItem(getText("Menu.ExportPreferences"));
+        mntmImportPreferences = new JMenuItem(getText("Menu.ImportPreferences"));
+        mntmAbout = new JMenuItem(getText("Menu.About"));
+        mntmCheckForUpdate = new JMenuItem(getText("Menu.CheckForUpdate"));
     }
 
     private void addComponentsToMenu() {

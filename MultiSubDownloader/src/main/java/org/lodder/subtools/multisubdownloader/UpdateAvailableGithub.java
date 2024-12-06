@@ -75,7 +75,8 @@ public class UpdateAvailableGithub {
                                 .userAgent(null)
                                 .cacheType(CacheType.NONE)
                                 .getAsJsoupDocument()
-                                .selectFirst("#repo-content-turbo-frame .box a[href='" + REPO_URI + "/releases/latest']");
+                                .selectFirst(
+                                        "#repo-content-turbo-frame .box a[href='" + REPO_URI + "/releases/latest']");
                         Pattern versionPattern = Pattern.compile("[0-9]*\\.[0-9]\\.[0-9]");
                         String versionText = element.parent().selectFirst("a").text();
                         Matcher matcher = versionPattern.matcher(versionText);
@@ -94,7 +95,7 @@ public class UpdateAvailableGithub {
                         updateLastUpdateCheck();
                         return Optional.of(url);
                     } catch (Exception e) {
-                        LOGGER.error(Messages.getString("LoggingPanel.UpdateCheckFailed"));
+                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
                         return Optional.empty();
                     }
                 }).getOptional();
@@ -108,23 +109,29 @@ public class UpdateAvailableGithub {
                     try {
                         LocalDateTime buildTista = getBuildTista();
 
-                        Element rowElement = manager.getPageContentBuilder().url(REPO_URL + "/actions?query=branch%3Amaster")
-                                .userAgent(null)
-                                .cacheType(CacheType.MEMORY)
-                                .getAsJsoupDocument()
-                                .selectFirst("#partial-actions-workflow-runs .Box-row");
+                        Element rowElement =
+                                manager.getPageContentBuilder().url(REPO_URL + "/actions?query=branch%3Amaster")
+                                        .userAgent(null)
+                                        .cacheType(CacheType.MEMORY)
+                                        .getAsJsoupDocument()
+                                        .selectFirst("#partial-actions-workflow-runs .Box-row");
                         LocalDateTime nightlyBuildTista =
-                                zonedDateTimeStringToLocalDateTime(rowElement.selectFirst(".d-inline relative-time").attr("datetime"));
+                                zonedDateTimeStringToLocalDateTime(
+                                        rowElement.selectFirst(".d-inline relative-time").attr("datetime"));
                         if (nightlyBuildTista.isBefore(buildTista)) {
                             return Optional.empty();
                         }
                         String url = "https://nightly.link" + rowElement.selectFirst(".Link--primary").attr("href");
-                        String downloadUrl = manager.getPageContentBuilder().url(url).cacheType(CacheType.MEMORY).getAsJsoupDocument()
-                                .selectFirst("table td a").attr("href");
+                        String downloadUrl = manager.getPageContentBuilder()
+                                .url(url)
+                                .cacheType(CacheType.MEMORY)
+                                .getAsJsoupDocument()
+                                .selectFirst("table td a")
+                                .attr("href");
                         updateLastUpdateCheck();
                         return Optional.of(downloadUrl);
                     } catch (Exception e) {
-                        LOGGER.error(Messages.getString("LoggingPanel.UpdateCheckFailed"));
+                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
                         return Optional.empty();
                     }
                 }).getOptional();

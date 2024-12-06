@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -15,7 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
@@ -45,83 +46,79 @@ public class StructureFilePanel extends JPanel {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.RenameFiles"))
+        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.RenameFiles"))
                 .margin(0)
                 .padding(0)
                 .marginLeft(20)
                 .paddingLeft(20)
                 .addTo(this, "span, grow");
 
+        new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
+        this.txtFileStructure =
+                MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+        new JButton(getText("StructureBuilderDialog.Structure"))
+                .actionListener(() -> {
+                    StructureBuilderDialog sDialog =
+                            new StructureBuilderDialog(null, getText("PreferenceDialog.StructureBuilderTitle"),
+                                    true, videoType, StructureBuilderDialog.StructureType.FILE, manager,
+                                    userInteractionHandler, getLibraryStructureBuilder());
+                    String value = sDialog.showDialog(txtFileStructure.getText());
+                    if (!value.isEmpty()) {
+                        txtFileStructure.setText(value);
+                    }
+
+                }).addTo(titlePanel, "shrink, wrap");
+
+        this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith"));
+
+        PanelCheckBox.checkbox(chkReplaceSpace)
+                .panelOnSameLine()
+                .addTo(titlePanel, "wrap")
+                .addComponent("width pref+10px, wrap", this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
+
+        this.chkIncludeLanguageCode =
+                new JCheckBox(getText("PreferenceDialog.IncludeLanguageInFileName"))
+                        .selectedListener(languageMapping::refreshState).addTo(titlePanel, "wrap");
+
+        JPanel languagePanelRoot = PanelCheckBox.checkbox(chkIncludeLanguageCode)
+                .panelOnNewLine()
+                .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
+                .addTo(titlePanel, "span, growx");
         {
-            new JLabel(Messages.getString("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
-            this.txtFileStructure =
-                    MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
-            new JButton(Messages.getString("StructureBuilderDialog.Structure")).actionListener(() -> {
-                StructureBuilderDialog sDialog =
-                        new StructureBuilderDialog(null, Messages.getString("PreferenceDialog.StructureBuilderTitle"),
-                                true, videoType, StructureBuilderDialog.StructureType.FILE, manager,
-                                userInteractionHandler, getLibraryStructureBuilder());
-                String value = sDialog.showDialog(txtFileStructure.getText());
-                if (!value.isEmpty()) {
-                    txtFileStructure.setText(value);
-                }
+            JPanel languagePanel = new JPanel(new MigLayout("insets 0, novisualpadding", "[][][][20px]"));
+            JScrollPane languageScrollPane =
+                    new JScrollPane(languagePanel).addTo(languagePanelRoot, "span, growx, wrap, hidemode 3");
+            languageScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+            languageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            languageScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            languageScrollPane.setVisible(false);
 
-            }).addTo(titlePanel, "shrink, wrap");
+            AtomicInteger langId = new AtomicInteger();
+            addLanguageSupplier = () -> {
+                int id = langId.getAndIncrement();
+                MyComboBox<Language> cmbLanguage = new MyComboBox<>(Language.values())
+                        .withToMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
+                MyTextFieldString txtLanguage = MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
+                JButton btnDelete = new JButton(getText("StructureFilePanel.Delete"))
+                        .actionListenerSelf(delBtn -> {
+                            languagePanel.remove(cmbLanguage);
+                            languagePanel.remove(txtLanguage);
+                            languagePanel.remove(delBtn);
+                            languageMapping.remove(id);
+                            languageScrollPane.setVisible(!languageMapping.isEmpty());
+                            languagePanelRoot.repaint();
+                            languagePanelRoot.revalidate();
+                        }).addTo(languagePanel, "wrap");
+                LanguageComponents languageComponents = new LanguageComponents(cmbLanguage, txtLanguage, btnDelete);
+                languageMapping.put(id, languageComponents);
 
-            this.chkReplaceSpace = new JCheckBox(Messages.getString("PreferenceDialog.ReplaceSpaceWith"));
-
-            PanelCheckBox.checkbox(chkReplaceSpace)
-                    .panelOnSameLine()
-                    .addTo(titlePanel, "wrap")
-                    .addComponent("width pref+10px, wrap",
-                            this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
-
-            this.chkIncludeLanguageCode =
-                    new JCheckBox(Messages.getString("PreferenceDialog.IncludeLanguageInFileName")).selectedListener(
-                            languageMapping::refreshState).addTo(titlePanel, "wrap");
-
-            JPanel languagePanelRoot = PanelCheckBox.checkbox(chkIncludeLanguageCode)
-                    .panelOnNewLine()
-                    .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
-                    .addTo(titlePanel, "span, growx");
-            {
-                JPanel languagePanel = new JPanel(new MigLayout("insets 0, novisualpadding", "[][][][20px]"));
-                JScrollPane languageScrollPane =
-                        new JScrollPane(languagePanel).addTo(languagePanelRoot, "span, growx, wrap, hidemode 3");
-                languageScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-                languageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                languageScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                languageScrollPane.setVisible(false);
-
-                AtomicInteger langId = new AtomicInteger();
-                addLanguageSupplier = () -> {
-                    int id = langId.getAndIncrement();
-                    MyComboBox<Language> cmbLanguage =
-                            new MyComboBox<>(Language.values()).withToMessageStringRenderer(Language::getMsgCode)
-                                    .addTo(languagePanel);
-                    MyTextFieldString txtLanguage =
-                            MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
-                    JButton btnDelete =
-                            new JButton(Messages.getString("StructureFilePanel.Delete")).actionListenerSelf(delBtn -> {
-                                languagePanel.remove(cmbLanguage);
-                                languagePanel.remove(txtLanguage);
-                                languagePanel.remove(delBtn);
-                                languageMapping.remove(id);
-                                languageScrollPane.setVisible(!languageMapping.isEmpty());
-                                languagePanelRoot.repaint();
-                                languagePanelRoot.revalidate();
-                            }).addTo(languagePanel, "wrap");
-                    LanguageComponents languageComponents = new LanguageComponents(cmbLanguage, txtLanguage, btnDelete);
-                    languageMapping.put(id, languageComponents);
-
-                    languageScrollPane.setVisible(true);
-                    languagePanelRoot.repaint();
-                    languagePanelRoot.revalidate();
-                    return languageComponents;
-                };
-                new JButton(Messages.getString("StructureFilePanel.AddLanguage")).actionListener(
-                        addLanguageSupplier::get).addTo(languagePanelRoot);
-            }
+                languageScrollPane.setVisible(true);
+                languagePanelRoot.repaint();
+                languagePanelRoot.revalidate();
+                return languageComponents;
+            };
+            new JButton(getText("StructureFilePanel.AddLanguage")).actionListener(
+                    addLanguageSupplier::get).addTo(languagePanelRoot);
         }
 
         loadPreferenceSettings();
@@ -231,7 +228,7 @@ public class StructureFilePanel extends JPanel {
             return languageComponentsMap.values()
                     .stream()
                     .collect(Collectors.toMap(langComps -> langComps.cmbLanguage().getSelectedItem(),
-                            langComps -> langComps.txtLanguage().getText(), (v1, v2) -> v1, LinkedHashMap::new));
+                            langComps -> langComps.txtLanguage().getText(), (v1, _) -> v1, LinkedHashMap::new));
         }
 
         public void refreshState(boolean enabled) {

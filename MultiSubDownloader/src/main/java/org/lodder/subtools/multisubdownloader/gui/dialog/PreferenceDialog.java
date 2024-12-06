@@ -34,7 +34,7 @@ public class PreferenceDialog extends MultiSubDialog {
 
     public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Emitter eventEmitter, Manager manager,
             UserInteractionHandler userInteractionHandler) {
-        super(gui, Messages.getString("PreferenceDialog.Title"), true);
+        super(gui, Messages.getText("PreferenceDialog.Title"), true);
         this.settingsCtrl = settingsCtrl;
         this.eventEmitter = eventEmitter;
 
@@ -56,7 +56,7 @@ public class PreferenceDialog extends MultiSubDialog {
                             (PreferencePanelIntf) tabbedPane.getComponentAt(selectedIndex.get());
                     if (!sourcePanel.hasValidSettings()) {
                         tabbedPane.setSelectedIndex(selectedIndex.get());
-                        JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"),
+                        JOptionPane.showMessageDialog(this, Messages.getText("PreferenceDialog.invalidInput"),
                                 "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         selectedIndex.set(tabbedPane.getSelectedIndex());
@@ -66,32 +66,32 @@ public class PreferenceDialog extends MultiSubDialog {
             contentPanel.add(tabbedPane);
 
             this.pnlGeneral = new GeneralPanel(gui, settingsCtrl);
-            tabbedPane.addTab(Messages.getString("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
+            tabbedPane.addTab(Messages.getText("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
 
             this.pnlEpisodeLibrary =
                     new EpisodeLibraryPanel(settingsCtrl.settings.episodeLibrarySettings, manager, false,
                             userInteractionHandler);
-            tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieLibrary"), null, pnlEpisodeLibrary, null);
+            tabbedPane.addTab(Messages.getText("PreferenceDialog.SerieLibrary"), null, pnlEpisodeLibrary, null);
 
             this.pnlMovieLibrary = new MovieLibraryPanel(settingsCtrl.settings.movieLibrarySettings, manager, false,
                     userInteractionHandler);
-            tabbedPane.addTab(Messages.getString("PreferenceDialog.MovieLibrary"), null, pnlMovieLibrary, null);
+            tabbedPane.addTab(Messages.getText("PreferenceDialog.MovieLibrary"), null, pnlMovieLibrary, null);
 
             this.pnlOptions = new OptionsPanel(settingsCtrl);
-            tabbedPane.addTab(Messages.getString("PreferenceDialog.Options"), null, pnlOptions, null);
+            tabbedPane.addTab(Messages.getText("PreferenceDialog.Options"), null, pnlOptions, null);
 
             this.pnlSerieSources = new SerieProvidersPanel(settingsCtrl);
-            tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieSources"), null, pnlSerieSources, null);
+            tabbedPane.addTab(Messages.getText("PreferenceDialog.SerieSources"), null, pnlSerieSources, null);
         }
 
         {
             new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
                     .addTo(getContentPane(), BorderLayout.SOUTH)
-                    .addComponent(new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane())
+                    .addComponent(new JButton(Messages.getText("App.OK")).defaultButtonFor(getRootPane())
                             .actionListener(this::testAndSaveValues)
-                            .actionCommand(Messages.getString("App.OK")))
+                            .actionCommand(Messages.getText("App.OK")))
                     .addComponent(
-                            new JButton(Messages.getString("App.Cancel")).actionListener(() -> setVisible(false))
+                            new JButton(Messages.getText("App.Cancel")).actionListener(() -> setVisible(false))
                                     .actionCommand("Cancel"));
         }
     }
@@ -109,7 +109,7 @@ public class PreferenceDialog extends MultiSubDialog {
             settingsCtrl.store();
             this.eventEmitter.fire(new Event("providers.settings.change"));
         } else {
-            JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"), "Error",
+            JOptionPane.showMessageDialog(this, Messages.getText("PreferenceDialog.invalidInput"), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }

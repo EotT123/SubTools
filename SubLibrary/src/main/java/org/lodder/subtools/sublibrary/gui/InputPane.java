@@ -58,12 +58,13 @@ public class InputPane {
     @Setter
     @Accessors(fluent = true)
     public static class InputPaneBuilder extends JDialog implements ActionListener, PropertyChangeListener,
-            InputPaneBuilderPromptIntf, InputPaneBuilderErrorMessageIntf, InputPaneBuilderValidatorIntf, InputPaneBuilderMessageIntf,
+            InputPaneBuilderPromptIntf, InputPaneBuilderErrorMessageIntf, InputPaneBuilderValidatorIntf,
+            InputPaneBuilderMessageIntf,
             InputPaneBuilderTitleIntf {
         @Serial
         private static final long serialVersionUID = 1L;
-        private static final String OK = Messages.getString("App.OK");
-        private static final String CANCEL = Messages.getString("App.Cancel");
+        private static final String OK = Messages.getText("App.OK");
+        private static final String CANCEL = Messages.getText("App.Cancel");
         private String title;
         private String message;
         private String errorMessage;
@@ -133,8 +134,8 @@ public class InputPane {
             String prop = e.getPropertyName();
 
             if (isVisible()
-                && e.getSource() == optionPane
-                && (JOptionPane.VALUE_PROPERTY.equals(prop)
+                    && e.getSource() == optionPane
+                    && (JOptionPane.VALUE_PROPERTY.equals(prop)
                     || JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))) {
                 Object value = optionPane.getValue();
 

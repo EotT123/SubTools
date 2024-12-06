@@ -32,7 +32,7 @@ public enum CliOption {
     }
 
     public String getDescription() {
-        return Messages.getString(msgCode);
+        return Messages.getText(msgCode);
     }
 
 }

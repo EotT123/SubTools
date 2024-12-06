@@ -18,7 +18,7 @@ public class Messages {
     private Messages() {
     }
 
-    public static String getString(String key) {
+    public static String getText(String key) {
         try {
             return resourceBundle.getString(key);
         } catch (MissingResourceException e) {
@@ -26,7 +26,7 @@ public class Messages {
         }
     }
 
-    public static String getString(String key, Object... replacements) {
+    public static String getText(String key, Object... replacements) {
         try {
             return resourceBundle.getString(key).formatted(replacements);
         } catch (MissingResourceException e) {

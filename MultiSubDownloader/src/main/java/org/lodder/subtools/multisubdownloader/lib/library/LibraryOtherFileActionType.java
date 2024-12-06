@@ -17,7 +17,7 @@ public enum LibraryOtherFileActionType {
 
     @Override
     public String toString() {
-        return Messages.getString(msgCode);
+        return Messages.getText(msgCode);
     }
 
     @Deprecated(since = "Settings version 2")

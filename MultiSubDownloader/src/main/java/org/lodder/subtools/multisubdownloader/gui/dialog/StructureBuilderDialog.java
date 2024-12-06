@@ -66,7 +66,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         setMinimumSize(new Dimension(600, 300));
         Container panel = getContentPane().layout(new MigLayout("insets 10, nogrid"));
 
-        new JLabel(Messages.getString("StructureBuilderDialog.AvailableTagsClickToAdd")).addTo(panel, "wrap");
+        new JLabel(Messages.getText("StructureBuilderDialog.AvailableTagsClickToAdd")).addTo(panel, "wrap");
 
         this.tagPanel = new JPanel(new MigLayout("flowy, wrap 5", "[150px][150px][150px]")).addTo(panel, "grow, wrap");
         {
@@ -82,21 +82,21 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
             }
         }
 
-        new JLabel(Messages.getString("StructureBuilderDialog.Structure")).addTo(panel);
+        new JLabel(Messages.getText("StructureBuilderDialog.Structure")).addTo(panel);
         this.txtStructure = new JTextField().columns(100).addTo(panel, "span, wrap");
         this.txtStructure.getDocument().addDocumentListener(this);
 
-        new JLabel(Messages.getString("StructureBuilderDialog.Preview")).addTo(panel);
+        new JLabel(Messages.getText("StructureBuilderDialog.Preview")).addTo(panel);
         this.lblPreview = new JLabel("").addTo(panel);
 
         new JPanel(new FlowLayout(FlowLayout.RIGHT)).addTo(panel, BorderLayout.SOUTH)
                 .addComponent(
-                        new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane()).actionListener(_ -> {
+                        new JButton(Messages.getText("App.OK")).defaultButtonFor(getRootPane()).actionListener(_ -> {
                             setVisible(false);
                             dispose(); // this is needed to dispose the dialog and return the control to the
                             // window
                         }).actionCommand("OK"))
-                .addComponent(new JButton(Messages.getString("App.Cancel")).actionListener(_ -> {
+                .addComponent(new JButton(Messages.getText("App.Cancel")).actionListener(_ -> {
                     setVisible(false);
                     txtStructure.setText(oldStructure);
                     dispose(); // this is needed to dispose the dialog and return the control to the window

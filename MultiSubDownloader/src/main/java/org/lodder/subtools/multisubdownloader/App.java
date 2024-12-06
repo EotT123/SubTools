@@ -158,7 +158,7 @@ public class App {
 
     private static Manager createManager(boolean useGui) {
         if (splash != null) {
-            splash.setProgressMsg(Messages.getString("App.Starting"));
+            splash.setProgressMsg(Messages.getText("App.Starting"));
         }
         DiskCache<String, Serializable> diskCache =
                 SerializableDiskCache.cacheBuilder().keyType(String.class).valueType(Serializable.class)

@@ -1,11 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 
 public class Splash extends JWindow {
 
@@ -21,7 +22,7 @@ public class Splash extends JWindow {
         setBounds(100, 100, 501, 100);
         getContentPane().setLayout(new MigLayout("", "[][475px,center][]", "[][40px:n]"));
 
-        JLabel label = new JLabel(Messages.getString("Splash.starting"));
+        JLabel label = new JLabel(getText("Splash.starting"));
         getContentPane().add(label, "cell 1 0 2 1,alignx left");
 
         progressBar = new JProgressBar(0, 100);

@@ -29,12 +29,11 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         this.settingsCtrl = settingsCtrl;
 
         unusedPatternsTable =
-                ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUnused"), Source.class)
+                ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUnused"), Source.class)
                         .add(this, "spany 2");
         new ArrowButton(SwingConstants.EAST, 1, 10).actionListener(this::addPattern).addTo(this);
-        usedPatternsTable =
-                ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUsed"), Source.class)
-                        .add(this, "spany 2");
+        usedPatternsTable = ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUsed"), Source.class)
+                .add(this, "spany 2");
         new ArrowButton(SwingConstants.NORTH, 1, 10).actionListener(this::moveRuleRowUp).addTo(this, "wrap");
 
         new ArrowButton(SwingConstants.WEST, 1, 10).actionListener(this::removePattern).addTo(this, "skip");

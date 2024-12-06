@@ -81,7 +81,7 @@ public class TheTvdbAdapter {
             try {
                 tvdbSerie = userInteractionHandler
                         .selectFromList(serieIds.stream().sorted(comparator).toList(),
-                                Messages.getString("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
+                                Messages.getText("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
                                 providerName, s -> "${s.serieName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
                     tvdbSerie = askUserToEnterTvdbId(serieName)

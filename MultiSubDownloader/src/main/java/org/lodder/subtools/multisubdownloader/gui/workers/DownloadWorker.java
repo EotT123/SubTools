@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by IntelliJ IDEA. User: lodder Date: 4/12/11 Time: 8:52 AM To change this template use
- * Path | Settings | Path Templates.
+ * Created by IntelliJ IDEA. User: lodder Date: 4/12/11 Time: 8:52 AM To change this template use Path | Settings | Path
+ * Templates.
  */
 public class DownloadWorker extends SwingWorker<Void, String> implements Cancelable {
 
@@ -83,11 +83,12 @@ public class DownloadWorker extends SwingWorker<Void, String> implements Cancela
 
     @Override
     protected void process(List<String> data) {
-        data.forEach(s -> StatusMessenger.instance.message(Messages.getString("MainWindow.DownloadingSubtitle", s)));
+        data.forEach(s -> StatusMessenger.instance.message(Messages.getText("MainWindow.DownloadingSubtitle", s)));
     }
 
     private void showErrorMessage(String message) {
-        JOptionPane.showConfirmDialog(null, message, "JBierSubDownloader", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showConfirmDialog(null, message, "JBierSubDownloader", JOptionPane.CLOSED_OPTION,
+                JOptionPane.ERROR_MESSAGE);
     }
 
 }

@@ -168,7 +168,7 @@ public class CliSearchAction extends SearchAction {
 
         LOGGER.debug("# Files found to process [{}] ", total);
 
-        System.out.println(Messages.getString("CliSearchAction.ParsingFoundFiles"));
+        System.out.println(Messages.getText("CliSearchAction.ParsingFoundFiles"));
         this.indexingProgressListener.progress(progress);
 
         List<Release> releases = new ArrayList<>();

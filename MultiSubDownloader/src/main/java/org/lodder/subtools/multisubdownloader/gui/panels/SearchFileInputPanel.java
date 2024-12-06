@@ -1,11 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 
 public class SearchFileInputPanel extends InputPanel {
 
@@ -25,23 +26,23 @@ public class SearchFileInputPanel extends InputPanel {
     }
 
     private void addComponentsToPanel() {
-        add(new JLabel(Messages.getString("MainWindow.LocationNewEpisodes")), "cell 1 0,alignx trailing");
+        add(new JLabel(getText("MainWindow.LocationNewEpisodes")), "cell 1 0,alignx trailing");
         add(txtIncomingPath, "cell 2 0,alignx leading");
         add(btnBrowse, "cell 3 0");
         add(chkRecursive, "cell 2 1 2 1");
         add(chkForceSubtitleOverwrite, "cell 2 3 2 1");
         add(getSearchButton(), "cell 0 5 3 1,alignx center");
-        add(new JLabel(Messages.getString("MainWindow.SelectSubtitleLanguage")), "cell 2 2");
+        add(new JLabel(getText("MainWindow.SelectSubtitleLanguage")), "cell 2 2");
         add(getLanguageCbx(), "cell 3 2");
     }
 
     private void createComponents() {
         txtIncomingPath = new JTextField().columns(20);
 
-        chkRecursive = new JCheckBox(Messages.getString("MainWindow.RecursiveSearch"));
-        chkForceSubtitleOverwrite = new JCheckBox(Messages.getString("MainWindow.ignoreExistingSubtitles"));
+        chkRecursive = new JCheckBox(getText("MainWindow.RecursiveSearch"));
+        chkForceSubtitleOverwrite = new JCheckBox(getText("MainWindow.ignoreExistingSubtitles"));
 
-        btnBrowse = new JButton(Messages.getString("App.Browse"));
+        btnBrowse = new JButton(getText("App.Browse"));
     }
 
     public void setRecursiveSelected(boolean selected) {

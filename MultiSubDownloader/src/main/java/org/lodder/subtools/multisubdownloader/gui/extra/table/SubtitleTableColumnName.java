@@ -26,7 +26,7 @@ public enum SubtitleTableColumnName implements CustomColumnName {
 
     SubtitleTableColumnName(String columnNameCode, Class<?> clazz, boolean editable,
             Function<Subtitle, Object> valueFunction) {
-        this.columnName = Messages.getString(columnNameCode);
+        this.columnName = Messages.getText(columnNameCode);
         this.clazz = clazz;
         this.editable = editable;
         this.valueFunction = valueFunction;

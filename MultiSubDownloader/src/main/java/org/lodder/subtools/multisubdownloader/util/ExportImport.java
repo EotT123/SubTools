@@ -58,8 +58,8 @@ public class ExportImport {
     public void importSettings(SettingsType listType) {
         chooseFile(listType.fileType).ifPresent(path -> {
             if (Files.notExists(path)) {
-                userInteractionHandler.showMessage(Messages.getString("ImportExport.FileDoesNotExist"),
-                        Messages.getString("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
+                userInteractionHandler.showMessage(Messages.getText("ImportExport.FileDoesNotExist"),
+                        Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
                 return;
             }
             try {
@@ -71,11 +71,11 @@ public class ExportImport {
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                 }
             } catch (CorruptSettingsFileException e) {
-                userInteractionHandler.showMessage(Messages.getString("ImportExport.ImportCorruptFile"),
-                        Messages.getString("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                userInteractionHandler.showMessage(Messages.getText("ImportExport.ImportCorruptFile"),
+                        Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             } catch (Exception e) {
-                userInteractionHandler.showMessage(Messages.getString("ImportExport.ErrorWhileImporting"),
-                        Messages.getString("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileImporting"),
+                        Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             }
         });
     }
@@ -91,8 +91,8 @@ public class ExportImport {
                             default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                         }
                     } catch (Exception e) {
-                        userInteractionHandler.showMessage(Messages.getString("ImportExport.ErrorWhileExporting"),
-                                Messages.getString("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
+                        userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileExporting"),
+                                Messages.getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
                     }
                 });
     }
@@ -185,10 +185,10 @@ public class ExportImport {
 
     private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
         return userInteractionHandler.choice(Arrays.asList(ImportStyle.values()),
-                Messages.getString("ImportExport.OverwriteOrAdd"),
-                Messages.getString("ImportExport.OverwriteOrAddTitle"), option -> switch (option) {
-                    case OVERWRITE -> Messages.getString("ImportExport.Overwrite");
-                    case APPEND -> Messages.getString("ImportExport.Add");
+                Messages.getText("ImportExport.OverwriteOrAdd"),
+                Messages.getText("ImportExport.OverwriteOrAddTitle"), option -> switch (option) {
+                    case OVERWRITE -> Messages.getText("ImportExport.Overwrite");
+                    case APPEND -> Messages.getText("ImportExport.Add");
                 });
     }
 

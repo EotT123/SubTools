@@ -32,7 +32,7 @@ public enum SearchColumnName implements CustomColumnName {
     @val @override boolean editable;
 
     SearchColumnName(String columnNameCode, Class<?> clazz, boolean editable) {
-        this.columnName = Messages.getString(columnNameCode);
+        this.columnName = Messages.getText(columnNameCode);
         this.clazz = clazz;
         this.editable = editable;
     }

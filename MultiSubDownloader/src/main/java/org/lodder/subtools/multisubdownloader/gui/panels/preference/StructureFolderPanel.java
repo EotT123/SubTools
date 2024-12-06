@@ -1,11 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.io.Serial;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
@@ -36,53 +37,46 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.MoveToLibrary"))
+        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.MoveToLibrary"))
                 .margin(0).padding(0).marginLeft(20).paddingLeft(20).useGrid()
                 .panelColumnConstraints("[shrink][grow][shrink]").addTo(this, "span, grow");
 
-        {
-            new JLabel(Messages.getString("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
-            this.txtLibraryFolder =
-                    MyTextFieldPath.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
-            new JButton(Messages.getString("App.Browse"))
-                    .actionListener(() -> MemoryFolderChooser.getInstance()
-                            .selectDirectory(getRootPane(), Messages.getString("PreferenceDialog.LibraryFolder"))
-                            .ifPresent(txtLibraryFolder::setObject))
-                    .addTo(titlePanel, "shrink, wrap");
+        new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
+        this.txtLibraryFolder =
+                MyTextFieldPath.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+        new JButton(getText("App.Browse"))
+                .actionListener(() -> MemoryFolderChooser.getInstance()
+                        .selectDirectory(getRootPane(), getText("PreferenceDialog.LibraryFolder"))
+                        .ifPresent(txtLibraryFolder::setObject))
+                .addTo(titlePanel, "shrink, wrap");
 
-            new JLabel(Messages.getString("StructureBuilderDialog.Structure")).addTo(titlePanel, "shrink");
-            this.txtFolderStructure = MyTextFieldString.builder()
-                    .requireValue()
-                    .build()
-                    .columns(20)
-                    .disabled()
-                    .addTo(titlePanel, "grow");
-            JButton btnStructure = new JButton(Messages.getString("StructureBuilderDialog.Structure"))
-                    .actionListener(() -> {
-                        StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
-                                Messages.getString("PreferenceDialog.StructureBuilderTitle"),
-                                true, videoType, StructureBuilderDialog.StructureType.FOLDER, manager,
-                                userInteractionHandler, getLibraryStructureBuilder());
-                        String value = sDialog.showDialog(txtFolderStructure.getText());
-                        if (!"".equals(value)) {
-                            txtFolderStructure.setText(value);
-                        }
+        new JLabel(getText("StructureBuilderDialog.Structure")).addTo(titlePanel, "shrink");
+        this.txtFolderStructure =
+                MyTextFieldString.builder().requireValue().build().columns(20).disabled().addTo(titlePanel, "grow");
+        JButton btnStructure = new JButton(getText("StructureBuilderDialog.Structure"))
+                .actionListener(() -> {
+                    StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
+                            getText("PreferenceDialog.StructureBuilderTitle"),
+                            true, videoType, StructureBuilderDialog.StructureType.FOLDER, manager,
+                            userInteractionHandler, getLibraryStructureBuilder());
+                    String value = sDialog.showDialog(txtFolderStructure.getText());
+                    if (!"".equals(value)) {
+                        txtFolderStructure.setText(value);
+                    }
+                })
+                .disabled()
+                .addTo(titlePanel, "shrink, wrap");
 
-                    })
-                    .disabled()
-                    .addTo(titlePanel, "shrink, wrap");
+        this.chkRemoveEmptyFolder = new JCheckBox(getText("PreferenceDialog.RemoveEmptyFolders"))
+                .addTo(titlePanel, "span, wrap");
 
-            this.chkRemoveEmptyFolder = new JCheckBox(Messages.getString("PreferenceDialog.RemoveEmptyFolders"))
-                    .addTo(titlePanel, "span, wrap");
+        PanelCheckBox.checkbox(this.chkReplaceSpace =
+                        new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith")))
+                .panelOnSameLine().addTo(titlePanel, "span")
+                .addComponent(this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
 
-            PanelCheckBox.checkbox(this.chkReplaceSpace =
-                            new JCheckBox(Messages.getString("PreferenceDialog.ReplaceSpaceWith")))
-                    .panelOnSameLine().addTo(titlePanel, "span")
-                    .addComponent(this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
-
-            // behaviour
-            txtLibraryFolder.withValidityChangedCallback(txtFolderStructure::setEnabled, btnStructure::setEnabled);
-        }
+        // behaviour
+        txtLibraryFolder.withValidityChangedCallback(txtFolderStructure::setEnabled, btnStructure::setEnabled);
 
         loadPreferenceSettings();
     }
