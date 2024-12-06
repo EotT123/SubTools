@@ -6,7 +6,8 @@ import java.io.Serializable;
 import lombok.ToString;
 
 @ToString
-class TemporarySerializableCacheObject<T extends Serializable> extends TemporaryCacheObject<T> implements Serializable {
+final class TemporarySerializableCacheObject<T extends Serializable> extends TemporaryCacheObject<T>
+        implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 3426939140266268946L;

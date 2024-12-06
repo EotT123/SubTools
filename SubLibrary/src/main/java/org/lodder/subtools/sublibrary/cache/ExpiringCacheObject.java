@@ -16,7 +16,7 @@ import manifold.ext.props.rt.api.var;
 
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-class ExpiringCacheObject<T> implements CacheObject<T>, Serializable {
+sealed class ExpiringCacheObject<T> implements CacheObject<T>, Serializable permits ExpiringSerializableCacheObject {
 
     @Serial
     private static final long serialVersionUID = 3852086993086134232L;

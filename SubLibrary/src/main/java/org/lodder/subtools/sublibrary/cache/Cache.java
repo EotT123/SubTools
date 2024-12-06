@@ -50,7 +50,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
                 return Optional.empty();
             } else {
                 obj.updateLastAccessed();
-                return Optional.ofNullable(obj.value);
+                return Optional.ofNullable((V) obj.value);
             }
         }
     }
@@ -70,9 +70,10 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
     public OptionalLong getTemporaryTimeToLive(K key) {
         synchronized (cacheMap) {
-            CacheObject<V> obj = cacheMap.get(key);
-            return obj instanceof TemporaryCacheObject<?> tempCacheObject ?
-                    OptionalLong.of(tempCacheObject.timeToLive) : OptionalLong.empty();
+            return switch (cacheMap.get(key)) {
+                case TemporaryCacheObject<?> tempCacheObject -> OptionalLong.of(tempCacheObject.timeToLive);
+                case ExpiringCacheObject<?> _ -> OptionalLong.empty();
+            };
         }
     }
 
@@ -96,7 +97,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
             return null;
         } else {
             obj.updateLastAccessed();
-            return obj.value;
+            return (V) obj.value;
         }
 
     }
@@ -119,7 +120,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
     public List<Pair<K, V>> getEntries(Predicate<K> keyFilter) {
         synchronized (cacheMap) {
-            return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), entry.getValue().value)).toList();
+            return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), (V) entry.getValue().value)).toList();
         }
     }
 

@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
 
-public interface CacheObject<T> {
+public sealed interface CacheObject<T> permits ExpiringCacheObject, TemporaryCacheObject {
 
     @val long created;
     @val T value;

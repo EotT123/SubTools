@@ -4,10 +4,9 @@ import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.List;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -24,13 +23,12 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 public abstract class SearchAction implements Runnable, Cancelable, SearchHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
-    @get(Protected) @NonNull Settings settings;
-    @get(Protected) @NonNull SubtitleProviderStore subtitleProviderStore;
+    @val(Protected) Settings settings;
+    @val(Protected) SubtitleProviderStore subtitleProviderStore;
 
     @get(Protected) @set(Private) StatusListener statusListener;
     @get(Protected) @set(Private) SearchManager searchManager;
@@ -39,6 +37,11 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
     abstract @get(Protected) IndexingProgressListener indexingProgressListener;
     abstract @get(Protected) UserInteractionHandler userInteractionHandler;
     abstract @get(Protected) SearchProgressListener searchProgressListener;
+
+    protected SearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore) {
+        this.settings = settings;
+        this.subtitleProviderStore = subtitleProviderStore;
+    }
 
     @Override
     public void run() {

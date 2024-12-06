@@ -15,7 +15,7 @@ import manifold.ext.props.rt.api.val;
 
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-class TemporaryCacheObject<T> implements CacheObject<T>, Serializable {
+sealed class TemporaryCacheObject<T> implements CacheObject<T>, Serializable permits TemporarySerializableCacheObject {
 
     @Serial
     private static final long serialVersionUID = -152474119228350222L;
@@ -50,7 +50,8 @@ class TemporaryCacheObject<T> implements CacheObject<T>, Serializable {
         return "created:%s|expire:%s|value:%s".formatted(created, timeToLive, valueToStringMapper.apply(value));
     }
 
-    public static <T> Optional<TemporaryCacheObject<T>> fromString(String string, Function<String, T> valueToObjectMapper) {
+    public static <T> Optional<TemporaryCacheObject<T>> fromString(String string,
+            Function<String, T> valueToObjectMapper) {
         Matcher matcher = PATTERN.matcher(string);
         if (matcher.matches()) {
             long created = Long.parseLong(matcher.group(1));

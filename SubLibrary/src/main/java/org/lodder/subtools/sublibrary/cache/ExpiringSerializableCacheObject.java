@@ -7,7 +7,8 @@ import lombok.ToString;
 
 
 @ToString
-class ExpiringSerializableCacheObject<T extends Serializable> extends ExpiringCacheObject<T> implements Serializable {
+final class ExpiringSerializableCacheObject<T extends Serializable> extends ExpiringCacheObject<T>
+        implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 8773462650510864103L;
