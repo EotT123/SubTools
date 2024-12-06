@@ -31,14 +31,14 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         unusedPatternsTable =
                 ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUnused"), Source.class)
                         .add(this, "spany 2");
-        new ArrowButton(SwingConstants.EAST, 1, 10).withActionListener(this::addPattern).addTo(this);
+        new ArrowButton(SwingConstants.EAST, 1, 10).actionListener(this::addPattern).addTo(this);
         usedPatternsTable =
                 ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUsed"), Source.class)
                         .add(this, "spany 2");
-        new ArrowButton(SwingConstants.NORTH, 1, 10).withActionListener(this::moveRuleRowUp).addTo(this, "wrap");
+        new ArrowButton(SwingConstants.NORTH, 1, 10).actionListener(this::moveRuleRowUp).addTo(this, "wrap");
 
-        new ArrowButton(SwingConstants.WEST, 1, 10).withActionListener(this::removePattern).addTo(this, "skip");
-        new ArrowButton(SwingConstants.SOUTH, 1, 10).withActionListener(this::moveRuleRowDown).addTo(this, "skip");
+        new ArrowButton(SwingConstants.WEST, 1, 10).actionListener(this::removePattern).addTo(this, "skip");
+        new ArrowButton(SwingConstants.SOUTH, 1, 10).actionListener(this::moveRuleRowDown).addTo(this, "skip");
 
         loadPreferenceSettings();
     }
@@ -65,7 +65,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
         private ScrollTable(String header, Stream<E> items) {
             this.table = new JTable(new DefaultTableModel(new String[]{ header }, 1));
-            this.scrollPane = new JScrollPane().withViewPort(table);
+            this.scrollPane = new JScrollPane().viewportView(table);
             this.model = (DefaultTableModel) table.getModel();
             model.removeRow(0);
             if (items != null) {

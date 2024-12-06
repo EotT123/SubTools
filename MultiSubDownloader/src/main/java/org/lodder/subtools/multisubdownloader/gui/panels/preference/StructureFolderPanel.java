@@ -43,9 +43,9 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         {
             new JLabel(Messages.getString("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
             this.txtLibraryFolder =
-                    MyTextFieldPath.builder().requireValue().build().withColumns(20).addTo(titlePanel, "grow");
+                    MyTextFieldPath.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
             new JButton(Messages.getString("App.Browse"))
-                    .withActionListener(() -> MemoryFolderChooser.getInstance()
+                    .actionListener(() -> MemoryFolderChooser.getInstance()
                             .selectDirectory(getRootPane(), Messages.getString("PreferenceDialog.LibraryFolder"))
                             .ifPresent(txtLibraryFolder::setObject))
                     .addTo(titlePanel, "shrink, wrap");
@@ -54,11 +54,11 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             this.txtFolderStructure = MyTextFieldString.builder()
                     .requireValue()
                     .build()
-                    .withColumns(20)
-                    .withDisabled()
+                    .columns(20)
+                    .disabled()
                     .addTo(titlePanel, "grow");
             JButton btnStructure = new JButton(Messages.getString("StructureBuilderDialog.Structure"))
-                    .withActionListener(() -> {
+                    .actionListener(() -> {
                         StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
                                 Messages.getString("PreferenceDialog.StructureBuilderTitle"),
                                 true, videoType, StructureBuilderDialog.StructureType.FOLDER, manager,
@@ -69,7 +69,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
                         }
 
                     })
-                    .withDisabled()
+                    .disabled()
                     .addTo(titlePanel, "shrink, wrap");
 
             this.chkRemoveEmptyFolder = new JCheckBox(Messages.getString("PreferenceDialog.RemoveEmptyFolders"))

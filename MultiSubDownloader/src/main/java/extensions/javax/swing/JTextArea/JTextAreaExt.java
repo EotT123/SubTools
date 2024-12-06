@@ -11,8 +11,8 @@ import manifold.ext.rt.api.This;
 @Extension
 public class JTextAreaExt {
 
-    public static @Self JTextArea autoscrolls(@This JTextArea textArea, boolean autoscrolls) {
-        textArea.setAutoscrolls(autoscrolls);
+    public static @Self JTextArea autoScrolls(@This JTextArea textArea, boolean autoScrolls) {
+        textArea.setAutoscrolls(autoScrolls);
         return textArea;
     }
 }

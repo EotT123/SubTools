@@ -11,17 +11,17 @@ import manifold.ext.rt.api.This;
 @Extension
 public class ContainerExt {
 
-    public static <S extends Component> @Self Container addComponent(@This Container component, S child) {
+    public static @Self Container addComponent(@This Container component, Component child) {
         component.add(child);
         return component;
     }
 
-    public static <S extends Component> @Self Container addComponent(@This Container component, S child, Object constraints) {
+    public static @Self Container addComponent(@This Container component, Component child, Object constraints) {
         component.add(child, constraints);
         return component;
     }
 
-    public static <S extends Component> @Self Container addComponent(@This Container component, Object constraints, S child) {
+    public static @Self Container addComponent(@This Container component, Object constraints, Component child) {
         component.add(child, constraints);
         return component;
     }

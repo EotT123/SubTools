@@ -42,7 +42,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                         .checkbox(this.chkMinScoreSelection =
                                 new JCheckBox(Messages.getString("PreferenceDialog.MinAutomaticScoreSelection")))
                         .panelOnSameLine().build()
-                        .addComponent(this.sldMinScoreSelection = new JSlider().withMinimum(0).withMaximum(100),
+                        .addComponent(this.sldMinScoreSelection = new JSlider().minimum(0).maximum(100),
                                 "wrap"))
                 .addComponent("wrap, grow", PanelCheckBox
                         .checkbox(this.chkDefaultSelection =

@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -25,7 +24,7 @@ public enum SearchColumnName implements CustomColumnName {
     SCORE("SearchColumnName.Score", Integer.class, false);
 
     private static final Map<String, SearchColumnName> MAP =
-            Arrays.stream(SearchColumnName.values())
+            SearchColumnName.values().stream()
                     .collect(Collectors.toMap(SearchColumnName::getColumnName, Function.identity()));
 
     @val @override String columnName;

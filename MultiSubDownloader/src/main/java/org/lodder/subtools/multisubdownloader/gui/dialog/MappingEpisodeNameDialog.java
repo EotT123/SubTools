@@ -258,7 +258,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             }
 
             {
-                btnAddCustomMapping.withActionListener(() -> {
+                btnAddCustomMapping.actionListener(() -> {
                     int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                     MappingTableModel model = (MappingTableModel) table.getModel();
 
@@ -299,8 +299,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
             {
                 new JButton(Messages.getString("App.Close")).defaultButtonFor(getRootPane())
-                        .withActionListener(() -> setVisible(false))
-                        .withActionCommand(Messages.getString("App.Close"))
+                        .actionListener(() -> setVisible(false))
+                        .actionCommand(Messages.getString("App.Close"))
                         .addTo(buttonPane, "skip");
             }
         }

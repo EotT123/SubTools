@@ -90,11 +90,11 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
         Release release = switch (type) {
             case EPISODE -> TvRelease.builder()
                     .name(name)
-                    .season(getInputPanel().getSeason())
-                    .episode(getInputPanel().getEpisode())
-                    .quality(getInputPanel().getQuality())
+                    .season(inputPanel.season)
+                    .episode(inputPanel.episode)
+                    .quality(inputPanel.quality)
                     .build();
-            case MOVIE -> MovieRelease.builder().name(name).quality(getInputPanel().getQuality()).build();
+            case MOVIE -> MovieRelease.builder().name(name).quality(inputPanel.quality).build();
             default -> releaseFactory.createRelease(Path.of(name), userInteractionHandler);
         };
         return release != null ? List.of(release) : List.of();

@@ -67,7 +67,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                                 JListWithImages.createForType(Path.class).distinctValues().build());
 
                 new JButton(Messages.getString("PreferenceDialog.AddFolder"))
-                        .withActionListener(
+                        .actionListener(
                                 () -> MemoryFolderChooser.getInstance()
                                         .selectDirectory(settingsPanel,
                                                 Messages.getString("PreferenceDialog.SelectFolder"))
@@ -79,7 +79,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                         .addTo(settingsPanel, "span, split 2");
 
                 new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
-                        .withActionListener(defaultIncomingFoldersList::removeSelectedItem)
+                        .actionListener(defaultIncomingFoldersList::removeSelectedItem)
                         .addTo(settingsPanel, "wrap, gapbottom 10px");
             }
             {
@@ -87,7 +87,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                         "aligny center, span 1 2");
 
                 new JScrollPane().addTo(settingsPanel, "growx, span, wrap")
-                        .withViewPort(this.excludeList =
+                        .viewportView(this.excludeList =
                                 JListWithImages.createForType(PathOrRegex.class).distinctValues().build());
 
                 Consumer<PathMatchType> addExcludeItemConsumer = type -> {
@@ -107,15 +107,15 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 };
 
                 new JButton(Messages.getString("PreferenceDialog.AddFolder"))
-                        .withActionListener(() -> addExcludeItemConsumer.accept(PathMatchType.FOLDER))
+                        .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.FOLDER))
                         .addTo(settingsPanel, "span, split 3");
 
                 new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
-                        .withActionListener(excludeList::removeSelectedItem)
+                        .actionListener(excludeList::removeSelectedItem)
                         .addTo(settingsPanel);
 
                 new JButton(Messages.getString("PreferenceDialog.RegexToevoegen"))
-                        .withActionListener(() -> addExcludeItemConsumer.accept(PathMatchType.REGEX))
+                        .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.REGEX))
                         .addTo(settingsPanel);
             }
         }
@@ -145,10 +145,10 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                     .panelOnSameLine().panelLayout(new MigLayout("insets 0, fill")).leftGap(0).addTo(proxyPanel)
                     .addComponent(new JLabel(Messages.getString("PreferenceDialog.Hostname")))
                     .addComponent("wrap",
-                            this.txtProxyHost = MyTextFieldString.builder().requireValue().build().withColumns(30))
+                            this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))
                     .addComponent(new JLabel(Messages.getString("PreferenceDialog.Port")))
                     .addComponent(
-                            this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().withColumns(5));
+                            this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
         }
 
         loadPreferenceSettings();

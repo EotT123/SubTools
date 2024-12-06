@@ -31,16 +31,16 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
                 .addTo(this, "span, growx");
 
         {
-            this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().withColumns(20);
+            this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().columns(20);
 
             PanelCheckBox.checkbox(
                             this.chkBackupSubtitle = new JCheckBox(Messages.getString("PreferenceDialog" +
-                                                                                      ".BackupSubtitles")))
+                                    ".BackupSubtitles")))
                     .panelOnNewLine()
                     .addTo(titelPanel, "span, wrap, growx")
                     .addComponent("split 3, shrink", new JLabel(Messages.getString("PreferenceDialog.Location")))
                     .addComponent("growx", txtBackupSubtitlePath)
-                    .addComponent("shrink", new JButton(Messages.getString("App.Browse")).withActionListener(
+                    .addComponent("shrink", new JButton(Messages.getString("App.Browse")).actionListener(
                             l -> MemoryFolderChooser.getInstance()
                                     .selectDirectory(this, Messages.getString("PreferenceDialog.SubtitleBackupFolder"))
                                     .ifPresent(txtBackupSubtitlePath::setObject)));

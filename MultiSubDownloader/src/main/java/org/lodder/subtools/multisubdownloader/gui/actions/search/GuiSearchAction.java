@@ -57,7 +57,7 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
 
     @Override
     protected Language getLanguage() {
-        return this.searchPanel.inputPanel.getSelectedLanguage();
+        return this.searchPanel.inputPanel.selectedLanguage;
     }
 
     @Override

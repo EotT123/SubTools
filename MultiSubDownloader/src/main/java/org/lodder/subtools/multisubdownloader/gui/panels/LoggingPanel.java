@@ -16,7 +16,8 @@ public class LoggingPanel extends JPanel {
 
     private final JTextArea txtLogging;
     private final ch.qos.logback.classic.Logger ROOT =
-            (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+            (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(
+                    ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 
     public LoggingPanel() {
         this.setLayout(new MigLayout("", "[698px,grow][]", "[][70px,grow]"));
@@ -32,7 +33,7 @@ public class LoggingPanel extends JPanel {
         this.add(cbxLogLevel, "cell 1 0,alignx right");
         this.add(scrollPane, "cell 0 1 2 1,grow");
 
-        txtLogging = new JTextArea().autoscrolls(true).editable(false);
+        txtLogging = new JTextArea().autoScrolls(true).editable(false);
         scrollPane.setViewportView(txtLogging);
 
         new LogTextAppender(txtLogging);

@@ -15,4 +15,12 @@ public class JTextComponentExt {
         textComponent.setEditable(editable);
         return textComponent;
     }
+
+    public static @Self JTextComponent editable(@This JTextComponent textComponent) {
+        return textComponent.editable(true);
+    }
+
+    public static @Self JTextComponent notEditable(@This JTextComponent textComponent) {
+        return textComponent.editable(false);
+    }
 }

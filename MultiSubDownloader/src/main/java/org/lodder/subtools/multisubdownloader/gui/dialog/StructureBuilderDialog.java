@@ -29,8 +29,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class StructureBuilderDialog extends MultiSubDialog implements DocumentListener {
 
-    @Serial
-    private static final long serialVersionUID = -5174968778375028124L;
+    @Serial private static final long serialVersionUID = -5174968778375028124L;
 
     private final VideoType videoType;
     private final StructureType structureType;
@@ -84,7 +83,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         }
 
         new JLabel(Messages.getString("StructureBuilderDialog.Structure")).addTo(panel);
-        this.txtStructure = new JTextField().withColumns(100).addTo(panel, "span, wrap");
+        this.txtStructure = new JTextField().columns(100).addTo(panel, "span, wrap");
         this.txtStructure.getDocument().addDocumentListener(this);
 
         new JLabel(Messages.getString("StructureBuilderDialog.Preview")).addTo(panel);
@@ -92,33 +91,25 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
 
         new JPanel(new FlowLayout(FlowLayout.RIGHT)).addTo(panel, BorderLayout.SOUTH)
                 .addComponent(
-                        new JButton(Messages.getString("App.OK"))
-                                .defaultButtonFor(getRootPane())
-                                .withActionListener(_ -> {
-                                    setVisible(false);
-                                    dispose(); // this is needed to dispose the dialog and return the control to the
-                                    // window
-                                })
-                                .withActionCommand("OK"))
-                .addComponent(new JButton(Messages.getString("App.Cancel"))
-                        .withActionListener(_ -> {
+                        new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane()).actionListener(_ -> {
                             setVisible(false);
-                            txtStructure.setText(oldStructure);
-                            dispose(); // this is needed to dispose the dialog and return the control to the window
-                        })
-                        .withActionCommand("Cancel"));
+                            dispose(); // this is needed to dispose the dialog and return the control to the
+                            // window
+                        }).actionCommand("OK"))
+                .addComponent(new JButton(Messages.getString("App.Cancel")).actionListener(_ -> {
+                    setVisible(false);
+                    txtStructure.setText(oldStructure);
+                    dispose(); // this is needed to dispose the dialog and return the control to the window
+                }).actionCommand("Cancel"));
     }
 
     private void generateVideoFiles() {
         ReleaseFactory releaseFactory = new ReleaseFactory(new Settings(), manager);
-        if (videoType == VideoType.EPISODE) {
-            tvRelease = (TvRelease) releaseFactory.createRelease(
-                    Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"),
-                    userInteractionHandler);
-        } else if (videoType == VideoType.MOVIE) {
-            movieRelease =
-                    (MovieRelease) releaseFactory.createRelease(Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED"),
-                            userInteractionHandler);
+        switch (videoType) {
+            case EPISODE -> tvRelease = (TvRelease) releaseFactory.createRelease(
+                    Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"), userInteractionHandler);
+            case MOVIE -> movieRelease = (MovieRelease) releaseFactory.createRelease(
+                    Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED"), userInteractionHandler);
         }
     }
 
@@ -127,10 +118,9 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     private void addTag(StructureTag structureTag) {
-        new JLabel(structureTag.label)
-                .withToolTipText(structureTag.description)
+        new JLabel(structureTag.label).withToolTipText(structureTag.description)
                 .addTo(tagPanel)
-                .withMouseListener(new InsertTag());
+                .mouseListener(new InsertTag());
     }
 
     public String showDialog(String structure) {

@@ -36,7 +36,7 @@ public class SearchFileInputPanel extends InputPanel {
     }
 
     private void createComponents() {
-        txtIncomingPath = new JTextField().withColumns(20);
+        txtIncomingPath = new JTextField().columns(20);
 
         chkRecursive = new JCheckBox(Messages.getString("MainWindow.RecursiveSearch"));
         chkForceSubtitleOverwrite = new JCheckBox(Messages.getString("MainWindow.ignoreExistingSubtitles"));

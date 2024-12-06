@@ -50,30 +50,30 @@ public class SearchTextInputPanel extends InputPanel {
         cbxVideoType = new MyComboBox<>(VideoSearchType.values())
                 .withToMessageStringRenderer(VideoSearchType::getMsgCode);
 
-        txtInputVideoName = new JTextField().withColumns(10);
+        txtInputVideoName = new JTextField().columns(10);
 
-        txtQualityVersion = new JTextField().withColumns(10);
+        txtQualityVersion = new JTextField().columns(10);
 
-        txtInputSeason = new JTextField().withColumns(10);
+        txtInputSeason = new JTextField().columns(10);
 
-        txtInputEpisode = new JTextField().withColumns(10);
+        txtInputEpisode = new JTextField().columns(10);
     }
 
     private void videoTypeChanged() {
         VideoSearchType videoTypeChoice = cbxVideoType.getSelectedItem();
         if (VideoSearchType.EPISODE == videoTypeChoice) {
-            txtInputSeason.editable(true).withEnabled(true);
-            txtInputEpisode.editable(true).withEnabled(true);
+            txtInputSeason.editable().enabled();
+            txtInputEpisode.editable().enabled();
         } else {
-            txtInputSeason.editable(false).withEnabled(false);
-            txtInputEpisode.editable(false).withEnabled(false);
+            txtInputSeason.notEditable().disabled();
+            txtInputEpisode.notEditable().disabled();
         }
         if (VideoSearchType.RELEASE == videoTypeChoice) {
-            txtQualityVersion.editable(false).withEnabled(false);
-            txtQualityVersion.editable(false).withEnabled(false);
+            txtQualityVersion.notEditable().disabled();
+            txtQualityVersion.notEditable().disabled();
         } else {
-            txtQualityVersion.editable(true).withEnabled(true);
-            txtQualityVersion.editable(true).withEnabled(true);
+            txtQualityVersion.editable().enabled();
+            txtQualityVersion.editable().enabled();
         }
     }
 

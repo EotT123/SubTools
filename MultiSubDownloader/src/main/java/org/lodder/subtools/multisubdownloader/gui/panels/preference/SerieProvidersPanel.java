@@ -59,10 +59,10 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                             .panelLayout(new MigLayout("insets 0, novisualpadding")).build()
                             .addComponent(new JLabel(Messages.getString("PreferenceDialog.Username")))
                             .addComponent("wrap", this.txtAddic7edUsername =
-                                    MyTextFieldString.builder().requireValue().build().withColumns(20))
+                                    MyTextFieldString.builder().requireValue().build().columns(20))
                             .addComponent(new JLabel(Messages.getString("PreferenceDialog.Password")))
                             .addComponent(this.txtAddic7edPassword =
-                                    MyPasswordField.builder().requireValue().build().withColumns(20)));
+                                    MyPasswordField.builder().requireValue().build().columns(20)));
 
             // TV SUBTITLES
             this.chkSourceTvSubtitles = new JCheckBox("Tv Subtitles").addTo(titelPanel, "wrap");
@@ -79,10 +79,10 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                             .panelLayout(new MigLayout("insets 0, novisualpadding")).build()
                             .addComponent(new JLabel(Messages.getString("PreferenceDialog.Username")))
                             .addComponent("wrap", txtOpenSubtitlesUsername =
-                                    MyTextFieldString.builder().requireValue().build().withColumns(20))
+                                    MyTextFieldString.builder().requireValue().build().columns(20))
                             .addComponent(new JLabel(Messages.getString("PreferenceDialog.Password")))
                             .addComponent(txtOpenSubtitlesPassword =
-                                    MyPasswordField.builder().requireValue().build().withColumns(20)));
+                                    MyPasswordField.builder().requireValue().build().columns(20)));
 
             // SUBSCENE
             this.chkSourceSubscene = new JCheckBox("Subscene").addTo(titelPanel, "wrap");
@@ -90,15 +90,15 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             // LOCAL
             this.chkSourceLocal = new JCheckBox(Messages.getString("PreferenceDialog.Local"));
             JScrollPane scrLocalSources =
-                    new JScrollPane().withViewPort(this.localSourcesFoldersList =
+                    new JScrollPane().viewportView(this.localSourcesFoldersList =
                             JListWithImages.createForType(Path.class).distinctValues().build());
             JButton btnBrowseLocalSources = new JButton(Messages.getString("PreferenceDialog.AddFolder"))
-                    .withActionListener(() -> MemoryFolderChooser.getInstance()
+                    .actionListener(() -> MemoryFolderChooser.getInstance()
                             .selectDirectory(this, Messages.getString("PreferenceDialog.SelectFolder"))
                             .map(Path::toAbsolutePath).filter(not(localSourcesFoldersList::contains))
                             .ifPresent(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.getImage(), path)));
             JButton btnRemoveLocalSources = new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
-                    .withActionListener(localSourcesFoldersList::removeSelectedItem);
+                    .actionListener(localSourcesFoldersList::removeSelectedItem);
 
             PanelCheckBox.checkbox(chkSourceLocal).panelOnNewLine().addTo(titelPanel)
                     .addComponent("aligny top, gapy 5px",
@@ -158,8 +158,8 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             return false;
         }
         if (chkUserOpenSubtitlesLogin.isSelected() &&
-            !OpenSubtitlesApi.isValidCredentials(txtOpenSubtitlesUsername.getText(),
-                    new String(txtOpenSubtitlesPassword.getPassword()))) {
+                !OpenSubtitlesApi.isValidCredentials(txtOpenSubtitlesUsername.getText(),
+                        new String(txtOpenSubtitlesPassword.getPassword()))) {
             txtOpenSubtitlesUsername.setErrorBorder();
             txtOpenSubtitlesPassword.setErrorBorder();
             return false;

@@ -88,17 +88,18 @@ public class PreferenceDialog extends MultiSubDialog {
             new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
                     .addTo(getContentPane(), BorderLayout.SOUTH)
                     .addComponent(new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane())
-                            .withActionListener(this::testAndSaveValues)
+                            .actionListener(this::testAndSaveValues)
                             .actionCommand(Messages.getString("App.OK")))
                     .addComponent(
-                            new JButton(Messages.getString("App.Cancel")).withActionListener(() -> setVisible(false))
+                            new JButton(Messages.getString("App.Cancel")).actionListener(() -> setVisible(false))
                                     .actionCommand("Cancel"));
         }
     }
 
     private void testAndSaveValues() {
         if (pnlGeneral.hasValidSettings() && pnlEpisodeLibrary.hasValidSettings() &&
-            pnlMovieLibrary.hasValidSettings() && pnlOptions.hasValidSettings() && pnlSerieSources.hasValidSettings()) {
+                pnlMovieLibrary.hasValidSettings() && pnlOptions.hasValidSettings() &&
+                pnlSerieSources.hasValidSettings()) {
             pnlGeneral.savePreferenceSettings();
             pnlEpisodeLibrary.savePreferenceSettings();
             pnlMovieLibrary.savePreferenceSettings();

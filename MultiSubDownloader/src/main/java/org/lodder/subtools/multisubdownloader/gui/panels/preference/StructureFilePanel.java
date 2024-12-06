@@ -30,8 +30,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class StructureFilePanel extends JPanel {
 
-    @Serial
-    private static final long serialVersionUID = -5458593307643063563L;
+    @Serial private static final long serialVersionUID = -5458593307643063563L;
 
     private final LibrarySettings librarySettings;
     private final MyTextFieldString txtFileStructure;
@@ -47,39 +46,43 @@ public class StructureFilePanel extends JPanel {
         this.librarySettings = librarySettings;
 
         JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.RenameFiles"))
-                .margin(0).padding(0).marginLeft(20).paddingLeft(20).addTo(this, "span, grow");
+                .margin(0)
+                .padding(0)
+                .marginLeft(20)
+                .paddingLeft(20)
+                .addTo(this, "span, grow");
 
         {
             new JLabel(Messages.getString("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
             this.txtFileStructure =
-                    MyTextFieldString.builder().requireValue().build().withColumns(20).addTo(titlePanel, "grow");
-            new JButton(Messages.getString("StructureBuilderDialog.Structure"))
-                    .withActionListener(() -> {
-                        StructureBuilderDialog sDialog =
-                                new StructureBuilderDialog(null,
-                                        Messages.getString("PreferenceDialog.StructureBuilderTitle"), true, videoType,
-                                        StructureBuilderDialog.StructureType.FILE, manager, userInteractionHandler,
-                                        getLibraryStructureBuilder());
-                        String value = sDialog.showDialog(txtFileStructure.getText());
-                        if (!value.isEmpty()) {
-                            txtFileStructure.setText(value);
-                        }
+                    MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+            new JButton(Messages.getString("StructureBuilderDialog.Structure")).actionListener(() -> {
+                StructureBuilderDialog sDialog =
+                        new StructureBuilderDialog(null, Messages.getString("PreferenceDialog.StructureBuilderTitle"),
+                                true, videoType, StructureBuilderDialog.StructureType.FILE, manager,
+                                userInteractionHandler, getLibraryStructureBuilder());
+                String value = sDialog.showDialog(txtFileStructure.getText());
+                if (!value.isEmpty()) {
+                    txtFileStructure.setText(value);
+                }
 
-                    })
-                    .addTo(titlePanel, "shrink, wrap");
+            }).addTo(titlePanel, "shrink, wrap");
 
             this.chkReplaceSpace = new JCheckBox(Messages.getString("PreferenceDialog.ReplaceSpaceWith"));
 
-            PanelCheckBox.checkbox(chkReplaceSpace).panelOnSameLine().addTo(titlePanel, "wrap")
+            PanelCheckBox.checkbox(chkReplaceSpace)
+                    .panelOnSameLine()
+                    .addTo(titlePanel, "wrap")
                     .addComponent("width pref+10px, wrap",
                             this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
 
             this.chkIncludeLanguageCode =
-                    new JCheckBox(Messages.getString("PreferenceDialog.IncludeLanguageInFileName"))
-                            .withSelectedListener(languageMapping::refreshState).addTo(titlePanel, "wrap");
+                    new JCheckBox(Messages.getString("PreferenceDialog.IncludeLanguageInFileName")).selectedListener(
+                            languageMapping::refreshState).addTo(titlePanel, "wrap");
 
             JPanel languagePanelRoot = PanelCheckBox.checkbox(chkIncludeLanguageCode)
-                    .panelOnNewLine().panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
+                    .panelOnNewLine()
+                    .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
                     .addTo(titlePanel, "span, growx");
             {
                 JPanel languagePanel = new JPanel(new MigLayout("insets 0, novisualpadding", "[][][][20px]"));
@@ -97,9 +100,9 @@ public class StructureFilePanel extends JPanel {
                             new MyComboBox<>(Language.values()).withToMessageStringRenderer(Language::getMsgCode)
                                     .addTo(languagePanel);
                     MyTextFieldString txtLanguage =
-                            MyTextFieldString.builder().build().withColumns(20).addTo(languagePanel);
-                    JButton btnDelete = new JButton(Messages.getString("StructureFilePanel.Delete"))
-                            .withActionListenerSelf(delBtn -> {
+                            MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
+                    JButton btnDelete =
+                            new JButton(Messages.getString("StructureFilePanel.Delete")).actionListenerSelf(delBtn -> {
                                 languagePanel.remove(cmbLanguage);
                                 languagePanel.remove(txtLanguage);
                                 languagePanel.remove(delBtn);
@@ -107,8 +110,7 @@ public class StructureFilePanel extends JPanel {
                                 languageScrollPane.setVisible(!languageMapping.isEmpty());
                                 languagePanelRoot.repaint();
                                 languagePanelRoot.revalidate();
-                            })
-                            .addTo(languagePanel, "wrap");
+                            }).addTo(languagePanel, "wrap");
                     LanguageComponents languageComponents = new LanguageComponents(cmbLanguage, txtLanguage, btnDelete);
                     languageMapping.put(id, languageComponents);
 
@@ -117,8 +119,8 @@ public class StructureFilePanel extends JPanel {
                     languagePanelRoot.revalidate();
                     return languageComponents;
                 };
-                new JButton(Messages.getString("StructureFilePanel.AddLanguage"))
-                        .withActionListener(addLanguageSupplier::get).addTo(languagePanelRoot);
+                new JButton(Messages.getString("StructureFilePanel.AddLanguage")).actionListener(
+                        addLanguageSupplier::get).addTo(languagePanelRoot);
             }
         }
 
@@ -212,10 +214,9 @@ public class StructureFilePanel extends JPanel {
         }
 
         public boolean hasValidSettings() {
-            return languageComponentsMap.values().stream().allMatch(LanguageComponents::hasValidValue)
-                   && languageComponentsMap.values().stream().map(LanguageComponents::getLanguage).distinct().count() ==
-                      languageComponentsMap
-                              .size();
+            return languageComponentsMap.values().stream().allMatch(LanguageComponents::hasValidValue) &&
+                    languageComponentsMap.values().stream().map(LanguageComponents::getLanguage).distinct().count() ==
+                            languageComponentsMap.size();
         }
 
         private Stream<LanguageComponents> getLanguageComponentsForLanguageStream(Language language) {
@@ -227,10 +228,10 @@ public class StructureFilePanel extends JPanel {
         }
 
         public Map<Language, String> toSettingsMap() {
-            return languageComponentsMap.values().stream().collect(Collectors.toMap(
-                    langComps -> langComps.cmbLanguage().getSelectedItem(),
-                    langComps -> langComps.txtLanguage().getText(),
-                    (v1, v2) -> v1, LinkedHashMap::new));
+            return languageComponentsMap.values()
+                    .stream()
+                    .collect(Collectors.toMap(langComps -> langComps.cmbLanguage().getSelectedItem(),
+                            langComps -> langComps.txtLanguage().getText(), (v1, v2) -> v1, LinkedHashMap::new));
         }
 
         public void refreshState(boolean enabled) {
@@ -256,8 +257,7 @@ public class StructureFilePanel extends JPanel {
     }
 
     public boolean hasValidSettings() {
-        return !isVisible()
-               || (txtFileStructure.hasValidValue()
-                   && (!chkIncludeLanguageCode.isSelected() || languageMapping.hasValidSettings()));
+        return !isVisible() || (txtFileStructure.hasValidValue() &&
+                (!chkIncludeLanguageCode.isSelected() || languageMapping.hasValidSettings()));
     }
 }

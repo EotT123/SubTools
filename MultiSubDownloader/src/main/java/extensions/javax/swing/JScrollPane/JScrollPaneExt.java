@@ -12,7 +12,7 @@ import manifold.ext.rt.api.This;
 @Extension
 public class JScrollPaneExt {
 
-    public static <S extends Component> @Self JScrollPane withViewPort(@This JScrollPane scrollPane, S view) {
+    public static @Self JScrollPane viewportView(@This JScrollPane scrollPane, Component view) {
         scrollPane.setViewportView(view);
         return scrollPane;
     }

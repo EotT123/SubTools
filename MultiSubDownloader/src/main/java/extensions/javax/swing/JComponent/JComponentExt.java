@@ -8,34 +8,46 @@ import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jetbrains.annotations.Nullable;
 
 @UtilityClass
 @Extension
 public class JComponentExt {
 
-    public static @Self JComponent withEnabled(@This JComponent component, boolean enabled) {
+    public static @Self JComponent enabled(@This JComponent component, boolean enabled) {
         component.setEnabled(enabled);
         return component;
     }
 
-    public static @Self JComponent withEnabled(@This JComponent component) {
-        withEnabled(component, true);
+    public static @Self JComponent enabled(@This JComponent component) {
+        return component.enabled(true);
+    }
+
+    public static @Self JComponent disabled(@This JComponent component) {
+        return component.enabled(false);
+    }
+
+    public static @Self JComponent toolTipText(@This JComponent component, String text) {
+        component.setToolTipText(text);
         return component;
     }
 
-    public static @Self JComponent withDisabled(@This JComponent component) {
-        withEnabled(component, false);
+    public static @Self JComponent hidden(@This JComponent component) {
+        return component.visible(false);
+    }
+
+    public static @Self JComponent visible(@This JComponent component) {
+        return component.visible(true);
+    }
+
+    public static @Self JComponent visible(@This JComponent component, boolean visible) {
+        component.setVisible(visible);
         return component;
     }
 
-    public static <S extends Container> @Self JComponent addTo(@This JComponent child, S parent) {
-        parent.add(child);
-        return child;
-    }
-
-    public static <S extends Container> @Self JComponent addTo(@This JComponent child, S parent, Object constraints) {
-        parent.add(child, constraints);
-        return child;
+    public static @Self JComponent background(@This JComponent component, @Nullable Color background) {
+        component.background = background;
+        return component;
     }
 
     public static void setEnabledRecursive(@This JComponent component, boolean enabled) {

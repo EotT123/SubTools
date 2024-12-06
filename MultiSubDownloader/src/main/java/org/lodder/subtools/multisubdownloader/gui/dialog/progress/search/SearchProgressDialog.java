@@ -31,7 +31,7 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
         this.window = window;
         this.completed = false;
 
-        initialize_ui();
+        initializeUi();
         setDialogLocation(window);
         repaint();
     }
@@ -76,7 +76,7 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
         this.window.setStatusMessage(message);
     }
 
-    private void initialize_ui() {
+    private void initializeUi() {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

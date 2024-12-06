@@ -11,12 +11,12 @@ import manifold.ext.rt.api.This;
 @Extension
 public class JSliderExt {
 
-    public static @Self JSlider withMinimum(@This JSlider slider, int minimum) {
+    public static @Self JSlider minimum(@This JSlider slider, int minimum) {
         slider.setMinimum(minimum);
         return slider;
     }
 
-    public static @Self JSlider withMaximum(@This JSlider slider, int maximum) {
+    public static @Self JSlider maximum(@This JSlider slider, int maximum) {
         slider.setMaximum(maximum);
         return slider;
     }

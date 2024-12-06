@@ -18,8 +18,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public class SelectDialog extends MultiSubDialog {
 
-    @Serial
-    private static final long serialVersionUID = -4092909537478305235L;
+    @Serial private static final long serialVersionUID = -4092909537478305235L;
 
     private final List<Subtitle> subtitles;
     private final Release release;
@@ -32,7 +31,8 @@ public class SelectDialog extends MultiSubDialog {
      */
     public SelectDialog(JFrame frame, List<Subtitle> subtitles, Release release) {
         super(frame, Messages.getString("SelectDialog.SelectCorrectSubtitle"), true);
-        this.subtitles = subtitles.stream().distinct().sorted(Comparator.comparing(Subtitle::getScore).reversed()).toList();
+        this.subtitles =
+                subtitles.stream().distinct().sorted(Comparator.comparing(Subtitle::getScore).reversed()).toList();
         this.release = release;
         initialize();
         pack();
@@ -42,7 +42,8 @@ public class SelectDialog extends MultiSubDialog {
 
     private void initialize() {
         getContentPane().setLayout(new MigLayout("", "[1000px:n,grow,fill]", "[][::100px,fill][grow]"));
-        JLabel lblNewLabel = new JLabel(Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileName);
+        JLabel lblNewLabel =
+                new JLabel(Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileName);
         getContentPane().add(lblNewLabel, "cell 0 0");
         {
             JScrollPane scrollPane = new JScrollPane();
@@ -53,30 +54,20 @@ public class SelectDialog extends MultiSubDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, "cell 0 2,grow");
 
-            new JButton(Messages.getString("App.OK"))
-                    .defaultButtonFor(getRootPane())
-                    .withActionListener(() -> {
-                        selectedSubtitleIdxs = getSelectedIdxs();
-                        setVisible(false);
-                    })
-                    .withActionCommand(Messages.getString("App.OK"))
-                    .addTo(buttonPane);
+            new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane()).actionListener(() -> {
+                selectedSubtitleIdxs = getSelectedIdxs();
+                setVisible(false);
+            }).actionCommand(Messages.getString("App.OK")).addTo(buttonPane);
 
-            new JButton(Messages.getString("SelectDialog.Everything"))
-                    .withActionListener(() -> {
-                        selectedSubtitleIdxs = IntStream.range(0, release.getMatchingSubs().size()).boxed().toList();
-                        setVisible(false);
-                    })
-                    .withActionCommand(Messages.getString("App.All"))
-                    .addTo(buttonPane);
+            new JButton(Messages.getString("SelectDialog.Everything")).actionListener(() -> {
+                selectedSubtitleIdxs = IntStream.range(0, release.getMatchingSubs().size()).boxed().toList();
+                setVisible(false);
+            }).actionCommand(Messages.getString("App.All")).addTo(buttonPane);
 
-            new JButton(Messages.getString("App.Cancel"))
-                    .withActionListener(() -> {
-                        selectedSubtitleIdxs = List.of();
-                        setVisible(false);
-                    })
-                    .withActionCommand(Messages.getString("App.Cancel"))
-                    .addTo(buttonPane);
+            new JButton(Messages.getString("App.Cancel")).actionListener(() -> {
+                selectedSubtitleIdxs = List.of();
+                setVisible(false);
+            }).actionCommand(Messages.getString("App.Cancel")).addTo(buttonPane);
         }
     }
 
@@ -112,8 +103,10 @@ public class SelectDialog extends MultiSubDialog {
 
     private List<Integer> getSelectedIdxs() {
         return IntStream.range(0, customTable.getModel().getRowCount())
-                .filter(i -> (boolean) customTable.getModel().getValueAt(i, customTable.getColumnIdByName(SubtitleTableColumnName.SELECT)))
-                .boxed().toList();
+                .filter(i -> (boolean) customTable.getModel()
+                        .getValueAt(i, customTable.getColumnIdByName(SubtitleTableColumnName.SELECT)))
+                .boxed()
+                .toList();
     }
 
     public List<Integer> getSelection() {
