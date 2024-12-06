@@ -7,7 +7,7 @@ import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.model.Release;
 
-public class CLISearchProgress extends CLIProgress<CLISearchProgress> implements SearchProgressListener {
+public class CLISearchProgress extends CLIProgress implements SearchProgressListener {
 
     private final TextTable table;
     private final SearchProgressTableModel tableModel;
@@ -25,13 +25,13 @@ public class CLISearchProgress extends CLIProgress<CLISearchProgress> implements
 
     @Override
     public void progress(int progress) {
-        setProgress(progress);
+        this.progress = progress;
         this.printProgress();
     }
 
     @Override
     public void completed() {
-        if (!this.isEnabled()) {
+        if (!this.enabled) {
             return;
         }
         this.disable();
@@ -39,12 +39,12 @@ public class CLISearchProgress extends CLIProgress<CLISearchProgress> implements
 
     @Override
     public void reset() {
-        this.setEnabled(true);
+        this.enabled = true;
     }
 
     @Override
     public void onError(ActionException exception) {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         System.out.println("Error: " + exception.getMessage());
@@ -52,7 +52,7 @@ public class CLISearchProgress extends CLIProgress<CLISearchProgress> implements
 
     @Override
     public void onStatus(String message) {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
         System.out.println(message);
@@ -60,17 +60,17 @@ public class CLISearchProgress extends CLIProgress<CLISearchProgress> implements
 
     @Override
     protected void printProgress() {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
 
         /* print table */
-        if (isVerbose()) {
+        if (verbose) {
             System.out.println();
             table.printTable();
         }
 
         /* print progressbar */
-        this.printProgBar(this.getProgress());
+        this.printProgBar(this.progress);
     }
 }

@@ -1,10 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
+import manifold.ext.props.rt.api.get;
+import manifold.ext.props.rt.api.override;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
@@ -22,16 +24,15 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-@Getter(value = AccessLevel.PROTECTED)
 public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction {
 
-    private final @NonNull GUI mainWindow;
-    private final @NonNull SearchPanel<P> searchPanel;
-    private final SubtitleFiltering filtering;
-    private final @NonNull ReleaseFactory releaseFactory;
-    private final IndexingProgressListener indexingProgressListener;
-    private final SearchProgressListener searchProgressListener;
-    private final UserInteractionHandlerGUI userInteractionHandler;
+    @get(Protected) @NonNull GUI mainWindow;
+    @get(Protected) @NonNull SearchPanel<P> searchPanel;
+    @get(Protected) SubtitleFiltering filtering;
+    @get(Protected) @NonNull ReleaseFactory releaseFactory;
+    @get(Protected) @override IndexingProgressListener indexingProgressListener;
+    @get(Protected) @override SearchProgressListener searchProgressListener;
+    @get(Protected) @override UserInteractionHandlerGUI userInteractionHandler;
 
     GuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
             GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
@@ -52,7 +53,7 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
     }
 
     protected P getInputPanel() {
-        return this.getSearchPanel().getInputPanel();
+        return this.searchPanel.getInputPanel();
     }
 
     @Override
@@ -72,8 +73,8 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
             searchPanel.getResultPanel().enableButtons();
         }
 
-        if (this.getSearchManager().getProgress() == 100) {
-            this.getSearchProgressListener().completed();
+        if (this.searchManager.getProgress() == 100) {
+            this.searchProgressListener.completed();
             searchPanel.getInputPanel().enableSearchButton();
         }
     }

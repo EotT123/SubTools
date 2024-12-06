@@ -71,11 +71,13 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
         @Override
         public FileGuiSearchAction build() {
-            return new FileGuiSearchAction(manager, settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
+            return new FileGuiSearchAction(manager, settings, subtitleProviderStore, mainWindow, searchPanel,
+                    releaseFactory);
         }
     }
 
-    private FileGuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
+    private FileGuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
+            GUI mainWindow,
             SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
         super(manager, settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
         this.filelistAction = new FileListAction(settings);
@@ -84,21 +86,23 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     @Override
     protected void validate() throws SearchSetupException {
         String path = getInputPanel().getIncomingPath();
-        if ("".equals(path) && !this.getSettings().hasDefaultFolders()) {
+        if ("".equals(path) && !this.settings.hasDefaultFolders()) {
             throw new SearchSetupException(Messages.getString("App.NoFolderSelected"));
         }
     }
 
     @Override
     public void onFound(Release release, List<Subtitle> subtitles) {
-        VideoTableModel model = (VideoTableModel) this.getSearchPanel().getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
 
         List<Subtitle> filteredSubtitles =
-                getFiltering() != null ? subtitles.stream().filter(subtitle -> getFiltering().useSubtitle(subtitle, release)).toList() : subtitles;
+                filtering != null ?
+                        subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() :
+                        subtitles;
         filteredSubtitles.forEach(release::addMatchingSub);
 
         model.addRow(release);
-        getMainWindow().repaint();
+        mainWindow.repaint();
 
         /* Let GuiSearchAction also make some decisions */
         super.onFound(release, filteredSubtitles);
@@ -112,7 +116,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
         boolean recursive = inputPanel.isRecursiveSelected();
         boolean overwriteExistingSubtitles = inputPanel.isForceOverwrite();
 
-        VideoTableModel model = (VideoTableModel) this.getSearchPanel().getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
         model.clearTable();
 
         /* get a list of video files */
@@ -130,38 +134,40 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
         int index = 0;
         int progress = 0;
 
-        this.getIndexingProgressListener().progress(progress);
+        this.indexingProgressListener.progress(progress);
 
         for (Path file : files) {
             index++;
             progress = (int) Math.floor((float) index / total * 100);
 
             /* Tell progressListener which file we are processing */
-            this.getIndexingProgressListener().progress(file.getFileName().toString());
+            this.indexingProgressListener.progress(file.getFileName().toString());
 
-            Release r = getReleaseFactory().createRelease(file, getUserInteractionHandler());
+            Release r = releaseFactory.createRelease(file, userInteractionHandler);
             if (r != null) {
                 releases.add(r);
             }
 
             /* Update progressListener */
-            this.getIndexingProgressListener().progress(progress);
+            this.indexingProgressListener.progress(progress);
         }
 
         return releases;
     }
 
-    private List<Path> getFiles(String filePath, Language language, boolean recursive, boolean overwriteExistingSubtitles) {
+    private List<Path> getFiles(String filePath, Language language, boolean recursive,
+            boolean overwriteExistingSubtitles) {
         /* Get a list of selected directories */
-        List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : this.getSettings().defaultFolders;
+        List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : this.settings.defaultFolders;
 
         /* Scan directories for video files */
         /* Tell Action where to send progressUpdates */
-        this.filelistAction.setIndexingProgressListener(this.getIndexingProgressListener());
+        this.filelistAction.indexingProgressListener = this.indexingProgressListener;
 
         /* Start the getFileListing Action */
         return dirs.stream()
-                .flatMap(dir -> this.filelistAction.getFileListing(dir, recursive, language, overwriteExistingSubtitles).stream())
+                .flatMap(dir -> this.filelistAction.getFileListing(dir, recursive, language, overwriteExistingSubtitles)
+                        .stream())
                 .toList();
     }
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 import extensions.java.nio.file.Path.PathExt;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import manifold.ext.props.rt.api.set;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -28,13 +29,14 @@ public class FileListAction {
     private static final String SUBTITLE_EXTENSION = "srt";
 
     private final Settings settings;
-    private IndexingProgressListener indexingProgressListener;
+    @set IndexingProgressListener indexingProgressListener;
     private int progressFileIndex;
     private int progressFilesTotal;
 
 
     public List<Path> getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
-        LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]", dir, recursive, language,
+        LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]", dir,
+                recursive, language,
                 forceSubtitleOverwrite);
         /* Reset progress counters */
         this.progressFileIndex = 0;
@@ -74,7 +76,8 @@ public class FileListAction {
 
             try {
                 if (file.isRegularFile()) {
-                    if (isValidVideoFile(file) && (forceSubtitleOverwrite || !fileHasSubtitles(file, language)) && !isExcludedFile(file)) {
+                    if (isValidVideoFile(file) && (forceSubtitleOverwrite || !fileHasSubtitles(file, language)) &&
+                        !isExcludedFile(file)) {
                         filelist.add(file);
                     }
                 } else if (recursive && !isExcludedDir(file)) {
@@ -136,12 +139,11 @@ public class FileListAction {
             }
             List<String> filters = langCodes.stream().map(word -> word + "." + SUBTITLE_EXTENSION).toList();
             String subtitleNameWithoutExtension = subtitleName.replace(subtitleExtensionWithDot, "");
-            return file.getParent().list().map(PathExt::getFileNameAsString).filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
+            return file.getParent()
+                    .list()
+                    .map(PathExt::getFileNameAsString)
+                    .filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
                     .anyMatch(fileName -> fileName.contains(subtitleNameWithoutExtension));
         }
-    }
-
-    public void setIndexingProgressListener(IndexingProgressListener indexingProgressListener) {
-        this.indexingProgressListener = indexingProgressListener;
     }
 }

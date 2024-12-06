@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.serviceproviders;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
@@ -15,12 +17,14 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
 
     protected Container app;
     protected SubtitleProvider subtitleProvider;
+    /* We define a priority lower than SubtitleServiceProvider */
+    @val @override int priority = 1;
 
-    @Override
-    public int getPriority() {
-        /* We define a priority lower than SubtitleServiceProvider */
-        return 1;
-    }
+    //    @Override
+    //    public int getPriority() {
+    //        /* We define a priority lower than SubtitleServiceProvider */
+    //        return 1;
+    //    }
 
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {
@@ -55,7 +59,8 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
         return new JOpenSubAdapter(loginEnabled, username, password, manager, userInteractionHandler);
     }
 
-    private void registerListener(SubtitleProviderStore subtitleProviderStore, UserInteractionHandler userInteractionHandler) {
+    private void registerListener(SubtitleProviderStore subtitleProviderStore,
+            UserInteractionHandler userInteractionHandler) {
         /* Resolve the EventEmitter from the IoC Container */
         Emitter emitter = (Emitter) app.make("EventEmitter");
 

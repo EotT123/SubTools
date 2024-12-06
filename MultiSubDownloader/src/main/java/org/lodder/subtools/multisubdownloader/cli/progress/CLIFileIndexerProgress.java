@@ -3,7 +3,7 @@ package org.lodder.subtools.multisubdownloader.cli.progress;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 
-public class CLIFileIndexerProgress extends CLIProgress<CLIFileIndexerProgress> implements IndexingProgressListener {
+public class CLIFileIndexerProgress extends CLIProgress implements IndexingProgressListener {
 
     private String currentFile;
 
@@ -14,7 +14,7 @@ public class CLIFileIndexerProgress extends CLIProgress<CLIFileIndexerProgress> 
 
     @Override
     public void progress(int progress) {
-        setProgress(progress);
+        this.progress = progress;
         this.printProgress();
     }
 
@@ -26,7 +26,7 @@ public class CLIFileIndexerProgress extends CLIProgress<CLIFileIndexerProgress> 
 
     @Override
     public void completed() {
-        if (!this.isEnabled()) {
+        if (!enabled) {
             return;
         }
         this.disable();
@@ -34,12 +34,12 @@ public class CLIFileIndexerProgress extends CLIProgress<CLIFileIndexerProgress> 
 
     @Override
     public void reset() {
-        this.setEnabled(true);
+        this.enabled = true;
     }
 
     @Override
     public void onError(ActionException exception) {
-        if (!this.isEnabled()) {
+        if (!enabled) {
             return;
         }
         System.out.println("Error: " + exception.getMessage());
@@ -47,7 +47,7 @@ public class CLIFileIndexerProgress extends CLIProgress<CLIFileIndexerProgress> 
 
     @Override
     public void onStatus(String message) {
-        if (!this.isEnabled()) {
+        if (!enabled) {
             return;
         }
         System.out.println(message);
@@ -55,11 +55,11 @@ public class CLIFileIndexerProgress extends CLIProgress<CLIFileIndexerProgress> 
 
     @Override
     protected void printProgress() {
-        if (!isEnabled()) {
+        if (!enabled) {
             return;
         }
 
-        if (isVerbose()) {
+        if (verbose) {
             /* newlines to counter the return carriage from printProgBar() */
             System.out.println();
             System.out.println(this.currentFile);

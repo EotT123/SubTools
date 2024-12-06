@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.serviceproviders;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
@@ -15,12 +17,14 @@ public class LocalServiceProvider implements ServiceProvider {
     private UserInteractionHandler userInteractionHandler;
     protected Container app;
     protected SubtitleProvider subtitleProvider;
+    /* We define a priority lower than SubtitleServiceProvider */
+    @val @override int priority = 1;
 
-    @Override
-    public int getPriority() {
-        /* We define a priority lower than SubtitleServiceProvider */
-        return 1;
-    }
+    //    @Override
+    //    public int getPriority() {
+    //        /* We define a priority lower than SubtitleServiceProvider */
+    //        return 1;
+    //    }
 
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {

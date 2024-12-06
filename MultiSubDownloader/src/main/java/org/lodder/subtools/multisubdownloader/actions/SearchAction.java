@@ -1,11 +1,13 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import manifold.ext.props.rt.api.get;
+import manifold.ext.props.rt.api.set;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -24,17 +26,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RequiredArgsConstructor
-@Getter(value = AccessLevel.PROTECTED)
 public abstract class SearchAction implements Runnable, Cancelable, SearchHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
-    private final Manager manager;
-    private final @NonNull Settings settings;
-    private final @NonNull SubtitleProviderStore subtitleProviderStore;
-    private StatusListener statusListener;
-    private SearchManager searchManager;
-    private List<Release> releases;
+    @get(Protected) @NonNull Manager manager;
+    @get(Protected) @NonNull Settings settings;
+    @get(Protected) @NonNull SubtitleProviderStore subtitleProviderStore;
+
+    @get(Protected) @set(Private) StatusListener statusListener;
+    @get(Protected) @set(Private) SearchManager searchManager;
+    @get(Protected) @set(Private) List<Release> releases;
+    @get(Protected) Language language;
+    abstract @get(Protected) IndexingProgressListener indexingProgressListener;
+    abstract @get(Protected) UserInteractionHandler userInteractionHandler;
+    abstract @get(Protected) SearchProgressListener searchProgressListener;
 
     @Override
     public void run() {
@@ -50,13 +56,11 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
     }
 
     private void search() throws ActionException {
-        this.statusListener = this.getIndexingProgressListener();
-        this.getIndexingProgressListener().reset();
-        this.getSearchProgressListener().reset();
+        this.statusListener = this.indexingProgressListener;
+        this.indexingProgressListener.reset();
+        this.searchProgressListener.reset();
 
         validate();
-
-        Language language = this.getLanguage();
 
         setStatusMessage(Messages.getString("SearchAction.StatusIndexing"));
 
@@ -71,9 +75,9 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
             return;
         }
 
-        this.getIndexingProgressListener().completed();
+        this.indexingProgressListener.completed();
 
-        this.statusListener = this.getSearchProgressListener();
+        this.statusListener = this.searchProgressListener;
 
         /* Create a new SearchManager. */
         this.searchManager =
@@ -81,9 +85,9 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
                         /* Tell the manager which language we want */
                         .language(language)
                         /* Tell the manager where to push progressUpdates */
-                        .progressListener(getSearchProgressListener())
+                        .progressListener(searchProgressListener)
                         /* Tell the manager how to handle user interactions */
-                        .userInteractionHandler(getUserInteractionHandler())
+                        .userInteractionHandler(userInteractionHandler)
                         /* Listen for when the manager tells us Subtitles are found */
                         .onFound(this);
 
@@ -115,17 +119,8 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
             this.searchManager.cancel(mayInterruptIfRunning);
         }
         Thread.currentThread().interrupt();
-        this.getIndexingProgressListener().completed();
-        this.getSearchProgressListener().completed();
+        this.indexingProgressListener.completed();
+        this.searchProgressListener.completed();
         return true;
     }
-
-    protected abstract Language getLanguage();
-
-    protected abstract UserInteractionHandler getUserInteractionHandler();
-
-    protected abstract IndexingProgressListener getIndexingProgressListener();
-
-    protected abstract SearchProgressListener getSearchProgressListener();
-
 }

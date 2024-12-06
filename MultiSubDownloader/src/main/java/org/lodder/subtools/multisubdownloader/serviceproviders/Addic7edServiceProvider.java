@@ -2,6 +2,8 @@ package org.lodder.subtools.multisubdownloader.serviceproviders;
 
 import java.util.prefs.Preferences;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
@@ -18,12 +20,14 @@ public class Addic7edServiceProvider implements ServiceProvider {
 
     protected Container app;
     protected SubtitleProvider subtitleProvider;
+    /* We define a priority lower than SubtitleServiceProvider */
+    @val @override int priority = 1;
 
-    @Override
-    public int getPriority() {
-        /* We define a priority lower than SubtitleServiceProvider */
-        return 1;
-    }
+    //    @Override
+    //    public int getPriority() {
+    //        /* We define a priority lower than SubtitleServiceProvider */
+    //        return 1;
+    //    }
 
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {
@@ -60,12 +64,14 @@ public class Addic7edServiceProvider implements ServiceProvider {
         if (settings.isSerieSourceAddic7edProxy()) {
             return new JAddic7edViaProxyAdapter(manager, userInteractionHandler);
         } else {
-            return new JAddic7edAdapter(loginEnabled, username, password, preferences.getBoolean("speedy", false), manager, userInteractionHandler);
+            return new JAddic7edAdapter(loginEnabled, username, password, preferences.getBoolean("speedy", false),
+                    manager, userInteractionHandler);
         }
     }
 
     // TODO is this still needed?
-    private void registerListener(SubtitleProviderStore subtitleProviderStore, UserInteractionHandler userInteractionHandler) {
+    private void registerListener(SubtitleProviderStore subtitleProviderStore,
+            UserInteractionHandler userInteractionHandler) {
         /* Resolve the EventEmitter from the IoC Container */
         Emitter emitter = (Emitter) app.make("EventEmitter");
 
