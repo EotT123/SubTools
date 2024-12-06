@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static org.lodder.subtools.sublibrary.model.VideoSearchType.*;
 
 import javax.swing.*;
 import java.io.Serial;
@@ -58,20 +59,9 @@ public class SearchTextInputPanel extends InputPanel {
 
     private void videoTypeChanged() {
         VideoSearchType videoTypeChoice = cbxVideoType.getSelectedItem();
-        if (VideoSearchType.EPISODE == videoTypeChoice) {
-            txtInputSeason.editable().enabled();
-            txtInputEpisode.editable().enabled();
-        } else {
-            txtInputSeason.notEditable().disabled();
-            txtInputEpisode.notEditable().disabled();
-        }
-        if (VideoSearchType.RELEASE == videoTypeChoice) {
-            txtQualityVersion.notEditable().disabled();
-            txtQualityVersion.notEditable().disabled();
-        } else {
-            txtQualityVersion.editable().enabled();
-            txtQualityVersion.editable().enabled();
-        }
+        txtInputSeason.editable(videoTypeChoice == EPISODE).enabled(videoTypeChoice == EPISODE);
+        txtInputEpisode.editable(videoTypeChoice == EPISODE).enabled(videoTypeChoice == EPISODE);
+        txtQualityVersion.editable(videoTypeChoice == RELEASE).enabled(videoTypeChoice == RELEASE);
     }
 
     public VideoSearchType getType() {
