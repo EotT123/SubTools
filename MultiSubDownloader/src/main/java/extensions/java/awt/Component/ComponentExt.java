@@ -16,10 +16,11 @@ import manifold.ext.rt.api.This;
 public class ComponentExt {
 
     public static void setRecursive(@This Component component, Consumer<Component> consumer) {
-        setRecursive(component, consumer, c -> true);
+        setRecursive(component, consumer, _ -> true);
     }
 
-    public static void setRecursive(@This Component component, Consumer<Component> consumer, Predicate<Container> condition) {
+    public static void setRecursive(@This Component component, Consumer<Component> consumer,
+            Predicate<Container> condition) {
         if (component != null) {
             consumer.accept(component);
             if (component instanceof Container container && condition.test(container)) {

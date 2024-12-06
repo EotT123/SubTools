@@ -80,15 +80,19 @@ public class TheTvdbAdapter {
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");
             Comparator<TheTvdbSerie> comparator = Comparator
-                    .comparing((TheTvdbSerie s) -> formattedSerieName.equalsIgnoreCase(s.serieName.replaceAll("[^A-Za-z]", "")),
+                    .comparing((TheTvdbSerie s) -> formattedSerieName.equalsIgnoreCase(
+                                    s.serieName.replaceAll("[^A-Za-z]", "")),
                             Comparator.reverseOrder())
                     .thenComparing(TheTvdbSerie::getFirstAired, Comparator.reverseOrder());
             try {
                 tvdbSerie = userInteractionHandler
                         .selectFromList(serieIds.stream().sorted(comparator).toList(),
                                 Messages.getString("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
-                                getProviderName(), s -> "${s.serieName} (${s.firstAired})")
-                        .orElseMap(() -> askUserToEnterTvdbId(serieName).mapToOptionalObj(id -> getApi().getSerie(id, null)));
+                                getProviderName(), s -> "${s.serieName} (${s.firstAired})");
+                if (tvdbSerie.isEmpty()) {
+                    tvdbSerie = askUserToEnterTvdbId(serieName)
+                            .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));
+                }
             } catch (TheTvdbException e) {
                 tvdbSerie = Optional.empty();
             }
@@ -119,15 +123,17 @@ public class TheTvdbAdapter {
                     try {
                         return getApi().getEpisode(tvdbId, season, episode, Language.ENGLISH);
                     } catch (TheTvdbException e) {
-                        LOGGER.error("API $providerName getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
-                                TvRelease.formatSeasonEpisode(season, episode)), e);
+                        LOGGER.error(
+                                "API $providerName getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
+                                        TvRelease.formatSeasonEpisode(season, episode)), e);
                         return Optional.empty();
                     }
                 }).storeTempNullValue().getOptional();
 
     }
 
-    public synchronized static TheTvdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
+    public synchronized static TheTvdbAdapter getInstance(Manager manager,
+            UserInteractionHandler userInteractionHandler) {
         if (instance == null) {
             instance = new TheTvdbAdapter(manager, userInteractionHandler);
         }

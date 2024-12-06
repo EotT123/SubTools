@@ -60,7 +60,8 @@ public class ImdbAdapter {
                     try {
                         return imdbApi.get().getMovieDetails(imdbId);
                     } catch (ImdbException e) {
-                        LOGGER.error("API %s getMovieDetails for id [%s] (%s)".formatted(getProviderName(), imdbId, e.getMessage()), e);
+                        LOGGER.error("API %s getMovieDetails for id [%s] (%s)".formatted(getProviderName(), imdbId,
+                                e.getMessage()), e);
                         return Optional.empty();
                     }
                 }).getOptional();
@@ -100,7 +101,8 @@ public class ImdbAdapter {
         try {
             providerSerieIds = providerSerieIdSupplier.apply(title, year);
         } catch (ImdbSearchIdException e) {
-            LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(getProviderName(), title, year, e.getMessage()), e);
+            LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(getProviderName(), title, year,
+                    e.getMessage()), e);
             return OptionalInt.empty();
         }
         if (!userInteractionHandler.getSettings().isOptionsConfirmProviderMapping && providerSerieIds.size() == 1) {
@@ -111,7 +113,8 @@ public class ImdbAdapter {
         return userInteractionHandler
                 .selectFromList(
                         providerSerieIds.stream().sorted(Comparator
-                                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.name.replaceAll("[^A-Za-z]", "")
+                                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.name.replaceAll(
+                                                        "[^A-Za-z]", "")
                                                 .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
                                         .thenComparing(ProviderSerieId::getName))
                                 .toList(),
@@ -122,7 +125,8 @@ public class ImdbAdapter {
     }
 
     private OptionalInt promptUserToEnterImdbId(String title, int year) {
-        return userInteractionHandler.enter(getProviderName(), Messages.getString("Prompter.EnterImdbMatchForSerie").formatted(title),
+        return userInteractionHandler.enter(getProviderName(),
+                Messages.getString("Prompter.EnterImdbMatchForSerie").formatted(title),
                 Messages.getString("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
     }
 

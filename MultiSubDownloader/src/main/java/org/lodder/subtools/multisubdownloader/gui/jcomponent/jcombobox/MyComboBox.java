@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Iterables;
+import manifold.ext.rt.api.Self;
 import org.lodder.subtools.multisubdownloader.gui.ToStringListCellRenderer;
 
 public class MyComboBox<E> extends JComboBox<E> {
@@ -21,18 +22,14 @@ public class MyComboBox<E> extends JComboBox<E> {
     private Border defaultBorder;
     private Predicate<E> selectedValueVerifier;
 
-    @Serial
-    private static final long serialVersionUID = -8449456978689044914L;
+    @Serial private static final long serialVersionUID = -8449456978689044914L;
 
     /**
-     * Creates a <code>MyComboBox</code> that takes its items from an
-     * existing <code>ComboBoxModel</code>. Since the
-     * <code>ComboBoxModel</code> is provided, a combo box created using
-     * this constructor does not create a default combo box model and
-     * may impact how the insert, remove and add methods behave.
+     * Creates a <code>MyComboBox</code> that takes its items from an existing <code>ComboBoxModel</code>. Since the
+     * <code>ComboBoxModel</code> is provided, a combo box created using this constructor does not create a default
+     * combo box model and may impact how the insert, remove and add methods behave.
      *
-     * @param aModel the <code>ComboBoxModel</code> that provides the
-     *        displayed list of items
+     * @param aModel the <code>ComboBoxModel</code> that provides the displayed list of items
      * @see DefaultComboBoxModel
      */
     public MyComboBox(ComboBoxModel<E> aModel) {
@@ -41,9 +38,8 @@ public class MyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * Creates a <code>MyComboBox</code> that contains the elements
-     * in the specified array. By default, the first item in the array
-     * (and therefore the data model) becomes selected.
+     * Creates a <code>MyComboBox</code> that contains the elements in the specified array. By default, the first item
+     * in the array (and therefore the data model) becomes selected.
      *
      * @param items an array of objects to insert into the combo box
      * @see DefaultComboBoxModel
@@ -54,9 +50,8 @@ public class MyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * Creates a <code>MyComboBox</code> that contains the elements
-     * in the specified collection. By default, the first item in the
-     * collection (and therefore the data model) becomes selected.
+     * Creates a <code>MyComboBox</code> that contains the elements in the specified collection. By default, the first
+     * item in the collection (and therefore the data model) becomes selected.
      *
      * @param items a collection of objects to insert into the combo box
      * @param elementType the type of elements in the list
@@ -68,9 +63,8 @@ public class MyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * Creates a <code>MyComboBox</code> that contains the elements
-     * in the specified Vector. By default, the first item in the vector
-     * (and therefore the data model) becomes selected.
+     * Creates a <code>MyComboBox</code> that contains the elements in the specified Vector. By default, the first item
+     * in the vector (and therefore the data model) becomes selected.
      *
      * @param items an array of vectors to insert into the combo box
      * @see DefaultComboBoxModel
@@ -81,10 +75,8 @@ public class MyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * Creates a <code>MyComboBox</code> with a default data model.
-     * The default data model is an empty list of objects.
-     * Use <code>addItem</code> to add items. By default, the first item
-     * in the data model becomes selected.
+     * Creates a <code>MyComboBox</code> with a default data model. The default data model is an empty list of objects.
+     * Use <code>addItem</code> to add items. By default, the first item in the data model becomes selected.
      *
      * @see DefaultComboBoxModel
      */
@@ -97,51 +89,51 @@ public class MyComboBox<E> extends JComboBox<E> {
         return new MyComboBox<>(values);
     }
 
-    public MyComboBox<E> withModel(ComboBoxModel<E> model) {
+    public @Self MyComboBox<E> withModel(ComboBoxModel<E> model) {
         setModel(model);
         return this;
     }
 
-    public MyComboBox<E> withRenderer(ListCellRenderer<? super E> renderer) {
+    public @Self MyComboBox<E> withRenderer(ListCellRenderer<? super E> renderer) {
         setRenderer(renderer);
         return this;
     }
 
-    public MyComboBox<E> withToStringRenderer(Function<E, String> toStringRenderer) {
+    public @Self MyComboBox<E> withToStringRenderer(Function<E, String> toStringRenderer) {
         return withRenderer(ToStringListCellRenderer.of(getRenderer(), toStringRenderer));
     }
 
-    public MyComboBox<E> withToMessageStringRenderer(Function<E, String> toStringRenderer) {
+    public @Self MyComboBox<E> withToMessageStringRenderer(Function<E, String> toStringRenderer) {
         return withRenderer(ToStringListCellRenderer.ofMessage(getRenderer(), toStringRenderer));
     }
 
-    public MyComboBox<E> withItemListener(ItemListener itemListener) {
+    public @Self MyComboBox<E> withItemListener(ItemListener itemListener) {
         this.addItemListener(itemListener);
         return this;
     }
 
-    public MyComboBox<E> withItemListener(Runnable itemListener) {
+    public @Self MyComboBox<E> withItemListener(Runnable itemListener) {
         return withItemListener(arg -> itemListener.run());
     }
 
-    public MyComboBox<E> withSelectedItem(E item) {
+    public @Self MyComboBox<E> withSelectedItem(E item) {
         setSelectedItem(item);
         return this;
     }
 
-    public MyComboBox<E> withActionListener(ActionListener actionListener) {
+    public @Self MyComboBox<E> withActionListener(ActionListener actionListener) {
         addActionListener(actionListener);
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public MyComboBox<E> withEventConsumer(Consumer<MyComboBox<E>> actionListener) {
+    public @Self MyComboBox<E> withEventConsumer(Consumer<MyComboBox<E>> actionListener) {
         addActionListener(event -> actionListener.accept((MyComboBox<E>) (event.getSource())));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public MyComboBox<E> withSelectedItemConsumer(Consumer<E> actionListener) {
+    public @Self MyComboBox<E> withSelectedItemConsumer(Consumer<E> actionListener) {
         addActionListener(event -> actionListener.accept(((MyComboBox<E>) (event.getSource())).getSelectedItem()));
         return this;
     }
@@ -152,7 +144,7 @@ public class MyComboBox<E> extends JComboBox<E> {
         return (E) super.getSelectedItem();
     }
 
-    public MyComboBox<E> withSelectedValueVerifier(Predicate<E> valueVerifier) {
+    public @Self MyComboBox<E> withSelectedValueVerifier(Predicate<E> valueVerifier) {
         this.selectedValueVerifier = valueVerifier;
         return this;
     }

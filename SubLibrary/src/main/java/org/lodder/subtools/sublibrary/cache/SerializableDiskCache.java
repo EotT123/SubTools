@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 
-public class SerializableDiskCache<K extends Serializable, V extends Serializable> extends DiskCache<K, V> {
+public final class SerializableDiskCache<K extends Serializable, V extends Serializable> extends DiskCache<K, V> {
 
     @override @val(Protected) Class<K> dbKeyType;
     @override @val(Protected) Class<V> dbValueType;
@@ -46,7 +46,8 @@ public class SerializableDiskCache<K extends Serializable, V extends Serializabl
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class DiskCacheBuilder<K extends Serializable, V extends Serializable>
-            implements DiskCacheBuilderOtherIntf<K, V>, DiskCacheBuilderPasswordIntf<K, V>, DiskCacheBuilderValueTypeIntf<K>,
+            implements DiskCacheBuilderOtherIntf<K, V>, DiskCacheBuilderPasswordIntf<K, V>,
+            DiskCacheBuilderValueTypeIntf<K>,
             DiskCacheBuilderKeyTypeIntf {
         private Class<K> keyType;
         private Class<V> valueType;
@@ -76,7 +77,8 @@ public class SerializableDiskCache<K extends Serializable, V extends Serializabl
         }
     }
 
-    private SerializableDiskCache(Class<K> keyType, Class<V> valueType, Long timeToLive, Integer maxItems, String username, String password,
+    private SerializableDiskCache(Class<K> keyType, Class<V> valueType, Long timeToLive, Integer maxItems,
+            String username, String password,
             String cacheName) {
         super(timeToLive, maxItems, username, password, cacheName);
         this.dbKeyType = keyType;

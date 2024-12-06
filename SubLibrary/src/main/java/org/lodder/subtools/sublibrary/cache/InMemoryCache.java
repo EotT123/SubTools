@@ -9,11 +9,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.val;
 
-public class InMemoryCache<K, V> extends Cache<K, V> {
+public final class InMemoryCache<K, V> extends Cache<K, V> {
 
     @val(Protected) Long timeToLive;
 
-    protected InMemoryCache(Long timeToLiveSeconds, Long timerIntervalSeconds, Integer maxItems) {
+    public InMemoryCache(Long timeToLiveSeconds, Long timerIntervalSeconds, Integer maxItems) {
         super(maxItems);
         if (maxItems != null && maxItems < 1) {
             throw new IllegalStateException("maxItems should be a positive number");
@@ -95,7 +95,9 @@ public class InMemoryCache<K, V> extends Cache<K, V> {
 
     public void cleanup(Predicate<K> keyFilter) {
         synchronized (cacheMap) {
-            cacheMap.entrySet().removeIf(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) && entry.getValue().isExpired(timeToLive));
+            cacheMap.entrySet()
+                    .removeIf(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) &&
+                                       entry.getValue().isExpired(timeToLive));
             Thread.yield();
         }
     }

@@ -36,28 +36,33 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titelPanel = TitlePanel.title(Messages.getString("PreferenceDialog.MoveToLibrary"))
+        JPanel titlePanel = TitlePanel.title(Messages.getString("PreferenceDialog.MoveToLibrary"))
                 .margin(0).padding(0).marginLeft(20).paddingLeft(20).useGrid()
                 .panelColumnConstraints("[shrink][grow][shrink]").addTo(this, "span, grow");
 
         {
-            new JLabel(Messages.getString("PreferenceDialog.Location")).addTo(titelPanel, "shrink");
-            this.txtLibraryFolder = MyTextFieldPath.builder().requireValue().build().withColumns(20).addTo(titelPanel, "grow");
+            new JLabel(Messages.getString("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
+            this.txtLibraryFolder =
+                    MyTextFieldPath.builder().requireValue().build().withColumns(20).addTo(titlePanel, "grow");
             new JButton(Messages.getString("App.Browse"))
                     .withActionListener(() -> MemoryFolderChooser.getInstance()
                             .selectDirectory(getRootPane(), Messages.getString("PreferenceDialog.LibraryFolder"))
                             .ifPresent(txtLibraryFolder::setObject))
-                    .addTo(titelPanel, "shrink, wrap");
+                    .addTo(titlePanel, "shrink, wrap");
 
-            new JLabel(Messages.getString("StructureBuilderDialog.Structure")).addTo(titelPanel, "shrink");
-            this.txtFolderStructure =
-                    MyTextFieldString.builder().requireValue().build().withColumns(20).withDisabled().addTo(titelPanel, "grow");
+            new JLabel(Messages.getString("StructureBuilderDialog.Structure")).addTo(titlePanel, "shrink");
+            this.txtFolderStructure = MyTextFieldString.builder()
+                    .requireValue()
+                    .build()
+                    .withColumns(20)
+                    .withDisabled()
+                    .addTo(titlePanel, "grow");
             JButton btnStructure = new JButton(Messages.getString("StructureBuilderDialog.Structure"))
                     .withActionListener(() -> {
                         StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
                                 Messages.getString("PreferenceDialog.StructureBuilderTitle"),
-                                true, videoType, StructureBuilderDialog.StructureType.FOLDER, manager, userInteractionHandler,
-                                getLibraryStructureBuilder());
+                                true, videoType, StructureBuilderDialog.StructureType.FOLDER, manager,
+                                userInteractionHandler, getLibraryStructureBuilder());
                         String value = sDialog.showDialog(txtFolderStructure.getText());
                         if (!"".equals(value)) {
                             txtFolderStructure.setText(value);
@@ -65,12 +70,14 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
 
                     })
                     .withDisabled()
-                    .addTo(titelPanel, "shrink, wrap");
+                    .addTo(titlePanel, "shrink, wrap");
 
-            this.chkRemoveEmptyFolder = new JCheckBox(Messages.getString("PreferenceDialog.RemoveEmptyFolders")).addTo(titelPanel, "span, wrap");
+            this.chkRemoveEmptyFolder = new JCheckBox(Messages.getString("PreferenceDialog.RemoveEmptyFolders"))
+                    .addTo(titlePanel, "span, wrap");
 
-            PanelCheckBox.checkbox(this.chkReplaceSpace = new JCheckBox(Messages.getString("PreferenceDialog.ReplaceSpaceWith")))
-                    .panelOnSameLine().addTo(titelPanel, "span")
+            PanelCheckBox.checkbox(this.chkReplaceSpace =
+                            new JCheckBox(Messages.getString("PreferenceDialog.ReplaceSpaceWith")))
+                    .panelOnSameLine().addTo(titlePanel, "span")
                     .addComponent(this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
 
             // behaviour

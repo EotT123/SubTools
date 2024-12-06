@@ -20,17 +20,18 @@ public class AbstractButtonExt {
     }
 
     public static @Self AbstractButton withActionListener(@This AbstractButton abstractButton, Runnable listener) {
-        withActionListener(abstractButton, arg -> listener.run());
+        withActionListener(abstractButton, _ -> listener.run());
         return abstractButton;
     }
 
-    public static @Self AbstractButton withActionListenerSelf(@This AbstractButton abstractButton, Consumer<@Self AbstractButton> selfConsumerListener) {
-        withActionListener(abstractButton, arg -> selfConsumerListener.accept(abstractButton));
+    public static @Self AbstractButton withActionListenerSelf(@This AbstractButton abstractButton,
+            Consumer<@Self AbstractButton> selfConsumerListener) {
+        withActionListener(abstractButton, _ -> selfConsumerListener.accept(abstractButton));
         return abstractButton;
     }
 
     public static @Self AbstractButton withSelectedListener(@This AbstractButton abstractButton, BooleanConsumer selectedConsumer) {
-        withActionListener(abstractButton, arg -> selectedConsumer.accept(abstractButton.isSelected()));
+        withActionListener(abstractButton, _ -> selectedConsumer.accept(abstractButton.isSelected()));
         return abstractButton;
     }
 

@@ -15,7 +15,7 @@ import com.pivovarit.function.ThrowingSupplier;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.tuple.Pair;
 
-public abstract class Cache<K, V> {
+public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
     @val(Protected) Map<K, CacheObject<V>> cacheMap;
 
@@ -57,7 +57,7 @@ public abstract class Cache<K, V> {
 
     public boolean isTemporaryObject(K key) {
         synchronized (cacheMap) {
-            return  cacheMap.get(key) instanceof TemporaryCacheObject<?>;
+            return cacheMap.get(key) instanceof TemporaryCacheObject<?>;
         }
     }
 
@@ -71,8 +71,8 @@ public abstract class Cache<K, V> {
     public OptionalLong getTemporaryTimeToLive(K key) {
         synchronized (cacheMap) {
             CacheObject<V> obj = cacheMap.get(key);
-            return obj instanceof TemporaryCacheObject<?> tempCacheObject ? OptionalLong.of(tempCacheObject.timeToLive)
-                    : OptionalLong.empty();
+            return obj instanceof TemporaryCacheObject<?> tempCacheObject ?
+                    OptionalLong.of(tempCacheObject.timeToLive) : OptionalLong.empty();
         }
     }
 

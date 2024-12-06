@@ -39,22 +39,24 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                     .url(DOMAIN + "/search.php")
                     .addData("qs", serieName)
                     .postAsJsoupDocument()
-                    .select(".left_articles > ul > li a").stream()
-                    .map(element -> new ProviderSerieId(element.text(), StringUtils.substringAfterLast(element.attr("href"), "/")))
+                    .select(".left_articles > ul > li a")
+                    .stream()
+                    .map(element -> new ProviderSerieId(element.text(),
+                            StringUtils.substringAfterLast(element.attr("href"), "/")))
                     .toList();
         } catch (Exception e) {
             throw new TvSubtitlesException(e);
         }
     }
 
-    public Set<TVsubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language)
-            throws TvSubtitlesException {
-        return getEpisodeUrl(SERIE_URL_PREFIX + providerSerieId.getProviderId(), season, episode)
-                .mapToObj((String episodeUrl) -> getSubtitles(episodeUrl, language))
-                .orElseGet(Set::of);
+    public Set<TVsubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
+            Language language) throws TvSubtitlesException {
+        return getEpisodeUrl(SERIE_URL_PREFIX + providerSerieId.getProviderId(), season, episode).mapThrowing(
+                (String episodeUrl) -> getSubtitles(episodeUrl, language)).orElseGet(Set::of);
     }
 
-    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language) throws TvSubtitlesException {
+    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language)
+            throws TvSubtitlesException {
         return manager.valueBuilder()
                 .memoryCache()
                 .key("%s-subtitles-%s-%s".formatted(getSubtitleSource().name(), episodeUrl, language))
@@ -62,7 +64,8 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                     Set<TVsubtitlesSubtitleDescriptor> lSubtitles = new HashSet<>();
                     try {
                         Document searchEpisodeDoc =
-                                this.getHtml(episodeUrl.replace(".html", "-" + language.getLangCode() + ".html")).cacheType(CacheType.NONE)
+                                this.getHtml(episodeUrl.replace(".html", "-" + language.getLangCode() + ".html"))
+                                        .cacheType(CacheType.NONE)
                                         .getAsJsoupDocument();
                         Elements searchEpisodes = searchEpisodeDoc.select(".left_articles > a");
 
@@ -71,7 +74,8 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                         for (Element ep : searchEpisodes) {
                             String url = ep.attr("href");
                             if (url.contains("subtitle-")) {
-                                Document subtitlePageDoc = this.getHtml(DOMAIN + url).cacheType(CacheType.NONE).getAsJsoupDocument();
+                                Document subtitlePageDoc =
+                                        this.getHtml(DOMAIN + url).cacheType(CacheType.NONE).getAsJsoupDocument();
                                 String filename = null, rip = null, title = null, author = null;
                                 Elements subtitlePageTableDoc = subtitlePageDoc.getElementsByClass("subtitle1");
                                 if (subtitlePageTableDoc.size() == 1) {
@@ -93,8 +97,9 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                                             TVsubtitlesSubtitleDescriptor sub = TVsubtitlesSubtitleDescriptor.builder()
                                                     .filename(filename)
                                                     .url(DOMAIN + "/files/" + URLEncoder.encode(
-                                                            filename.replace(title + ".", "").replace(".srt", ".zip").replace(" - ", "_"),
-                                                            StandardCharsets.UTF_8))
+                                                            filename.replace(title + ".", "")
+                                                                    .replace(".srt", ".zip")
+                                                                    .replace(" - ", "_"), StandardCharsets.UTF_8))
                                                     .rip(rip)
                                                     .author(author)
                                                     .build();
@@ -122,18 +127,24 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                 .key("%s-episodeUrl-%s-%s-%s".formatted(getSubtitleSource().name(), showUrl, season, episode))
                 .optionalSupplier(() -> {
                     try {
-                        String formattedSeasonEpisode = season + "x" + (episode < 10 ? "0" + episode : String.valueOf(episode));
-                        return getHtml(showUrl.replace(".html", "-" + season + ".html"))
-                                .getAsJsoupDocument()
-                                .getElementById("table5").getElementsByTag("tr").stream().skip(1)
+                        String formattedSeasonEpisode =
+                                season + "x" + (episode < 10 ? "0" + episode : String.valueOf(episode));
+                        return getHtml(showUrl.replace(".html", "-" + season + ".html")).getAsJsoupDocument()
+                                .getElementById("table5")
+                                .getElementsByTag("tr")
+                                .stream()
+                                .skip(1)
                                 .filter(row -> Optional.ofNullable(row.selectFirst("td"))
                                         .map(element -> formattedSeasonEpisode.equals(element.text()))
                                         .orElse(false))
-                                .map(element -> DOMAIN + "/" + element.select("td").get(1).selectFirst("a").attr("href")).findAny();
+                                .map(element -> DOMAIN + "/" +
+                                                element.select("td").get(1).selectFirst("a").attr("href"))
+                                .findAny();
                     } catch (Exception e) {
                         throw new TvSubtitlesException(e);
                     }
-                }).getOptional();
+                })
+                .getOptional();
     }
 
     @Override

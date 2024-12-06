@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -96,7 +97,8 @@ public class Manager {
     @Accessors(chain = true, fluent = true)
     @RequiredArgsConstructor
     public static class PostBuilder
-            implements PostBuilderUrlIntf, PostBuilderUserAgentIntf, PostBuilderDataMapIntf, PostBuilderDataIntf, PostBuilderPostIntf {
+            implements PostBuilderUrlIntf, PostBuilderUserAgentIntf, PostBuilderDataMapIntf, PostBuilderDataIntf,
+            PostBuilderPostIntf {
         private final HttpClient httpClient;
         private String url;
         private String userAgent;
@@ -168,11 +170,13 @@ public class Manager {
 
         Optional<Document> getAsDocument() throws ParserConfigurationException, ManagerException;
 
-        Optional<Document> getAsDocument(Predicate<String> emptyResultPredicate) throws ParserConfigurationException, ManagerException;
+        Optional<Document> getAsDocument(Predicate<String> emptyResultPredicate)
+                throws ParserConfigurationException, ManagerException;
 
         org.jsoup.nodes.Document getAsJsoupDocument() throws ManagerException;
 
-        Optional<org.jsoup.nodes.Document> getAsJsoupDocument(Predicate<String> emptyResultPredicate) throws ManagerException;
+        Optional<org.jsoup.nodes.Document> getAsJsoupDocument(Predicate<String> emptyResultPredicate)
+                throws ManagerException;
 
         JSONObject getAsJsonObject() throws ManagerException;
 
@@ -182,8 +186,9 @@ public class Manager {
     @Setter
     @Accessors(chain = true, fluent = true)
     @RequiredArgsConstructor
-    public static class PageContentBuilder implements PageContentBuilderGetIntf, PageContentBuilderCacheTypeIntf,
-            PageContentBuilderUserAgentIntf, PageContentBuilderUrlIntf, PageContentBuilderRetryIntf, PageContentBuilderRetryConditionIntf,
+    public static class PageContentBuilder
+            implements PageContentBuilderGetIntf, PageContentBuilderCacheTypeIntf, PageContentBuilderUserAgentIntf,
+            PageContentBuilderUrlIntf, PageContentBuilderRetryIntf, PageContentBuilderRetryConditionIntf,
             PageContentBuilderRetryWaitIntf {
         private final HttpClient httpClient;
         private final InMemoryCache<String, String> inMemoryCache;
@@ -226,10 +231,11 @@ public class Manager {
         }
 
         @Override
-        public Optional<Document> getAsDocument(Predicate<String> emptyResultPredicate) throws ParserConfigurationException, ManagerException {
+        public Optional<Document> getAsDocument(Predicate<String> emptyResultPredicate)
+                throws ParserConfigurationException, ManagerException {
             String html = get();
-            return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ? Optional.empty()
-                    : XMLHelper.getDocument(html);
+            return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
+                    Optional.empty() : XMLHelper.getDocument(html);
         }
 
         @Override
@@ -238,10 +244,11 @@ public class Manager {
         }
 
         @Override
-        public Optional<org.jsoup.nodes.Document> getAsJsoupDocument(Predicate<String> emptyResultPredicate) throws ManagerException {
+        public Optional<org.jsoup.nodes.Document> getAsJsoupDocument(Predicate<String> emptyResultPredicate)
+                throws ManagerException {
             String html = get();
-            return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ? Optional.empty()
-                    : Optional.of(Jsoup.parse(html));
+            return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
+                    Optional.empty() : Optional.of(Jsoup.parse(html));
         }
 
         @Override
@@ -274,8 +281,9 @@ public class Manager {
                     }
                     return getContentWithoutCache(urlString, userAgent);
                 }
-                throw new ManagerException("Error occurred with httpclient response: %s %s".formatted(e.getResponseCode(), e.getResponseMessage()),
-                        e);
+                throw new ManagerException(
+                        "Error occurred with httpclient response: %s %s".formatted(e.getResponseCode(),
+                                e.getResponseMessage()), e);
             } catch (IOException e) {
                 if (retries-- > 0 && retryPredicate.test(e)) {
                     return getContentWithoutCache(urlString, userAgent);
@@ -315,7 +323,8 @@ public class Manager {
     @RequiredArgsConstructor
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static class ClearExpiredCacheBuilder<K>
-            implements ClearExpiredCacheBuilderCacheTypeIntf, ClearExpiredCacheBuilderKeyFilterIntf, ClearExpiredCacheBuilderClearIntf {
+            implements ClearExpiredCacheBuilderCacheTypeIntf, ClearExpiredCacheBuilderKeyFilterIntf,
+            ClearExpiredCacheBuilderClearIntf {
         private final InMemoryCache inMemoryCache;
         private final DiskCache diskCache;
         private CacheType cacheType;
@@ -373,8 +382,8 @@ public class Manager {
     public interface ValuesBuilderCacheTypeIntf<T> extends ValueBuilderRetryIntf<T> {
         <S extends T> ValueBuilderGetOptionalIntf<S, Nothing> returnType(Class<S> returnType);
 
-        <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> returnType(Class<C> collectionReturnType,
-                Class<S> returnType);
+        <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> returnType(
+                Class<C> collectionReturnType, Class<S> returnType);
 
         void remove();
     }
@@ -388,7 +397,8 @@ public class Manager {
 
         ValueBuilderGetOptionalIntStoreTempValueIntf<Nothing> optionalIntValue(OptionalInt optionalIntValue);
 
-        <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> collectionValue(C collectionValue);
+        <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> collectionValue(
+                C collectionValue);
     }
 
     public interface ValueBuilderRetryConditionIntf<T> {
@@ -401,19 +411,21 @@ public class Manager {
 
     public interface ValueBuilderValueSupplierIntf<T> {
 
-        <S extends T, X extends Exception> ValueBuilderGetValueStoreTempValueIntf<S, X> valueSupplier(ThrowingSupplier<S, X> valueSupplier);
+        <S extends T, X extends Exception> ValueBuilderGetValueStoreTempValueIntf<S, X> valueSupplier(
+                ThrowingSupplier<S, X> valueSupplier);
 
-        <C extends Collection<S>, S extends T, X extends Exception> ValueBuilderGetCollectionIntf<C, S, X>
-        collectionSupplier(Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
+        <C extends Collection<S>, S extends T, X extends Exception> ValueBuilderGetCollectionIntf<C, S, X> collectionSupplier(
+                Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
 
-        <S extends T, X extends Exception> ValueBuilderGetOptionalStoreTempValueIntf<S, X>
-        optionalSupplier(ThrowingSupplier<Optional<S>, X> valueSupplier);
+        <S extends T, X extends Exception> ValueBuilderGetOptionalStoreTempValueIntf<S, X> optionalSupplier(
+                ThrowingSupplier<Optional<S>, X> valueSupplier);
 
-        <X extends Exception> ValueBuilderGetOptionalIntStoreTempValueIntf<X>
-        optionalIntSupplier(ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
+        <X extends Exception> ValueBuilderGetOptionalIntStoreTempValueIntf<X> optionalIntSupplier(
+                ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
     }
 
-    public interface ValueBuilderGetValueStoreTempValueIntf<T, X extends Exception> extends ValueBuilderGetValueIntf<T, X> {
+    public interface ValueBuilderGetValueStoreTempValueIntf<T, X extends Exception>
+            extends ValueBuilderGetValueIntf<T, X> {
         ValueBuilderGetValueStoreTempValueTtlIntf<T, X> storeTempNullValue();
     }
 
@@ -446,11 +458,13 @@ public class Manager {
         Optional<T> getOptional() throws X;
     }
 
-    public interface ValueBuilderGetOptionalIntStoreTempValueIntf<X extends Exception> extends ValueBuilderGetOptionalIntIntf<X> {
+    public interface ValueBuilderGetOptionalIntStoreTempValueIntf<X extends Exception>
+            extends ValueBuilderGetOptionalIntIntf<X> {
         ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X> storeTempNullValue();
     }
 
-    public interface ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X extends Exception> extends ValueBuilderGetOptionalIntIntf<X> {
+    public interface ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X extends Exception>
+            extends ValueBuilderGetOptionalIntIntf<X> {
         ValueBuilderGetOptionalIntIntf<X> timeToLive(long seconds);
 
         ValueBuilderGetOptionalIntIntf<X> timeToLiveFunction(Function<Long, Long> timeToLiveFunction);
@@ -488,13 +502,14 @@ public class Manager {
     @RequiredArgsConstructor
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static class ValueBuilder<C extends Collection<T>, T, X extends Exception>
-            implements ValueBuilderGetOptionalIntf<T, X>, ValueBuilderCacheTypeIntf,
-            ValueBuilderValueSupplierIntf<T>, ValueBuilderKeyIntf<T>, ValueBuilderGetCollectionIntf<C, T, X>, ValueBuilderGetOptionalIntIntf<X>,
+            implements ValueBuilderGetOptionalIntf<T, X>, ValueBuilderCacheTypeIntf, ValueBuilderValueSupplierIntf<T>,
+            ValueBuilderKeyIntf<T>, ValueBuilderGetCollectionIntf<C, T, X>, ValueBuilderGetOptionalIntIntf<X>,
             ValueBuilderRetryIntf<T>, ValueBuilderRetryConditionIntf<T>, ValueBuilderRetryWaitIntf<T>,
-            ValueBuilderIsPresentIntf<T>, ValuesBuilderCacheTypeIntf<T>,
-            ValueBuilderStoreIntf<X>, ValueBuilderGetOptionalIntStoreTempValueIntf<X>, ValueBuilderGetOptionalStoreTempValueIntf<T, X>,
+            ValueBuilderIsPresentIntf<T>, ValuesBuilderCacheTypeIntf<T>, ValueBuilderStoreIntf<X>,
+            ValueBuilderGetOptionalIntStoreTempValueIntf<X>, ValueBuilderGetOptionalStoreTempValueIntf<T, X>,
             ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X>, ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X>,
-            ValueBuilderGetValueStoreTempValueIntf<T, X>, ValueBuilderGetValueStoreTempValueTtlIntf<T, X>, ValueBuilderGetValueIntf<T, X> {
+            ValueBuilderGetValueStoreTempValueIntf<T, X>, ValueBuilderGetValueStoreTempValueTtlIntf<T, X>,
+            ValueBuilderGetValueIntf<T, X> {
         private final InMemoryCache inMemoryCache;
         private final DiskCache diskCache;
         private String key;
@@ -513,10 +528,8 @@ public class Manager {
         private Predicate<Exception> retryPredicate;
         private int retryWait;
         private Predicate<String> keyFilter;
-        @Setter(value = AccessLevel.NONE)
-        private Long timeToLive;
-        @Setter(value = AccessLevel.NONE)
-        private boolean storeTempNullValue;
+        @Setter(value = AccessLevel.NONE) private Long timeToLive;
+        @Setter(value = AccessLevel.NONE) private boolean storeTempNullValue;
         private Function<Long, Long> timeToLiveFunction;
 
         //
@@ -559,34 +572,36 @@ public class Manager {
         }
 
         @Override
-        public <L extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<L, S, Nothing>
-        returnType(Class<L> collectionReturnType, Class<S> returnType) {
+        public <L extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<L, S, Nothing> returnType(
+                Class<L> collectionReturnType, Class<S> returnType) {
             this.returnType = (Class<T>) returnType;
             return (ValueBuilder<L, S, Nothing>) this;
         }
 
         @Override
-        public <S extends T, E extends Exception> ValueBuilder<?, S, E> valueSupplier(ThrowingSupplier<S, E> valueSupplier) {
+        public <S extends T, E extends Exception> ValueBuilder<?, S, E> valueSupplier(
+                ThrowingSupplier<S, E> valueSupplier) {
             this.valueSupplier = (ThrowingSupplier<T, X>) valueSupplier;
             return (ValueBuilder<?, S, E>) this;
         }
 
         @Override
-        public <S extends T, E extends Exception> ValueBuilder<?, S, E>
-        optionalSupplier(ThrowingSupplier<Optional<S>, E> valueSupplier) {
+        public <S extends T, E extends Exception> ValueBuilder<?, S, E> optionalSupplier(
+                ThrowingSupplier<Optional<S>, E> valueSupplier) {
             this.optionalSupplier = (ThrowingSupplier) valueSupplier;
             return (ValueBuilder<?, S, E>) this;
         }
 
         @Override
-        public <E extends Exception> ValueBuilder<?, Integer, E> optionalIntSupplier(ThrowingSupplier<OptionalInt, E> optionalIntSupplier) {
+        public <E extends Exception> ValueBuilder<?, Integer, E> optionalIntSupplier(
+                ThrowingSupplier<OptionalInt, E> optionalIntSupplier) {
             this.optionalIntSupplier = (ThrowingSupplier) optionalIntSupplier;
             return (ValueBuilder<?, Integer, E>) this;
         }
 
         @Override
-        public <L extends Collection<S>, S extends T, E extends Exception> ValueBuilder<L, S, E>
-        collectionSupplier(Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
+        public <L extends Collection<S>, S extends T, E extends Exception> ValueBuilder<L, S, E> collectionSupplier(
+                Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
             this.collectionSupplier = (ThrowingSupplier<C, X>) collectionSupplier;
             return (ValueBuilder<L, S, E>) this;
         }
@@ -646,10 +661,9 @@ public class Manager {
             if (value != null) {
                 cache.put(key, value);
             } else {
-                if (cache instanceof DiskCache dCache) {
-                    dCache.putWithoutPersist(key, null);
-                } else {
-                    cache.put(key, null);
+                switch (cache) {
+                    case DiskCache dCache -> dCache.putWithoutPersist(key, null);
+                    case InMemoryCache mCache -> mCache.put(key, null);
                 }
             }
             return value;
@@ -711,10 +725,9 @@ public class Manager {
             } else {
                 Optional<T> value = executeSupplier(optionalSupplier);
                 value.ifPresentOrElse(v -> cache.put(key, v), () -> {
-                    if (cache instanceof DiskCache dCache) {
-                        dCache.putWithoutPersist(key, null);
-                    } else {
-                        cache.put(key, null);
+                    switch (cache) {
+                        case DiskCache dCache -> dCache.putWithoutPersist(key, null);
+                        case InMemoryCache mCache -> mCache.put(key, null);
                     }
                 });
                 return value;
@@ -727,27 +740,35 @@ public class Manager {
 
         @Override
         public OptionalInt getOptionalInt() throws X {
-            return switch (cacheType) {
-                case NONE -> optionalIntSupplier.get();
-                case MEMORY -> getOrPutOptionalInt(inMemoryCache);
-                case DISK -> getOrPutOptionalInt(diskCache);
-            };
+            try {
+                return switch (cacheType) {
+                    case NONE -> optionalIntSupplier.get();
+                    case MEMORY -> getOrPutOptionalInt(inMemoryCache);
+                    case DISK -> getOrPutOptionalInt(diskCache);
+                };
+            } catch (Exception e) {
+                // TODO why is this needed?
+                try {
+                    throw (X) e;
+                } catch (ClassCastException e2) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
-        private OptionalInt getOrPutOptionalInt(Cache cache) throws X {
+        private OptionalInt getOrPutOptionalInt(Cache<String, Integer> cache) throws X {
             boolean containsKey = cache.contains(key);
             if (!containsKey && storeTempNullValue) {
                 timeToLive(calculateTtl()).store();
-                return cache.get(key).mapToOptionalInt();
+                return cache.get(key).mapToInt(t -> t);
             } else if (containsKey && !isExpiredTemporary()) {
-                return cache.get(key).mapToOptionalInt();
+                return cache.get(key).mapToInt(t -> t);
             } else {
                 OptionalInt value = executeSupplier(optionalIntSupplier);
                 value.ifPresentOrElse(v -> cache.put(key, v), () -> {
-                    if (cache instanceof DiskCache dCache) {
-                        dCache.putWithoutPersist(key, null);
-                    } else {
-                        cache.put(key, null);
+                    switch (cache) {
+                        case DiskCache dCache -> dCache.putWithoutPersist(key, null);
+                        case InMemoryCache mCache -> mCache.put(key, null);
                     }
                 });
                 return value;
@@ -812,7 +833,7 @@ public class Manager {
         }
 
         private OptionalLong getTemporaryTimeToLive(Cache cache) {
-            return cache.getTemporaryTimeToLive(key).map(v -> TimeUnit.SECONDS.convert(v, TimeUnit.MILLISECONDS));
+            return cache.getTemporaryTimeToLive(key).map(v -> SECONDS.convert(v, MILLISECONDS));
         }
 
         // ##### \\
@@ -836,20 +857,20 @@ public class Manager {
             } else if (optionalSupplier != null) {
                 value = executeSupplier(optionalSupplier).orElse(null);
             } else if (optionalIntSupplier != null) {
-                value = executeSupplier(optionalIntSupplier).mapToObj(i -> i).orElse(null);
+                value = executeSupplier(optionalIntSupplier).orElseNull();
             } else if (collectionSupplier != null) {
                 value = executeSupplier(collectionSupplier);
             } else if (optionalValue != null) {
                 value = optionalValue.orElse(null);
             } else if (optionalIntValue != null) {
-                value = optionalIntValue.mapToObj(i -> i).orElse(null);
+                value = optionalIntValue.orElseNull();
             } else if (collectionValue != null) {
                 value = collectionValue;
             } else {
                 value = this.value;
             }
             if (storeAsTempValue || (storeTempNullValue && value == null)) {
-                long ttl = timeToLive != null ? timeToLive : TimeUnit.SECONDS.convert(1, TimeUnit.DAYS);
+                long ttl = timeToLive != null ? timeToLive : SECONDS.convert(1, DAYS);
                 switch (cacheType) {
                     case MEMORY -> inMemoryCache.put(key, value, ttl);
                     case DISK -> diskCache.put(key, value, ttl);
@@ -901,13 +922,18 @@ public class Manager {
                     }
                     return executeSupplier(supplier);
                 }
-                throw new RuntimeException("Exception while getting value (%s)".formatted(e.getMessage()), e);
+                try {
+                    throw (X) e;
+                } catch (ClassCastException e2) {
+                    throw new RuntimeException("Exception while getting value (%s)".formatted(e.getMessage()), e);
+                }
             }
         }
 
         private long calculateTtl() {
-            return getTemporaryTimeToLive().mapToObj(v -> timeToLiveFunction != null ? timeToLiveFunction.apply(v) : v * 2)
-                    .orElseGet(() -> timeToLive != null ? timeToLive : TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+            return getTemporaryTimeToLive().mapToObj(
+                            v -> timeToLiveFunction != null ? timeToLiveFunction.apply(v) : v * 2)
+                    .orElseGet(() -> timeToLive != null ? timeToLive : MILLISECONDS.convert(1, DAYS));
         }
     }
 }
