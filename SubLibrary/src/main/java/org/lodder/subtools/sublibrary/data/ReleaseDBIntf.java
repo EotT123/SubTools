@@ -1,8 +1,10 @@
 package org.lodder.subtools.sublibrary.data;
 
+import manifold.ext.props.rt.api.val;
+
 public interface ReleaseDBIntf {
 
-    String getName();
+    @val String name;
 
     int year();
 }

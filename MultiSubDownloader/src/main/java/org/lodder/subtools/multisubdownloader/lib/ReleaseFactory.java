@@ -39,7 +39,7 @@ public class ReleaseFactory {
                 case MOVIE -> new MovieReleaseControl((MovieRelease) r, settings, manager, userInteractionHandler);
             };
             releaseControl.process();
-            return releaseControl.getVideoFile();
+            return releaseControl.videoFile;
 
         } catch (ReleaseParseException | ReleaseControlException e) {
             LOGGER.error("createRelease: " + e.getMessage(), e);

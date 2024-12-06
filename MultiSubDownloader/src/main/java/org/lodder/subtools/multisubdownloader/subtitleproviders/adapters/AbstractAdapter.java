@@ -7,25 +7,25 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.pivovarit.function.ThrowingSupplier;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 
 /**
- * @param <T>
- *         type of the subtitle objects returned by the api
- * @param <X>
- *         type of the exception thrown by the api
+ * @param <T> type of the subtitle objects returned by the api
+ * @param <X> type of the exception thrown by the api
  */
-@Getter
-@RequiredArgsConstructor
-abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception> implements Adapter<T, S, X>, SubtitleProvider {
+@AllArgsConstructor
+abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception>
+        implements Adapter<T, S, X>, SubtitleProvider {
 
-    private final Manager manager;
-    private final UserInteractionHandler userInteractionHandler;
+    @val @override Manager manager;
+    @val @override UserInteractionHandler userInteractionHandler;
 
     @RequiredArgsConstructor
     public static class ExecuteCall<T, X extends Exception, E extends ExecuteCall<T, X, E>> {
@@ -35,7 +35,8 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
         private final List<Predicate<X>> retryPredicates = new ArrayList<>();
         private final List<HandleException<T, X>> exceptionHandlers = new ArrayList<>();
 
-        private record HandleException<T, X extends Exception>(Predicate<X> predicate, Function<X, T> exceptionFunction) {}
+        private record HandleException<T, X extends Exception>(Predicate<X> predicate,
+                Function<X, T> exceptionFunction) {}
 
         public E retryWhenException(Predicate<X> predicate) {
             retryPredicates.add(predicate);
@@ -93,8 +94,11 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
                     return execute();
                 } else {
                     try {
-                        return exceptionHandlers.stream().filter(handleException -> handleException.predicate().test(exception)).findAny()
-                                .map(handleException -> handleException.exceptionFunction().apply(exception)).orElseThrow(() -> e);
+                        return exceptionHandlers.stream()
+                                .filter(handleException -> handleException.predicate().test(exception))
+                                .findAny()
+                                .map(handleException -> handleException.exceptionFunction().apply(exception))
+                                .orElseThrow(() -> e);
                     } catch (Exception e1) {
                         throw (X) e1;
                     }

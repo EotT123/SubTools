@@ -1,9 +1,9 @@
 package org.lodder.subtools.multisubdownloader.settings.model.structure;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.Messages;
 
-@Getter
 public enum SerieStructureTag implements StructureTag {
 
     SHOW_NAME("%SHOW NAME%", "StructureBuilderDialog.NameTvShow"),
@@ -17,8 +17,8 @@ public enum SerieStructureTag implements StructureTag {
     QUALITY("%QUALITY%", "StructureBuilderDialog.QualityOfRelease"),
     DESCRIPTION("%DESCRIPTION%", "StructureBuilderDialog.Description");
 
-    private final String label;
-    private final String description;
+    @val @override String label;
+    @val @override String description;
 
     SerieStructureTag(String label, String descriptionMessage) {
         this.label = label;

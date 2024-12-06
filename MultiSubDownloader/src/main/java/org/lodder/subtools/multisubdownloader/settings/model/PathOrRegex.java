@@ -9,17 +9,15 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 public class PathOrRegex implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Getter
-    private final String value;
-    @Getter
-    private final transient Image image;
+    @val String value;
+    @val transient Image image;
     private final transient Predicate<Path> isExcludedPathPredicate;
 
     public PathOrRegex(Path path) {
@@ -39,7 +37,7 @@ public class PathOrRegex implements Serializable {
             regex = true;
         }
         if (regex) {
-            this.image = PathMatchType.REGEX.getImage();
+            this.image = PathMatchType.REGEX.image;
             NamedPattern np = NamedPattern.compile(value.replace("*", ".*") + ".*$", Pattern.CASE_INSENSITIVE);
             this.isExcludedPathPredicate = p -> np.matcher(p.getFileName().toString()).find();
         } else {
@@ -49,7 +47,7 @@ public class PathOrRegex implements Serializable {
     }
 
     private Image getImage(Path path) {
-        return Files.isDirectory(path) ? PathMatchType.FOLDER.getImage() : PathMatchType.FILE.getImage();
+        return Files.isDirectory(path) ? PathMatchType.FOLDER.image : PathMatchType.FILE.image;
     }
 
     public boolean isExcludedPath(Path path) {
@@ -68,6 +66,6 @@ public class PathOrRegex implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof PathOrRegex other && Objects.equals(value, other.getValue());
+        return obj instanceof PathOrRegex other && Objects.equals(value, other.value);
     }
 }

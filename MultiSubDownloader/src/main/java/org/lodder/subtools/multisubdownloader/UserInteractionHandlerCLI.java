@@ -61,7 +61,7 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
 
     private TableDisplayer<Subtitle> createTableDisplayer() {
         return new TableDisplayer<>(Stream.of(SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER,
-                        HEARING_IMPAIRED)
+                        HEARINGIMPAIRED)
                 .map(stcn -> createSubtitleDisplayer(stcn, stcn.getValueFunction())).toList());
     }
 

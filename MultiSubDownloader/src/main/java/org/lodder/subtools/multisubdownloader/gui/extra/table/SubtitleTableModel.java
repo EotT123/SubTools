@@ -16,7 +16,7 @@ public class SubtitleTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 4205143311042280620L;
 
     private static final SubtitleTableColumnName[] COLUMNS =
-            Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARING_IMPAIRED)
+            Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED)
                     .toArray(SubtitleTableColumnName[]::new);
 
     public SubtitleTableModel(Object[][] data, String[] columnNames) {

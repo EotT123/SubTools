@@ -12,11 +12,6 @@ public class SubtitleServiceProvider implements ServiceProvider {
 
     @val @override int priority = 0;
 
-    //    @Override
-    //    public int getPriority() {
-    //        return 0;
-    //    }
-
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {
         app.bind("SubtitleProviderStore", new LazySupplier<>(SubtitleProviderStore::new));

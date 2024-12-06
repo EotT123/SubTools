@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.settings;
 
+import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.multisubdownloader.settings.SettingValue.*;
 
 import java.io.BufferedInputStream;
@@ -15,8 +16,9 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.IntStream;
 
-import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
+import manifold.ext.props.rt.api.get;
+import manifold.ext.props.rt.api.set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
@@ -44,10 +46,8 @@ public class SettingsControl {
 
     private final Manager manager;
     private final Preferences preferences;
-    @Getter
-    private Settings settings;
-    @Getter
-    private State state;
+    @get @set(Private) Settings settings;
+    @get @set(Private) State state;
 
     public SettingsControl(Manager manager) {
         if (!backingStoreAvailable()) {
@@ -98,7 +98,8 @@ public class SettingsControl {
         }
     }
 
-    public void importPreferences(Path file) throws IOException, BackingStoreException, InvalidPreferencesFormatException {
+    public void importPreferences(Path file)
+            throws IOException, BackingStoreException, InvalidPreferencesFormatException {
         try (InputStream is = new BufferedInputStream(file.newInputStream())) {
             preferences.clear();
             Preferences.importPreferences(is);
@@ -153,7 +154,8 @@ public class SettingsControl {
 
     public void migrateSettingsV0ToV1() {
         preferences.putInt("GeneralDefaultIncomingFolderSize", preferences.getInt("lastDefaultIncomingFolder", 0));
-        preferences.putInt("LocalSubtitlesSourcesFoldersSize", preferences.getInt("lastLocalSubtitlesSourcesFolder", 0));
+        preferences.putInt("LocalSubtitlesSourcesFoldersSize",
+                preferences.getInt("lastLocalSubtitlesSourcesFolder", 0));
         preferences.putInt("GeneralDefaultIncomingFolderSize", preferences.getInt("lastDefaultIncomingFolder", 0));
         preferences.putInt("DefaultSelectionQualitySize", preferences.getInt("lastItemDefaultSelectionQuality", 0));
         preferences.putInt("DefaultSelectionQualitySize", preferences.getInt("lastItemDefaultSelectionQuality", 0));
@@ -180,22 +182,26 @@ public class SettingsControl {
 
         EPISODE_LIBRARY_FOLDER_STRUCTURE.load(this, preferences);
         settings.episodeLibrarySettings
-                .setLibraryFolderStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
+                .setLibraryFolderStructure(
+                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
         EPISODE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
 
         EPISODE_LIBRARY_FILENAME_STRUCTURE.load(this, preferences);
         settings.episodeLibrarySettings
-                .setLibraryFilenameStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
+                .setLibraryFilenameStructure(
+                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
         EPISODE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         MOVIE_LIBRARY_FOLDER_STRUCTURE.load(this, preferences);
         settings.episodeLibrarySettings
-                .setLibraryFolderStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
+                .setLibraryFolderStructure(
+                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFolderStructure()));
         MOVIE_LIBRARY_FOLDER_STRUCTURE.store(this, preferences);
 
         MOVIE_LIBRARY_FILENAME_STRUCTURE.load(this, preferences);
         settings.episodeLibrarySettings
-                .setLibraryFilenameStructure(migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
+                .setLibraryFilenameStructure(
+                        migrateLibraryStructureV0(settings.episodeLibrarySettings.getLibraryFilenameStructure()));
         MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         try {
@@ -215,11 +221,13 @@ public class SettingsControl {
     @SuppressWarnings("deprecation")
     public void migrateSettingsV1ToV2() {
         settings.episodeLibrarySettings
-                .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(preferences.get(EPISODE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
+                .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(
+                        preferences.get(EPISODE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
         EPISODE_LIBRARY_OTHER_FILE_ACTION.store(this, preferences);
 
         settings.movieLibrarySettings
-                .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(preferences.get(MOVIE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
+                .setLibraryOtherFileAction(LibraryOtherFileActionType.fromString(
+                        preferences.get(MOVIE_LIBRARY_OTHER_FILE_ACTION.getKey(), "")));
         MOVIE_LIBRARY_OTHER_FILE_ACTION.store(this, preferences);
 
         settings.episodeLibrarySettings
@@ -288,16 +296,20 @@ public class SettingsControl {
 
     public void migrateSettingsV5ToV6() {
         IntStream.range(0, preferences.getInt("ExcludeItemSize", 0))
-                .forEach(i -> preferences.put("ExcludeItem" + i, preferences.get("ExcludeItem" + i, "").split("//", 2)[1]));
+                .forEach(i -> preferences.put("ExcludeItem" + i,
+                        preferences.get("ExcludeItem" + i, "").split("//", 2)[1]));
         EXCLUDE_ITEM.store(this, preferences);
 
         // Conversion from String to enum + remove duplicates
         int defaultSelectionQualitySize = preferences.getInt("DefaultSelectionQualitySize", 0);
         if (defaultSelectionQualitySize > 0) {
             List<Source> defaultSelectionQualitySizes = IntStream.range(0, defaultSelectionQualitySize)
-                    .mapToObj(i -> VideoPatterns.Source.fromValue(preferences.get("DefaultSelectionQuality" + i, ""))).distinct().toList();
+                    .mapToObj(i -> VideoPatterns.Source.fromValue(preferences.get("DefaultSelectionQuality" + i, "")))
+                    .distinct()
+                    .toList();
             IntStream.range(0, defaultSelectionQualitySizes.size())
-                    .forEach(i -> preferences.put("DefaultSelectionQuality" + i, defaultSelectionQualitySizes.get(i).name()));
+                    .forEach(i -> preferences.put("DefaultSelectionQuality" + i,
+                            defaultSelectionQualitySizes.get(i).name()));
             if (defaultSelectionQualitySize != defaultSelectionQualitySizes.size()) {
                 preferences.putInt("DefaultSelectionQualitySize", defaultSelectionQualitySizes.size());
                 IntStream.range(defaultSelectionQualitySize, defaultSelectionQualitySizes.size())
@@ -326,7 +338,8 @@ public class SettingsControl {
         EPISODE_LIBRARY_LANG_CODE_MAPPING.store(this, preferences);
         MOVIE_LIBRARY_LANG_CODE_MAPPING.store(this, preferences);
 
-        if (settings.episodeLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME)) {
+        if (settings.episodeLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME,
+                LibraryActionType.MOVEANDRENAME)) {
             if (StringUtils.isBlank(settings.episodeLibrarySettings.getLibraryFilenameStructure())) {
                 settings.movieLibrarySettings.setLibraryFilenameStructure("%SHOW NAME%%SEPARATOR%%Season %S%");
                 MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
@@ -338,7 +351,8 @@ public class SettingsControl {
             }
         }
 
-        if (settings.movieLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME)) {
+        if (settings.movieLibrarySettings.hasAnyLibraryAction(LibraryActionType.RENAME,
+                LibraryActionType.MOVEANDRENAME)) {
             if (StringUtils.isBlank(settings.movieLibrarySettings.getLibraryFilenameStructure())) {
                 settings.movieLibrarySettings.setLibraryFilenameStructure("%MOVIE TITLE% (%YEAR%)");
                 MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
@@ -351,7 +365,8 @@ public class SettingsControl {
 
     public void migrateSettingsV7ToV8() {
         if (settings.loginOpenSubtitlesEnabled
-            && !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername, settings.loginOpenSubtitlesPassword)) {
+            && !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername,
+                settings.loginOpenSubtitlesPassword)) {
             settings.loginOpenSubtitlesEnabled = false;
             LOGIN_OPEN_SUBTITLES_ENABLED.store(this, preferences);
         }
@@ -376,7 +391,8 @@ public class SettingsControl {
     }
 
     private void migrateDatabase() {
-        int version = manager.valueBuilder().cacheType(CacheType.DISK).key("DATABSE_VERSION").valueSupplier(() -> 0).get();
+        int version =
+                manager.valueBuilder().cacheType(CacheType.DISK).key("DATABSE_VERSION").valueSupplier(() -> 0).get();
         if (version == 0) {
             migrateDatabaseV0ToV1();
         }

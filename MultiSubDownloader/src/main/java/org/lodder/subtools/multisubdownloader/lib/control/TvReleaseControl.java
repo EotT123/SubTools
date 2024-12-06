@@ -12,7 +12,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TvReleaseControl extends ReleaseControl {
+public final class TvReleaseControl extends ReleaseControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
 
@@ -57,7 +57,7 @@ public class TvReleaseControl extends ReleaseControl {
         jtvdba.getSerie(tvRelease.name).useIfPresent(tvdbSerie -> {
             tvRelease.tvdbId = tvdbSerie.id;
             tvRelease.originalName = tvdbSerie.serieName;
-            if (getSettings().processEpisodeSource == SettingsProcessEpisodeSource.TVDB) {
+            if (settings.processEpisodeSource == SettingsProcessEpisodeSource.TVDB) {
                 jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisodeNumber)
                         .ifPresent(tvRelease::updateTvdbEpisodeInfo);
             }

@@ -1,23 +1,25 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.get;
+import manifold.ext.props.rt.api.set;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.GroupReplacer;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.KeywordReplacer;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
 
-@Getter
 public class SortWeight {
 
     private static final List<KeywordReplacer> KEYWORD_REPLACERS = List.of(new GroupReplacer());
 
-    private Map<String, Integer> weights;
-    protected int maxScore;
+    @get Map<String, Integer> weights = new HashMap<>();
+    @get @set(Private) int maxScore;
 
     public SortWeight(Release release, Map<String, Integer> defaultWeights) {
         this.setWeights(release, defaultWeights);
@@ -25,7 +27,7 @@ public class SortWeight {
 
     protected void setWeights(Release release, Map<String, Integer> defaultWeights) {
         this.maxScore = 0;
-        this.weights = new HashMap<>();
+        this.weights.clear();
 
         /* make a clone, so we can't mess up the defined weights */
         defaultWeights = new HashMap<>(defaultWeights); // clone

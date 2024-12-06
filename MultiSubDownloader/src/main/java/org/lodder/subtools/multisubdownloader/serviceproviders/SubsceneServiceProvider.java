@@ -17,12 +17,6 @@ public class SubsceneServiceProvider implements ServiceProvider {
     /* We define a priority lower than SubtitleServiceProvider */
     @val @override int priority = 1;
 
-    //    @Override
-    //    public int getPriority() {
-    //        /* We define a priority lower than SubtitleServiceProvider */
-    //        return 1;
-    //    }
-
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {
         /* Resolve the SubtitleProviderStore from the IoC Container */

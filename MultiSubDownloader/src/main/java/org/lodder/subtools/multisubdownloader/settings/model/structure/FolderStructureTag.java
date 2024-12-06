@@ -1,16 +1,16 @@
 package org.lodder.subtools.multisubdownloader.settings.model.structure;
 
 import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.Messages;
 
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum FolderStructureTag implements StructureTag {
 
     SEPARATOR("%SEPARATOR%", Messages.getString("StructureBuilderDialog.SystemdependendSeparator"));
 
-    private final String label;
-    private final String description;
+    @val @override String label;
+    @val @override String description;
 }

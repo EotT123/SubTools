@@ -15,14 +15,15 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MovieReleaseControl extends ReleaseControl {
+public final class MovieReleaseControl extends ReleaseControl {
     private final ImdbAdapter imdbAdapter;
     private final OmdbAdapter omdbAdapter;
     private final MovieRelease movieRelease;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieReleaseControl.class);
 
-    public MovieReleaseControl(MovieRelease movieRelease, Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
+    public MovieReleaseControl(MovieRelease movieRelease, Settings settings, Manager manager,
+            UserInteractionHandler userInteractionHandler) {
         super(settings, manager);
         this.movieRelease = movieRelease;
         this.imdbAdapter = ImdbAdapter.getInstance(manager, userInteractionHandler);
@@ -34,19 +35,21 @@ public class MovieReleaseControl extends ReleaseControl {
         if (StringUtils.isBlank(movieRelease.name)) {
             throw new ReleaseControlException("Unable to extract/find title, check file", movieRelease);
         } else {
-            int imdbId = imdbAdapter.getImdbId(movieRelease.getName(), movieRelease.getYear())
-                    .orElseThrow(() -> new ReleaseControlException("Movie not found on IMDB, check file", movieRelease));
+            int imdbId = imdbAdapter.getImdbId(movieRelease.name, movieRelease.year)
+                    .orElseThrow(
+                            () -> new ReleaseControlException("Movie not found on IMDB, check file", movieRelease));
             movieRelease.setImdbId(imdbId);
 
             Optional<? extends ReleaseDBIntf> movieDetails =
                     movieRelease.getImdbId().mapToObj(imdbAdapter::getMovieDetails).orElseGet(Optional::empty);
             if (movieDetails.isEmpty()) {
-                movieDetails = movieRelease.getImdbId().mapToObj(omdbAdapter::getMovieDetails).orElseGet(Optional::empty);
+                movieDetails =
+                        movieRelease.getImdbId().mapToObj(omdbAdapter::getMovieDetails).orElseGet(Optional::empty);
             }
             movieDetails.ifPresentOrElse(info -> {
                 movieRelease.year = info.year();
                 movieRelease.name = info.name;
-            }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info {}", movieRelease));
+            }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info $movieRelease"));
         }
     }
 
