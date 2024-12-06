@@ -6,10 +6,10 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.io.Serial;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 
 public class PanelCheckBox extends JPanel {
@@ -17,10 +17,10 @@ public class PanelCheckBox extends JPanel {
     private static final long serialVersionUID = 1L;
     private final JCheckBox checkbox;
 
-    @Getter
-    private final JPanel panel;
+    @val JPanel panel;
 
-    private PanelCheckBox(JCheckBox checkbox, boolean panelOnNewLine, LayoutManager panelLayout, boolean addVerticalSeparator, int leftGap) {
+    private PanelCheckBox(JCheckBox checkbox, boolean panelOnNewLine, LayoutManager panelLayout,
+            boolean addVerticalSeparator, int leftGap) {
         super(new MigLayout("insets 0, novisualpadding, fillx"));
         this.checkbox = checkbox;
         this.panel = new JPanel(panelLayout) {

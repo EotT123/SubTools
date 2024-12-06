@@ -8,14 +8,15 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReleaseGroupFilter extends SubtitleFilter {
+public final class ReleaseGroupFilter extends SubtitleFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseGroupFilter.class);
 
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {
         if (subtitle.releaseGroup.isEmpty()) {
-            subtitle.releaseGroup = ReleaseParser.extractReleaseGroup(subtitle.fileName, subtitle.fileName.endsWith(".srt"));
+            subtitle.releaseGroup =
+                    ReleaseParser.extractReleaseGroup(subtitle.fileName, subtitle.fileName.endsWith(".srt"));
         }
         if (!StringUtils.containsAnyIgnoreCase(subtitle.releaseGroup, release.releaseGroup, subtitle.releaseGroup)) {
             return false;

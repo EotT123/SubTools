@@ -5,7 +5,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serial;
 
-import lombok.Getter;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.Messenger;
@@ -17,8 +16,6 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
     private static final long serialVersionUID = -2320149791421648965L;
 
     private final Cancelable worker;
-
-    @Getter
     private JProgressBar progressBar;
     private JLabel label;
 
@@ -26,7 +23,7 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
         super(frame, Messages.getString("ProgressDialog.Title"), false);
         worker = sft;
         StatusMessenger.instance.addListener(this);
-        initialize_ui();
+        initializeUi();
         setDialogLocation(frame);
         repaint();
     }
@@ -35,11 +32,11 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
         super(Messages.getString("ProgressDialog.Title"), false);
         worker = sft;
         StatusMessenger.instance.addListener(this);
-        initialize_ui();
+        initializeUi();
         repaint();
     }
 
-    private void initialize_ui() {
+    private void initializeUi() {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -77,11 +74,11 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
 
     public void updateProgress(int progress) {
         if (progress == 0) {
-            getProgressBar().setIndeterminate(true);
+            progressBar.setIndeterminate(true);
         } else {
-            getProgressBar().setIndeterminate(false);
-            getProgressBar().setValue(progress);
-            getProgressBar().setString(Integer.toString(progress));
+            progressBar.setIndeterminate(false);
+            progressBar.setValue(progress);
+            progressBar.setString(Integer.toString(progress));
         }
     }
 }

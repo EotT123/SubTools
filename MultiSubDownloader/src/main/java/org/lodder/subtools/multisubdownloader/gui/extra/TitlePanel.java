@@ -4,19 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
 
 public class TitlePanel extends JPanel {
     @Serial
     private static final long serialVersionUID = 1L;
-    @Getter
-    private final JPanel panel;
+    @var JPanel panel;
 
-    private TitlePanel(String title, LayoutManager panelLayout, int marginTop, int marginLeft, int marginBottom, int marginRight) {
+    private TitlePanel(String title, LayoutManager panelLayout, int marginTop, int marginLeft, int marginBottom,
+            int marginRight) {
         super(new MigLayout("fillx, nogrid, insets %s %s %s %s".formatted(getPadding(marginTop),
                 getPadding(marginLeft), getPadding(marginBottom), getPadding(marginRight))));
         super.add(new JLabel(title));
@@ -138,13 +138,15 @@ public class TitlePanel extends JPanel {
         public JPanel addTo(Container component, Object constraints) {
             if (panelLayout == null) {
                 panelLayout = new MigLayout(
-                        (fillContents ? "fill," : "") + (useGrid ? "" : "nogrid,") + "insets %s %s %s %s".formatted(getPadding(paddingTop),
+                        (fillContents ? "fill," : "") + (useGrid ? "" : "nogrid,") +
+                        "insets %s %s %s %s".formatted(getPadding(paddingTop),
                                 getPadding(paddingLeft), getPadding(paddingBottom), getPadding(paddingRight)),
                         panelColumnConstraints);
             }
-            TitlePanel titlePanel = new TitlePanel(title, panelLayout, marginTop, marginLeft, marginBottom, marginRight);
+            TitlePanel titlePanel =
+                    new TitlePanel(title, panelLayout, marginTop, marginLeft, marginBottom, marginRight);
             component.add(titlePanel, constraints);
-            return titlePanel.getPanel();
+            return titlePanel.panel;
 
         }
     }

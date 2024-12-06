@@ -10,7 +10,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExactNameFilter extends SubtitleFilter {
+public final class ExactNameFilter extends SubtitleFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExactNameFilter.class);
 

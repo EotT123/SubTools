@@ -6,7 +6,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-public abstract class SubtitleFilter {
+public abstract sealed class SubtitleFilter permits ExactNameFilter, KeywordFilter, ReleaseGroupFilter {
 
     public abstract boolean useSubtitle(Release release, Subtitle subtitle);
 

@@ -43,7 +43,8 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
 
     @Override
     public List<Subtitle> selectSubtitles(Release release) {
-        System.out.printf("\n%s : %s%n", Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease"), release.fileName);
+        System.out.printf("\n%s : %s%n", Messages.getString("SelectDialog.SelectCorrectSubtitleThisRelease"),
+                release.fileName);
         return PrompterUtil
                 .getElementsFromList(release.getMatchingSubs())
                 .displayAsTable(createTableDisplayer())
@@ -53,12 +54,14 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
                 .prompt(prompter);
     }
 
-    private ColumnDisplayer<Subtitle> createSubtitleDisplayer(SubtitleTableColumnName column, Function<Subtitle, Object> toStringMapper) {
+    private ColumnDisplayer<Subtitle> createSubtitleDisplayer(SubtitleTableColumnName column,
+            Function<Subtitle, Object> toStringMapper) {
         return new ColumnDisplayer<>(column.getColumnName(), (Subtitle s) -> String.valueOf(toStringMapper.apply(s)));
     }
 
     private TableDisplayer<Subtitle> createTableDisplayer() {
-        return new TableDisplayer<>(Stream.of(SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED)
+        return new TableDisplayer<>(Stream.of(SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER,
+                        HEARING_IMPAIRED)
                 .map(stcn -> createSubtitleDisplayer(stcn, stcn.getValueFunction())).toList());
     }
 

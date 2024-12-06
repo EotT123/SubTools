@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.var;
 
-public class MovieRelease extends Release {
+public final class MovieRelease extends Release {
 
     @var String name;
     @var Integer year;

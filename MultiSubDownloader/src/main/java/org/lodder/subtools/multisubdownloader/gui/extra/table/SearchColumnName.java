@@ -6,11 +6,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.Messages;
 
-@RequiredArgsConstructor
 public enum SearchColumnName implements CustomColumnName {
 
     RELEASE("App.Release", String.class, false),
@@ -26,17 +25,17 @@ public enum SearchColumnName implements CustomColumnName {
     SCORE("SearchColumnName.Score", Integer.class, false);
 
     private static final Map<String, SearchColumnName> MAP =
-            Arrays.stream(SearchColumnName.values()).collect(Collectors.toMap(SearchColumnName::getColumnName, Function.identity()));
+            Arrays.stream(SearchColumnName.values())
+                    .collect(Collectors.toMap(SearchColumnName::getColumnName, Function.identity()));
 
-    private final String columnNameCode;
-    @Getter
-    private final Class<?> c;
-    @Getter
-    private final boolean editable;
+    @val @override String columnName;
+    @val @override Class<?> c;
+    @val @override boolean editable;
 
-    @Override
-    public String getColumnName() {
-        return Messages.getString(columnNameCode);
+    SearchColumnName(String columnNameCode, Class<?> c, boolean editable) {
+        this.columnName = Messages.getString(columnNameCode);
+        this.c = c;
+        this.editable = editable;
     }
 
     public static Optional<SearchColumnName> getForColumnName(String columnName) {

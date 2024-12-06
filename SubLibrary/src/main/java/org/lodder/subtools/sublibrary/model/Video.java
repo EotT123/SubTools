@@ -2,7 +2,7 @@ package org.lodder.subtools.sublibrary.model;
 
 import manifold.ext.props.rt.api.val;
 
-public abstract class Video {
+public abstract sealed class Video permits Release {
 
     @val VideoType videoType;
 

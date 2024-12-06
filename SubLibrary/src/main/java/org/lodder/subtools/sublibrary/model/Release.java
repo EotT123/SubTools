@@ -9,7 +9,7 @@ import java.util.Set;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class Release extends Video {
+public abstract sealed class Release extends Video permits MovieRelease, TvRelease {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
     @val Path filePath;

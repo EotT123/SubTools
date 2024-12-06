@@ -4,8 +4,8 @@ import javax.swing.*;
 import java.io.Serial;
 import java.nio.file.Files;
 
-import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
+import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.PartialDisableComboBox;
@@ -19,13 +19,13 @@ import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @ExtensionMethod({ Files.class })
-public abstract class VideoLibraryPanel extends JPanel implements PreferencePanelIntf {
+public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
+        permits EpisodeLibraryPanel, MovieLibraryPanel {
 
     @Serial
     private static final long serialVersionUID = -9175813173306481849L;
 
-    @Getter
-    private final LibrarySettings librarySettings;
+    @val LibrarySettings librarySettings;
     private final MyComboBox<LibraryActionType> cbxLibraryAction;
     private final JCheckBox chkUseTVDBNaming;
     private final PartialDisableComboBox<LibraryOtherFileActionType> cbxLibraryOtherFileAction;
@@ -33,7 +33,7 @@ public abstract class VideoLibraryPanel extends JPanel implements PreferencePane
     protected final StructureFolderPanel pnlStructureFolder;
     protected final StructureFilePanel pnlStructureFile;
 
-    public VideoLibraryPanel(LibrarySettings librarySettings, VideoType videoType, Manager manager, boolean renameMode,
+    VideoLibraryPanel(LibrarySettings librarySettings, VideoType videoType, Manager manager, boolean renameMode,
             UserInteractionHandler userInteractionHandler) {
         super(new MigLayout("fillx, nogrid"));
         this.librarySettings = librarySettings;
@@ -53,13 +53,16 @@ public abstract class VideoLibraryPanel extends JPanel implements PreferencePane
                     .withToMessageStringRenderer(LibraryActionType::getMsgCode)
                     .addTo(performActionPanel, "wrap");
 
-            this.pnlStructureFolder = new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
-                    .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
+            this.pnlStructureFolder =
+                    new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
+                            .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
             this.pnlStructureFile = new StructureFilePanel(librarySettings, videoType, manager, userInteractionHandler)
                     .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
 
-            JLabel lblActionForOtherFiles = new JLabel(Messages.getString("PreferenceDialog.ActionForOtherFiles")).addTo(performActionPanel);
-            this.cbxLibraryOtherFileAction = PartialDisableComboBox.of(LibraryOtherFileActionType.values()).addTo(performActionPanel);
+            JLabel lblActionForOtherFiles =
+                    new JLabel(Messages.getString("PreferenceDialog.ActionForOtherFiles")).addTo(performActionPanel);
+            this.cbxLibraryOtherFileAction =
+                    PartialDisableComboBox.of(LibraryOtherFileActionType.values()).addTo(performActionPanel);
 
             //
             this.cbxLibraryAction.withSelectedItemConsumer(action -> {
@@ -86,8 +89,10 @@ public abstract class VideoLibraryPanel extends JPanel implements PreferencePane
         for (int i = 0; i < cbxLibraryOtherFileAction.getModel().getSize(); i++) {
             LibraryOtherFileActionType ofa = cbxLibraryOtherFileAction.getItemAt(i);
             boolean enabled = switch (libraryActionType) {
-                case MOVE -> LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.RENAME != ofa;
-                case RENAME -> LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.MOVE != ofa;
+                case MOVE ->
+                        LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.RENAME != ofa;
+                case RENAME ->
+                        LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.MOVE != ofa;
                 case MOVEANDRENAME -> true;
                 case NOTHING -> LibraryOtherFileActionType.NOTHING == ofa;
             };
@@ -129,7 +134,8 @@ public abstract class VideoLibraryPanel extends JPanel implements PreferencePane
         }
         librarySettings.setLibraryAction(this.cbxLibraryAction.getSelectedItem())
                 .setLibraryUseTVDBNaming(this.chkUseTVDBNaming.isSelected())
-                .setLibraryOtherFileAction((LibraryOtherFileActionType) this.cbxLibraryOtherFileAction.getSelectedItem());
+                .setLibraryOtherFileAction(
+                        (LibraryOtherFileActionType) this.cbxLibraryOtherFileAction.getSelectedItem());
 
         pnlStructureFolder.savePreferenceSettings();
         pnlStructureFile.savePreferenceSettings();
@@ -137,7 +143,8 @@ public abstract class VideoLibraryPanel extends JPanel implements PreferencePane
 
     @Override
     public boolean hasValidSettings() {
-        return pnlStructureFolder.hasValidSettings() && pnlStructureFile.hasValidSettings() && (pnlBackup == null || pnlBackup.hasValidSettings());
+        return pnlStructureFolder.hasValidSettings() && pnlStructureFile.hasValidSettings() &&
+               (pnlBackup == null || pnlBackup.hasValidSettings());
     }
 
 }

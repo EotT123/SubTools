@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Streams;
-import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
+import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
@@ -59,9 +59,11 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
                 .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().withColumns(20))
                 .addComponent("shrink, wrap", new JButton(Messages.getString("App.Browse"))
                         .withActionListener(() -> MemoryFolderChooser.getInstance()
-                                .selectDirectory(getContentPane(), Messages.getString("PreferenceDialog.SelectFolderForRenameReplace"))
+                                .selectDirectory(getContentPane(),
+                                        Messages.getString("PreferenceDialog.SelectFolderForRenameReplace"))
                                 .ifPresent(txtFolder::setObject)))
-                .addComponent("wrap", this.chkRecursive = new JCheckBox(Messages.getString("RenameDialog.RecursiveSearch")));
+                .addComponent("wrap",
+                        this.chkRecursive = new JCheckBox(Messages.getString("RenameDialog.RecursiveSearch")));
 
         if (videoType == VideoType.EPISODE) {
             pnlLibrary = new EpisodeLibraryPanel(settings.episodeLibrarySettings, manager, true, userInteractionHandler)
@@ -92,15 +94,17 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             UserInteractionHandler userInteractionHandler) {
 
         if (!hasValidSettings()) {
-            JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"), "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
         setVisible(false);
         pnlLibrary.savePreferenceSettings();
-        TypedRenameWorker renameWorker = new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.getLibrarySettings(), videoType,
-                this.chkRecursive.isSelected(), manager, userInteractionHandler);
+        TypedRenameWorker renameWorker =
+                new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.getLibrarySettings(), videoType,
+                        this.chkRecursive.isSelected(), manager, userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
-        renameWorker.setReleaseFactory(new ReleaseFactory(settings, manager));
+        renameWorker.releaseFactory = new ReleaseFactory(settings, manager);
         progressDialog = new ProgressDialog(renameWorker);
         progressDialog.setVisible(true);
         renameWorker.execute();
@@ -127,14 +131,14 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         private final VideoType videoType;
         private final Set<String> extensions;
         private final boolean isRecursive;
-        @Setter
-        private ReleaseFactory releaseFactory;
         private final RenameAction renameAction;
+        @set ReleaseFactory releaseFactory;
 
         public TypedRenameWorker(Path dir, LibrarySettings librarySettings, VideoType videoType,
                 boolean isRecursive, Manager manager, UserInteractionHandler userInteractionHandler) {
             this.userInteractionHandler = userInteractionHandler;
-            this.extensions = Streams.concat(VideoPatterns.EXTENSIONS.stream(), Stream.of("srt")).collect(Collectors.toUnmodifiableSet());
+            this.extensions = Streams.concat(VideoPatterns.EXTENSIONS.stream(), Stream.of("srt"))
+                    .collect(Collectors.toUnmodifiableSet());
             this.dir = dir;
             this.videoType = videoType;
             this.isRecursive = isRecursive;

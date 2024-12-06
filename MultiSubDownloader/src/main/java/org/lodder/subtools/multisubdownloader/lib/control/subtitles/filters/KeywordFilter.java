@@ -7,7 +7,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KeywordFilter extends SubtitleFilter {
+public final class KeywordFilter extends SubtitleFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordFilter.class);
 

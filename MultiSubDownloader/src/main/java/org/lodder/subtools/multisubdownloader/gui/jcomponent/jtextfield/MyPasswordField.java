@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 
@@ -79,8 +79,7 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
     }
 
     private static class ObjectWrapper<S> {
-        @Getter
-        private S value;
+        @var S value;
 
         public boolean setValue(S value) {
             boolean changed = this.value != value;
@@ -119,7 +118,8 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
             completeValueVerifier = t -> true;
         }
 
-        if (valueVerifier != null || requireValue || valueChangedCalbackListener != null || validityChangedCalbackListeners != null) {
+        if (valueVerifier != null || requireValue || valueChangedCalbackListener != null ||
+            validityChangedCalbackListeners != null) {
             checkValidity(getRawText());
             getDocument().addDocumentListener(new DocumentListener() {
 
@@ -178,8 +178,8 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
     @Override
     public void setText(String password) {
         super.setText(password);
-        valueWrapper.setValue(password);
-        validWrapper.setValue(completeValueVerifier.test(password));
+        valueWrapper.value = password;
+        validWrapper.value = completeValueVerifier.test(password);
     }
 
     public boolean hasValidValue() {

@@ -1,11 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.Serial;
 
-import lombok.AccessLevel;
-import lombok.Getter;
+import manifold.ext.props.rt.api.get;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 
@@ -14,14 +15,11 @@ public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel
     @Serial
     private static final long serialVersionUID = 7507970016496546514L;
 
-    @Getter(value = AccessLevel.PROTECTED)
-    private final JButton btnBuildStructure;
-    @Getter(value = AccessLevel.PROTECTED)
-    private final JCheckBox chkReplaceSpace;
-    @Getter(value = AccessLevel.PROTECTED)
-    private final MyComboBox<String> cbxReplaceSpaceChar;
+    @get(Protected) JButton btnBuildStructure;
+    @get(Protected) JCheckBox chkReplaceSpace;
+    @get(Protected) MyComboBox<String> cbxReplaceSpaceChar;
 
-    public StructurePanel() {
+    StructurePanel() {
         this.btnBuildStructure = new JButton(Messages.getString("StructureBuilderDialog.Structure"));
 
         this.cbxReplaceSpaceChar = new MyComboBox<>(new String[]{ "-", ".", "_" });
@@ -37,19 +35,19 @@ public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel
     }
 
     public String getReplaceSpaceChar() {
-        return this.getCbxReplaceSpaceChar().getSelectedItem();
+        return this.cbxReplaceSpaceChar.getSelectedItem();
     }
 
     public void setReplaceSpaceChar(String s) {
-        this.getCbxReplaceSpaceChar().setSelectedItem(s);
+        this.cbxReplaceSpaceChar.setSelectedItem(s);
     }
 
     public boolean isReplaceSpaceSelected() {
-        return this.getChkReplaceSpace().isSelected();
+        return this.chkReplaceSpace.isSelected();
     }
 
     public void setReplaceSpaceSelected(boolean b) {
-        this.getChkReplaceSpace().setSelected(b);
+        this.chkReplaceSpace.setSelected(b);
     }
 
 }

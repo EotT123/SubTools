@@ -12,7 +12,7 @@ import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
 
-public class TvRelease extends Release {
+public final class TvRelease extends Release {
 
     // parsed from the filename
     @val String name;
@@ -79,7 +79,8 @@ public class TvRelease extends Release {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class TvReleaseBuilder
-            implements TvReleaseBuilderOther, TvReleaseBuilderEpisode, TvReleaseBuilderSeason, TvReleaseBuilderShowName {
+            implements TvReleaseBuilderOther, TvReleaseBuilderEpisode, TvReleaseBuilderSeason,
+            TvReleaseBuilderShowName {
         private String name;
         private String title;
         private int season;
@@ -106,11 +107,13 @@ public class TvRelease extends Release {
 
         @Override
         public TvRelease build() {
-            return new TvRelease(file, description, releaseGroup, quality, name, originalName, customName, title, season, episodes, special);
+            return new TvRelease(file, description, releaseGroup, quality, name, originalName, customName, title,
+                    season, episodes, special);
         }
     }
 
-    private TvRelease(Path file, String description, String releaseGroup, String quality, String name, String originalName, String customName,
+    private TvRelease(Path file, String description, String releaseGroup, String quality, String name,
+            String originalName, String customName,
             String title, int season, List<Integer> episodeNumbers, boolean special) {
         super(VideoType.EPISODE, file, description, releaseGroup, quality);
         this.name = name;
