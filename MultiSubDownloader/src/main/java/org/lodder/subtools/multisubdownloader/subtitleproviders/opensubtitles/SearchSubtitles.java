@@ -76,6 +76,8 @@ public class SearchSubtitles extends OpenSubtitlesExecuter {
 
     private Integer year;
 
+    private String userAgent = "SubTools"; // should be set
+
     public Subtitles200Response searchSubtitles() throws OpenSubtitlesException {
         return manager.valueBuilder()
                 .cacheType(CacheType.MEMORY)
@@ -92,7 +94,7 @@ public class SearchSubtitles extends OpenSubtitlesExecuter {
                                         getValue(machineTranslated), getValue(aiTranslated),
                                         orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
                                         parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
-                                        getValue(movieHashMatch), page));
+                                        getValue(movieHashMatch), page, userAgent));
                     } catch (Exception e) {
                         throw new OpenSubtitlesException(e);
                     }

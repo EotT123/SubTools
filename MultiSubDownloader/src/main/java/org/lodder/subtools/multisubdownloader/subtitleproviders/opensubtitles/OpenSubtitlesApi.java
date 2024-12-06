@@ -23,6 +23,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private static final String APIKEY = "3IlyaP0KNv6QmJ1gOBX8IXwzD1P9b8c0";//"lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";
     private static final ApiClient API_CLIENT;
+    private static final String USER_AGENT = "SubTools";
     @val Manager manager;
     @val @override SubtitleSource subtitleSource = SubtitleSource.OPENSUBTITLES;
 
@@ -43,7 +44,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     public void login(String userName, String password) throws OpenSubtitlesException {
         try {
             Login200Response loginResponse =
-                    new AuthenticationApi(API_CLIENT).login("application/json",
+                    new AuthenticationApi(API_CLIENT).login("application/json", USER_AGENT,
                             new LoginRequest().username(userName).password(password));
             API_CLIENT.setBearerToken(loginResponse.getToken());
         } catch (ApiException e) {
@@ -53,7 +54,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public static boolean isValidCredentials(String userName, String password) {
         try {
-            new AuthenticationApi(API_CLIENT).login("application/json",
+            new AuthenticationApi(API_CLIENT).login("application/json", USER_AGENT,
                     new LoginRequest().username(userName).password(password));
             return true;
         } catch (ApiException e) {

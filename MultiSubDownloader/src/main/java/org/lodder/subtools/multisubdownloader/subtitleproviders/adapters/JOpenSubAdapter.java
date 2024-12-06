@@ -27,8 +27,8 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
-import org.opensubtitles.model.Latest200ResponseDataInnerAttributesFilesInner;
 import org.opensubtitles.model.SubtitleAttributes;
+import org.opensubtitles.model.SubtitleAttributesFilesInner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,13 +125,12 @@ public class JOpenSubAdapter
                 .flatMap(attributes -> attributes.getFiles().stream().filter(file -> {
                     String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
                     return subFileName.contains(name) ||
-                           (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
+                            (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
                 }).map(file -> createSubtitle(file, attributes)))
                 .collect(Collectors.toSet());
     }
 
-    private Subtitle createSubtitle(Latest200ResponseDataInnerAttributesFilesInner file,
-            SubtitleAttributes attributes) {
+    private Subtitle createSubtitle(SubtitleAttributesFilesInner file, SubtitleAttributes attributes) {
         return Subtitle.downloadSource(
                         () -> getApi().downloadSubtitle().fileId(file.getFileId().intValue()).download().getLink())
                 .subtitleSource(subtitleSource)
