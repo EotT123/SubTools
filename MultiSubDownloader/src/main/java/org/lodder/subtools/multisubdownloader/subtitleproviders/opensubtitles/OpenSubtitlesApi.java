@@ -4,7 +4,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
@@ -22,8 +22,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private static final String APIKEY = "lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";
     private static final ApiClient API_CLIENT;
-    @Getter
-    private final Manager manager;
+    @val Manager manager;
 
     static {
         API_CLIENT = new ApiClient();
@@ -42,7 +41,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
     public void login(String userName, String password) throws OpenSubtitlesException {
         try {
             Login200Response loginResponse =
-                    new AuthenticationApi(API_CLIENT).login("application/json", new LoginRequest().username(userName).password(password));
+                    new AuthenticationApi(API_CLIENT).login("application/json",
+                            new LoginRequest().username(userName).password(password));
             API_CLIENT.setBearerToken(loginResponse.getToken());
         } catch (ApiException e) {
             throw new OpenSubtitlesException(e);
@@ -51,7 +51,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public static boolean isValidCredentials(String userName, String password) {
         try {
-            new AuthenticationApi(API_CLIENT).login("application/json", new LoginRequest().username(userName).password(password));
+            new AuthenticationApi(API_CLIENT).login("application/json",
+                    new LoginRequest().username(userName).password(password));
             return true;
         } catch (ApiException e) {
             return false;
@@ -74,12 +75,14 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     .userAgent("")
                     .cacheType(CacheType.MEMORY)
                     .retries(1)
-                    .retryPredicate(exception -> exception instanceof HttpClientException e && e.getResponseCode() == 429)
+                    .retryPredicate(
+                            exception -> exception instanceof HttpClientException e && e.getResponseCode() == 429)
                     .retryWait(5)
                     .getAsJsonArray()
                     .stream()
                     .filter(show -> "tv".equals(show.getString("kind")))
-                    .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"), show.getString("year")))
+                    .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
+                            show.getString("year")))
                     .toList();
         } catch (Exception e) {
             throw new OpenSubtitlesException(e);

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import manifold.ext.rt.api.Self;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.Manager;
@@ -28,7 +29,7 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
     @val @override UserInteractionHandler userInteractionHandler;
 
     @RequiredArgsConstructor
-    public static class ExecuteCall<T, X extends Exception, E extends ExecuteCall<T, X, E>> {
+    public static class ExecuteCall<T, X extends Exception> {
         private final ThrowingSupplier<T, X> supplier;
         private String message;
         private int retries = 3;
@@ -38,39 +39,39 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
         private record HandleException<T, X extends Exception>(Predicate<X> predicate,
                 Function<X, T> exceptionFunction) {}
 
-        public E retryWhenException(Predicate<X> predicate) {
+        public @Self ExecuteCall<T, X> retryWhenException(Predicate<X> predicate) {
             retryPredicates.add(predicate);
-            return getThis();
+            return this;
         }
 
-        public E handleException(Predicate<X> predicate, Function<X, T> exceptionFunction) {
+        public @Self ExecuteCall<T, X> handleException(Predicate<X> predicate, Function<X, T> exceptionFunction) {
             exceptionHandlers.add(new HandleException<>(predicate, exceptionFunction));
-            return getThis();
+            return this;
         }
 
-        public E handleException(Predicate<X> predicate, Supplier<T> supplier) {
-            return handleException(predicate, e -> supplier.get());
+        public @Self ExecuteCall<T, X> handleException(Predicate<X> predicate, Supplier<T> supplier) {
+            return handleException(predicate, _ -> supplier.get());
         }
 
-        public E handleException(Function<X, T> exceptionFunction) {
+        public @Self ExecuteCall<T, X> handleException(Function<X, T> exceptionFunction) {
             return handleException(e -> true, exceptionFunction);
         }
 
-        public E handleException(Supplier<T> supplier) {
+        public @Self ExecuteCall<T, X> handleException(Supplier<T> supplier) {
             return handleException(e -> true, e -> supplier.get());
         }
 
-        public E retries(int retries) {
+        public @Self ExecuteCall<T, X> retries(int retries) {
             if (retries <= 0) {
                 throw new IllegalStateException("Retries should be greater than 0");
             }
             this.retries = retries;
-            return getThis();
+            return this;
         }
 
-        public E message(String message) {
+        public @Self ExecuteCall<T, X> message(String message) {
             this.message = message;
-            return getThis();
+            return this;
         }
 
         @SuppressWarnings("unchecked")
@@ -104,11 +105,6 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
                     }
                 }
             }
-        }
-
-        @SuppressWarnings("unchecked")
-        private E getThis() {
-            return (E) this;
         }
     }
 }

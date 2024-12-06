@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,7 +26,6 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
-@Getter(value = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class JPodnapisiApi implements SubtitleApi {
 
@@ -44,27 +41,32 @@ public class JPodnapisiApi implements SubtitleApi {
                 : Optional.empty();
     }
 
-    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, int year, int season, int episode, Language language)
+    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, int year, int season, int episode,
+            Language language)
             throws PodnapisiException {
         return getSubtitles(new SerieMapping(movieName, movieName, movieName, season), year, season, episode, language);
 
     }
 
-    public List<PodnapisiSubtitleDescriptor> getSerieSubtitles(SerieMapping providerSerieId, int season, int episode, Language language)
+    public List<PodnapisiSubtitleDescriptor> getSerieSubtitles(SerieMapping providerSerieId, int season, int episode,
+            Language language)
             throws PodnapisiException {
         return getSubtitles(providerSerieId, null, season, episode, language);
 
     }
 
-    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, Integer year, int season, int episode, Language language)
+    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, Integer year, int season,
+            int episode, Language language)
             throws PodnapisiException {
-        return getManager().valueBuilder()
+        return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.getProviderId(), season, episode, language))
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), providerSerieId.getProviderId(),
+                        season, episode, language))
                 .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
                     try {
                         StringBuilder url = new StringBuilder(DOMAIN + "/sl/ppodnapisi/search?sK=")
-                                .append(URLEncoder.encode(providerSerieId.getProviderId().trim().toLowerCase(), StandardCharsets.UTF_8));
+                                .append(URLEncoder.encode(providerSerieId.getProviderId().trim().toLowerCase(),
+                                        StandardCharsets.UTF_8));
                         if (PODNAPISI_LANGS.containsKey(language)) {
                             url.append("&sJ=").append(PODNAPISI_LANGS.get(language));
                         }
@@ -81,7 +83,10 @@ public class JPodnapisiApi implements SubtitleApi {
                         }
                         url.append("&sXML=1");
 
-                        return getXml(url.toString()).select("subtitle").stream().map(this::parsePodnapisiSubtitle).toList();
+                        return getXml(url.toString()).select("subtitle")
+                                .stream()
+                                .map(this::parsePodnapisiSubtitle)
+                                .toList();
                     } catch (Exception e) {
                         throw new PodnapisiException(e);
                     }
@@ -92,8 +97,9 @@ public class JPodnapisiApi implements SubtitleApi {
 
     protected Document getXml(String url) throws PodnapisiException {
         try {
-            return manager.getPageContentBuilder().url(url).userAgent(getUserAgent()).cacheType(CacheType.MEMORY).retries(1)
-                    .retryPredicate(e -> e instanceof HttpClientException httpClientException && httpClientException.getResponseCode() >= 500
+            return manager.getPageContentBuilder().url(url).userAgent(userAgent).cacheType(CacheType.MEMORY).retries(1)
+                    .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
+                                         httpClientException.getResponseCode() >= 500
                                          && httpClientException.getResponseCode() < 600)
                     .retryWait(5).getAsJsoupDocument();
         } catch (Exception e) {
@@ -104,7 +110,9 @@ public class JPodnapisiApi implements SubtitleApi {
     private PodnapisiSubtitleDescriptor parsePodnapisiSubtitle(Element elem) {
         Function<Element, String> getText = e -> e == null ? null : e.text();
         return PodnapisiSubtitleDescriptor.builder()
-                .hearingImpaired(elem.select("new_flags flags").stream().anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))
+                .hearingImpaired(elem.select("new_flags flags")
+                        .stream()
+                        .anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))
                 .language(languageIdToLanguage(elem.selectFirst("languageId").text()))
                 .releaseString(elem.selectFirst("release").text().length() > 10 ? elem.selectFirst("release").text()
                         : elem.selectFirst("title").text().replace(":", "") + " " + elem.selectFirst("release").text())
@@ -123,7 +131,12 @@ public class JPodnapisiApi implements SubtitleApi {
     }
 
     private Language languageIdToLanguage(String languageId) {
-        return PODNAPISI_LANGS.entrySet().stream().filter(entry -> entry.getValue().equals(languageId)).map(Entry::getKey).findFirst().orElse(null);
+        return PODNAPISI_LANGS.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(languageId))
+                .map(Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     private static final Map<Language, String> PODNAPISI_LANGS = Collections

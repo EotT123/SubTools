@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import manifold.ext.props.rt.api.get;
+import manifold.ext.props.rt.api.var;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -42,7 +43,7 @@ public class VideoTableModel extends DefaultTableModel {
     private final Map<Release, Row> rowMap = new LinkedHashMap<>();
 
     private boolean showOnlyFound = false;
-    @get UserInteractionHandler userInteractionHandler;
+    @var UserInteractionHandler userInteractionHandler;
 
     private VideoTableModel(List<SearchColumnName> searchColumnNames) {
         super(new Object[][]{}, searchColumnNames.stream().map(SearchColumnName::getColumnName).toArray(String[]::new));

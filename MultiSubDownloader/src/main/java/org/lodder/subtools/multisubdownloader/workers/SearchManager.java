@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.workers;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,11 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.set;
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.ScoreCalculator;
@@ -24,7 +27,6 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-@RequiredArgsConstructor
 public class SearchManager implements Cancelable {
 
     public interface SearchManagerLanguage {
@@ -46,7 +48,8 @@ public class SearchManager implements Cancelable {
     @Setter
     @Accessors(fluent = true)
     public static class SearchManagerBuilder
-            implements SearchManagerOnFound, SearchManagerUserInteractionHandler, SearchManagerProgressListener, SearchManagerLanguage {
+            implements SearchManagerOnFound, SearchManagerUserInteractionHandler, SearchManagerProgressListener,
+            SearchManagerLanguage {
         private Settings settings;
         private Language language;
         private SearchProgressListener progressListener;
@@ -62,16 +65,22 @@ public class SearchManager implements Cancelable {
     private final Map<SubtitleProvider, SearchWorker> workers = new HashMap<>();
     private final Map<Release, ScoreCalculator> scoreCalculators = new HashMap<>();
     private final Settings settings;
-    @Getter
-    private int progress = 0;
+    @var @set(Private) int progress = 0;
     private int totalJobs;
 
     private final SearchHandler onFound;
-    @Getter
-    private final Language language;
+    @val Language language;
     private final SearchProgressListener progressListener;
-    @Getter
-    private final UserInteractionHandler userInteractionHandler;
+    @val UserInteractionHandler userInteractionHandler;
+
+    public SearchManager(Settings settings, SearchHandler onFound, Language language,
+            SearchProgressListener progressListener, UserInteractionHandler userInteractionHandler) {
+        this.settings = settings;
+        this.onFound = onFound;
+        this.language = language;
+        this.progressListener = progressListener;
+        this.userInteractionHandler = userInteractionHandler;
+    }
 
     public static SearchManagerLanguage createWithSettings(Settings settings) {
         return new SearchManagerBuilder().settings(settings);
@@ -115,7 +124,7 @@ public class SearchManager implements Cancelable {
         synchronized (this) {
             calculateProgress();
             /* Tell the progress listener our total progress */
-            this.progressListener.progress(this.getProgress());
+            this.progressListener.progress(this.progress);
         }
 
         onFound.onFound(release, subtitles);

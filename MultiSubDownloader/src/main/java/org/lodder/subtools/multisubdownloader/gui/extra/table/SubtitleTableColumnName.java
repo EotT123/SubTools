@@ -28,7 +28,7 @@ public enum SubtitleTableColumnName implements CustomColumnName {
     @val
     @override
     boolean editable;
-    private final Function<Subtitle, Object> valueFunction;
+    @val Function<Subtitle, Object> valueFunction;
 
     SubtitleTableColumnName(String columnNameCode, Class<?> clazz, boolean editable,
             Function<Subtitle, Object> valueFunction) {

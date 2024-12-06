@@ -82,15 +82,20 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                 .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
-                                return new ExecuteCall<>(() -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language))
+                                return new ExecuteCall<>(
+                                        () -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode,
+                                                language))
                                         .message("getSubtitles: [%s]".formatted(
-                                                TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode)))
+                                                TvRelease.formatName(providerSerieId.getProviderName(),
+                                                        tvRelease.season, episode)))
                                         .retryWhenHttpCode(ReturnCode.REFRESHING)
                                         .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                                         .execute().stream();
                             } catch (ApiException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
+                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(
+                                        getSubtitleSource().getName(),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season,
+                                                episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }
@@ -100,15 +105,17 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season) throws ApiException {
-        List<ProviderSerieId> serieIds = tvdbIdOptional.mapToObj(tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId))
-                .message("getProviderSerieName: [%s]".formatted(tvdbId))
-                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                    LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(getProviderName(), tvdbId));
-                    return List.of();
-                })
-                .execute()).orElseGet(List::of);
+    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+            throws ApiException {
+        List<ProviderSerieId> serieIds =
+                tvdbIdOptional.mapToObj(tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId))
+                        .message("getProviderSerieName: [%s]".formatted(tvdbId))
+                        .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                        .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
+                            LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(getProviderName(), tvdbId));
+                            return List.of();
+                        })
+                        .execute()).orElseGet(List::of);
 
         if (serieIds.isEmpty()) {
             serieIds = new ExecuteCall<>(() -> getApi().getProviderSerieName(serieName))
@@ -122,7 +129,8 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
         }
         return serieIds.stream()
                 .sorted(Comparator
-                        .comparing(n -> !serieName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
+                        .comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
+                                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
                 .toList();
     }
 
@@ -155,7 +163,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
         }
     }
 
-    public static class ExecuteCall<T> extends AbstractAdapter.ExecuteCall<T, ApiException, ExecuteCall<T>> {
+    public static class ExecuteCall<T> extends AbstractAdapter.ExecuteCall<T, ApiException> {
 
         public ExecuteCall(ThrowingSupplier<T, ApiException> supplier) {
             super(supplier);
@@ -175,7 +183,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
 
         @Override
         public ExecuteCall<T> handleException(Supplier<T> suppliers) {
-            return super.handleException(e -> true, suppliers);
+            return super.handleException(_ -> true, suppliers);
         }
     }
 }

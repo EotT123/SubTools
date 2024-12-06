@@ -2,15 +2,13 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.m
 
 import java.io.Serial;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 
-@Getter
 public class OpensubtitleSerieId extends ProviderSerieId {
 
-    @Serial
-    private static final long serialVersionUID = 5858875211782260667L;
-    private final String year;
+    @Serial private static final long serialVersionUID = 5858875211782260667L;
+    @val String year;
 
     public OpensubtitleSerieId(String name, int id, String year) {
         super(name, String.valueOf(id));

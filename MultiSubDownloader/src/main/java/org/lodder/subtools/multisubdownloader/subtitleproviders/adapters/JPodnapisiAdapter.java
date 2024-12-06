@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.JPodnapisiApi;
@@ -27,8 +26,8 @@ import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Getter
-public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
+public class JPodnapisiAdapter
+        extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPodnapisiAdapter.class);
 
@@ -72,25 +71,31 @@ public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescript
     }
 
     @Override
-    public List<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithName(String name, int year, Language language) throws PodnapisiException {
+    public List<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithName(String name, int year, Language language)
+            throws PodnapisiException {
         return getApi().getMovieSubtitles(name, year, 0, 0, language);
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<PodnapisiSubtitleDescriptor> subtitles, Language language) {
+    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<PodnapisiSubtitleDescriptor> subtitles,
+            Language language) {
         return buildListSubtitles(language, subtitles);
     }
 
     @Override
-    public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language) throws PodnapisiException {
+    public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
+            throws PodnapisiException {
         return getProviderSerieId(tvRelease)
                 .map(providerSerieId -> tvRelease.episodeNumbers.stream()
                         .flatMap(episode -> {
                             try {
-                                return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
+                                return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language)
+                                        .stream();
                             } catch (PodnapisiException e) {
-                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(getSubtitleSource().getName(),
-                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season, episode),
+                                LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(
+                                        getSubtitleSource().getName(),
+                                        TvRelease.formatName(providerSerieId.getProviderName(), tvRelease.season,
+                                                episode),
                                         e.getMessage()), e);
                                 return Stream.empty();
                             }
@@ -100,7 +105,8 @@ public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescript
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<PodnapisiSubtitleDescriptor> subtitles, Language language) {
+    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<PodnapisiSubtitleDescriptor> subtitles,
+            Language language) {
         return buildListSubtitles(language, subtitles);
     }
 
@@ -121,7 +127,8 @@ public class JPodnapisiAdapter extends AbstractAdapter<PodnapisiSubtitleDescript
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season) throws PodnapisiException {
+    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+            throws PodnapisiException {
         return getApi().getPodnapisiShowName(serieName).stream().toList();
     }
 

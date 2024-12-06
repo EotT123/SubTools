@@ -32,7 +32,7 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public class JAddic7edApi extends Html implements SubtitleApi {
 
     private static final long RATEDURATION = 1; // seconds
-    
+
     private static final String DOMAIN = "https://www.addic7ed.com";
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - [0-9]+x[0-9]+ - (.*)");
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: ([0-9]+).([0-9])+");
@@ -69,8 +69,10 @@ public class JAddic7edApi extends Html implements SubtitleApi {
         }
         try {
             List<ProviderSerieId> providerSerieIds = getContent(DOMAIN + "/allshows/" + serieName.split(" ")[0])
-                    .map(doc -> doc.select("table.tabel90 td a").stream()
-                            .map(element -> new ProviderSerieId(element.text(), element.attr("href").split("/")[2])).toList())
+                    .map(doc -> doc.select("table.tabel90 td a")
+                            .stream()
+                            .map(element -> new ProviderSerieId(element.text(), element.attr("href").split("/")[2]))
+                            .toList())
                     .orElseGet(List::of);
 
             String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
@@ -96,11 +98,13 @@ public class JAddic7edApi extends Html implements SubtitleApi {
     // .toList())
     // .orElseGet(List::of));
 
-    public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode, Language language)
+    public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode,
+            Language language)
             throws Addic7edException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), addic7edSerieMapping.getProviderId(), season, episode,
+                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(),
+                        addic7edSerieMapping.getProviderId(), season, episode,
                         language))
                 .collectionSupplier(Addic7edSubtitleDescriptor.class, () -> {
                     List<LanguageId> languageIds = LanguageId.forLanguage(language);
@@ -109,7 +113,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                             URLEncoder.encode(addic7edSerieMapping.getProviderName().replace(" ", "_"), UTF_8),
                             season,
                             episode,
-                            languageIds.size() == 1 ? languageIds.first.getId() : LanguageId.ALL.getId());
+                            languageIds.size() == 1 ? languageIds.first.id : LanguageId.ALL.id);
 
                     Optional<Document> doc = getContent(url);
                     if (doc.isEmpty()) {

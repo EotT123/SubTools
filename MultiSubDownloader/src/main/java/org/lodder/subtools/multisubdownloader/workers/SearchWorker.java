@@ -28,7 +28,7 @@ public class SearchWorker extends Thread {
 
     @Override
     public void run() {
-        Language language = this.scheduler.getLanguage();
+        Language language = this.scheduler.language;
         this.busy = false;
         try {
             while (!this.isInterrupted()) {
@@ -48,7 +48,8 @@ public class SearchWorker extends Thread {
                 this.subtitles = Set.copyOf(subtitles);
 
                 this.busy = false;
-                LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.getName(), subtitles.size(), release);
+                LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.getName(), subtitles.size(),
+                        release);
 
                 if (!this.isInterrupted()) {
                     this.scheduler.onCompleted(this);

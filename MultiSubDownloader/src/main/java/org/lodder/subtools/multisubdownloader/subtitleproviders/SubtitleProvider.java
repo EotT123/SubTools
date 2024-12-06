@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders;
 import java.util.Optional;
 import java.util.Set;
 
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -15,6 +16,9 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.LoggerFactory;
 
 public interface SubtitleProvider {
+
+    @val String providerName;
+    @val Manager manager;
 
     Set<Subtitle> searchSubtitles(TvRelease tvRelease, Language language);
 
@@ -44,7 +48,8 @@ public interface SubtitleProvider {
                 return this.searchSubtitles(tvRelease, language);
             }
         } catch (Exception e) {
-            LoggerFactory.getLogger(SubtitleProvider.class).error("Error in %s API: %s".formatted(getName(), e.getMessage()), e);
+            LoggerFactory.getLogger(SubtitleProvider.class)
+                    .error("Error in %s API: %s".formatted(getName(), e.getMessage()), e);
         }
         return Set.of();
     }
@@ -56,9 +61,6 @@ public interface SubtitleProvider {
                 .clear();
     }
 
-    String getProviderName();
-
-    Manager getManager();
 
     <X extends Exception> Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X;
 

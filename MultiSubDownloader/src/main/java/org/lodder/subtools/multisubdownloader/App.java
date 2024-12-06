@@ -70,8 +70,8 @@ public class App {
         final Container app = new Container();
         final Manager manager = createManager(!line.hasCliOption(CliOption.NO_GUI));
         prefCtrl = new SettingsControl(manager);
-        Messages.language = prefCtrl.getSettings().language;
-        Bootstrapper bootstrapper = new Bootstrapper(app, prefCtrl.getSettings(), preferences, manager);
+        Messages.language = prefCtrl.settings.language;
+        Bootstrapper bootstrapper = new Bootstrapper(app, prefCtrl.settings, preferences, manager);
 
         if (line.hasCliOption(CliOption.TRACE)) {
             setLogLevel(Level.ALL);
@@ -80,7 +80,7 @@ public class App {
         }
 
         if (line.hasCliOption(CliOption.NO_GUI)) {
-            bootstrapper.initialize(new UserInteractionHandlerCLI(prefCtrl.getSettings()));
+            bootstrapper.initialize(new UserInteractionHandlerCLI(prefCtrl.settings));
             CLI cmd = new CLI(prefCtrl, app);
 
             /* Defined here so there is output on console */
@@ -101,7 +101,7 @@ public class App {
             /* Defined here so there is output in the splash */
             importPreferences(line);
 
-            bootstrapper.initialize(new UserInteractionHandlerGUI(prefCtrl.getSettings(), null));
+            bootstrapper.initialize(new UserInteractionHandlerGUI(prefCtrl.settings, null));
             EventQueue.invokeLater(() -> {
                 try {
                     JFrame window = new GUI(prefCtrl, app);
@@ -115,9 +115,10 @@ public class App {
         }
         new Thread(() -> {
             SubtitleProviderStore subtitleProviderStore = (SubtitleProviderStore) app.make("SubtitleProviderStore");
-            List<String> providerNames = subtitleProviderStore.getAllProviders().stream().map(SubtitleProvider::getProviderName)
-                    .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
-                    .map(providerName -> providerName + "-").toList();
+            List<String> providerNames =
+                    subtitleProviderStore.getAllProviders().stream().map(SubtitleProvider::getProviderName)
+                            .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
+                            .map(providerName -> providerName + "-").toList();
             manager.clearExpiredCacheBuilder()
                     .cacheType(CacheType.DISK)
                     .keyFilter((String key) -> providerNames.stream().noneMatch(key::startsWith))
@@ -127,7 +128,8 @@ public class App {
     }
 
     private static void setLogLevel(Level level) {
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        ch.qos.logback.classic.Logger root =
+                (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(level);
     }
 
@@ -148,7 +150,8 @@ public class App {
     public static Options getCLIOptions() {
         Options options = new Options();
         Arrays.stream(CliOption.values()).forEach(
-                cliOption -> options.addOption(cliOption.getValue(), cliOption.getLongValue(), cliOption.isHasArg(), cliOption.getDescription()));
+                cliOption -> options.addOption(cliOption.value, cliOption.longValue, cliOption.hasArg,
+                        cliOption.description));
         return options;
     }
 

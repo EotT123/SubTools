@@ -56,13 +56,13 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
 
     private ColumnDisplayer<Subtitle> createSubtitleDisplayer(SubtitleTableColumnName column,
             Function<Subtitle, Object> toStringMapper) {
-        return new ColumnDisplayer<>(column.getColumnName(), (Subtitle s) -> String.valueOf(toStringMapper.apply(s)));
+        return new ColumnDisplayer<>(column.columnName, subtitle -> String.valueOf(toStringMapper.apply(subtitle)));
     }
 
     private TableDisplayer<Subtitle> createTableDisplayer() {
         return new TableDisplayer<>(Stream.of(SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER,
                         HEARINGIMPAIRED)
-                .map(stcn -> createSubtitleDisplayer(stcn, stcn.getValueFunction())).toList());
+                .map(stcn -> createSubtitleDisplayer(stcn, stcn.valueFunction)).toList());
     }
 
     @Override
