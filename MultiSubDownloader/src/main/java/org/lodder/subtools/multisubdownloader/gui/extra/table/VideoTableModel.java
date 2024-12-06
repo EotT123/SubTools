@@ -201,10 +201,6 @@ public class VideoTableModel extends DefaultTableModel {
         updateTable();
     }
 
-    public boolean isShowOnlyFound() {
-        return this.showOnlyFound;
-    }
-
     public void executedSynchronized(Runnable runnable) {
         synchronized (this) {
             runnable.run();

@@ -1,7 +1,5 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
-import java.util.Arrays;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.Messages;
@@ -24,7 +22,7 @@ public enum LibraryOtherFileActionType {
 
     @Deprecated(since = "Settings version 2")
     public static LibraryOtherFileActionType fromString(String description) {
-        return Arrays.stream(LibraryOtherFileActionType.values())
+        return LibraryOtherFileActionType.values().stream()
                 .filter(v -> description.equalsIgnoreCase(v.toString())).findAny()
                 .orElse(LibraryOtherFileActionType.NOTHING);
     }

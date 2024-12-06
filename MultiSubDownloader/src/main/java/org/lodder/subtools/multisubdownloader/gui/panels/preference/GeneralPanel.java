@@ -59,18 +59,23 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             }
 
             {
-                new JLabel(Messages.getString("PreferenceDialog.DefaultIncomingFolder")).addTo(settingsPanel, "aligny center, span 1 2");
+                new JLabel(Messages.getString("PreferenceDialog.DefaultIncomingFolder")).addTo(settingsPanel,
+                        "aligny center, span 1 2");
 
                 new JScrollPane().addTo(settingsPanel, "growx, span, wrap")
-                        .setViewportView(this.defaultIncomingFoldersList = JListWithImages.createForType(Path.class).distinctValues().build());
+                        .setViewportView(this.defaultIncomingFoldersList =
+                                JListWithImages.createForType(Path.class).distinctValues().build());
 
                 new JButton(Messages.getString("PreferenceDialog.AddFolder"))
                         .withActionListener(
                                 () -> MemoryFolderChooser.getInstance()
-                                        .selectDirectory(settingsPanel, Messages.getString("PreferenceDialog.SelectFolder"))
+                                        .selectDirectory(settingsPanel,
+                                                Messages.getString("PreferenceDialog.SelectFolder"))
                                         .map(Path::toAbsolutePath)
                                         .filter(path -> !defaultIncomingFoldersList.contains(path))
-                                        .ifPresent(path -> defaultIncomingFoldersList.addItem(PathMatchType.FOLDER.getImage(), path)))
+                                        .ifPresent(
+                                                path -> defaultIncomingFoldersList.addItem(PathMatchType.FOLDER.image,
+                                                        path)))
                         .addTo(settingsPanel, "span, split 2");
 
                 new JButton(Messages.getString("PreferenceDialog.DeleteFolder"))
@@ -78,20 +83,25 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                         .addTo(settingsPanel, "wrap, gapbottom 10px");
             }
             {
-                new JLabel(Messages.getString("PreferenceDialog.ExcludeList")).addTo(settingsPanel, "aligny center, span 1 2");
+                new JLabel(Messages.getString("PreferenceDialog.ExcludeList")).addTo(settingsPanel,
+                        "aligny center, span 1 2");
 
                 new JScrollPane().addTo(settingsPanel, "growx, span, wrap")
-                        .withViewPort(this.excludeList = JListWithImages.createForType(PathOrRegex.class).distinctValues().build());
+                        .withViewPort(this.excludeList =
+                                JListWithImages.createForType(PathOrRegex.class).distinctValues().build());
 
                 Consumer<PathMatchType> addExcludeItemConsumer = type -> {
                     if (type == PathMatchType.FOLDER) {
-                        MemoryFolderChooser.getInstance().selectDirectory(settingsPanel, Messages.getString("PreferenceDialog.SelectExcludeFolder"))
-                                .map(Path::toAbsolutePath).map(PathOrRegex::new)
-                                .ifPresent(pathOrRegex -> excludeList.addItem(pathOrRegex.getImage(), pathOrRegex));
+                        MemoryFolderChooser.getInstance()
+                                .selectDirectory(settingsPanel,
+                                        Messages.getString("PreferenceDialog.SelectExcludeFolder"))
+                                .map(Path::toAbsolutePath)
+                                .map(PathOrRegex::new)
+                                .ifPresent(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
                     } else if (type == PathMatchType.REGEX) {
                         String regex = JOptionPane.showInputDialog(Messages.getString("PreferenceDialog.EnterRegex"));
                         if (StringUtils.isNotBlank(regex)) {
-                            excludeList.addItem(PathMatchType.REGEX.getImage(), new PathOrRegex(regex));
+                            excludeList.addItem(PathMatchType.REGEX.image, new PathOrRegex(regex));
                         }
                     }
                 };
@@ -130,26 +140,29 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             JPanel proxyPanel = TitlePanel.title(Messages.getString("PreferenceDialog.ConfigureProxy"))
                     .padding(0).paddingLeft(20).fillContents(false).addTo(this, "span, grow");
 
-            PanelCheckBox.checkbox(this.chkUseProxy = new JCheckBox(Messages.getString("PreferenceDialog.UseProxyServer")))
+            PanelCheckBox.checkbox(
+                            this.chkUseProxy = new JCheckBox(Messages.getString("PreferenceDialog.UseProxyServer")))
                     .panelOnSameLine().panelLayout(new MigLayout("insets 0, fill")).leftGap(0).addTo(proxyPanel)
                     .addComponent(new JLabel(Messages.getString("PreferenceDialog.Hostname")))
-                    .addComponent("wrap", this.txtProxyHost = MyTextFieldString.builder().requireValue().build().withColumns(30))
+                    .addComponent("wrap",
+                            this.txtProxyHost = MyTextFieldString.builder().requireValue().build().withColumns(30))
                     .addComponent(new JLabel(Messages.getString("PreferenceDialog.Port")))
-                    .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().withColumns(5));
+                    .addComponent(
+                            this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().withColumns(5));
         }
 
         loadPreferenceSettings();
     }
 
     public void loadPreferenceSettings() {
-        cbxLanguage.setSelectedItem(settingsCtrl.getSettings().language);
-        defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.getImage(), settingsCtrl.getSettings().defaultIncomingFolders);
-        settingsCtrl.getSettings().excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.getImage(), pathOrRegex));
-        cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.getSettings().updateCheckPeriod);
-        cbxUpdateType.setSelectedItem(settingsCtrl.getSettings().updateType);
-        chkUseProxy.setSelected(settingsCtrl.getSettings().generalProxyEnabled);
-        txtProxyHost.setText(settingsCtrl.getSettings().generalProxyHost);
-        txtProxyPort.setObject(settingsCtrl.getSettings().generalProxyPort);
+        cbxLanguage.setSelectedItem(settingsCtrl.settings.language);
+        defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.image, settingsCtrl.settings.defaultIncomingFolders);
+        settingsCtrl.settings.excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
+        cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.settings.updateCheckPeriod);
+        cbxUpdateType.setSelectedItem(settingsCtrl.settings.updateType);
+        chkUseProxy.setSelected(settingsCtrl.settings.generalProxyEnabled);
+        txtProxyHost.setText(settingsCtrl.settings.generalProxyHost);
+        txtProxyPort.setObject(settingsCtrl.settings.generalProxyPort);
     }
 
     public void savePreferenceSettings() {
@@ -158,15 +171,16 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             gui.redraw();
         }
         List<Path> defaultIncomingFolders = defaultIncomingFoldersList.stream().map(LabelPanel::getObject).toList();
-        List<PathOrRegex> exclList = excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().getValue())).toList();
-        settingsCtrl.getSettings().language = cbxLanguage.getSelectedItem();
-        settingsCtrl.getSettings().defaultIncomingFolders = defaultIncomingFolders;
-        settingsCtrl.getSettings().replaceExcludeList(exclList);
-        settingsCtrl.getSettings().updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedItem();
-        settingsCtrl.getSettings().updateType = cbxUpdateType.getSelectedItem();
-        settingsCtrl.getSettings().generalProxyEnabled = chkUseProxy.isSelected();
-        settingsCtrl.getSettings().generalProxyHost = txtProxyHost.getText();
-        settingsCtrl.getSettings().generalProxyPort = txtProxyPort.getOptionalObject().orElse(80);
+        List<PathOrRegex> exclList =
+                excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().value)).toList();
+        settingsCtrl.settings.language = cbxLanguage.getSelectedItem();
+        settingsCtrl.settings.defaultIncomingFolders = defaultIncomingFolders;
+        settingsCtrl.settings.replaceExcludeList(exclList);
+        settingsCtrl.settings.updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedItem();
+        settingsCtrl.settings.updateType = cbxUpdateType.getSelectedItem();
+        settingsCtrl.settings.generalProxyEnabled = chkUseProxy.isSelected();
+        settingsCtrl.settings.generalProxyHost = txtProxyHost.getText();
+        settingsCtrl.settings.generalProxyPort = txtProxyPort.getOptionalObject().orElse(80);
     }
 
     @Override

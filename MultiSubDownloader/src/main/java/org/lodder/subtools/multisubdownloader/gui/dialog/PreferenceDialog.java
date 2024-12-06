@@ -22,8 +22,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class PreferenceDialog extends MultiSubDialog {
 
-    @Serial
-    private static final long serialVersionUID = -4910124272966075979L;
+    @Serial private static final long serialVersionUID = -4910124272966075979L;
 
     private final SettingsControl settingsCtrl;
     private final Emitter eventEmitter;
@@ -33,8 +32,8 @@ public class PreferenceDialog extends MultiSubDialog {
     private final OptionsPanel pnlOptions;
     private final SerieProvidersPanel pnlSerieSources;
 
-    public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Emitter eventEmitter,
-            Manager manager, UserInteractionHandler userInteractionHandler) {
+    public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Emitter eventEmitter, Manager manager,
+            UserInteractionHandler userInteractionHandler) {
         super(gui, Messages.getString("PreferenceDialog.Title"), true);
         this.settingsCtrl = settingsCtrl;
         this.eventEmitter = eventEmitter;
@@ -53,10 +52,12 @@ public class PreferenceDialog extends MultiSubDialog {
             tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
             tabbedPane.addChangeListener(l -> {
                 if (tabbedPane.getSelectedIndex() != selectedIndex.get()) {
-                    PreferencePanelIntf sourcePanel = (PreferencePanelIntf) tabbedPane.getComponentAt(selectedIndex.get());
+                    PreferencePanelIntf sourcePanel =
+                            (PreferencePanelIntf) tabbedPane.getComponentAt(selectedIndex.get());
                     if (!sourcePanel.hasValidSettings()) {
                         tabbedPane.setSelectedIndex(selectedIndex.get());
-                        JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"), "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"),
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         selectedIndex.set(tabbedPane.getSelectedIndex());
                     }
@@ -68,11 +69,12 @@ public class PreferenceDialog extends MultiSubDialog {
             tabbedPane.addTab(Messages.getString("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
 
             this.pnlEpisodeLibrary =
-                    new EpisodeLibraryPanel(settingsCtrl.getSettings().episodeLibrarySettings, manager, false, userInteractionHandler);
+                    new EpisodeLibraryPanel(settingsCtrl.settings.episodeLibrarySettings, manager, false,
+                            userInteractionHandler);
             tabbedPane.addTab(Messages.getString("PreferenceDialog.SerieLibrary"), null, pnlEpisodeLibrary, null);
 
-            this.pnlMovieLibrary =
-                    new MovieLibraryPanel(settingsCtrl.getSettings().movieLibrarySettings, manager, false, userInteractionHandler);
+            this.pnlMovieLibrary = new MovieLibraryPanel(settingsCtrl.settings.movieLibrarySettings, manager, false,
+                    userInteractionHandler);
             tabbedPane.addTab(Messages.getString("PreferenceDialog.MovieLibrary"), null, pnlMovieLibrary, null);
 
             this.pnlOptions = new OptionsPanel(settingsCtrl);
@@ -83,25 +85,20 @@ public class PreferenceDialog extends MultiSubDialog {
         }
 
         {
-            new JPanel().layout(new FlowLayout(FlowLayout.RIGHT)).addTo(getContentPane(), BorderLayout.SOUTH)
+            new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
+                    .addTo(getContentPane(), BorderLayout.SOUTH)
+                    .addComponent(new JButton(Messages.getString("App.OK")).defaultButtonFor(getRootPane())
+                            .withActionListener(this::testAndSaveValues)
+                            .actionCommand(Messages.getString("App.OK")))
                     .addComponent(
-                            new JButton(Messages.getString("App.OK"))
-                                    .defaultButtonFor(getRootPane())
-                                    .withActionListener(this::testAndSaveValues)
-                                    .actionCommand(Messages.getString("App.OK")))
-                    .addComponent(
-                            new JButton(Messages.getString("App.Cancel"))
-                                    .withActionListener(() -> setVisible(false))
+                            new JButton(Messages.getString("App.Cancel")).withActionListener(() -> setVisible(false))
                                     .actionCommand("Cancel"));
         }
     }
 
     private void testAndSaveValues() {
-        if (pnlGeneral.hasValidSettings() &&
-            pnlEpisodeLibrary.hasValidSettings() &&
-            pnlMovieLibrary.hasValidSettings() &&
-            pnlOptions.hasValidSettings() &&
-            pnlSerieSources.hasValidSettings()) {
+        if (pnlGeneral.hasValidSettings() && pnlEpisodeLibrary.hasValidSettings() &&
+            pnlMovieLibrary.hasValidSettings() && pnlOptions.hasValidSettings() && pnlSerieSources.hasValidSettings()) {
             pnlGeneral.savePreferenceSettings();
             pnlEpisodeLibrary.savePreferenceSettings();
             pnlMovieLibrary.savePreferenceSettings();
@@ -111,7 +108,8 @@ public class PreferenceDialog extends MultiSubDialog {
             settingsCtrl.store();
             this.eventEmitter.fire(new Event("providers.settings.change"));
         } else {
-            JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, Messages.getString("PreferenceDialog.invalidInput"), "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }

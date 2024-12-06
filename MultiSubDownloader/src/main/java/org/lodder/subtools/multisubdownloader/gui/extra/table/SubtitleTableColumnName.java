@@ -19,15 +19,9 @@ public enum SubtitleTableColumnName implements CustomColumnName {
     RELEASEGROUP("SubtitleTableColumnName.Releasegroup", String.class, false, Subtitle::getReleaseGroup);
 
 
-    @val
-    @override
-    String columnName;
-    @val
-    @override
-    Class<?> clazz;
-    @val
-    @override
-    boolean editable;
+    @val @override String columnName;
+    @val @override Class<?> clazz;
+    @val @override boolean editable;
     @val Function<Subtitle, Object> valueFunction;
 
     SubtitleTableColumnName(String columnNameCode, Class<?> clazz, boolean editable,

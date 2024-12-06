@@ -94,13 +94,14 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
                 .addComponent(
                         new JButton(Messages.getString("App.OK"))
                                 .defaultButtonFor(getRootPane())
-                                .withActionListener(e -> {
+                                .withActionListener(_ -> {
                                     setVisible(false);
-                                    dispose(); // this is needed to dispose the dialog and return the control to the window
+                                    dispose(); // this is needed to dispose the dialog and return the control to the
+                                    // window
                                 })
                                 .withActionCommand("OK"))
                 .addComponent(new JButton(Messages.getString("App.Cancel"))
-                        .withActionListener(e -> {
+                        .withActionListener(_ -> {
                             setVisible(false);
                             txtStructure.setText(oldStructure);
                             dispose(); // this is needed to dispose the dialog and return the control to the window
@@ -115,8 +116,9 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
                     Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"),
                     userInteractionHandler);
         } else if (videoType == VideoType.MOVIE) {
-            movieRelease = (MovieRelease) releaseFactory.createRelease(Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED"),
-                    userInteractionHandler);
+            movieRelease =
+                    (MovieRelease) releaseFactory.createRelease(Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED"),
+                            userInteractionHandler);
         }
     }
 
@@ -125,8 +127,8 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     private void addTag(StructureTag structureTag) {
-        new JLabel(structureTag.getLabel())
-                .withToolTipText(structureTag.getDescription())
+        new JLabel(structureTag.label)
+                .withToolTipText(structureTag.description)
                 .addTo(tagPanel)
                 .withMouseListener(new InsertTag());
     }

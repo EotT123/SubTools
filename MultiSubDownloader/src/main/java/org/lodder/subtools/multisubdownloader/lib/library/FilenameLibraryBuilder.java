@@ -25,7 +25,8 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     private final Map<Language, String> languageTags;
     private final boolean rename;
 
-    private FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar, boolean includeLanguageCode,
+    private FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
+            boolean includeLanguageCode,
             Map<Language, String> languageTags, boolean useTvdb, TheTvdbAdapter tvdbAdapter, boolean rename) {
         super(useTvdb, tvdbAdapter);
         this.structure = structure;
@@ -117,7 +118,8 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
 
         @Override
         public FilenameLibraryBuilder build() {
-            return new FilenameLibraryBuilder(structure, replaceSpace, replacingSpaceChar, includeLanguageCode, languageTags, useTvdbName,
+            return new FilenameLibraryBuilder(structure, replaceSpace, replacingSpaceChar, includeLanguageCode,
+                    languageTags, useTvdbName,
                     tvdbAdapter, rename);
         }
     }
@@ -130,12 +132,16 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
                 filename = structure;
                 // order is important!
                 filename = replace(filename, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
-                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers, true);
-                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers, false);
+                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_LONG,
+                        tvRelease.episodeNumbers, true);
+                filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_SHORT,
+                        tvRelease.episodeNumbers, false);
                 filename = replace(filename, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
                 filename = replace(filename, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
-                filename = replace(filename, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
-                filename = replace(filename, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
+                filename = replace(filename, SerieStructureTag.EPISODE_LONG,
+                        formattedNumber(tvRelease.firstEpisodeNumber, true));
+                filename = replace(filename, SerieStructureTag.EPISODE_SHORT,
+                        formattedNumber(tvRelease.firstEpisodeNumber, false));
                 filename = replace(filename, SerieStructureTag.TITLE, tvRelease.title);
                 filename = replace(filename, SerieStructureTag.QUALITY, release.quality);
                 filename = replace(filename, SerieStructureTag.DESCRIPTION, release.description);
@@ -164,7 +170,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
             filename = filename.substring(0, filename.indexOf(extension)) + "-v$version.${release.extension}";
         }
         if (includeLanguageCode) {
-            String langCode = language == null ? "" : languageTags.getOrDefault(language, language.getLangCode());
+            String langCode = language == null ? "" : languageTags.getOrDefault(language, language.langCode);
             filename = changeExtension(filename, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
         } else {
             filename = changeExtension(filename, ".srt");

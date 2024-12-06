@@ -20,7 +20,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.workers.SearchHandler;
 import org.lodder.subtools.multisubdownloader.workers.SearchManager;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
-    @get(Protected) @NonNull Manager manager;
     @get(Protected) @NonNull Settings settings;
     @get(Protected) @NonNull SubtitleProviderStore subtitleProviderStore;
 

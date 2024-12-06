@@ -48,14 +48,14 @@ public class Addic7edServiceProvider implements ServiceProvider {
         boolean loginEnabled = false;
         String username = "";
         String password = "";
-        if (settings.isLoginAddic7edEnabled()) {
+        if (settings.loginAddic7edEnabled) {
             username = StringUtils.trim(settings.loginAddic7edUsername);
             password = StringUtils.trim(settings.loginAddic7edPassword);
             /* Protect against empty login */
             loginEnabled = !username.isEmpty() && !password.isEmpty();
         }
 
-        if (settings.isSerieSourceAddic7edProxy()) {
+        if (settings.serieSourceAddic7edProxy) {
             return new JAddic7edViaProxyAdapter(manager, userInteractionHandler);
         } else {
             return new JAddic7edAdapter(loginEnabled, username, password, preferences.getBoolean("speedy", false),

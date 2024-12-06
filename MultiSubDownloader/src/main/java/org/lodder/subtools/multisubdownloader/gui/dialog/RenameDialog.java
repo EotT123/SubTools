@@ -101,7 +101,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         setVisible(false);
         pnlLibrary.savePreferenceSettings();
         TypedRenameWorker renameWorker =
-                new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.getLibrarySettings(), videoType,
+                new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.librarySettings, videoType,
                         this.chkRecursive.isSelected(), manager, userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
         renameWorker.releaseFactory = new ReleaseFactory(settings, manager);

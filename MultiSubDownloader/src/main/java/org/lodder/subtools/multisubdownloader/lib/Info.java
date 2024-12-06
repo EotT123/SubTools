@@ -1,10 +1,12 @@
 package org.lodder.subtools.multisubdownloader.lib;
 
+import lombok.experimental.UtilityClass;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@UtilityClass
 public class Info {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Info.class);
@@ -42,7 +44,8 @@ public class Info {
             System.out.println("----- Subtitle Filtering ------");
             System.out.println(" - OptionSubtitleExactMatch : " + settings.optionSubtitleExactMatch);
             System.out.println(" - OptionSubtitleKeywordMatch : " + settings.optionSubtitleKeywordMatch);
-            System.out.println(" - OptionSubtitleExcludeHearingImpaired : " + settings.optionSubtitleExcludeHearingImpaired);
+            System.out.println(
+                    " - OptionSubtitleExcludeHearingImpaired : " + settings.optionSubtitleExcludeHearingImpaired);
             System.out.println("-------------------------------");
         } else {
             LOGGER.info("----- Subtitle Filtering ------");

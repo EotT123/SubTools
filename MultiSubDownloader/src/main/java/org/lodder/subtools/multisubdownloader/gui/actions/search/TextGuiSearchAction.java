@@ -15,7 +15,6 @@ import org.lodder.subtools.multisubdownloader.gui.panels.SearchTextInputPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -23,10 +22,6 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
-
-    public interface FileGuiSearchActionBuilderManager {
-        TextGuiSearchActionBuilderSubtitleProviderStore manager(Manager manager);
-    }
 
     public interface TextGuiSearchActionBuilderSubtitleProviderStore {
         TextGuiSearchActionBuilderGUI subtitleProviderStore(SubtitleProviderStore subtitleProviderStore);
@@ -48,7 +43,7 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
         TextGuiSearchAction build();
     }
 
-    public static FileGuiSearchActionBuilderManager createWithSettings(Settings settings) {
+    public static TextGuiSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
         return new TextGuiSearchActionBuilder(settings);
     }
 
@@ -57,11 +52,9 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
     @Accessors(chain = true, fluent = true)
     public static class TextGuiSearchActionBuilder
             implements TextGuiSearchActionBuilderBuild, TextGuiSearchActionBuilderReleaseFactory,
-            TextGuiSearchActionBuilderSearchPanel,
-            TextGuiSearchActionBuilderGUI, TextGuiSearchActionBuilderSubtitleProviderStore,
-            FileGuiSearchActionBuilderManager {
+            TextGuiSearchActionBuilderSearchPanel, TextGuiSearchActionBuilderGUI,
+            TextGuiSearchActionBuilderSubtitleProviderStore {
         private final Settings settings;
-        private Manager manager;
         private SubtitleProviderStore subtitleProviderStore;
         private GUI mainWindow;
         private SearchPanel<SearchTextInputPanel> searchPanel;
@@ -69,15 +62,13 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
 
         @Override
         public TextGuiSearchAction build() {
-            return new TextGuiSearchAction(manager, settings, subtitleProviderStore, mainWindow, searchPanel,
-                    releaseFactory);
+            return new TextGuiSearchAction(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
         }
     }
 
-    private TextGuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
-            GUI mainWindow,
+    private TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
             SearchPanel<SearchTextInputPanel> searchPanel, ReleaseFactory releaseFactory) {
-        super(manager, settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
+        super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
     }
 
     @Override
@@ -92,7 +83,7 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
         String name = getInputPanel().getReleaseName();
         VideoSearchType type = getInputPanel().getType();
 
-        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
         model.clearTable();
 
         // TODO: Redefine what a "release" is.
@@ -103,10 +94,7 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
                     .episode(getInputPanel().getEpisode())
                     .quality(getInputPanel().getQuality())
                     .build();
-            case MOVIE -> MovieRelease.builder()
-                    .name(name)
-                    .quality(getInputPanel().getQuality())
-                    .build();
+            case MOVIE -> MovieRelease.builder().name(name).quality(getInputPanel().getQuality()).build();
             default -> releaseFactory.createRelease(Path.of(name), userInteractionHandler);
         };
         return release != null ? List.of(release) : List.of();
@@ -114,12 +102,10 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
 
     @Override
     public void onFound(Release release, List<Subtitle> subtitles) {
-        VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
-        List<Subtitle> subtitlesFiltered =
-                filtering != null ?
-                        subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() :
-                        subtitles;
+        List<Subtitle> subtitlesFiltered = filtering != null ?
+                subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
         subtitlesFiltered.forEach(release::addMatchingSub);
 
         // use automatic selection to reduce the selection for the user

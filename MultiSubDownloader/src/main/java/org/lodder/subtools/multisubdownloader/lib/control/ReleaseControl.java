@@ -14,7 +14,7 @@ public abstract sealed class ReleaseControl permits MovieReleaseControl, TvRelea
 
     @get(Protected) Settings settings;
     @get(Protected) Manager manager;
-    @get(Abstract) Release videoFile;
+    @get abstract Release videoFile;
 
     ReleaseControl(Settings settings, Manager manager) {
         this.settings = settings;

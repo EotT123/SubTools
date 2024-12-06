@@ -18,7 +18,7 @@ public class CustomTable extends ZebraJTable {
 
     public int getColumnIdByName(CustomColumnName customColumnName) {
         return IntStream.range(0, this.getColumnCount())
-                .filter(i -> this.getColumnName(i).equals(customColumnName.getColumnName())).findFirst()
+                .filter(i -> this.getColumnName(i).equals(customColumnName.columnName)).findFirst()
                 .orElse(-1);
     }
 

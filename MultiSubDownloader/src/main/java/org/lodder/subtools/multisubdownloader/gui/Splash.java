@@ -14,10 +14,10 @@ public class Splash extends JWindow {
     private JProgressBar progressBar;
 
     public Splash() {
-        initialize_ui();
+        initializeUi();
     }
 
-    public void initialize_ui() {
+    public void initializeUi() {
         setBounds(100, 100, 501, 100);
         getContentPane().setLayout(new MigLayout("", "[][475px,center][]", "[][40px:n]"));
 

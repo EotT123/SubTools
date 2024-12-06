@@ -131,7 +131,7 @@ public class PanelCheckBox extends JPanel {
         public JPanel addTo(JComponent component, Object constraints) {
             PanelCheckBox panelCheckBox = build();
             component.add(panelCheckBox, constraints);
-            return panelCheckBox.getPanel();
+            return panelCheckBox.panel;
         }
 
         @Override

@@ -97,9 +97,9 @@ public class ResultPanel extends JPanel {
     }
 
     private void setupListeners() {
-        btnSelectNone.addActionListener(e -> deselectAllRows());
-        btnSelectFound.addActionListener(e -> selectRowsWithFoundSubtitles());
-        btnSelectAll.addActionListener(e -> selectAllRows());
+        btnSelectNone.addActionListener(_ -> deselectAllRows());
+        btnSelectFound.addActionListener(_ -> selectRowsWithFoundSubtitles());
+        btnSelectAll.addActionListener(_ -> selectAllRows());
     }
 
     private void createComponents() {

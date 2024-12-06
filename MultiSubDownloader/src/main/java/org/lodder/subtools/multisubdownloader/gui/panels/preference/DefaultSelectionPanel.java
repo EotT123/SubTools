@@ -28,9 +28,13 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         super(new MigLayout("fill, bottom, insets 0", "[grow][][grow][]", "[grow, bottom][grow, top]"));
         this.settingsCtrl = settingsCtrl;
 
-        unusedPatternsTable = ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUnused"), Source.class).add(this, "spany 2");
+        unusedPatternsTable =
+                ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUnused"), Source.class)
+                        .add(this, "spany 2");
         new ArrowButton(SwingConstants.EAST, 1, 10).withActionListener(this::addPattern).addTo(this);
-        usedPatternsTable = ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUsed"), Source.class).add(this, "spany 2");
+        usedPatternsTable =
+                ScrollTable.create(Messages.getString("PreferenceDialog.DefaultSelectionUsed"), Source.class)
+                        .add(this, "spany 2");
         new ArrowButton(SwingConstants.NORTH, 1, 10).withActionListener(this::moveRuleRowUp).addTo(this, "wrap");
 
         new ArrowButton(SwingConstants.WEST, 1, 10).withActionListener(this::removePattern).addTo(this, "skip");
@@ -175,13 +179,13 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
     }
 
     public void loadPreferenceSettings() {
-        Source.values().stream().filter(not(settingsCtrl.getSettings().optionsDefaultSelectionQualityList::contains))
+        Source.values().stream().filter(not(settingsCtrl.settings.optionsDefaultSelectionQualityList::contains))
                 .forEach(unusedPatternsTable::addItem);
-        settingsCtrl.getSettings().optionsDefaultSelectionQualityList.forEach(usedPatternsTable::addItem);
+        settingsCtrl.settings.optionsDefaultSelectionQualityList.forEach(usedPatternsTable::addItem);
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.getSettings().optionsDefaultSelectionQualityList = usedPatternsTable.getItems();
+        settingsCtrl.settings.optionsDefaultSelectionQualityList = usedPatternsTable.getItems();
     }
 
     @Override

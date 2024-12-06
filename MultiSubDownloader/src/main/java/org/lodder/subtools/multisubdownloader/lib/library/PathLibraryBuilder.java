@@ -24,8 +24,8 @@ public class PathLibraryBuilder extends LibraryBuilder {
     private final Path libraryFolder;
     private final boolean move;
 
-    private PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar, boolean useTvdb, TheTvdbAdapter tvdbAdapter,
-            Path libraryFolder, boolean move) {
+    private PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar, boolean useTvdb,
+            TheTvdbAdapter tvdbAdapter, Path libraryFolder, boolean move) {
         super(useTvdb, tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
@@ -34,7 +34,8 @@ public class PathLibraryBuilder extends LibraryBuilder {
         this.move = move;
     }
 
-    public static PathLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager, UserInteractionHandler userInteractionHandler) {
+    public static PathLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
+            UserInteractionHandler userInteractionHandler) {
         return PathLibraryBuilder.builder()
                 .structure(librarySettings.getLibraryFolderStructure())
                 .replaceSpace(librarySettings.isLibraryFolderReplaceSpace())
@@ -84,14 +85,10 @@ public class PathLibraryBuilder extends LibraryBuilder {
 
     @Setter
     @Accessors(chain = true, fluent = true)
-    public static class PathLibraryBuilderBuilder implements
-            PathLibraryBuilderStructureIntf,
-            PathLibraryBuilderReplaceSpaceIntf,
-            PathLibraryBuilderReplaceSpaceCharIntf,
-            PathLibraryBuilderUseTvdbNameIntf,
-            PathLibraryBuilderTvdbAdapterIntf,
-            PathLibraryBuilderLibraryFolderIntf,
-            PathLibraryBuilderMoveIntf,
+    public static class PathLibraryBuilderBuilder
+            implements PathLibraryBuilderStructureIntf, PathLibraryBuilderReplaceSpaceIntf,
+            PathLibraryBuilderReplaceSpaceCharIntf, PathLibraryBuilderUseTvdbNameIntf,
+            PathLibraryBuilderTvdbAdapterIntf, PathLibraryBuilderLibraryFolderIntf, PathLibraryBuilderMoveIntf,
             PathLibraryBuilderBuildIntf {
         private String structure;
 
@@ -107,21 +104,18 @@ public class PathLibraryBuilder extends LibraryBuilder {
 
         @Override
         public PathLibraryBuilder build() {
-            return new PathLibraryBuilder(structure, replaceSpace, replacingSpaceChar, useTvdbName, tvdbAdapter, libraryFolder, move);
+            return new PathLibraryBuilder(structure, replaceSpace, replacingSpaceChar, useTvdbName, tvdbAdapter,
+                    libraryFolder, move);
         }
     }
 
     @Override
     public Path build(Release release) {
         if (move) {
-            Path subpath;
-            if (release instanceof TvRelease tvRelease) {
-                subpath = buildEpisode(tvRelease);
-            } else if (release instanceof MovieRelease movieRelease) {
-                subpath = buildMovie(movieRelease);
-            } else {
-                subpath = Path.of("");
-            }
+            Path subpath = switch (release) {
+                case TvRelease tvRelease -> buildEpisode(tvRelease);
+                case MovieRelease movieRelease -> buildMovie(movieRelease);
+            };
             return libraryFolder.resolve(subpath);
         } else {
             return release.getPath();
@@ -131,10 +125,12 @@ public class PathLibraryBuilder extends LibraryBuilder {
     private Path buildEpisode(TvRelease tvRelease) {
         String folder = structure;
 
-        folder = folder.replace(SerieStructureTag.SHOW_NAME.getLabel(), getShowName(tvRelease.name)).removeIllegalWindowsChars();
+        folder = folder.replace(SerieStructureTag.SHOW_NAME.label, getShowName(tvRelease.name))
+                .removeIllegalWindowsChars();
         // order is important!
         folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers, true);
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers, false);
+        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers,
+                false);
         folder = replace(folder, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
         folder = replace(folder, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
         folder = replace(folder, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
@@ -146,7 +142,7 @@ public class PathLibraryBuilder extends LibraryBuilder {
             folder = folder.replace(' ', replacingSpaceChar);
         }
         folder = folder.trim();
-        return Paths.get("", folder.split(FolderStructureTag.SEPARATOR.getLabel()));
+        return Paths.get("", folder.split(FolderStructureTag.SEPARATOR.label));
     }
 
     private Path buildMovie(MovieRelease movieRelease) {
@@ -159,6 +155,6 @@ public class PathLibraryBuilder extends LibraryBuilder {
             folder = folder.replace(' ', replacingSpaceChar);
         }
         folder = folder.trim();
-        return Paths.get("", folder.split(FolderStructureTag.SEPARATOR.getLabel()));
+        return Paths.get("", folder.split(FolderStructureTag.SEPARATOR.label));
     }
 }

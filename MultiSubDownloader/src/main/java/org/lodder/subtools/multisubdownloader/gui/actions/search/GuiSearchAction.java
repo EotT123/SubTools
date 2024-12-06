@@ -20,7 +20,6 @@ import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
@@ -34,9 +33,9 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
     @get(Protected) @override SearchProgressListener searchProgressListener;
     @get(Protected) @override UserInteractionHandlerGUI userInteractionHandler;
 
-    GuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
+    GuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore,
             GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
-        super(manager, settings, subtitleProviderStore);
+        super(settings, subtitleProviderStore);
         this.mainWindow = mainWindow;
         this.searchPanel = searchPanel;
         this.filtering = new SubtitleFiltering(settings);

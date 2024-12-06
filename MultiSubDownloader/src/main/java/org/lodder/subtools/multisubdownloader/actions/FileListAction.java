@@ -131,8 +131,8 @@ public class FileListAction {
             String subtitleExtensionWithDot = "." + SUBTITLE_EXTENSION;
 
             Set<String> langCodes = new HashSet<>();
-            langCodes.add(language.getLangCode());
-            langCodes.addAll(language.getLangCodesOther());
+            langCodes.add(language.langCode);
+            langCodes.addAll(language.langCodesOther);
             String customLangCode = settings.episodeLibrarySettings.getLangCodeMap().get(language);
             if (!StringUtils.isBlank(customLangCode)) {
                 langCodes.add(customLangCode);

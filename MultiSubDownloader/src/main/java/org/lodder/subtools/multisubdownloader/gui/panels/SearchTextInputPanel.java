@@ -43,7 +43,7 @@ public class SearchTextInputPanel extends InputPanel {
     }
 
     private void setupListeners() {
-        cbxVideoType.addItemListener(arg0 -> videoTypeChanged());
+        cbxVideoType.addItemListener(_ -> videoTypeChanged());
     }
 
     private void createComponents() {

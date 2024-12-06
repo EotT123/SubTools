@@ -91,7 +91,8 @@ public class CLI {
             try {
                 this.download(release);
             } catch (Exception e) {
-                LOGGER.error("Error while downloading subtitle for ${release.releaseDescription} (%${e.getMessage()})", e);
+                LOGGER.error("Error while downloading subtitle for ${release.releaseDescription} (%${e.getMessage()})",
+                        e);
             }
         }
     }
@@ -100,7 +101,6 @@ public class CLI {
         try {
             CliSearchAction
                     .createWithSettings(settings)
-                    .manager(manager)
                     .subtitleProviderStore((SubtitleProviderStore) app.make("SubtitleProviderStore"))
                     .indexingProgressListener(new CLIFileIndexerProgress().verbose(verboseProgress))
                     .searchProgressListener(new CLISearchProgress().verbose(verboseProgress))
@@ -138,7 +138,9 @@ public class CLI {
                 try {
                     downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
                 } catch (IOException | ManagerException e) {
-                    LOGGER.error("Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})", e);
+                    LOGGER.error(
+                            "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})",
+                            e);
                 }
             });
         }
@@ -155,7 +157,9 @@ public class CLI {
     private Language getLanguage(CommandLine line) throws CliException {
         if (line.hasCliOption(CliOption.LANGUAGE)) {
             String languageString = line.getCliOptionValue(CliOption.LANGUAGE);
-            return Arrays.stream(Language.values()).filter(lang -> lang.name().equalsIgnoreCase(languageString)).findAny()
+            return Arrays.stream(Language.values())
+                    .filter(lang -> lang.name().equalsIgnoreCase(languageString))
+                    .findAny()
                     .orElseThrow(() -> new CliException(Messages.getString("App.NoValidLanguage")));
         } else {
             return Language.ENGLISH;

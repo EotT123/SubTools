@@ -29,12 +29,12 @@ public enum SearchColumnName implements CustomColumnName {
                     .collect(Collectors.toMap(SearchColumnName::getColumnName, Function.identity()));
 
     @val @override String columnName;
-    @val @override Class<?> c;
+    @val @override Class<?> clazz;
     @val @override boolean editable;
 
-    SearchColumnName(String columnNameCode, Class<?> c, boolean editable) {
+    SearchColumnName(String columnNameCode, Class<?> clazz, boolean editable) {
         this.columnName = Messages.getString(columnNameCode);
-        this.c = c;
+        this.clazz = clazz;
         this.editable = editable;
     }
 

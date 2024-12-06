@@ -24,12 +24,13 @@ public abstract class LibraryBuilder {
     }
 
     protected String replace(String structure, StructureTag tag, String value) {
-        return structure.replace(tag.getLabel(), value);
+        return structure.replace(tag.label, value);
     }
 
-    protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers, boolean leadingZero) {
-        if (structure.contains(tag.getLabel())) {
-            String afterLabel = StringUtils.substringAfter(structure, tag.getLabel());
+    protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers,
+            boolean leadingZero) {
+        if (structure.contains(tag.label)) {
+            String afterLabel = StringUtils.substringAfter(structure, tag.label);
             String separator = StringUtils.isNotEmpty(afterLabel) ? afterLabel.substring(0, 1) : "";
             if ("%".equals(separator)) {
                 separator = "";
@@ -37,7 +38,7 @@ public abstract class LibraryBuilder {
             String formattedEpisodeNumber = episodeNumbers.stream()
                     .map(episode -> formattedNumber(episode, leadingZero))
                     .collect(Collectors.joining(separator));
-            return structure.replace(tag.getLabel(), formattedEpisodeNumber);
+            return structure.replace(tag.label, formattedEpisodeNumber);
         }
         return structure;
 

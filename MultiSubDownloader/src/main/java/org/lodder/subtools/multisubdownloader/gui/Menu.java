@@ -205,7 +205,7 @@ public class Menu extends JMenuBar {
     }
 
     public Menu withAboutAction(Runnable aboutAction) {
-        addActionListener(mntmAbout, arg -> aboutAction.run());
+        addActionListener(mntmAbout, _ -> aboutAction.run());
         return this;
     }
 
@@ -250,7 +250,7 @@ public class Menu extends JMenuBar {
     }
 
     private void addActionListener(JMenuItem menuItem, Runnable actionListener) {
-        addActionListener(menuItem, arg -> actionListener.run());
+        addActionListener(menuItem, _ -> actionListener.run());
     }
 
     private void addActionListener(JMenuItem menuItem, ActionListener actionListener) {

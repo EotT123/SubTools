@@ -28,7 +28,6 @@ import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
@@ -50,10 +49,6 @@ public class CliSearchAction extends SearchAction {
     @get @override @NonNull Language language;
     @get(Protected) @override @NonNull IndexingProgressListener indexingProgressListener;
     @get(Protected) @override @NonNull SearchProgressListener searchProgressListener;
-
-    public interface CliSearchActionBuilderManager {
-        CliSearchActionBuilderSubtitleProviderStore manager(Manager manager);
-    }
 
     public interface CliSearchActionBuilderSubtitleProviderStore {
         CliSearchActionBuilderIndexingProgressListener subtitleProviderStore(
@@ -101,7 +96,7 @@ public class CliSearchAction extends SearchAction {
         CliSearchAction build() throws SearchSetupException;
     }
 
-    public static CliSearchActionBuilderManager createWithSettings(Settings settings) {
+    public static CliSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
         return new CliSearchActionBuilder(settings);
     }
 
@@ -112,10 +107,8 @@ public class CliSearchAction extends SearchAction {
             implements CliSearchActionBuilderSearchProgressListener, CliSearchActionBuilderIndexingProgressListener,
             CliSearchActionBuilderSubtitleProviderStore, CliSearchActionBuilderCLI,
             CliSearchActionBuilderFileListAction, CliSearchActionBuilderLanguage, CliSearchActionBuilderReleaseFactory,
-            CliSearchActionBuilderFiltering, CliSearchActionBuilderFolders, CliSearchActionBuilderOther,
-            CliSearchActionBuilderManager {
+            CliSearchActionBuilderFiltering, CliSearchActionBuilderFolders, CliSearchActionBuilderOther {
         private final Settings settings;
-        private Manager manager;
         private SubtitleProviderStore subtitleProviderStore;
         private IndexingProgressListener indexingProgressListener;
         private SearchProgressListener searchProgressListener;
@@ -130,18 +123,18 @@ public class CliSearchAction extends SearchAction {
 
         @Override
         public CliSearchAction build() throws SearchSetupException {
-            return new CliSearchAction(manager, settings, subtitleProviderStore, indexingProgressListener,
+            return new CliSearchAction(settings, subtitleProviderStore, indexingProgressListener,
                     searchProgressListener, cli, fileListAction, language, releaseFactory, filtering, folders,
                     overwriteSubtitles, recursive);
         }
     }
 
-    private CliSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
+    private CliSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore,
             IndexingProgressListener indexingProgressListener, SearchProgressListener searchProgressListener, CLI cli,
             FileListAction fileListAction, Language language, ReleaseFactory releaseFactory,
             SubtitleFiltering filtering, List<Path> folders, boolean overwriteSubtitles, boolean recursive)
             throws SearchSetupException {
-        super(manager, settings, subtitleProviderStore);
+        super(settings, subtitleProviderStore);
         this.indexingProgressListener = indexingProgressListener;
         this.searchProgressListener = searchProgressListener;
         this.cli = cli;

@@ -261,7 +261,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setDownloadAction(arg -> downloadText());
 
         TextGuiSearchAction searchAction = TextGuiSearchAction.createWithSettings(settings)
-                .manager(manager)
                 .subtitleProviderStore(subtitleProviderStore)
                 .mainWindow(this)
                 .searchPanel(pnlSearchText)
@@ -292,7 +291,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setTable(createVideoTable());
 
         FileGuiSearchAction searchAction = FileGuiSearchAction.createWithSettings(settings)
-                .manager(manager)
                 .subtitleProviderStore((SubtitleProviderStore) this.app.make("SubtitleProviderStore"))
                 .mainWindow(this)
                 .searchPanel(pnlSearchFile)

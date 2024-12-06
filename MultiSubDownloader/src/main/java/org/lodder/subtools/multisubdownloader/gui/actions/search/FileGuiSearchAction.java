@@ -19,17 +19,12 @@ import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
     private final @NonNull FileListAction filelistAction;
-
-    public interface FileGuiSearchActionBuilderManager {
-        FileGuiSearchActionBuilderSubtitleProviderStore manager(Manager manager);
-    }
 
     public interface FileGuiSearchActionBuilderSubtitleProviderStore {
         FileGuiSearchActionBuilderGUI subtitleProviderStore(SubtitleProviderStore subtitleProviderStore);
@@ -51,7 +46,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
         FileGuiSearchAction build();
     }
 
-    public static FileGuiSearchActionBuilderManager createWithSettings(Settings settings) {
+    public static FileGuiSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
         return new FileGuiSearchActionBuilder(settings);
     }
 
@@ -61,9 +56,8 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     public static class FileGuiSearchActionBuilder
             implements FileGuiSearchActionBuilderBuild, FileGuiSearchActionBuilderReleaseFactory,
             FileGuiSearchActionBuilderSearchPanel, FileGuiSearchActionBuilderGUI,
-            FileGuiSearchActionBuilderSubtitleProviderStore, FileGuiSearchActionBuilderManager {
+            FileGuiSearchActionBuilderSubtitleProviderStore {
         private final Settings settings;
-        private Manager manager;
         private SubtitleProviderStore subtitleProviderStore;
         private GUI mainWindow;
         private SearchPanel<SearchFileInputPanel> searchPanel;
@@ -71,15 +65,13 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
         @Override
         public FileGuiSearchAction build() {
-            return new FileGuiSearchAction(manager, settings, subtitleProviderStore, mainWindow, searchPanel,
-                    releaseFactory);
+            return new FileGuiSearchAction(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
         }
     }
 
-    private FileGuiSearchAction(Manager manager, Settings settings, SubtitleProviderStore subtitleProviderStore,
-            GUI mainWindow,
+    private FileGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
             SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
-        super(manager, settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
+        super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
         this.filelistAction = new FileListAction(settings);
     }
 
@@ -95,10 +87,8 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     public void onFound(Release release, List<Subtitle> subtitles) {
         VideoTableModel model = (VideoTableModel) this.searchPanel.getResultPanel().getTable().getModel();
 
-        List<Subtitle> filteredSubtitles =
-                filtering != null ?
-                        subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() :
-                        subtitles;
+        List<Subtitle> filteredSubtitles = filtering != null ?
+                subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
         filteredSubtitles.forEach(release::addMatchingSub);
 
         model.addRow(release);

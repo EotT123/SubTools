@@ -63,7 +63,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
                 .stream()
-                .filter(subtitleProvider -> subtitleProvider.getProviderName().equals(mappingType.getProviderName()))
+                .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.getProviderName()))
                 .findAny();
         btnAddCustomMapping.setEnabled(selectedSubtitleProvider.isPresent());
         mappingTableModel.setMappingType(mappingType);
@@ -163,8 +163,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                             .map(serieMappingPair -> {
                                 SerieMapping serieMapping = serieMappingPair.getValue();
                                 String name = serieMapping.name;
-                                String providerId =
-                                        serieMapping.providerId == null ? "" : serieMapping.providerId;
+                                String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
                                 String providerName = serieMapping.providerName;
                                 if (providerId.contains("/")) {
                                     providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
@@ -191,12 +190,12 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
-        GridBagLayout gbl_contentPanel = new GridBagLayout();
-        gbl_contentPanel.columnWidths = new int[]{ 0, 0 };
-        gbl_contentPanel.rowHeights = new int[]{ 0, 40, 0 };
-        gbl_contentPanel.columnWeights = new double[]{ 1.0, Double.MIN_VALUE };
-        gbl_contentPanel.rowWeights = new double[]{ 0.0, 1.0, Double.MIN_VALUE };
-        contentPanel.setLayout(gbl_contentPanel);
+        GridBagLayout gblContentPanel = new GridBagLayout();
+        gblContentPanel.columnWidths = new int[]{ 0, 0 };
+        gblContentPanel.rowHeights = new int[]{ 0, 40, 0 };
+        gblContentPanel.columnWeights = new double[]{ 1.0, Double.MIN_VALUE };
+        gblContentPanel.rowWeights = new double[]{ 0.0, 1.0, Double.MIN_VALUE };
+        contentPanel.setLayout(gblContentPanel);
         {
             JPanel selectionPane = new JPanel();
             contentPanel.add(selectionPane);
@@ -212,20 +211,20 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         }
         {
             JPanel pnlButtons = new JPanel();
-            GridBagConstraints gbc_pnlButtons = new GridBagConstraints();
-            gbc_pnlButtons.insets = new Insets(0, 0, 5, 0);
-            gbc_pnlButtons.fill = GridBagConstraints.BOTH;
-            gbc_pnlButtons.gridx = 0;
-            gbc_pnlButtons.gridy = 0;
-            contentPanel.add(pnlButtons, gbc_pnlButtons);
+            GridBagConstraints gbcPnlButtons = new GridBagConstraints();
+            gbcPnlButtons.insets = new Insets(0, 0, 5, 0);
+            gbcPnlButtons.fill = GridBagConstraints.BOTH;
+            gbcPnlButtons.gridx = 0;
+            gbcPnlButtons.gridy = 0;
+            contentPanel.add(pnlButtons, gbcPnlButtons);
         }
         {
             JScrollPane scrollPane = new JScrollPane();
-            GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-            gbc_scrollPane.fill = GridBagConstraints.BOTH;
-            gbc_scrollPane.gridx = 0;
-            gbc_scrollPane.gridy = 1;
-            contentPanel.add(scrollPane, gbc_scrollPane);
+            GridBagConstraints gbcScrollPane = new GridBagConstraints();
+            gbcScrollPane.fill = GridBagConstraints.BOTH;
+            gbcScrollPane.gridx = 0;
+            gbcScrollPane.gridy = 1;
+            contentPanel.add(scrollPane, gbcScrollPane);
             {
                 table = new JTable();
 
@@ -266,14 +265,14 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                     MappingTableModel model = (MappingTableModel) table.getModel();
 
                     Row row = (Row) model.getDataVector().get(rowNbr);
-                    String currentName = row.serieMapping.getName();
+                    String currentName = row.serieMapping.name;
 
                     String message = Messages.getString("MappingEpisodeNameDialog.enterNewNameForSerie", currentName);
                     selectedSubtitleProvider.ifPresent(
                             provider -> userInteractionHandler.enter(message, message).ifPresent(newName -> {
                                 TvRelease tvRelease = TvRelease.builder()
                                         .name(currentName)
-                                        .season(row.serieMapping.getSeason())
+                                        .season(row.serieMapping.season)
                                         .episode(1)
                                         .originalName(currentName)
                                         .customName(newName)
@@ -281,8 +280,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                 try {
                                     provider.getProviderSerieId(tvRelease).ifPresentOrElse(providerSerieId -> {
                                         SerieMapping newSerieMapping =
-                                                new SerieMapping(currentName, providerSerieId.getProviderId(),
-                                                        providerSerieId.getProviderName(), providerSerieId.getSeason());
+                                                new SerieMapping(currentName, providerSerieId.providerId,
+                                                        providerSerieId.providerName, providerSerieId.season);
                                         row.serieMapping = newSerieMapping;
                                         List<? extends SortKey> sortKeys = table.getRowSorter().getSortKeys();
                                         selectMappingType(selectedMappingType);
