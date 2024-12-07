@@ -1,7 +1,6 @@
 package org.lodder.subtools.sublibrary.control;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -88,7 +87,7 @@ class ReleaseParserTest {
 
         assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
         assertThat(release.extension).isEqualTo("mkv");
-        assertEquals(release.fileName, "Spartacus.Gods.of.The.Arena.Pt.I.720p.HDTV.X264-DIMENSION.mkv");
+        assertThat(release.fileName).isEqualTo("Spartacus.Gods.of.The.Arena.Pt.I.720p.HDTV.X264-DIMENSION.mkv");
         assertThat(release.releaseGroup).isEqualTo("DIMENSION");
         assertThat(release.quality).isEqualTo("720p hdtv x264");
 
@@ -176,7 +175,7 @@ class ReleaseParserTest {
 
         assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
         assertThat(release.extension).isEqualTo("mkv");
-        assertEquals(release.getFileName(), "The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv");
+        assertThat(release.getFileName()).isEqualTo("The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv");
         assertThat(release.releaseGroup).isEqualTo("GECKOS");
         assertThat(release.quality).isEqualTo("720p bluray x264");
 
