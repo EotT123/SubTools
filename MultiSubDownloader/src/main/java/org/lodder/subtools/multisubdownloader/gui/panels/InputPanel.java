@@ -5,7 +5,6 @@ import java.io.Serial;
 
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.sublibrary.Language;
 
 public abstract class InputPanel extends JPanel {
@@ -13,14 +12,14 @@ public abstract class InputPanel extends JPanel {
     @Serial
     private static final long serialVersionUID = 7753220002440733463L;
     private JButton btnSearch;
-    private MyComboBox<Language> cbxLanguage;
+    private JComboBox<Language> cbxLanguage;
 
     InputPanel() {
         createComponents();
     }
 
     public Language getSelectedLanguage() {
-        return cbxLanguage.getSelectedItem();
+        return cbxLanguage.getSelectedValue();
     }
 
     public void setSelectedLanguage(Language language) {
@@ -45,13 +44,12 @@ public abstract class InputPanel extends JPanel {
         return this.btnSearch;
     }
 
-    protected MyComboBox<Language> getLanguageCbx() {
+    protected JComboBox<Language> getLanguageCbx() {
         return this.cbxLanguage;
     }
 
     private void createComponents() {
-        cbxLanguage = new MyComboBox<>(Language.values())
-                .withToMessageStringRenderer(Language::getMsgCode);
+        cbxLanguage = new JComboBox<>(Language.values()).toMessageStringRenderer(Language::getMsgCode);
 
         btnSearch = new JButton(Messages.getText("InputPanel.SearchForSubtitles"));
     }

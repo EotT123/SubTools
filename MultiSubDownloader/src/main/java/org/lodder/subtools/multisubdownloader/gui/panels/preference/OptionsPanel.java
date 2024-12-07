@@ -8,7 +8,6 @@ import java.io.Serial;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 
@@ -27,7 +26,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
     private final JCheckBox chkExcludeHearingImpaired;
     private final JCheckBox chkOnlyFound;
     private final JCheckBox chkStopOnSearchError;
-    private final MyComboBox<SettingsProcessEpisodeSource> cbxEpisodeProcessSource;
+    private final JComboBox<SettingsProcessEpisodeSource> cbxEpisodeProcessSource;
     private final JCheckBox chkConfirmProviderMapping;
 
     public OptionsPanel(SettingsControl settingsCtrl) {
@@ -85,7 +84,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                 .padding(0)
                 .paddingLeft(20)
                 .addTo(this, "span, grow")
-                .addComponent(this.cbxEpisodeProcessSource = MyComboBox.ofValues(SettingsProcessEpisodeSource.values()),
+                .addComponent(this.cbxEpisodeProcessSource = new JComboBox<>(SettingsProcessEpisodeSource.values()),
                         "wrap")
                 .addComponent(this.chkConfirmProviderMapping =
                         new JCheckBox(getText("PreferenceDialog.ConfirmProviderMapping")));
@@ -117,7 +116,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
         settingsCtrl.settings.optionSubtitleExcludeHearingImpaired = chkExcludeHearingImpaired.isSelected();
         settingsCtrl.settings.optionsShowOnlyFound = chkOnlyFound.isSelected();
         settingsCtrl.settings.optionsStopOnSearchError = chkStopOnSearchError.isSelected();
-        settingsCtrl.settings.processEpisodeSource = cbxEpisodeProcessSource.getSelectedItem();
+        settingsCtrl.settings.processEpisodeSource = cbxEpisodeProcessSource.getSelectedValue();
         settingsCtrl.settings.optionsConfirmProviderMapping = chkConfirmProviderMapping.isSelected();
         pnlDefaultSelection.savePreferenceSettings();
     }

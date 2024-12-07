@@ -11,7 +11,6 @@ import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.PartialDisableComboBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
@@ -26,7 +25,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     @Serial private static final long serialVersionUID = -9175813173306481849L;
 
     @val LibrarySettings librarySettings;
-    private final MyComboBox<LibraryActionType> cbxLibraryAction;
+    private final JComboBox<LibraryActionType> cbxLibraryAction;
     private final JCheckBox chkUseTVDBNaming;
     private final PartialDisableComboBox<LibraryOtherFileActionType> cbxLibraryOtherFileAction;
     private final SubtitleBackupPanel pnlBackup;
@@ -48,8 +47,9 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
                     VideoType.EPISODE == videoType).addTo(performActionPanel, "hidemode 3, wrap");
 
             new JLabel(getText("PreferenceDialog.ActionForShowFiles")).addTo(performActionPanel);
-            this.cbxLibraryAction = new MyComboBox<>(LibraryActionType.values()).withToMessageStringRenderer(
-                    LibraryActionType::getMsgCode).addTo(performActionPanel, "wrap");
+            this.cbxLibraryAction = new JComboBox<>(LibraryActionType.values())
+                    .toMessageStringRenderer(LibraryActionType::getMsgCode)
+                    .addTo(performActionPanel, "wrap");
 
             this.pnlStructureFolder =
                     new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
@@ -64,14 +64,14 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
                     PartialDisableComboBox.of(LibraryOtherFileActionType.values()).addTo(performActionPanel);
 
             //
-            this.cbxLibraryAction.withSelectedItemConsumer(action -> {
+            this.cbxLibraryAction.selectedItemConsumer(action -> {
                 boolean enable = action != LibraryActionType.NOTHING;
                 cbxLibraryOtherFileAction.setEnabled(enable);
                 lblActionForOtherFiles.setEnabled(enable);
             });
         }
 
-        this.cbxLibraryAction.withItemListener(() -> {
+        this.cbxLibraryAction.itemListener(() -> {
             checkEnableStatusPanel();
             checkPossibleOtherFileActions();
             if (!cbxLibraryOtherFileAction.isItemEnabled(cbxLibraryOtherFileAction.getSelectedIndex())) {
@@ -83,7 +83,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     }
 
     private void checkPossibleOtherFileActions() {
-        LibraryActionType libraryActionType = cbxLibraryAction.getSelectedItem();
+        LibraryActionType libraryActionType = cbxLibraryAction.getSelectedValue();
         for (int i = 0; i < cbxLibraryOtherFileAction.getModel().getSize(); i++) {
             LibraryOtherFileActionType ofa = cbxLibraryOtherFileAction.getItemAt(i);
             boolean enabled = switch (libraryActionType) {
@@ -99,7 +99,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     }
 
     private void checkEnableStatusPanel() {
-        LibraryActionType libraryActionType = cbxLibraryAction.getSelectedItem();
+        LibraryActionType libraryActionType = cbxLibraryAction.getSelectedValue();
         boolean pnlStructureFileVisible = switch (libraryActionType) {
             case MOVE, NOTHING -> false;
             case RENAME, MOVEANDRENAME -> true;
@@ -130,9 +130,9 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
         if (pnlBackup != null) {
             pnlBackup.savePreferenceSettings();
         }
-        librarySettings.libraryAction = this.cbxLibraryAction.getSelectedItem();
+        librarySettings.libraryAction = this.cbxLibraryAction.getSelectedValue();
         librarySettings.libraryUseTVDBNaming = this.chkUseTVDBNaming.isSelected();
-        librarySettings.libraryOtherFileAction = this.cbxLibraryOtherFileAction.getSelectedItem();
+        librarySettings.libraryOtherFileAction = this.cbxLibraryOtherFileAction.getSelectedValue();
 
         pnlStructureFolder.savePreferenceSettings();
         pnlStructureFile.savePreferenceSettings();

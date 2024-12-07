@@ -17,7 +17,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPan
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldInteger;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -33,11 +32,11 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
     private final GUI gui;
     private final SettingsControl settingsCtrl;
-    private final MyComboBox<Language> cbxLanguage;
+    private final JComboBox<Language> cbxLanguage;
     private final JListWithImages<Path> defaultIncomingFoldersList;
     private final JListWithImages<PathOrRegex> excludeList;
-    private final MyComboBox<UpdateCheckPeriod> cbxUpdateCheckPeriod;
-    private final MyComboBox<UpdateType> cbxUpdateType;
+    private final JComboBox<UpdateCheckPeriod> cbxUpdateCheckPeriod;
+    private final JComboBox<UpdateType> cbxUpdateType;
     private final JCheckBox chkUseProxy;
     private final MyTextFieldString txtProxyHost;
     private final MyTextFieldInteger txtProxyPort;
@@ -55,9 +54,8 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             // Language \\
 
             new JLabel(getText("PreferenceDialog.Language")).addTo(settingsPanel);
-
-            this.cbxLanguage = new MyComboBox<>(Messages.getAvailableLanguages(), Language.class)
-                    .withToMessageStringRenderer(Language::getMsgCode)
+            this.cbxLanguage = JComboBox.create(Messages.getAvailableLanguages())
+                    .toMessageStringRenderer(Language::getMsgCode)
                     .addTo(settingsPanel, "wrap");
 
             // Default Incoming Folder \\
@@ -130,12 +128,13 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                     .addTo(this, "span, grow, wrap");
 
             new JLabel(getText("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
-            this.cbxUpdateCheckPeriod = new MyComboBox<>(UpdateCheckPeriod.values()).withToMessageStringRenderer(
-                    UpdateCheckPeriod::getLangCode).addTo(updatePanel, "wrap");
+            this.cbxUpdateCheckPeriod = new JComboBox<>(UpdateCheckPeriod.values())
+                    .toMessageStringRenderer(UpdateCheckPeriod::getLangCode)
+                    .addTo(updatePanel, "wrap");
             new JLabel(getText("PreferenceDialog.UpdateType")).addTo(updatePanel);
-            this.cbxUpdateType =
-                    new MyComboBox<>(UpdateType.values()).withToMessageStringRenderer(UpdateType::getMsgCode)
-                            .addTo(updatePanel);
+            this.cbxUpdateType = new JComboBox<>(UpdateType.values())
+                    .toMessageStringRenderer(UpdateType::getMsgCode)
+                    .addTo(updatePanel);
         }
 
         {
@@ -174,18 +173,18 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void savePreferenceSettings() {
-        if (Messages.language != cbxLanguage.getSelectedItem()) {
-            Messages.language = cbxLanguage.getSelectedItem();
+        if (Messages.language != cbxLanguage.getSelectedValue()) {
+            Messages.language = cbxLanguage.getSelectedValue();
             gui.redraw();
         }
         List<Path> defaultIncomingFolders = defaultIncomingFoldersList.stream().map(LabelPanel::getObject).toList();
         List<PathOrRegex> exclList =
                 excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().value)).toList();
-        settingsCtrl.settings.language = cbxLanguage.getSelectedItem();
+        settingsCtrl.settings.language = cbxLanguage.getSelectedValue();
         settingsCtrl.settings.defaultIncomingFolders = defaultIncomingFolders;
         settingsCtrl.settings.replaceExcludeList(exclList);
-        settingsCtrl.settings.updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedItem();
-        settingsCtrl.settings.updateType = cbxUpdateType.getSelectedItem();
+        settingsCtrl.settings.updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedValue();
+        settingsCtrl.settings.updateType = cbxUpdateType.getSelectedValue();
         settingsCtrl.settings.generalProxyEnabled = chkUseProxy.isSelected();
         settingsCtrl.settings.generalProxyHost = txtProxyHost.getText();
         settingsCtrl.settings.generalProxyPort = txtProxyPort.getOptionalObject().orElse(80);

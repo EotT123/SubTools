@@ -8,7 +8,6 @@ import java.io.Serial;
 import ch.qos.logback.classic.Level;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.LogTextAppender;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 
 public class LoggingPanel extends JPanel {
 
@@ -28,9 +27,9 @@ public class LoggingPanel extends JPanel {
         this.add(new JSeparator(), "cell 0 0,growx,gaptop 5");
 
         Level[] logLevels = { Level.ALL, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR };
-        MyComboBox<Level> cbxLogLevel = new MyComboBox<>(logLevels)
-                .withSelectedItem(ROOT.getLevel())
-                .withSelectedItemConsumer(ROOT::setLevel);
+        JComboBox<Level> cbxLogLevel = new JComboBox<>(logLevels)
+                .selectedValue(ROOT.getLevel())
+                .selectedItemConsumer(ROOT::setLevel);
         this.add(cbxLogLevel, "cell 1 0,alignx right");
         this.add(scrollPane, "cell 0 1 2 1,grow");
 

@@ -16,11 +16,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
@@ -29,6 +29,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@Slf4j
 public class StructureFilePanel extends JPanel {
 
     @Serial private static final long serialVersionUID = -5458593307643063563L;
@@ -36,7 +37,7 @@ public class StructureFilePanel extends JPanel {
     private final LibrarySettings librarySettings;
     private final MyTextFieldString txtFileStructure;
     private final JCheckBox chkReplaceSpace;
-    private final MyComboBox<Character> cbxReplaceSpaceChar;
+    private final JComboBox<Character> cbxReplaceSpaceChar;
     private final JCheckBox chkIncludeLanguageCode;
     private final Supplier<LanguageComponents> addLanguageSupplier;
     private final LanguageMapping languageMapping = new LanguageMapping();
@@ -74,7 +75,8 @@ public class StructureFilePanel extends JPanel {
         PanelCheckBox.checkbox(chkReplaceSpace)
                 .panelOnSameLine()
                 .addTo(titlePanel, "wrap")
-                .addComponent("width pref+10px, wrap", this.cbxReplaceSpaceChar = MyComboBox.ofValues('-', '.', '_'));
+                .addComponent("width pref+10px, wrap",
+                        this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         this.chkIncludeLanguageCode =
                 new JCheckBox(getText("PreferenceDialog.IncludeLanguageInFileName"))
@@ -96,8 +98,8 @@ public class StructureFilePanel extends JPanel {
             AtomicInteger langId = new AtomicInteger();
             addLanguageSupplier = () -> {
                 int id = langId.getAndIncrement();
-                MyComboBox<Language> cmbLanguage = new MyComboBox<>(Language.values())
-                        .withToMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
+                JComboBox<Language> cmbLanguage = new JComboBox<>(Language.values())
+                        .toMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
                 MyTextFieldString txtLanguage = MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
                 JButton btnDelete = new JButton(getText("StructureFilePanel.Delete"))
                         .actionListenerSelf(delBtn -> {
@@ -124,7 +126,7 @@ public class StructureFilePanel extends JPanel {
         loadPreferenceSettings();
     }
 
-    private record LanguageComponents(MyComboBox<Language> cmbLanguage, MyTextFieldString txtLanguage,
+    private record LanguageComponents(JComboBox<Language> cmbLanguage, MyTextFieldString txtLanguage,
             JButton btnDelete) {
 
         public void setValue(Language language, String langCode) {
@@ -137,7 +139,7 @@ public class StructureFilePanel extends JPanel {
         }
 
         Language getLanguage() {
-            return cmbLanguage.getSelectedItem();
+            return cmbLanguage.getSelectedValue();
         }
 
     }
@@ -151,7 +153,7 @@ public class StructureFilePanel extends JPanel {
         return structure -> FilenameLibraryBuilder.builder()
                 .structure(structure)
                 .replaceSpace(chkReplaceSpace.isSelected())
-                .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedItem())
+                .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
                 .includeLanguageCode(chkIncludeLanguageCode.isSelected())
                 .languageTags(languageMapping.toSettingsMap())
                 .useTvdbName(false)
@@ -177,7 +179,7 @@ public class StructureFilePanel extends JPanel {
     public void savePreferenceSettings() {
         librarySettings.libraryFilenameStructure = txtFileStructure.getText();
         librarySettings.libraryFilenameReplaceSpace = chkReplaceSpace.isSelected();
-        librarySettings.libraryFilenameReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedItem();
+        librarySettings.libraryFilenameReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedValue();
         librarySettings.langCodeMap = languageMapping.toSettingsMap();
     }
 
@@ -193,11 +195,11 @@ public class StructureFilePanel extends JPanel {
         public void put(int id, LanguageComponents languageComponents) {
             languageComponentsMap.put(id, languageComponents);
 
-            MyComboBox<Language> cmbLanguage = languageComponents.cmbLanguage();
+            JComboBox<Language> cmbLanguage = languageComponents.cmbLanguage();
             cmbLanguage.putClientProperty(DEFAULT_BORDER_PROPERTY, cmbLanguage.getBorder());
-            cmbLanguage.withSelectedItemConsumer(this::updateBorder);
+            cmbLanguage.selectedItemConsumer(this::updateBorder);
             cmbLanguage.addItemListener(e -> updateBorder((Language) e.getItem()));
-            updateBorder(cmbLanguage.getSelectedItem());
+            updateBorder(cmbLanguage.getSelectedValue());
         }
 
         private void updateBorder(Language lang) {
@@ -227,7 +229,7 @@ public class StructureFilePanel extends JPanel {
         public Map<Language, String> toSettingsMap() {
             return languageComponentsMap.values()
                     .stream()
-                    .collect(Collectors.toMap(langComps -> langComps.cmbLanguage().getSelectedItem(),
+                    .collect(Collectors.toMap(langComps -> langComps.cmbLanguage().getSelectedValue(),
                             langComps -> langComps.txtLanguage().getText(), (v1, _) -> v1, LinkedHashMap::new));
         }
 
@@ -235,7 +237,7 @@ public class StructureFilePanel extends JPanel {
             if (enabled) {
                 languageComponentsMap.values()
                         .stream()
-                        .map(langComp -> langComp.cmbLanguage.getSelectedItem())
+                        .map(langComp -> langComp.cmbLanguage.getSelectedValue())
                         .distinct()
                         .forEach(this::updateBorder);
             } else {

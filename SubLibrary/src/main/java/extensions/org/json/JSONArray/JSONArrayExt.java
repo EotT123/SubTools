@@ -17,7 +17,8 @@ import org.json.JSONObject;
 public class JSONArrayExt {
 
     public static Stream<JSONObject> stream(@This JSONArray jsonArray) {
-        return StreamSupport
-                .stream(Spliterators.spliteratorUnknownSize((Iterator<JSONObject>) (Iterator) jsonArray.iterator(), Spliterator.ORDERED), false);
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                (Iterator<JSONObject>) (Iterator) jsonArray.iterator(), Spliterator.ORDERED), false);
+        //        return IntStream.range(0, jsonArray.length()).mapToObj(jsonArray::getJSONObject);
     }
 }

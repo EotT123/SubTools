@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 public class SearchTextInputPanel extends InputPanel {
@@ -15,7 +14,7 @@ public class SearchTextInputPanel extends InputPanel {
     @Serial
     private static final long serialVersionUID = 7030171360517948253L;
 
-    private MyComboBox<VideoSearchType> cbxVideoType;
+    private JComboBox<VideoSearchType> cbxVideoType;
     private JTextField txtInputVideoName;
     protected JTextField txtInputSeason;
     protected JTextField txtInputEpisode;
@@ -49,8 +48,7 @@ public class SearchTextInputPanel extends InputPanel {
     }
 
     private void createComponents() {
-        cbxVideoType = new MyComboBox<>(VideoSearchType.values())
-                .withToMessageStringRenderer(VideoSearchType::getMsgCode);
+        cbxVideoType = new JComboBox<>(values()).toStringRenderer(VideoSearchType::getMsgCode);
         txtInputVideoName = new JTextField().columns(10);
         txtQualityVersion = new JTextField().columns(10);
         txtInputSeason = new JTextField().columns(10);
@@ -58,14 +56,14 @@ public class SearchTextInputPanel extends InputPanel {
     }
 
     private void videoTypeChanged() {
-        VideoSearchType videoTypeChoice = cbxVideoType.getSelectedItem();
+        VideoSearchType videoTypeChoice = cbxVideoType.getSelectedValue();
         txtInputSeason.editable(videoTypeChoice == EPISODE).enabled(videoTypeChoice == EPISODE);
         txtInputEpisode.editable(videoTypeChoice == EPISODE).enabled(videoTypeChoice == EPISODE);
         txtQualityVersion.editable(videoTypeChoice == RELEASE).enabled(videoTypeChoice == RELEASE);
     }
 
     public VideoSearchType getType() {
-        return cbxVideoType.getSelectedItem();
+        return cbxVideoType.getSelectedValue();
     }
 
     public int getSeason() {

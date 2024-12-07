@@ -8,7 +8,6 @@ import java.io.Serial;
 
 import manifold.ext.props.rt.api.get;
 import org.lodder.subtools.multisubdownloader.Messages;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcombobox.MyComboBox;
 
 public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel implements PreferencePanelIntf {
 
@@ -17,12 +16,12 @@ public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel
 
     @get(Protected) JButton btnBuildStructure;
     @get(Protected) JCheckBox chkReplaceSpace;
-    @get(Protected) MyComboBox<String> cbxReplaceSpaceChar;
+    @get(Protected) JComboBox<String> cbxReplaceSpaceChar;
 
     StructurePanel() {
         this.btnBuildStructure = new JButton(Messages.getText("StructureBuilderDialog.Structure"));
 
-        this.cbxReplaceSpaceChar = new MyComboBox<>(new String[]{ "-", ".", "_" });
+        this.cbxReplaceSpaceChar = JComboBox.create("-", ".", "_");
 
         this.chkReplaceSpace = new JCheckBox(Messages.getText("PreferenceDialog.ReplaceSpaceWith"))
                 .addCheckedChangeListener(cbxReplaceSpaceChar::setEnabled);
@@ -35,7 +34,7 @@ public abstract class StructurePanel<T extends StructurePanel<T>> extends JPanel
     }
 
     public String getReplaceSpaceChar() {
-        return this.cbxReplaceSpaceChar.getSelectedItem();
+        return this.cbxReplaceSpaceChar.getSelectedValue();
     }
 
     public void setReplaceSpaceChar(String s) {
