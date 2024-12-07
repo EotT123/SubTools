@@ -104,6 +104,6 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
     }
 
     public T getSelectedItem() {
-        return super.getSelectedValue();
+        return (T) super.getSelectedItem();
     }
 }

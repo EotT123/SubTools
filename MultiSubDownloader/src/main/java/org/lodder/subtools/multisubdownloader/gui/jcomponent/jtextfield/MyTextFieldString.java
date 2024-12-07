@@ -10,20 +10,20 @@ public class MyTextFieldString extends MyTextFieldCommon<String, MyTextFieldStri
 
     private static final Function<String, String> TO_STRING_MAPPER = Function.identity();
     private static final Function<String, String> TO_OBJECT_MAPPER = Function.identity();
-    public static final Predicate<String> VERIFIER = text -> true;
+    public static final Predicate<String> VERIFIER = _ -> true;
 
     private MyTextFieldString() {
 
     }
 
-    public static <T> MyTextFieldOthersIntf<String, MyTextFieldString> builder() {
+    public static MyTextFieldOthersIntf<String, MyTextFieldString> builder() {
         return new MyTextFieldString()
                 .withToStringMapper(TO_STRING_MAPPER)
                 .withToObjectMapper(TO_OBJECT_MAPPER)
                 .withValueVerifier(VERIFIER);
     }
 
-    public static <T> MyTextFieldOthersIntf<String, MyTextFieldString> create() {
+    public static MyTextFieldOthersIntf<String, MyTextFieldString> create() {
         return builder().build();
     }
 }
