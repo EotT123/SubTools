@@ -176,7 +176,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
                     beforeCaret = txtStructure.getText();
                     afterCaret = "";
                 }
-                txtStructure.setText(String.format("%s%s%s", beforeCaret, clickedTag, afterCaret));
+                txtStructure.setText("%s%s%s".formatted(beforeCaret, clickedTag, afterCaret));
             }
         }
 

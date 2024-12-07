@@ -60,7 +60,7 @@ public final class MovieRelease extends Release {
     }
 
     public String getImdbIdAsString() {
-        return String.format("tt%07d", imdbId);
+        return "tt%07d".formatted(imdbId);
     }
 
     public OptionalInt getTvdbId() {

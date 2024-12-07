@@ -20,7 +20,7 @@ public class OpenSubtitlesMovieDescriptor {
     @Override
     public boolean equals(Object object) {
         return object instanceof OpenSubtitlesMovieDescriptor other
-               && imdbId == other.imdbId && year == other.year && name.equals(other.name);
+                && imdbId == other.imdbId && year == other.year && name.equals(other.name);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class OpenSubtitlesMovieDescriptor {
         if (year < 0) {
             return name;
         }
-        return String.format("%s (%d)", name, year);
+        return "$name ($year)";
     }
 }

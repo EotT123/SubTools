@@ -83,7 +83,7 @@ public class PrompterBuilderValueFromList {
 
         @Override
         public ValueFromListBuilder<T> message(String message, Object... replacements) {
-            this.message = String.format(message, replacements);
+            this.message = message.formatted(replacements);
             return this;
         }
 

@@ -72,13 +72,13 @@ public class PrompterBuilderBoolean {
 
         @Override
         public ValueBuilder message(String message, Object... replacements) {
-            this.message = String.format(message, replacements);
+            this.message = message.formatted(replacements);
             return this;
         }
 
         @Override
         public ValueBuilder errorMessage(String errorMessage, Object... replacements) {
-            this.errorMessage = String.format(errorMessage, replacements);
+            this.errorMessage = errorMessage.formatted(replacements);
             return this;
         }
 
