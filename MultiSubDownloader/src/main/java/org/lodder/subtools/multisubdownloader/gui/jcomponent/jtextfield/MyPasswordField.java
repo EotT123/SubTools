@@ -80,12 +80,6 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
 
     private static class ObjectWrapper<S> {
         @var S value;
-
-        public boolean setValue(S value) {
-            boolean changed = this.value != value;
-            this.value = value;
-            return changed;
-        }
     }
 
     @Override
@@ -147,15 +141,17 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
         boolean valid = completeValueVerifier.test(text);
         setSuperBorder(valid ? MyPasswordField.getDefaultBorder(this) : ERROR_BORDER);
 
-        boolean changedValidity = validWrapper.setValue(valid);
-        if (changedValidity && validityChangedCalbackListeners != null) {
-            Arrays.stream(validityChangedCalbackListeners).forEach(listener -> listener.accept(valid));
+        boolean changedValidity =  validWrapper.value != valid;
+        validWrapper.value = valid;
+        if (changedValidity && validityChangedCallbackListeners != null) {
+            Arrays.stream(validityChangedCallbackListeners).forEach(listener -> listener.accept(valid));
         }
 
-        if (valueChangedCalbackListener != null) {
-            boolean valueChanged = valueWrapper.setValue(text);
+        if (valueChangedCallbackListener != null) {
+            boolean valueChanged = !StringUtils.equals(valueWrapper.value,  text);
+            valueWrapper.value = text;
             if (valueChanged) {
-                valueChangedCalbackListener.accept(text);
+                valueChangedCallbackListener.accept(text);
             }
         }
     }
@@ -168,11 +164,6 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
     public String getText() {
         String text = new String(getPassword());
         return completeValueVerifier.test(text) ? text : null;
-    }
-
-
-    public Optional<String> getOptionalObject() {
-        return Optional.ofNullable(getText());
     }
 
     @Override
