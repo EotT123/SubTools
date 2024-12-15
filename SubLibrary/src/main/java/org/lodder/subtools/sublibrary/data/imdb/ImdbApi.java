@@ -18,17 +18,18 @@ public class ImdbApi {
                 .memoryCache()
                 .key("IMDB-moviedetails-$imdbId")
                 .optionalSupplier(() -> {
-                    final String url = "$DOMAIN/title/tt${String.format(\"%07d\", imdbId)}/releaseinfo";
+                    final String url = "$DOMAIN/title/tt${%07d/releaseinfo".formatted(imdbId);
                     try {
                         org.jsoup.nodes.Element element = manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsJsoupDocument()
                                 .selectFirst(".article .subpage_title_block .subpage_title_block__right-column");
-                        String imdbName = element.selectFirst("a[itemprop='url']").text();
-                        int year = Integer.parseInt(element.selectFirst("span.nobr").text().replaceAll("[^0-9]", ""));
+                        String imdbName = element.getFirstElementByCss("a[itemprop='url']").getText();
+                        int year = Integer.parseInt(
+                                element.getFirstElementByCss("span.nobr").getText().replaceAll("[^0-9]", ""));
                         return Optional.of(new ImdbDetails(imdbName, year));
                     } catch (Exception e) {
-                        throw new ImdbException("Error IMDBAPI", url, e);
+                        throw new ImdbException("Error IMDB API", url, e);
                     }
                 }).getOptional();
     }

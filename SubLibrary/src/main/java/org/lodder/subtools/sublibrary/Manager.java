@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
@@ -168,14 +169,18 @@ public class Manager {
 
         InputStream getAsInputStream() throws ManagerException;
 
-        Optional<Document> getAsDocument() throws ParserConfigurationException, ManagerException;
+        @Nullable
+        Document getAsDocument() throws ParserConfigurationException, ManagerException;
 
-        Optional<Document> getAsDocument(Predicate<String> emptyResultPredicate)
+        @Nullable
+        Document getAsDocument(Predicate<String> emptyResultPredicate)
                 throws ParserConfigurationException, ManagerException;
 
+        //        @Nullable
         org.jsoup.nodes.Document getAsJsoupDocument() throws ManagerException;
 
-        Optional<org.jsoup.nodes.Document> getAsJsoupDocument(Predicate<String> emptyResultPredicate)
+        //        @Nullable
+        org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate)
                 throws ManagerException;
 
         JSONObject getAsJsonObject() throws ManagerException;
@@ -226,16 +231,16 @@ public class Manager {
         }
 
         @Override
-        public Optional<Document> getAsDocument() throws ParserConfigurationException, ManagerException {
+        public Document getAsDocument() throws ParserConfigurationException, ManagerException {
             return XMLHelper.getDocument(get());
         }
 
         @Override
-        public Optional<Document> getAsDocument(Predicate<String> emptyResultPredicate)
+        public Document getAsDocument(Predicate<String> emptyResultPredicate)
                 throws ParserConfigurationException, ManagerException {
             String html = get();
             return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
-                    Optional.empty() : XMLHelper.getDocument(html);
+                    null : XMLHelper.getDocument(html);
         }
 
         @Override
@@ -244,11 +249,11 @@ public class Manager {
         }
 
         @Override
-        public Optional<org.jsoup.nodes.Document> getAsJsoupDocument(Predicate<String> emptyResultPredicate)
+        public org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate)
                 throws ManagerException {
             String html = get();
             return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
-                    Optional.empty() : Optional.of(Jsoup.parse(html));
+                    null : Jsoup.parse(html);
         }
 
         @Override

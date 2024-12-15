@@ -16,8 +16,8 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,23 +123,23 @@ public class XMLHelper {
         return result.getWriter().toString();
     }
 
-    public static Optional<Document> getDocument(String string) throws ParserConfigurationException {
+    public static @Nullable Document getDocument(String string) throws ParserConfigurationException {
         try {
             return getDocument(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException e) {
             // should not happen
-            return Optional.empty();
+            return null;
         }
     }
 
-    public static Optional<Document> getDocument(InputStream inputStream) throws ParserConfigurationException,
+    public static @Nullable Document getDocument(InputStream inputStream) throws ParserConfigurationException,
             IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // Use the factory to create a builder
         DocumentBuilder builder;
         builder = factory.newDocumentBuilder();
         try {
-            return Optional.of(builder.parse(inputStream));
+            return builder.parse(inputStream);
         } catch (SAXException e) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("getDocument: Not a valid XML document, setting a blank document!");
@@ -147,6 +147,6 @@ public class XMLHelper {
                 LOGGER.debug("Not a valid XML document, setting a blank document!");
             }
         }
-        return Optional.empty();
+        return null;
     }
 }
