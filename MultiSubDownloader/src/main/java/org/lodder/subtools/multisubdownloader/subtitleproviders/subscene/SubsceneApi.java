@@ -1,8 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
 import java.io.Serial;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -13,7 +11,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.Getter;
@@ -21,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
@@ -37,6 +33,7 @@ import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
+import util.Utils;
 
 public class SubsceneApi extends Html implements SubtitleApi {
 
@@ -45,13 +42,12 @@ public class SubsceneApi extends Html implements SubtitleApi {
     private static final String DOMAIN = "https://subscene.com";
     private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
 
-    private static final Predicate<Exception> RETRY_PREDICATE = exception ->
-            switch (exception) {
-                case HttpClientException httpClientException ->
-                        httpClientException.getResponseCode() == 409 || httpClientException.getResponseCode() == 429;
-                case ManagerException managerException -> managerException.getMessage().contains("409 Conflict");
-                default -> false;
-            };
+    private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
+        case HttpClientException httpClientException ->
+                httpClientException.getResponseCode() == 409 || httpClientException.getResponseCode() == 429;
+        case ManagerException managerException -> managerException.getMessage().contains("409 Conflict");
+        default -> false;
+    };
 
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
@@ -74,24 +70,19 @@ public class SubsceneApi extends Html implements SubtitleApi {
             if (StringUtils.isBlank(serieName)) {
                 return Map.of();
             }
-            String url =
-                    DOMAIN + "/subtitles/searchbytitle?query=" + URLEncoder.encode(serieName, StandardCharsets.UTF_8);
-            Element searchResultElement = getJsoupDocument(url).selectFirst(".search-result");
-
-            return searchResultElement.select("h2")
+            String url = "$DOMAIN/subtitles/searchbytitle?query=" + serieName.urlEncode();
+            return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
                     .stream()
-                    .map(titleElement -> Pair.of(titleElement.text(),
-                            titleElement.nextElementSibling().select("a").stream().map(aElem -> {
-                                Matcher matcher = SERIE_NAME_PATTERN.matcher(aElem.text());
+                    .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
+                            titleElement.nextElementSibling().selectAllByTag("a").stream().map(elem -> {
+                                Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
                                 int season = 0;
                                 if (matcher.matches()) {
                                     season = OrdinalNumber.optionalFromValue(matcher.group(1))
-                                            .mapToInt(OrdinalNumber::getNumber)
-                                            .orElse(-1);
+                                            .mapToInt(OrdinalNumber::getNumber).orElse(-1);
                                 }
-                                return new SubSceneSerieId(aElem.text(), aElem.attr("href"), season);
-                            }).toList()))
-                    .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+                                return new SubSceneSerieId(elem.text(), elem.attr("href"), season);
+                            }).toList())));
         } catch (Exception e) {
             throw new SubsceneException(e);
         }
@@ -106,17 +97,19 @@ public class SubsceneApi extends Html implements SubtitleApi {
                 .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
                     setLanguageWithCookie(language);
                     try {
-                        return getJsoupDocument(DOMAIN + providerSerieId.providerId).select("td.a1")
+                        return getJsoupDocument(DOMAIN + providerSerieId.providerId)
+                                .selectAllByCss("td.a1")
                                 .stream()
                                 .map(Element::parent)
                                 .map(row -> new SubsceneSubtitleDescriptor().setLanguage(
-                                                Language.fromValueOptional(row.select(".a1 span.l").text().trim()).orElse(null))
+                                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").getText().trim())
+                                                        .orElse(null))
                                         .setUrlSupplier(() -> getDownloadUrl(
-                                                DOMAIN + row.select(".a1 > a").attr("href").trim()))
-                                        .setName(row.select(".a1 span:not(.l)").text().trim())
-                                        .setHearingImpaired(!row.select(".a41").isEmpty())
-                                        .setUploader(row.select(".a5 > a").text().trim())
-                                        .setComment(row.select(".a6 > div").text().trim()))
+                                                DOMAIN + row.selectAllByCss(".a1 > a").getAttr("href").trim()))
+                                        .setName(row.selectAllByCss(".a1 span:not(.l)").getText().trim())
+                                        .setHearingImpaired(row.selectFirstByCss(".a41") != null)
+                                        .setUploader(row.selectFirstByCss(".a5 > a").getText().trim())
+                                        .setComment(row.selectFirstByCss(".a6 > div").getText().trim()))
                                 .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
                                         subDescriptor.getSeasonEpisode().episodes.stream()
                                                 .anyMatch(ep -> ep == episode))
@@ -130,7 +123,11 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
         try {
-            return DOMAIN + getJsoupDocument(seriePageUrl).selectFirst("#downloadButton").attr("href");
+            String href = getJsoupDocument(seriePageUrl).selectFirstById("downloadButton").getAttr("href");
+            if (StringUtils.isBlank(href)) {
+                throw new SubsceneException("href for $seriePageUrl is blank");
+            }
+            return DOMAIN + href;
         } catch (ManagerException e) {
             throw new SubsceneException(e);
         }

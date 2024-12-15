@@ -14,7 +14,7 @@ public class DocumentExt {
     // Get First Element \\
     // ----------------- \\
 
-    public static @Nullable NodeList getAllElementsByTag(@Nullable @This Document document, String tagName) {
+    public static @Nullable NodeList selectAllByTag(@Nullable @This Document document, String tagName) {
         return document == null ? null : document.getElementsByTagName(requireNotEmpty(tagName));
     }
 

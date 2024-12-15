@@ -3,13 +3,11 @@ package org.lodder.subtools.sublibrary.data.imdb;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
@@ -17,6 +15,7 @@ import org.jsoup.select.Elements;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
+import util.Utils;
 
 record ImdbSearchIdApi(Manager manager) {
 
@@ -37,9 +36,9 @@ record ImdbSearchIdApi(Manager manager) {
                         Elements searchResults = manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsJsoupDocument()
-                                .select("#main .findList .findResult .result_text");
+                                .selectAllByCss("#main .findList .findResult .result_text");
                         return getImdbIdCommon(searchResults,
-                                e -> e.getFirstElementByTag("a").getText() + " " + e.getText(),
+                                e -> e.selectFirstByTag("a").getText() + " " + e.getText(),
                                 e -> e.selectFirst("a").getAttr("href"));
                     } catch (Exception e) {
                         throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
@@ -67,7 +66,7 @@ record ImdbSearchIdApi(Manager manager) {
                         Elements searchResults = manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsJsoupDocument()
-                                .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
+                                .selectAllByCss("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
                         Function<Element, String> toStringMapper = e -> Optional.ofNullable(e.selectFirst("h3"))
                                 .map(e2 -> e2.text().replace(" - IMDb", ""))
                                 .orElse(null);
@@ -98,9 +97,9 @@ record ImdbSearchIdApi(Manager manager) {
                         Elements searchResults = manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsJsoupDocument()
-                                .select("a[href*='https://www.imdb.com/title/tt']");
+                                .selectAllByCss("a[href*='https://www.imdb.com/title/tt']");
                         Function<Element, String> toStringMapper =
-                                e -> e.getFirstElementByTag("span").getText().replace(" - IMDb", "");
+                                e -> e.selectFirstByTag("span").getText().replace(" - IMDb", "");
                         Function<Element, String> toHrefMapper = e -> e.getAttr("href");
                         return getImdbIdCommon(searchResults, toStringMapper, toHrefMapper);
                     } catch (Exception e) {
@@ -112,11 +111,7 @@ record ImdbSearchIdApi(Manager manager) {
 
     private Set<ProviderSerieId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,
             Function<Element, String> toHrefMapper) {
-        if (searchResults == null) {
-            return Set.of();
-        }
-        return searchResults.stream().collect(Collector.of(
-                HashSet::new,
+        return searchResults.stream().collect(Utils.setCollector(
                 (set, element) -> {
                     String name = toStringMapper.apply(element);
                     if (StringUtils.isBlank(name)) {
@@ -127,9 +122,6 @@ record ImdbSearchIdApi(Manager manager) {
                     if (matcher.find()) {
                         set.add(new ProviderSerieId(name, matcher.group().replace("/title/tt", "")));
                     }
-                }, (set1, set2) -> {
-                    set1.addAll(set2);
-                    return set1;
                 }));
     }
 }

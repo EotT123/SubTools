@@ -138,8 +138,7 @@ public class JOpenSubAdapter
                 .language(Language.fromIdOptional(attributes.getLanguage()).orElse(null))
                 .quality(ReleaseParser.getQualityKeyword(file.getFileName()))
                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(
-                        ReleaseParser.extractReleaseGroup(file.getFileName(), file.getFileName().endsWith(".srt")))
+                .releaseGroup(ReleaseParser.extractReleaseGroup(file.fileName, file.fileName.endsWith(".srt")))
                 .uploader(attributes.getUploader() != null ? attributes.getUploader().getName() : null)
                 .hearingImpaired(Boolean.TRUE == attributes.isHearingImpaired());
     }

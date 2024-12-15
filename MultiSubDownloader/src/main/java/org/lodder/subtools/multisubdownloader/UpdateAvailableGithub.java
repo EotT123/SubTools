@@ -75,10 +75,9 @@ public class UpdateAvailableGithub {
                                 .userAgent(null)
                                 .cacheType(CacheType.NONE)
                                 .getAsJsoupDocument()
-                                .selectFirst(
-                                        "#repo-content-turbo-frame .box a[href='" + REPO_URI + "/releases/latest']");
-                        Pattern versionPattern = Pattern.compile("[0-9]*\\.[0-9]\\.[0-9]");
-                        String versionText = element.parent().selectFirst("a").text();
+                                .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
+                        Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
+                        String versionText = element.getParent().selectFirstByCss("a").getText();
                         Matcher matcher = versionPattern.matcher(versionText);
                         matcher.find();
                         String version = matcher.group();
@@ -90,12 +89,16 @@ public class UpdateAvailableGithub {
                                 .userAgent(null)
                                 .cacheType(CacheType.NONE)
                                 .getAsJsoupDocument()
-                                .selectFirst(".Box-row a[href$='.jar']");
-                        String url = DOMAIN + artifactElement.attr("href");
+                                .selectFirstByCss(".Box-row a[href$='.jar']");
+                        String url = DOMAIN + artifactElement.getAttr("href");
                         updateLastUpdateCheck();
                         return Optional.of(url);
                     } catch (Exception e) {
-                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        if (LOGGER.isTraceEnabled) {
+                            LOGGER.trace(Messages.getText("LoggingPanel.UpdateCheckFailed"), e);
+                        } else {
+                            LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        }
                         return Optional.empty();
                     }
                 }).getOptional();
@@ -114,24 +117,28 @@ public class UpdateAvailableGithub {
                                         .userAgent(null)
                                         .cacheType(CacheType.MEMORY)
                                         .getAsJsoupDocument()
-                                        .selectFirst("#partial-actions-workflow-runs .Box-row");
-                        LocalDateTime nightlyBuildTista =
-                                zonedDateTimeStringToLocalDateTime(
-                                        rowElement.selectFirst(".d-inline relative-time").attr("datetime"));
+                                        .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
+                        LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
+                                rowElement.selectFirstByCss(".d-inline relative-time").getAttr("datetime"));
                         if (nightlyBuildTista.isBefore(buildTista)) {
                             return Optional.empty();
                         }
-                        String url = "https://nightly.link" + rowElement.selectFirst(".Link--primary").attr("href");
+                        String url =
+                                "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").getAttr("href");
                         String downloadUrl = manager.getPageContentBuilder()
                                 .url(url)
                                 .cacheType(CacheType.MEMORY)
                                 .getAsJsoupDocument()
-                                .selectFirst("table td a")
-                                .attr("href");
+                                .selectFirstByCss("table td a")
+                                .getAttr("href");
                         updateLastUpdateCheck();
                         return Optional.of(downloadUrl);
                     } catch (Exception e) {
-                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        if (LOGGER.isTraceEnabled) {
+                            LOGGER.trace(Messages.getText("LoggingPanel.UpdateCheckFailed"), e);
+                        } else {
+                            LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        }
                         return Optional.empty();
                     }
                 }).getOptional();

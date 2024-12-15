@@ -35,7 +35,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
@@ -169,19 +168,14 @@ public class Manager {
 
         InputStream getAsInputStream() throws ManagerException;
 
-        @Nullable
-        Document getAsDocument() throws ParserConfigurationException, ManagerException;
+        Document getAsDocument() throws ParserConfigurationException, ManagerException, IOException;
 
-        @Nullable
         Document getAsDocument(Predicate<String> emptyResultPredicate)
-                throws ParserConfigurationException, ManagerException;
+                throws ParserConfigurationException, ManagerException, IOException;
 
-        //        @Nullable
         org.jsoup.nodes.Document getAsJsoupDocument() throws ManagerException;
 
-        //        @Nullable
-        org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate)
-                throws ManagerException;
+        org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate) throws ManagerException;
 
         JSONObject getAsJsonObject() throws ManagerException;
 
@@ -231,13 +225,13 @@ public class Manager {
         }
 
         @Override
-        public Document getAsDocument() throws ParserConfigurationException, ManagerException {
+        public Document getAsDocument() throws ParserConfigurationException, ManagerException, IOException {
             return XMLHelper.getDocument(get());
         }
 
         @Override
         public Document getAsDocument(Predicate<String> emptyResultPredicate)
-                throws ParserConfigurationException, ManagerException {
+                throws ParserConfigurationException, ManagerException, IOException {
             String html = get();
             return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
                     null : XMLHelper.getDocument(html);

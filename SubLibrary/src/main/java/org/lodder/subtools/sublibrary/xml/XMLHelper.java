@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +75,8 @@ public class XMLHelper {
     public static boolean getBooleanAttributeValue(String sTag, String sAttribute, Element eElement) {
         LOGGER.trace("getBooleanAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
-        return ((Element) nlList).getAttribute(sAttribute) != null
-                && Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
+        return ((Element) nlList).getAttribute(sAttribute) != null &&
+                Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
     }
 
     public static String cleanBadChars(String string) {
@@ -123,30 +122,19 @@ public class XMLHelper {
         return result.getWriter().toString();
     }
 
-    public static @Nullable Document getDocument(String string) throws ParserConfigurationException {
-        try {
-            return getDocument(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
-        } catch (IOException e) {
-            // should not happen
-            return null;
-        }
+    public static Document getDocument(String string) throws ParserConfigurationException, IOException {
+        return getDocument(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public static @Nullable Document getDocument(InputStream inputStream) throws ParserConfigurationException,
-            IOException {
+    public static Document getDocument(InputStream inputStream) throws ParserConfigurationException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // Use the factory to create a builder
         DocumentBuilder builder;
         builder = factory.newDocumentBuilder();
         try {
             return builder.parse(inputStream);
-        } catch (SAXException e) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("getDocument: Not a valid XML document, setting a blank document!");
-            } else {
-                LOGGER.debug("Not a valid XML document, setting a blank document!");
-            }
+        } catch (SAXException | IOException e) {
+            throw new IOException("XML input could not be converted to a document");
         }
-        return null;
     }
 }

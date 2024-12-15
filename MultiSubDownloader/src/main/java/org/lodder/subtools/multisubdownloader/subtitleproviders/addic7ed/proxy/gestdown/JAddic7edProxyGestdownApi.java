@@ -72,11 +72,9 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
 
     private Subtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {
         return Subtitle.downloadSource(getDownloadUrl(sub.getDownloadUri()))
-                .subtitleSource(getSubtitleSource())
-                .fileName(StringExt
-                        .removeIllegalFilenameChars(
-                                "%s - %s - %s".formatted(episodedto.getShow(), episodedto.getTitle(),
-                                        sub.getVersion())))
+                .subtitleSource(subtitleSource)
+                .fileName(StringExt.removeIllegalFilenameChars(
+                        "${episodedto.show} - ${episodedto.title} - ${sub.version}"))
                 .language(language)
                 .quality(ReleaseParser.getQualityKeyword(episodedto.getTitle() + " " + sub.getVersion()))
                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)

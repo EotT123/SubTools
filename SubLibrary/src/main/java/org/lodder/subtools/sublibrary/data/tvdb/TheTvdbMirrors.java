@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,12 +32,13 @@ public class TheTvdbMirrors {
     private final List<String> bannerList = new ArrayList<>();
     private final List<String> zipList = new ArrayList<>();
 
-    public TheTvdbMirrors(String apikey, Manager manager) throws ManagerException, ParserConfigurationException {
+    public TheTvdbMirrors(String apikey, Manager manager) throws ManagerException, ParserConfigurationException,
+            IOException {
         synchronized (this) {
             manager.getPageContentBuilder()
                     .url("http://www.thetvdb.com/api/" + apikey + "/mirrors.xml")
                     .getAsDocument()
-                    .getAllElementsByTag("Mirror").stream()
+                    .selectAllByTag("Mirror").stream()
                     .filter(nMirror -> nMirror.getNodeType() == Node.ELEMENT_NODE)
                     .map(Element.class::cast)
                     .forEach(eMirror -> {

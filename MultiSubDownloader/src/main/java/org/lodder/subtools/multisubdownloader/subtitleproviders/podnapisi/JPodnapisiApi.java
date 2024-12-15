@@ -17,6 +17,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleDescriptor;
@@ -39,7 +40,7 @@ public class JPodnapisiApi implements SubtitleApi {
 
     public Optional<ProviderSerieId> getPodnapisiShowName(String showName) throws PodnapisiException {
         String url = DOMAIN + "/sl/ppodnapisi/search?sK=" + showName.trim().toLowerCase().urlEncode();
-        return getXml(url).selectFirst(".subtitle-entry") != null
+        return getXml(url).selectFirstByClass("subtitle-entry") != null
                 ? Optional.of(new ProviderSerieId(showName, showName))
                 : Optional.empty();
     }
@@ -67,7 +68,7 @@ public class JPodnapisiApi implements SubtitleApi {
                         season, episode, language))
                 .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
                     try {
-                        StringBuilder url = new StringBuilder(DOMAIN + "/sl/ppodnapisi/search?sK=")
+                        StringBuilder url = new StringBuilder("$DOMAIN/sl/ppodnapisi/search?sK=")
                                 .append(URLEncoder.encode(providerSerieId.providerId.trim().toLowerCase(),
                                         StandardCharsets.UTF_8));
                         if (PODNAPISI_LANGS.containsKey(language)) {
@@ -86,7 +87,7 @@ public class JPodnapisiApi implements SubtitleApi {
                         }
                         url.append("&sXML=1");
 
-                        return getXml(url.toString()).select("subtitle")
+                        return getXml(url.toString()).selectAllByTag("subtitle")
                                 .stream()
                                 .map(this::parsePodnapisiSubtitle)
                                 .toList();
@@ -98,7 +99,7 @@ public class JPodnapisiApi implements SubtitleApi {
     }
 
 
-    protected Document getXml(String url) throws PodnapisiException {
+    protected @Nullable Document getXml(String url) throws PodnapisiException {
         try {
             return manager.getPageContentBuilder().url(url).userAgent(userAgent).cacheType(CacheType.MEMORY).retries(1)
                     .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
@@ -116,12 +117,14 @@ public class JPodnapisiApi implements SubtitleApi {
                 .hearingImpaired(elem.select("new_flags flags")
                         .stream()
                         .anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))
-                .language(languageIdToLanguage(elem.selectFirst("languageId").text()))
-                .releaseString(elem.selectFirst("release").text().length() > 10 ? elem.selectFirst("release").text()
-                        : elem.selectFirst("title").text().replace(":", "") + " " + elem.selectFirst("release").text())
-                .uploaderName(elem.selectFirst("uploaderName").text())
-                .url(elem.selectFirst("url").text() + "/download?")
-                .subtitleId(elem.selectFirst("id").text())
+                .language(languageIdToLanguage(elem.selectFirst("languageId").getText()))
+                .releaseString(
+                        elem.selectFirst("release").getText().length() > 10 ? elem.selectFirst("release").getText()
+                                : elem.selectFirst("title").getText().replace(":", "") + " " +
+                                elem.selectFirst("release").getText())
+                .uploaderName(elem.selectFirst("uploaderName").getText())
+                .url(elem.selectFirst("url").getText() + "/download?")
+                .subtitleId(elem.selectFirst("id").getText())
                 .year(getText.apply(elem.selectFirst("year")))
                 .imdb(getText.apply(elem.selectFirst("imdb")))
                 .omdb(getText.apply(elem.selectFirst("omdb")))

@@ -23,10 +23,10 @@ public class ImdbApi {
                         org.jsoup.nodes.Element element = manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsJsoupDocument()
-                                .selectFirst(".article .subpage_title_block .subpage_title_block__right-column");
-                        String imdbName = element.getFirstElementByCss("a[itemprop='url']").getText();
+                                .selectFirstByCss(".article .subpage_title_block .subpage_title_block__right-column");
+                        String imdbName = element.selectFirstByCss("a[itemprop='url']").getText();
                         int year = Integer.parseInt(
-                                element.getFirstElementByCss("span.nobr").getText().replaceAll("[^0-9]", ""));
+                                element.selectFirstByCss("span.nobr").getText().replaceAll("[^0-9]", ""));
                         return Optional.of(new ImdbDetails(imdbName, year));
                     } catch (Exception e) {
                         throw new ImdbException("Error IMDB API", url, e);

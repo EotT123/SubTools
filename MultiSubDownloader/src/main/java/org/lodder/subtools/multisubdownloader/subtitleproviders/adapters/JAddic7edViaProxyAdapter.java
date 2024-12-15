@@ -75,8 +75,9 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
         return getProviderSerieId(tvRelease).map(
                 providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
                     try {
-                        return new ExecuteCall<>(() -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode,
-                                language)).message("getSubtitles: [%s]".formatted(
+                        return new ExecuteCall<>(
+                                () -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language))
+                                .message("getSubtitles: [%s]".formatted(
                                         TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode)))
                                 .retryWhenHttpCode(ReturnCode.REFRESHING)
                                 .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
