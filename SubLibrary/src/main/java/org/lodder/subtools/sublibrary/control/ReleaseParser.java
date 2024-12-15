@@ -39,7 +39,7 @@ public class ReleaseParser {
     }
 
     private Release parsePatternResult(Path file, String fileParseName) throws ReleaseParseException {
-        List<String> namedGroups = namedMatcher.namedPattern().groupNames();
+        List<String> namedGroups = namedMatcher.namedPattern().groupNames;
         String seriesName = "";
         List<Integer> episodeNumbers = new ArrayList<>();
         int seasonNumber = 0;
@@ -55,7 +55,8 @@ public class ReleaseParser {
                 } else if (namedGroups.contains("partnumber")) {
                     number = namedMatcher.group("partnumber");
                 }
-                movieName = cleanUnwantedChars(namedMatcher.group("moviename") + " " + namedMatcher.group("part") + " " + number);
+                movieName = cleanUnwantedChars(
+                        namedMatcher.group("moviename") + " " + namedMatcher.group("part") + " " + number);
             } else {
                 movieName = cleanUnwantedChars(namedMatcher.group("moviename"));
             }

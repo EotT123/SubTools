@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import extensions.java.io.InputStream.InputStreamExt;
 import extensions.java.nio.file.Path.PathExt;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.sublibrary.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class HttpClient {
         int respCode = ((HttpURLConnection) conn).getResponseCode();
 
         if (respCode == 200) {
-            String result = IOUtils.toString(conn.getInputStream(), StandardCharsets.UTF_8);
+            String result = InputStreamExt.asString(conn.getInputStream(), StandardCharsets.UTF_8);
             ((HttpURLConnection) conn).disconnect();
             return result;
         }
@@ -91,7 +91,7 @@ public class HttpClient {
                 return doGet(new URI(conn.getHeaderField("Location")).toURL(), userAgent);
             }
 
-            String result = IOUtils.toString(conn.getInputStream(), StandardCharsets.UTF_8);
+            String result = InputStreamExt.asString(conn.getInputStream(), StandardCharsets.UTF_8);
             conn.disconnect();
             return result;
 
@@ -148,7 +148,7 @@ public class HttpClient {
 
         if (status != HttpURLConnection.HTTP_OK) {
             if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
-                || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
                 if (HttpClient.isUrl(conn.getHeaderField("Location"))) {
                     url = new URI(conn.getHeaderField("Location")).toURL();
                 } else {

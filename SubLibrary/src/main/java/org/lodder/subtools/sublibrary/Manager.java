@@ -39,7 +39,6 @@ import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
 import org.lodder.subtools.sublibrary.cache.InMemoryCache;
-import org.lodder.subtools.sublibrary.util.IOUtils;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.xml.XMLHelper;
@@ -223,7 +222,7 @@ public class Manager {
 
         @Override
         public InputStream getAsInputStream() throws ManagerException {
-            return IOUtils.toInputStream(get(), StandardCharsets.UTF_8);
+            return get().toInputStream(StandardCharsets.UTF_8);
         }
 
         @Override

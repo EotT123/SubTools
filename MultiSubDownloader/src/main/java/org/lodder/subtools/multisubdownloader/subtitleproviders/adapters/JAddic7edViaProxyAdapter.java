@@ -109,7 +109,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
                             "getProviderSerieName: [$serieName]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                        LOGGER.info("API %s - Could not find serie name [%s]".formatted(providerName, serieName));
+                        LOGGER.info("API $providerName - Could not find serie name [$serieName]");
                         return List.of();
                     })
                     .execute();
@@ -147,7 +147,7 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
         }
     }
 
-    public static class ExecuteCall<T> extends AbstractAdapter.ExecuteCall<T, ApiException> {
+    private static class ExecuteCall<T> extends AbstractAdapter.ExecuteCall<T, ApiException> {
 
         public ExecuteCall(ThrowingSupplier<T, ApiException> supplier) {
             super(supplier);

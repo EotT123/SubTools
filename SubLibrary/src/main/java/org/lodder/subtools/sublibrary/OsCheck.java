@@ -2,6 +2,8 @@ package org.lodder.subtools.sublibrary;
 
 import java.util.Locale;
 
+import manifold.ext.props.rt.api.val;
+
 /**
  * helper class to check the operating system this Java VM runs in
  * <p>
@@ -19,27 +21,19 @@ public final class OsCheck {
         WINDOWS, MAC, LINUX, OTHER
     }
 
-    // cached result of OS detection
-    private static OSType detectedOS;
+    @val static OSType operatingSystemType = calculatedOsType();
 
-    /**
-     * detect the operating system from the os.name System property and cache the result
-     *
-     * @return the operating system detected
-     */
-    public static OSType getOperatingSystemType() {
-        if (detectedOS == null) {
-            String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-            if (os.contains("mac") || os.contains("darwin")) {
-                detectedOS = OSType.MAC;
-            } else if (os.contains("win")) {
-                detectedOS = OSType.WINDOWS;
-            } else if (os.contains("nux")) {
-                detectedOS = OSType.LINUX;
-            } else {
-                detectedOS = OSType.OTHER;
-            }
+    private static OSType calculatedOsType() {
+        // detect the operating system from the os.name System property
+        String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        if (os.contains("mac") || os.contains("darwin")) {
+            return OSType.MAC;
+        } else if (os.contains("win")) {
+            return OSType.WINDOWS;
+        } else if (os.contains("nux")) {
+            return OSType.LINUX;
+        } else {
+            return OSType.OTHER;
         }
-        return detectedOS;
     }
 }

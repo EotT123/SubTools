@@ -1,13 +1,13 @@
 package org.lodder.subtools.sublibrary.util;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import manifold.ext.rt.api.Self;
 
 public class NamedMatcher implements NamedMatchResult {
 
@@ -24,7 +24,7 @@ public class NamedMatcher implements NamedMatchResult {
 
     NamedMatcher(NamedPattern parentPattern, CharSequence input) {
         this.parentPattern = parentPattern;
-        this.matcher = parentPattern.pattern().matcher(input);
+        this.matcher = parentPattern.pattern.matcher(input);
     }
 
     public Pattern standardPattern() {
@@ -37,7 +37,7 @@ public class NamedMatcher implements NamedMatchResult {
 
     public NamedMatcher usePattern(NamedPattern newPattern) {
         this.parentPattern = newPattern;
-        matcher.usePattern(newPattern.pattern());
+        matcher.usePattern(newPattern.pattern);
         return this;
     }
 
@@ -96,11 +96,6 @@ public class NamedMatcher implements NamedMatchResult {
     }
 
     @Override
-    public List<String> orderedGroups() {
-        return IntStream.rangeClosed(1, groupCount()).sequential().mapToObj(this::group).collect(Collectors.toList());
-    }
-
-    @Override
     public String group(String groupName) {
         return group(groupIndex(groupName));
     }
@@ -108,13 +103,11 @@ public class NamedMatcher implements NamedMatchResult {
     @Override
     public Map<String, Integer> namedGroups() {
         return IntStream.rangeClosed(1, groupCount()).sequential()
-                .collect(LinkedHashMap::new,
-                        (map, i) -> map.put(parentPattern.groupNames().get(i - 1), i),
-                        Map::putAll);
+                .collect(LinkedHashMap::new, (map, i) -> map.put(parentPattern.groupNames.get(i - 1), i), Map::putAll);
     }
 
     private int groupIndex(String groupName) {
-        return parentPattern.groupNames().indexOf(groupName) + 1;
+        return parentPattern.groupNames.indexOf(groupName) + 1;
     }
 
     @Override
@@ -194,7 +187,8 @@ public class NamedMatcher implements NamedMatchResult {
         return this;
     }
 
-    public boolean equals(Matcher obj) {
+    @Override
+    public boolean equals(@Self Object obj) {
         return matcher.equals(obj);
     }
 

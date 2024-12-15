@@ -431,7 +431,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                             if (!subtitle.fileName.endsWith(".srt")) {
                                 filename = subtitle.fileName + ".srt";
                             }
-                            if (OsCheck.getOperatingSystemType() == OSType.WINDOWS) {
+                            if (OsCheck.operatingSystemType == OSType.WINDOWS) {
                                 filename = filename.removeIllegalWindowsChars();
                             }
 

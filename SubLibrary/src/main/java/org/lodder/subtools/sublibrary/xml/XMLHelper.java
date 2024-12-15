@@ -31,17 +31,17 @@ public class XMLHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
-    private static String XMLCleanup(String text) {
+    private static String xmlCleanup(String text) {
         return text.replace("&amp;", "&");
     }
 
-    private static String HTMLCleanup(String text) {
+    private static String htmlCleanup(String text) {
         return StringUtils.unescapeHTML(text);
     }
 
     public static String getStringTagValue(String sTag, Element eElement) {
         LOGGER.trace("getStringTagValue: sTag [{}]", sTag);
-        return HTMLCleanup(XMLCleanup(getStringTagRawValue(sTag, eElement)));
+        return htmlCleanup(xmlCleanup(getStringTagRawValue(sTag, eElement)));
     }
 
     public static String getStringTagRawValue(String sTag, Element eElement) {
@@ -58,7 +58,7 @@ public class XMLHelper {
     public static String getStringAttributeValue(String sTag, String sAttribute, Element eElement) {
         LOGGER.trace("getStringAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
-        return XMLCleanup(((Element) nlList).getAttribute(sAttribute));
+        return xmlCleanup(((Element) nlList).getAttribute(sAttribute));
     }
 
     public static int getIntTagValue(String sTag, Element eElement) {
@@ -77,7 +77,7 @@ public class XMLHelper {
         LOGGER.trace("getBooleanAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
         return ((Element) nlList).getAttribute(sAttribute) != null
-               && Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
+                && Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
     }
 
     public static String cleanBadChars(String string) {

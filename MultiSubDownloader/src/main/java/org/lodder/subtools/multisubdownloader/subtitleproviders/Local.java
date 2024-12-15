@@ -30,7 +30,6 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +71,8 @@ public class Local implements SubtitleProvider {
             try {
                 Release release = vfp.parse(fileSub);
                 if ((release.videoType == VideoType.EPISODE)
-                        && (((TvRelease) release).season == tvRelease.season && Utils.containsAll(
-                        ((TvRelease) release).episodeNumbers, tvRelease.episodeNumbers))) {
+                        && (((TvRelease) release).season == tvRelease.season &&
+                        new HashSet(((TvRelease) release).episodeNumbers).containsAll(tvRelease.episodeNumbers))) {
 
                     TvReleaseControl epCtrl =
                             new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
@@ -84,7 +83,7 @@ public class Local implements SubtitleProvider {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
                             listFoundSubtitles.add(
                                     Subtitle.downloadSource(fileSub)
-                                            .subtitleSource(getSubtitleSource())
+                                            .subtitleSource(subtitleSource)
                                             .fileName(fileSub.getFileNameAsString())
                                             .language(language)
                                             .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))

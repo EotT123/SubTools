@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import manifold.ext.props.rt.api.val;
+
 public class NamedPattern {
 
     private static final Pattern NAMED_GROUP_PATTERN = Pattern.compile("\\(\\?<(\\w+)>");
 
-    private final Pattern pattern;
-    private final String namedPattern;
-    private final List<String> groupNames;
+    @val Pattern pattern;
+    @val String namedPattern;
+    @val List<String> groupNames;
 
     public static NamedPattern compile(String regex) {
         return new NamedPattern(regex, 0);
@@ -35,20 +37,8 @@ public class NamedPattern {
         return new NamedMatcher(this, input);
     }
 
-    Pattern pattern() {
-        return pattern;
-    }
-
     public String standardPattern() {
         return pattern.pattern();
-    }
-
-    public String namedPattern() {
-        return namedPattern;
-    }
-
-    public List<String> groupNames() {
-        return groupNames;
     }
 
     public String[] split(CharSequence input, int limit) {

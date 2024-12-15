@@ -113,8 +113,8 @@ public final class TvRelease extends Release {
     }
 
     private TvRelease(Path file, String description, String releaseGroup, String quality, String name,
-            String originalName, String customName,
-            String title, int season, List<Integer> episodeNumbers, boolean special) {
+            String originalName, String customName, String title, int season, List<Integer> episodeNumbers,
+            boolean special) {
         super(VideoType.EPISODE, file, description, releaseGroup, quality);
         this.name = name;
         this.title = title;

@@ -17,9 +17,8 @@ public class PrompterBuilderCommon {
     }
 
     protected static <T> Optional<T> prompt(Prompter prompter, Function<String, T> toObjectMapper,
-            Predicate<String> validator,
-            Predicate<T> objValidator, T defaultValue, Supplier<T> defaultValueSupplier, String message,
-            String errorMessage) {
+            Predicate<String> validator, Predicate<T> objValidator, T defaultValue, Supplier<T> defaultValueSupplier,
+            String message, String errorMessage) {
         try {
             String value = prompter.prompt(message + System.lineSeparator());
             if (StringUtils.isEmpty(value)) {

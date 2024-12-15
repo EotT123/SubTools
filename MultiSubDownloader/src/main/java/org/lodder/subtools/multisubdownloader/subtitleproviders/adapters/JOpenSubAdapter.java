@@ -140,8 +140,8 @@ public class JOpenSubAdapter
                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)
                 .releaseGroup(
                         ReleaseParser.extractReleaseGroup(file.getFileName(), file.getFileName().endsWith(".srt")))
-                .uploader(attributes.getUploader().getName())
-                .hearingImpaired(attributes.isHearingImpaired());
+                .uploader(attributes.getUploader() != null ? attributes.getUploader().getName() : null)
+                .hearingImpaired(Boolean.TRUE == attributes.isHearingImpaired());
     }
 
     @Override
@@ -162,6 +162,6 @@ public class JOpenSubAdapter
 
     @Override
     public String providerSerieIdToDisplayString(OpensubtitleSerieId providerSerieId) {
-        return "${providerSerieId.name} (${providerSerieId.getYear()})";
+        return "${providerSerieId.name} (${providerSerieId.year})";
     }
 }

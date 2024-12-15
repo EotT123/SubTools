@@ -82,8 +82,7 @@ public class JPodnapisiAdapter
         return getProviderSerieId(tvRelease).map(
                 providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
                     try {
-                        return getApi().getSerieSubtitles(providerSerieId, tvRelease.season, episode, language)
-                                .stream();
+                        return api.getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                     } catch (PodnapisiException e) {
                         LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                                 TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),

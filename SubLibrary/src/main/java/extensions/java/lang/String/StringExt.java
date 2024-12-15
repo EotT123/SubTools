@@ -1,6 +1,9 @@
 package extensions.java.lang.String;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import lombok.experimental.UtilityClass;
@@ -22,5 +25,9 @@ public class StringExt {
 
     public static String urlEncode(@This String text) {
         return URLEncoder.encode(text, StandardCharsets.UTF_8);
+    }
+
+    public static InputStream toInputStream(@This String text, Charset charset) {
+        return new ByteArrayInputStream(text.getBytes(charset));
     }
 }
