@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ public class LibrarySettings {
     }
 
     public boolean hasAnyLibraryAction(LibraryActionType... libraryActions) {
-        return Arrays.stream(libraryActions).anyMatch(this::hasLibraryAction);
+        return libraryActions.stream().anyMatch(this::hasLibraryAction);
     }
 
     public boolean hasLibraryOtherFileAction(LibraryOtherFileActionType libraryOtherFileAction) {

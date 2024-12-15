@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -77,7 +76,7 @@ public class SettingsControl {
         try {
             // clean up
             preferences.clear();
-            Arrays.stream(SettingValue.values()).forEach(sv -> sv.store(this, preferences));
+            SettingValue.values().forEach(sv -> sv.store(this, preferences));
             updateProxySettings();
         } catch (BackingStoreException e) {
             LOGGER.error(e.getMessage(), e);
@@ -201,7 +200,7 @@ public class SettingsControl {
         MOVIE_LIBRARY_FILENAME_STRUCTURE.store(this, preferences);
 
         try {
-            Arrays.stream(preferences.keys()).forEach(key -> {
+            preferences.keys().forEach(key -> {
                 String value = preferences.get(key, "");
                 preferences.remove(key);
                 preferences.put(StringUtils.capitalize(key), value);
@@ -276,7 +275,7 @@ public class SettingsControl {
     }
 
     public void migrateSettingsV4ToV5() {
-        Arrays.stream(MappingType.ADDIC7ED_PROXY.getSelectionForKeyPrefixList())
+        MappingType.ADDIC7ED_PROXY.selectionForKeyPrefixList
                 .forEach(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
                         .forEach(serieMappingPair -> manager.valueBuilder()
                                 .cacheType(CacheType.DISK)
@@ -357,8 +356,8 @@ public class SettingsControl {
 
     public void migrateSettingsV7ToV8() {
         if (settings.loginOpenSubtitlesEnabled &&
-            !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername,
-                    settings.loginOpenSubtitlesPassword)) {
+                !OpenSubtitlesApi.isValidCredentials(settings.loginOpenSubtitlesUsername,
+                        settings.loginOpenSubtitlesPassword)) {
             settings.loginOpenSubtitlesEnabled = false;
             LOGIN_OPEN_SUBTITLES_ENABLED.store(this, preferences);
         }

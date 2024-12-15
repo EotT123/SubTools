@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 
-import java.util.Arrays;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -81,6 +80,6 @@ public enum LanguageId {
     @val int id;
 
     public static List<LanguageId> forLanguage(Language language) {
-        return Arrays.stream(LanguageId.values()).filter(langId -> langId.language == language).toList();
+        return LanguageId.values().stream().filter(langId -> langId.language == language).toList();
     }
 }

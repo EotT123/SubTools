@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.util.prompter;
 
-import java.util.Arrays;
 import java.util.List;
 
 import dnl.utils.text.table.TextTable;
@@ -14,8 +13,9 @@ public class TableDisplayer<T> {
     @SafeVarargs
     public final void display(T... tableElements) {
         String[] columnNames = columnDisplayers.stream().map(ColumnDisplayer::columnName).toArray(String[]::new);
-        Object[][] dataTable = Arrays.stream(tableElements)
-                .map(tableElement -> columnDisplayers.stream().map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
+        Object[][] dataTable = tableElements.stream()
+                .map(tableElement -> columnDisplayers.stream()
+                        .map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
                         .toArray())
                 .toArray(Object[][]::new);
 
@@ -29,7 +29,8 @@ public class TableDisplayer<T> {
 
         String[] columnNames = columnDisplayers.stream().map(ColumnDisplayer::columnName).toArray(String[]::new);
         Object[][] dataTable = tableElements.stream()
-                .map(tableElement -> columnDisplayers.stream().map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
+                .map(tableElement -> columnDisplayers.stream()
+                        .map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
                         .toArray())
                 .toArray(Object[][]::new);
 

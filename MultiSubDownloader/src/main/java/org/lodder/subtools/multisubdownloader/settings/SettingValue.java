@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.settings;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -448,7 +447,7 @@ public enum SettingValue {
     }
 
     public static void loadAll(SettingsControl settingsControl, Preferences preferences) {
-        Arrays.stream(SettingValue.values()).forEach(sv -> sv.load(settingsControl, preferences));
+        SettingValue.values().forEach(sv -> sv.load(settingsControl, preferences));
     }
 
 
@@ -509,7 +508,8 @@ public enum SettingValue {
     }
 
     private interface SettingTypedPreferenceGetterIntf<T> {
-        SettingTypedRootElementFunctionIntf<T> preferencesGetter(TriFunction<Preferences, String, T, T> preferencesGetter);
+        SettingTypedRootElementFunctionIntf<T> preferencesGetter(
+                TriFunction<Preferences, String, T, T> preferencesGetter);
     }
 
     private interface SettingTypedRootElementFunctionIntf<T> {
@@ -619,13 +619,15 @@ public enum SettingValue {
                 case SINGLE_VALUE -> {
                     super.storeValueFunction((settingsControl, preferences) -> {
                         T value = valueGetter.apply(getRootElement(settingsControl));
-                        if (!Objects.equal(value, getDefaultValue()) && !(value instanceof String text && "".equals(text))) {
+                        if (!Objects.equal(value, getDefaultValue()) &&
+                                !(value instanceof String text && "".equals(text))) {
                             preferencesSetter.accept(preferences, key, value);
                         }
                     });
 
-                    super.loadValueFunction((settingsControl, preferences) -> valueSetter.accept(getRootElement(settingsControl),
-                            preferencesGetter.apply(preferences, key, getDefaultValue())));
+                    super.loadValueFunction(
+                            (settingsControl, preferences) -> valueSetter.accept(getRootElement(settingsControl),
+                                    preferencesGetter.apply(preferences, key, getDefaultValue())));
                 }
                 case COLLECTION -> {
                     super.storeValueFunction((settingsControl, preferences) -> {
@@ -641,7 +643,8 @@ public enum SettingValue {
                         R rootElement = getRootElement(settingsControl);
                         listCleaner.accept(rootElement);
                         IntStream.range(0, numberOfItems)
-                                .forEach(i -> valueAdder.accept(rootElement, toObjectMapper.apply(preferences.get(key + i, ""))));
+                                .forEach(i -> valueAdder.accept(rootElement,
+                                        toObjectMapper.apply(preferences.get(key + i, ""))));
                     });
                 }
                 default -> throw new IllegalArgumentException("Unexpected value: " + settingType);

@@ -5,8 +5,6 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.io.Serial;
-import java.util.Arrays;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -24,8 +22,8 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
     public Predicate<String> valueVerifier = StringUtils::isNotEmpty;
 
     private boolean requireValue;
-    private Consumer<String> valueChangedCalbackListener;
-    private BooleanConsumer[] validityChangedCalbackListeners;
+    private Consumer<String> valueChangedCallbackListener;
+    private BooleanConsumer[] validityChangedCallbackListeners;
 
     private final ObjectWrapper<String> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();
@@ -67,14 +65,14 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
     }
 
     @Override
-    public MyPasswordField withValueChangedCallback(Consumer<String> valueChangedCalbackListener) {
-        this.valueChangedCalbackListener = valueChangedCalbackListener;
+    public MyPasswordField withValueChangedCallback(Consumer<String> valueChangedCallbackListener) {
+        this.valueChangedCallbackListener = valueChangedCallbackListener;
         return this;
     }
 
     @Override
-    public MyPasswordField withValidityChangedCallback(BooleanConsumer... validityChangedCalbackListeners) {
-        this.validityChangedCalbackListeners = validityChangedCalbackListeners;
+    public MyPasswordField withValidityChangedCallback(BooleanConsumer... validityChangedCallbackListeners) {
+        this.validityChangedCallbackListeners = validityChangedCallbackListeners;
         return this;
     }
 
@@ -109,11 +107,11 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
         } else if (requireValue) {
             completeValueVerifier = StringUtils::isNotEmpty;
         } else {
-            completeValueVerifier = t -> true;
+            completeValueVerifier = _ -> true;
         }
 
-        if (valueVerifier != null || requireValue || valueChangedCalbackListener != null ||
-            validityChangedCalbackListeners != null) {
+        if (valueVerifier != null || requireValue || valueChangedCallbackListener != null ||
+                validityChangedCallbackListeners != null) {
             checkValidity(getRawText());
             getDocument().addDocumentListener(new DocumentListener() {
 
@@ -141,14 +139,14 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
         boolean valid = completeValueVerifier.test(text);
         setSuperBorder(valid ? MyPasswordField.getDefaultBorder(this) : ERROR_BORDER);
 
-        boolean changedValidity =  validWrapper.value != valid;
+        boolean changedValidity = validWrapper.value != valid;
         validWrapper.value = valid;
         if (changedValidity && validityChangedCallbackListeners != null) {
-            Arrays.stream(validityChangedCallbackListeners).forEach(listener -> listener.accept(valid));
+            validityChangedCallbackListeners.forEach(listener -> listener.accept(valid));
         }
 
         if (valueChangedCallbackListener != null) {
-            boolean valueChanged = !StringUtils.equals(valueWrapper.value,  text);
+            boolean valueChanged = !StringUtils.equals(valueWrapper.value, text);
             valueWrapper.value = text;
             if (valueChanged) {
                 valueChangedCallbackListener.accept(text);

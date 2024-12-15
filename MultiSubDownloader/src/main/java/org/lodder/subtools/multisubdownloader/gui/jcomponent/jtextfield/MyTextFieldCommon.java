@@ -28,8 +28,8 @@ public abstract class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> ex
     private Function<String, T> toObjectMapper;
     private Predicate<String> valueVerifier;
     private boolean requireValue;
-    private Consumer<T> valueChangedCalbackListener;
-    private BooleanConsumer[] validityChangedCalbackListeners;
+    private Consumer<T> valueChangedCallbackListener;
+    private BooleanConsumer[] validityChangedCallbackListeners;
 
     private final ObjectWrapper<T> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();
@@ -78,14 +78,14 @@ public abstract class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> ex
     }
 
     @Override
-    public R withValueChangedCallback(Consumer<T> valueChangedCalbackListener) {
-        this.valueChangedCalbackListener = valueChangedCalbackListener;
+    public R withValueChangedCallback(Consumer<T> valueChangedCallbackListener) {
+        this.valueChangedCallbackListener = valueChangedCallbackListener;
         return self();
     }
 
     @Override
-    public final R withValidityChangedCallback(BooleanConsumer... validityChangedCalbackListeners) {
-        this.validityChangedCalbackListeners = validityChangedCalbackListeners;
+    public final R withValidityChangedCallback(BooleanConsumer... validityChangedCallbackListeners) {
+        this.validityChangedCallbackListeners = validityChangedCallbackListeners;
         return self();
     }
 
@@ -133,7 +133,8 @@ public abstract class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> ex
             completeValueVerifier = t -> true;
         }
 
-        if (valueVerifier != null || requireValue || valueChangedCalbackListener != null || validityChangedCalbackListeners != null) {
+        if (valueVerifier != null || requireValue || valueChangedCallbackListener != null ||
+                validityChangedCallbackListeners != null) {
             checkValidity(getText());
             getDocument().addDocumentListener(new DocumentListener() {
 
@@ -162,15 +163,15 @@ public abstract class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> ex
         setSuperBorder(valid ? MyTextFieldCommon.getDefaultBorder(self()) : ERROR_BORDER);
 
         boolean changedValidity = validWrapper.setValue(valid);
-        if (changedValidity && validityChangedCalbackListeners != null) {
-            Arrays.stream(validityChangedCalbackListeners).forEach(listener -> listener.accept(valid));
+        if (changedValidity && validityChangedCallbackListeners != null) {
+            Arrays.stream(validityChangedCallbackListeners).forEach(listener -> listener.accept(valid));
         }
 
-        if (valueChangedCalbackListener != null) {
+        if (valueChangedCallbackListener != null) {
             T value = toObjectMapper.apply(text);
             boolean valueChanged = valueWrapper.setValue(toObjectMapper.apply(text));
             if (valueChanged) {
-                valueChangedCalbackListener.accept(value);
+                valueChangedCallbackListener.accept(value);
             }
         }
     }

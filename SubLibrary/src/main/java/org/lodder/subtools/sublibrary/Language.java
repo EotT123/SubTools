@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -78,18 +77,18 @@ public enum Language {
     @val Set<String> langCodesOther;
 
     public static Language fromValue(String value) {
-        return Arrays.stream(Language.values())
+        return Language.values().stream()
                 .filter(lang -> lang.name().equalsIgnoreCase(value))
                 .findAny()
                 .orElseThrow();
     }
 
     public static Optional<Language> fromValueOptional(String value) {
-        return Arrays.stream(Language.values()).filter(lang -> lang.name().equalsIgnoreCase(value)).findAny();
+        return Language.values().stream().filter(lang -> lang.name().equalsIgnoreCase(value)).findAny();
     }
 
     public static Optional<Language> fromIdOptional(String languageId) {
-        return Arrays.stream(Language.values()).filter(lang -> lang.langCode.equalsIgnoreCase(languageId)).findAny();
+        return Language.values().stream().filter(lang -> lang.langCode.equalsIgnoreCase(languageId)).findAny();
     }
 
     public static Language fromId(String languageId) {

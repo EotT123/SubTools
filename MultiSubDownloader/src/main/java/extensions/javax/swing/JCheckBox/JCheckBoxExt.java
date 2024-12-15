@@ -1,7 +1,6 @@
 package extensions.javax.swing.JCheckBox;
 
 import javax.swing.*;
-import java.util.Arrays;
 
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
@@ -14,8 +13,7 @@ import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 public class JCheckBoxExt {
 
     public static @Self JCheckBox addCheckedChangeListener(@This JCheckBox checkBox, BooleanConsumer... listeners) {
-        checkBox.addItemListener(e -> Arrays.stream(listeners)
-                .forEach(listener -> listener.accept(((JCheckBox) e.getSource()).isSelected())));
+        checkBox.addItemListener(e -> listeners.forEach(lis -> lis.accept(((JCheckBox) e.getSource()).isSelected())));
         return checkBox;
     }
 

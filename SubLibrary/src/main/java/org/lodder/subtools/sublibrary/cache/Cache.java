@@ -97,7 +97,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
             return null;
         } else {
             obj.updateLastAccessed();
-            return (V) obj.value;
+            return obj.value;
         }
 
     }

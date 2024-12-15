@@ -118,7 +118,7 @@ public class ExportImport {
     public static class ExportImportSerieMapping {
 
         public void exportSettings(Path path, Manager manager) throws IOException {
-            List<SeriemappingWithKey> serieMappingsWithKey = Arrays.stream(MappingType.values())
+            List<SeriemappingWithKey> serieMappingsWithKey = MappingType.values().stream()
                     .map(MappingType::getSelectionForKeyPrefixList)
                     .flatMap(Arrays::stream)
                     .flatMap(selectionForKeyPrefix -> manager.valueBuilder()
@@ -144,7 +144,7 @@ public class ExportImport {
             }
             getImportStyle(userInteractionHandler).ifPresent(importStyle -> {
                 if (importStyle == ImportStyle.OVERWRITE) {
-                    Arrays.stream(MappingType.values())
+                    MappingType.values().stream()
                             .map(MappingType::getSelectionForKeyPrefixList)
                             .flatMap(Arrays::stream)
                             .forEach(selectionForKeyPrefix -> manager.clearExpiredCacheBuilder()
@@ -152,12 +152,11 @@ public class ExportImport {
                                     .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
                                     .clear());
                 }
-                Arrays.stream(serieMappings)
-                        .forEach(serieMapping -> manager.valueBuilder()
-                                .cacheType(CacheType.DISK)
-                                .key(serieMapping.key)
-                                .value(serieMapping.serieMapping)
-                                .store());
+                serieMappings.forEach(serieMapping -> manager.valueBuilder()
+                        .cacheType(CacheType.DISK)
+                        .key(serieMapping.key)
+                        .value(serieMapping.serieMapping)
+                        .store());
             });
         }
 

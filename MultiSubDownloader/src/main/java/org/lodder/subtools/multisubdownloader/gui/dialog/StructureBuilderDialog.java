@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serial;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
@@ -113,7 +112,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     private void buildLabelTable(StructureTag[] structureTags) {
-        Arrays.stream(structureTags).forEach(this::addTag);
+        structureTags.forEach(this::addTag);
     }
 
     private void addTag(StructureTag structureTag) {

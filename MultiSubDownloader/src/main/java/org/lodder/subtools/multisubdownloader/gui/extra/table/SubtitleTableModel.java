@@ -4,7 +4,6 @@ import static org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTab
 
 import javax.swing.table.*;
 import java.io.Serial;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -24,8 +23,7 @@ public class SubtitleTableModel extends DefaultTableModel {
     }
 
     public static SubtitleTableModel getDefaultSubtitleTableModel() {
-        String[] columnNames =
-                Arrays.stream(COLUMNS).map(SubtitleTableColumnName::getColumnName).toArray(String[]::new);
+        String[] columnNames = COLUMNS.stream().map(SubtitleTableColumnName::getColumnName).toArray(String[]::new);
         return new SubtitleTableModel(new Object[][]{}, columnNames);
     }
 

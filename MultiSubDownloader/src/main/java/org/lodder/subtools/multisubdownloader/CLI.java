@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -157,7 +156,7 @@ public class CLI {
     private Language getLanguage(CommandLine line) throws CliException {
         if (line.hasCliOption(CliOption.LANGUAGE)) {
             String languageString = line.getCliOptionValue(CliOption.LANGUAGE);
-            return Arrays.stream(Language.values())
+            return Language.values().stream()
                     .filter(lang -> lang.name().equalsIgnoreCase(languageString))
                     .findAny()
                     .orElseThrow(() -> new CliException(Messages.getText("App.NoValidLanguage")));

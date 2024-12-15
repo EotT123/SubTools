@@ -7,7 +7,6 @@ import java.awt.*;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -150,7 +149,7 @@ public class App {
 
     public static Options getCLIOptions() {
         Options options = new Options();
-        Arrays.stream(CliOption.values()).forEach(
+        CliOption.values().forEach(
                 cliOption -> options.addOption(cliOption.value, cliOption.longValue, cliOption.hasArg,
                         cliOption.description));
         return options;

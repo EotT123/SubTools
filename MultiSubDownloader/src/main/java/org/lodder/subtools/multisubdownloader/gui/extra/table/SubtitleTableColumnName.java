@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
-import java.util.Arrays;
 import java.util.function.Function;
 
 import manifold.ext.props.rt.api.override;
@@ -33,7 +32,7 @@ public enum SubtitleTableColumnName implements CustomColumnName {
     }
 
     public static SubtitleTableColumnName forColumnName(String columnName) {
-        return Arrays.stream(SubtitleTableColumnName.values())
+        return SubtitleTableColumnName.values().stream()
                 .filter(stcn -> stcn.columnName.equals(columnName))
                 .findAny()
                 .orElseThrow();

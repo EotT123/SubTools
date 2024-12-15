@@ -14,9 +14,9 @@ public interface MyPasswordFieldOthersIntf {
 
     MyPasswordFieldOthersIntf requireValue(boolean requireValue);
 
-    MyPasswordFieldOthersIntf withValueChangedCallback(Consumer<String> valueChangedCalbackListener);
+    MyPasswordFieldOthersIntf withValueChangedCallback(Consumer<String> valueChangedCallbackListener);
 
-    MyPasswordFieldOthersIntf withValidityChangedCallback(BooleanConsumer... validityChangedCalbackListeners);
+    MyPasswordFieldOthersIntf withValidityChangedCallback(BooleanConsumer... validityChangedCallbackListeners);
 
     MyPasswordField build();
 }
