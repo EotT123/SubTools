@@ -46,7 +46,7 @@ public final class MovieReleaseControl extends ReleaseControl {
                         movieRelease.getImdbId().mapToObj(omdbAdapter::getMovieDetails).orElseGet(Optional::empty);
             }
             movieDetails.ifPresentOrElse(info -> {
-                movieRelease.year = info.year();
+                movieRelease.year = info.year;
                 movieRelease.name = info.name;
             }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info $movieRelease"));
         }

@@ -6,5 +6,5 @@ public interface ReleaseDBIntf {
 
     @val String name;
 
-    int year();
+    @val int year;
 }
