@@ -20,12 +20,13 @@ public final class TvReleaseControl extends ReleaseControl {
 
     private final TheTvdbAdapter jtvdba;
     private final TvRelease tvRelease;
-    @val @override Release videoFile = tvRelease;
+    @val @override Release videoFile;
 
     public TvReleaseControl(TvRelease tvRelease, Settings settings, Manager manager,
             UserInteractionHandler userInteractionHandler) {
         super(settings, manager);
         this.tvRelease = tvRelease;
+        this.videoFile = tvRelease;
         this.jtvdba = TheTvdbAdapter.getInstance(manager, userInteractionHandler);
     }
 
