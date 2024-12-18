@@ -11,11 +11,6 @@ public class EventServiceProvider implements ServiceProvider {
 
     @val @override int priority = 0;
 
-    //    @Override
-    //    public int getPriority() {
-    //        return 0;
-    //    }
-
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {
         // Add EventEmitter to container

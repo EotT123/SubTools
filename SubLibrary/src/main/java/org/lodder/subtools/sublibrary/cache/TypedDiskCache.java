@@ -13,17 +13,6 @@ public final class TypedDiskCache<K, V> extends DiskCache<K, V> {
     private final Function<String, K> toObjectMapperKey;
     private final Function<V, String> toStringMapperValue;
     private final Function<String, V> toObjectMapperValue;
-    //    @SuppressWarnings("unchecked")
-    //    private final LazySupplier<Class<K>> keyType =
-    //            new LazySupplier<>(() -> (Class<K>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this
-    //            .getClass())[0]);
-    //    @override @val(Protected) Class<K> dbKeyType = keyType.get();
-    //    @SuppressWarnings("unchecked")
-    //    private final LazySupplier<Class<V>> valueType =
-    //            new LazySupplier<>(() -> (Class<V>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this
-    //            .getClass())[1]);
-    //
-    //    @override @val(Protected) Class<V> dbValueType = valueType.get();
 
     @Getter(lazy = true) @SuppressWarnings("unchecked")
     private final Class<K> dbKeyType =

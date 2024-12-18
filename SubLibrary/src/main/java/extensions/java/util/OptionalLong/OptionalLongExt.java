@@ -47,36 +47,4 @@ public class OptionalLongExt {
             ThrowingFunction<Long, T, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsLong())) : Optional.empty();
     }
-
-    //    public static <X extends Exception> OptionalLong ifPresentDo(@This OptionalLong optional,
-    //    ThrowingLongConsumer<X> consumer) throws X {
-    //        if (optional.isPresent()) {
-    //            consumer.accept(optional.getAsLong());
-    //        }
-    //        return optional;
-    //    }
-    //
-    //    ////
-    //
-    //    public static <X extends Exception> void orElseDo(@This OptionalLong optional, ThrowingRunnable<X>
-    //    consumer) throws X {
-    //        if (optional.isEmpty()) {
-    //            consumer.run();
-    //        }
-    //    }
-    //
-    //    //
-    //
-    //    public static <T, X extends Exception> Optional<T> mapToObj(@This OptionalLong optionalLong,
-    //    ThrowingLongFunction<T, X> mapper) throws X {
-    //        return optionalLong.isPresent() ? Optional.ofNullable(mapper.apply(optionalLong.getAsLong())) :
-    //        Optional.empty();
-    //    }
-    //
-    //    //
-    //
-    //    public static <T, X extends Exception> OptionalLong map(@This OptionalLong optionalLong,
-    //    ThrowingLongFunction<Long, X> mapper) throws X {
-    //        return optionalLong.isPresent() ? OptionalLong.of(mapper.apply(optionalLong.getAsLong())) : optionalLong;
-    //    }
 }

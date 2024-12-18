@@ -115,8 +115,8 @@ public class PrompterBuilderValueFromList {
                     value = prompter.prompt(message);
                 } else {
                     String choicesMessage = IntStream.range(0, elements.size())
-                                                    .mapToObj(number -> "  - " + (number + 1) + ": " + toStringMapper.apply(elements.get(number)))
-                                                    .collect(Collectors.joining(System.lineSeparator())) + System.lineSeparator();
+                            .mapToObj(nbr -> "  - " + (nbr + 1) + ": " + toStringMapper.apply(elements.get(nbr)))
+                            .collect(Collectors.joining(System.lineSeparator())) + System.lineSeparator();
                     value = prompter.prompt(StringUtils.isBlank(message) ? choicesMessage
                             : message + System.lineSeparator() + choicesMessage);
                 }
@@ -125,7 +125,8 @@ public class PrompterBuilderValueFromList {
                 }
                 int number = Integer.parseInt(value);
                 if (number < 1 || number > elements.size()) {
-                    PrompterUtil.showMessage(prompter, "The entered value isn't in the range [1, %s], try again.", elements.size());
+                    PrompterUtil.showMessage(prompter, "The entered value isn't in the range [1, %s], try again.",
+                            elements.size());
                     return prompt(prompter);
                 }
                 return Optional.ofNullable(elements.get(number - 1));

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
+import static org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag.*;
+
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -7,7 +9,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
@@ -125,20 +126,16 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
                 case TvRelease tvRelease when StringUtils.isNotBlank(structure) -> {
                     String fName = structure;
                     // order is important!
-                    fName = replace(fName, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
-                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG,
-                            tvRelease.episodeNumbers, true);
-                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT,
-                            tvRelease.episodeNumbers, false);
-                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
-                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
-                    fName = replace(fName, SerieStructureTag.EPISODE_LONG,
-                            formattedNumber(tvRelease.firstEpisodeNumber, true));
-                    fName = replace(fName, SerieStructureTag.EPISODE_SHORT,
-                            formattedNumber(tvRelease.firstEpisodeNumber, false));
-                    fName = replace(fName, SerieStructureTag.TITLE, tvRelease.title);
-                    fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
-                    fName = replace(fName, SerieStructureTag.DESCRIPTION, release.description);
+                    fName = replace(fName, SHOW_NAME, getShowName(tvRelease.name));
+                    fName = replaceFormattedEpisodeNumber(fName, EPISODES_LONG, tvRelease.episodeNumbers, true);
+                    fName = replaceFormattedEpisodeNumber(fName, EPISODES_SHORT, tvRelease.episodeNumbers, false);
+                    fName = replace(fName, SEASON_LONG, formattedNumber(tvRelease.season, true));
+                    fName = replace(fName, SEASON_SHORT, formattedNumber(tvRelease.season, false));
+                    fName = replace(fName, EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
+                    fName = replace(fName, EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
+                    fName = replace(fName, TITLE, tvRelease.title);
+                    fName = replace(fName, QUALITY, release.quality);
+                    fName = replace(fName, DESCRIPTION, release.description);
 
                     fName += "." + release.extension;
                     yield fName;
