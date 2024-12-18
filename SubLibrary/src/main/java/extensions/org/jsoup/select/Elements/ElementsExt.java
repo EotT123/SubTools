@@ -1,7 +1,5 @@
 package extensions.org.jsoup.select.Elements;
 
-import java.util.stream.Stream;
-
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
@@ -31,9 +29,9 @@ public class ElementsExt {
         return elements == null ? null : elements.first();
     }
 
-    public static Stream<Element> stream(@This Elements elements) {
-        return elements == null ? Stream.of() : elements.stream();
-    }
+    //    public static Stream<Element> stream(@This Elements elements) {
+    //        return elements == null ? Stream.of() : elements.stream();
+    //    }
 
     public static int getSize(@This Elements elements) {
         return elements == null ? 0 : elements.size();

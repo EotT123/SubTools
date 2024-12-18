@@ -73,6 +73,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
             return switch (cacheMap.get(key)) {
                 case TemporaryCacheObject<?> tempCacheObject -> OptionalLong.of(tempCacheObject.timeToLive);
                 case ExpiringCacheObject<?> _ -> OptionalLong.empty();
+                case null -> OptionalLong.empty();
             };
         }
     }
