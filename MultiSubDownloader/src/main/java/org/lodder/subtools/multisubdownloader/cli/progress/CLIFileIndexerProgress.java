@@ -68,4 +68,10 @@ public class CLIFileIndexerProgress extends CLIProgress implements IndexingProgr
 
         this.printProgBar(this.progress);
     }
+
+    // TODO: remove this when https://github.com/manifold-systems/manifold/issues/642 is fixed
+    public CLIFileIndexerProgress verbose(boolean verbose) {
+        super.verbose(verbose);
+        return this;
+    }
 }

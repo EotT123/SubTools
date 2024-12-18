@@ -73,4 +73,10 @@ public class CLISearchProgress extends CLIProgress implements SearchProgressList
         /* print progressbar */
         this.printProgBar(this.progress);
     }
+
+    // TODO: remove this when https://github.com/manifold-systems/manifold/issues/642 is fixed
+    public CLISearchProgress verbose(boolean verbose) {
+        super.verbose(verbose);
+        return this;
+    }
 }
