@@ -50,7 +50,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
                 return Optional.empty();
             } else {
                 obj.updateLastAccessed();
-                return Optional.ofNullable((V) obj.value);
+                return Optional.ofNullable(obj.value);
             }
         }
     }
@@ -120,7 +120,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
     public List<Pair<K, V>> getEntries(Predicate<K> keyFilter) {
         synchronized (cacheMap) {
-            return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), (V) entry.getValue().value)).toList();
+            return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), entry.getValue().value)).toList();
         }
     }
 

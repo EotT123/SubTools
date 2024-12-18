@@ -37,7 +37,6 @@ public class CLI {
 
     private final Container app;
     private final Settings settings;
-    private final Manager manager;
     private boolean recursive = false;
     private Language language;
     private boolean force = false;
@@ -52,11 +51,11 @@ public class CLI {
     public CLI(SettingsControl settingControl, Container app) {
         this.app = app;
         this.settings = settingControl.getSettings();
-        this.manager = (Manager) this.app.make("Manager");
+        Manager manager = (Manager) this.app.make("Manager");
         checkUpdate(manager);
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(settings, userInteractionHandler);
-        downloadAction = new DownloadAction(settings, (Manager) this.app.make("Manager"), userInteractionHandler);
+        downloadAction = new DownloadAction(settings, manager, userInteractionHandler);
     }
 
     private void checkUpdate(Manager manager) {

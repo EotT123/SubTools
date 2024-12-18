@@ -27,8 +27,7 @@ public class ImageListCellRenderer extends JLabel implements ListCellRenderer<Ob
     @Override
     public Component getListCellRendererComponent(JList<?> jlist, Object value, int cellIndex,
             boolean selected, boolean cellHasFocus) {
-        if (value instanceof JPanel) {
-            Component component = (Component) value;
+        if (value instanceof JPanel component) {
             if (selected) {
                 component.setBackground(jlist.getSelectionBackground());
                 component.setForeground(jlist.getSelectionForeground());

@@ -47,26 +47,26 @@ public class ElementExt extends NodeExt {
     // ----------------- \\
 
     public static @Nullable Element selectFirstByClass(@Nullable @This Element element, String className) {
-        return element == null ? null : selectFirst(element, new Evaluator.Class(requireNotEmpty(className)));
+        return element == null ? null : element.selectFirst(new Evaluator.Class(requireNotEmpty(className)));
     }
 
     public static @Nullable Element selectFirstByTag(@Nullable @This Element element, String tagName) {
-        return element == null ? null : selectFirst(element, new Evaluator.Tag(requireNotEmpty(tagName)));
+        return element == null ? null : element.selectFirst(new Evaluator.Tag(requireNotEmpty(tagName)));
     }
 
     public static @Nullable Element selectFirstByAttribute(@Nullable @This Element element, String attribute) {
-        return element == null ? null : selectFirst(element, new Evaluator.Attribute(requireNotEmpty(attribute)));
+        return element == null ? null : element.selectFirst(new Evaluator.Attribute(requireNotEmpty(attribute)));
     }
 
     public static @Nullable Element selectFirstByCss(@Nullable @This Element element, String cssQuery) {
-        return element == null ? null : selectFirst(element, QueryParser.parse(requireNotEmpty(cssQuery)));
+        return element == null ? null : element.selectFirst(QueryParser.parse(requireNotEmpty(cssQuery)));
     }
 
     public static @Nullable Element selectFirstById(@Nullable @This Element element, String id) {
-        return element == null ? null : selectFirst(element, new Evaluator.Id(requireNotEmpty(id)));
+        return element == null ? null : element.selectFirst(new Evaluator.Id(requireNotEmpty(id)));
     }
 
-    public static @Nullable Element selectFirst(@Nullable @This Element element, Evaluator evaluator) {
+    public static @Nullable Element selectFirstBy(@Nullable @This Element element, Evaluator evaluator) {
         return element == null ? null : Collector.findFirst(evaluator, element);
     }
 
@@ -148,7 +148,7 @@ public class ElementExt extends NodeExt {
 
     public static Element selectOrThrow(@Nullable @This Element element, Evaluator evaluator)
             throws WebpageException {
-        Element n = selectFirst(element, evaluator);
+        Element n = selectFirstBy(element, evaluator);
         if (n == null) {
             throw new WebpageException("Could not find element using selector '%s'".formatted(evaluator));
         }

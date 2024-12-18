@@ -126,7 +126,7 @@ public class Local implements SubtitleProvider {
                                 && DetectLanguage.execute(fileSub) == language) {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(Subtitle.downloadSource(fileSub)
-                                    .subtitleSource(getSubtitleSource())
+                                    .subtitleSource(subtitleSource)
                                     .fileName(fileSub.getFileNameAsString())
                                     .language(language) // TODO previously: language(""). This was not correct?
                                     .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))

@@ -32,9 +32,9 @@ public class CleanAction {
 
         release.getPath().list().asThrowingStream(IOException.class)
                 .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
-                             || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
+                        || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
                 .forEach(p -> {
-                    switch (librarySettings.getLibraryOtherFileAction()) {
+                    switch (librarySettings.libraryOtherFileAction) {
                         case MOVE -> move(p, destination);
                         case MOVEANDRENAME -> moveAndRename(p, destination, videoFileName);
                         case REMOVE -> delete(p);
@@ -48,7 +48,8 @@ public class CleanAction {
     private void rename(Path path, Path destinationFolder, String videoFileName) throws IOException {
         if (path.isRegularFile()) {
             String fileName =
-                    path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME : StringUtils.substringBeforeLast(videoFileName, ".");
+                    path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
+                            StringUtils.substringBeforeLast(videoFileName, ".");
             String extension = path.getExtension();
             if (!extension.isBlank()) {
                 extension = "." + extension;
@@ -66,7 +67,8 @@ public class CleanAction {
     private void moveAndRename(Path path, Path destinationFolder, String videoFileName) throws IOException {
         if (path.isRegularFile()) {
             String fileName =
-                    path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME : StringUtils.substringBeforeLast(videoFileName, ".");
+                    path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
+                            StringUtils.substringBeforeLast(videoFileName, ".");
             String extension = path.getExtension();
             if (!extension.isBlank()) {
                 extension = "." + extension;

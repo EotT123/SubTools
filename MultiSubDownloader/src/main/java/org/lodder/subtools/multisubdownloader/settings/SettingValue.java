@@ -759,11 +759,11 @@ public enum SettingValue {
             };
             this.loadValueFunction = (settingsControl, preferences) -> {
                 int numberOfItems = preferences.getInt(key + "Size", 0);
-                IntStream.range(0, numberOfItems).forEach(idx -> {
-                    valueAdder.accept(getRootElement(settingsControl),
-                            toObjectMapperKey.apply(preferences.get(getKeyString(key, idx), "")),
-                            toObjectMapperValue.apply(preferences.get(getValueString(key, idx), "")));
-                });
+                IntStream.range(0, numberOfItems).forEach(idx ->
+                        valueAdder.accept(getRootElement(settingsControl),
+                                toObjectMapperKey.apply(preferences.get(getKeyString(key, idx), "")),
+                                toObjectMapperValue.apply(preferences.get(getValueString(key, idx), "")))
+                );
 
             };
             return this;
