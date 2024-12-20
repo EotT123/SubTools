@@ -1,11 +1,11 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog.progress.search;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.table.*;
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.lodder.subtools.multisubdownloader.Messages;
 
 public class SearchProgressTableModel extends DefaultTableModel {
 
@@ -17,9 +17,9 @@ public class SearchProgressTableModel extends DefaultTableModel {
         super();
         this.setColumnCount(3);
         this.setColumnIdentifiers(new String[]{
-                Messages.getText("SearchProgressTableModel.Source"),
-                Messages.getText("SearchProgressTableModel.Queue"),
-                Messages.getText("SearchProgressTableModel.Release") });
+            getText("SearchProgressTableModel.Source"),
+            getText("SearchProgressTableModel.Queue"),
+            getText("SearchProgressTableModel.Release") });
     }
 
     public void update(String source, int queue, String release) {

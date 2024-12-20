@@ -1,6 +1,7 @@
 package extensions.javax.swing.JComponent;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
 
 import extensions.java.awt.Component.ComponentExt;
@@ -61,6 +62,11 @@ public class JComponentExt {
 
     public static @Self JComponent withToolTipText(@This JComponent component, String text) {
         component.setToolTipText(text);
+        return component;
+    }
+
+    public static @Self JComponent border(@This JComponent component, Border border) {
+        component.setBorder(border);
         return component;
     }
 }

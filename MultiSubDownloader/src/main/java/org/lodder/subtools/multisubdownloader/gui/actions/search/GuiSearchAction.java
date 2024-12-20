@@ -4,7 +4,6 @@ import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.List;
 
-import lombok.NonNull;
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
 import org.lodder.subtools.multisubdownloader.GUI;
@@ -25,10 +24,10 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction {
 
-    @get(Protected) @NonNull GUI mainWindow;
-    @get(Protected) @NonNull SearchPanel<P> searchPanel;
+    @get(Protected) GUI mainWindow;
+    @get(Protected) SearchPanel<P> searchPanel;
     @get(Protected) SubtitleFiltering filtering;
-    @get(Protected) @NonNull ReleaseFactory releaseFactory;
+    @get(Protected) ReleaseFactory releaseFactory;
     @get(Protected) @override IndexingProgressListener indexingProgressListener;
     @get(Protected) @override SearchProgressListener searchProgressListener;
     @get(Protected) @override UserInteractionHandlerGUI userInteractionHandler;

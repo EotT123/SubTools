@@ -15,28 +15,25 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
     @Serial
     private static final long serialVersionUID = -2320149791421648965L;
 
-    private final Cancelable worker;
     private JProgressBar progressBar;
     private JLabel label;
 
     public ProgressDialog(JFrame frame, Cancelable sft) {
         super(frame, Messages.getText("ProgressDialog.Title"), false);
-        worker = sft;
         StatusMessenger.instance.addListener(this);
-        initializeUi();
+        initializeUi(sft);
         setDialogLocation(frame);
         repaint();
     }
 
     public ProgressDialog(Cancelable sft) {
         super(Messages.getText("ProgressDialog.Title"), false);
-        worker = sft;
         StatusMessenger.instance.addListener(this);
-        initializeUi();
+        initializeUi(sft);
         repaint();
     }
 
-    private void initializeUi() {
+    private void initializeUi(Cancelable worker) {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -44,32 +41,28 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
             }
         });
         setBounds(100, 100, 501, 151);
-        getContentPane().setLayout(new MigLayout("", "[][475px,center][]", "[][40px:n][][]"));
 
-        label = new JLabel("");
-        getContentPane().add(label, "cell 1 0 2 1,alignx left");
-
-        progressBar = new JProgressBar(0, 100);
-        progressBar.setIndeterminate(true);
-        getContentPane().add(progressBar, "cell 1 1,grow");
-
-        JButton btnStop = new JButton("Stop!");
-        btnStop.addActionListener(_ -> worker.cancel(true));
-        getContentPane().add(btnStop, "cell 1 2 1 2,alignx left");
+        getContentPane()
+            .layout(new MigLayout("", "[][475px,center][]", "[][40px:n][][]"))
+            .addComponent("cell 1 0 2 1,alignx left", label = new JLabel(""))
+            .addComponent("cell 1 1,grow", progressBar = new JProgressBar(0, 100).indeterminate((true)))
+            .addComponent("cell 1 2 1 2,alignx left", new JButton("Stop!")
+                .actionListener(_ -> worker.cancel(true))
+            );
     }
 
     public void setMessage(String message) {
-        label.setText(message);
+        label.text = message;
         repaint();
     }
 
     public String getMessage() {
-        return label.getText();
+        return label.text;
     }
 
     @Override
     public void message(String message) {
-        setMessage(message);
+        this.message = message;
     }
 
     public void updateProgress(int progress) {

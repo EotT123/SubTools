@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import javax.swing.RowSorter.*;
 import javax.swing.border.*;
@@ -19,9 +21,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
-import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Manager;
@@ -34,62 +34,137 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final JPanel contentPanel = new JPanel();
-    private final Manager manager;
     private final MappingTableModel mappingTableModel;
     private final SubtitleProviderStore subtitleProviderStore;
-    private final UserInteractionHandlerGUI userInteractionHandler;
     private final JButton btnAddCustomMapping;
-    private JTable table;
+    private final JTable table;
     private Optional<SubtitleProvider> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
-    /**
-     * Create the dialog.
-     */
-    public MappingEpisodeNameDialog(JFrame frame, final SettingsControl prefCtrl, Manager manager,
-            SubtitleProviderStore subtitleProviderStore, UserInteractionHandlerGUI userInteractionHandler) {
-        super(frame, Messages.getText("MappingEpisodeNameDialog.Title"), true);
-        this.manager = manager;
+    public MappingEpisodeNameDialog(JFrame frame, Manager manager, SubtitleProviderStore subtitleProviderStore,
+        UserInteractionHandlerGUI userInteractionHandler) {
+        super(frame, getText("MappingEpisodeNameDialog.Title"), true);
         this.subtitleProviderStore = subtitleProviderStore;
-        this.userInteractionHandler = userInteractionHandler;
-        this.btnAddCustomMapping = new JButton(Messages.getText("MappingEpisodeNameDialog.ChangeMapping"));
         this.mappingTableModel = new MappingTableModel(manager);
-        initialize();
+        setResizable(true);
+        setBounds(150, 150, 650, 400);
+
+        table = new JTable().model(mappingTableModel).rowSorter(TableRowSorter::new);
+
+        getContentPane()
+            .layout(new BorderLayout())
+            .addComponent(BorderLayout.CENTER, new JPanel()
+                .border(new EmptyBorder(5, 5, 5, 5))
+                .layout(new GridBagLayout()
+                    .columnWidths(new int[]{ 0, 0 })
+                    .rowHeights(new int[]{ 0, 40, 0 })
+                    .columnWeights(new double[]{ 1.0, Double.MIN_VALUE })
+                    .rowWeights(new double[]{ 0.0, 1.0, Double.MIN_VALUE }))
+                // select provider panel
+                .addComponent(new JPanel()
+                    .addComponent(new JLabel(getText("MappingEpisodeNameDialog.SelectProvider")))
+                    .addComponent(new JComboBox<>()
+                        .model(new DefaultComboBoxModel<>(MappingType.values()))
+                        .itemListener(event -> selectMappingType((MappingType) event.getItem()))))
+                .addComponent(new JPanel(),
+                    new GridBagConstraints().insets(new Insets(0, 0, 5, 0))
+                        .fill(GridBagConstraints.BOTH).gridx(0).gridy(0))
+                .addComponent(new JScrollPane().viewportView(table),
+                    new GridBagConstraints().fill(GridBagConstraints.BOTH).gridx(0).gridy(1)))
+            // button panel
+            .addComponent(BorderLayout.SOUTH, new JPanel()
+                .layout(new MigLayout("", "[25px][50px][grow][50px][grow][50px][25px]",
+                    "[][25px,grow,fill]"))
+                .addComponent("skip", new JButton(getText("MappingEpisodeNameDialog.DeleteRow"))
+                    .actionListener(_ -> {
+                        int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
+                        MappingTableModel model = (MappingTableModel) table.getModel();
+                        Row row = (Row) model.getDataVector().get(rowNbr);
+                        manager.valueBuilder().cacheType(CacheType.DISK).key(row.key).remove();
+                        if (row.selectionForKeyPrefix.deleteOtherFunction() != null) {
+                            manager.valueBuilder()
+                                .cacheType(CacheType.DISK)
+                                .key(row.selectionForKeyPrefix.deleteOtherFunction().apply(row.key))
+                                .remove();
+                        }
+                        model.removeRow(rowNbr);
+                    }))
+                .addComponent("skip", btnAddCustomMapping =
+                    new JButton(getText("MappingEpisodeNameDialog.ChangeMapping"))
+                        .actionListener(() -> {
+                            int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
+                            MappingTableModel model = (MappingTableModel) table.getModel();
+
+                            Row row = (Row) model.getDataVector().get(rowNbr);
+                            String currentName = row.serieMapping.name;
+
+                            String message = getText("MappingEpisodeNameDialog.enterNewNameForSerie",
+                                currentName);
+                            selectedSubtitleProvider.ifPresent(provider ->
+                                userInteractionHandler.enter(message, message).ifPresent(newName -> {
+                                    TvRelease tvRelease = TvRelease.builder()
+                                        .name(currentName)
+                                        .season(row.serieMapping.season)
+                                        .episode(1)
+                                        .originalName(currentName)
+                                        .customName(newName)
+                                        .build();
+                                    try {
+                                        provider.getProviderSerieId(tvRelease).ifPresentOrElse(serieId -> {
+                                            row.serieMapping =
+                                                new SerieMapping(currentName, serieId.providerId, serieId.providerName,
+                                                    serieId.season);
+                                            List<? extends SortKey> sortKeys = table.rowSorter.sortKeys;
+                                            selectMappingType(selectedMappingType);
+                                            table.rowSorter.sortKeys = sortKeys;
+                                        }, () -> userInteractionHandler.message(
+                                            getText("MappingEpisodeNameDialog.NoResultsFoundForSerieName", newName),
+                                            getText("App.Info")));
+                                    } catch (Exception e) {
+                                        userInteractionHandler.message(getText("App.ErrorOccurred", e.getMessage()),
+                                            getText("App.Error"));
+                                    }
+                                }));
+                        }))
+                .addComponent("skip", new JButton(getText("App.Close"))
+                    .defaultButtonFor(getRootPane())
+                    .actionListener(() -> setVisible(false))
+                    .actionCommand(getText("App.Close"))));
+        selectMappingType(MappingType.values()[0]);
     }
 
     private void selectMappingType(MappingType mappingType) {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
-                .stream()
-                .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.providerName))
-                .findAny();
-        btnAddCustomMapping.setEnabled(selectedSubtitleProvider.isPresent());
-        mappingTableModel.setMappingType(mappingType);
+            .stream()
+            .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.providerName))
+            .findAny();
+        btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
+        mappingTableModel.mappingType = mappingType;
         repaint();
     }
 
     public enum MappingType {
         TVDB("TVDB", "TVDB",
-                new SelectionForKeyPrefix("", "TVDB-serieId-", k -> k.replace("-serieId-", "-tvdbSerie-"))),
+            new SelectionForKeyPrefix("", "TVDB-serieId-", k -> k.replace("-serieId-", "-tvdbSerie-"))),
         ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, new SelectionForKeyPrefix("", "ADDIC7ED-serieName-name:"),
-                new SelectionForKeyPrefix("", "ADDIC7ED-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "ADDIC7ED-serieName-tvdbId:")),
         ADDIC7ED_PROXY("Addic7ed (Proxy)", SubtitleSource.ADDIC7ED.name() + "-GESTDOWN",
-                new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-name:"),
-                new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-name:"),
+            new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-tvdbId:")),
         SUBSCENE("Subscene", SubtitleSource.SUBSCENE, new SelectionForKeyPrefix("", "SUBSCENE-serieName-name:"),
-                new SelectionForKeyPrefix("", "SUBSCENE-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "SUBSCENE-serieName-tvdbId:")),
         TV_SUBTITLES("TVSubtitles", SubtitleSource.TVSUBTITLES,
-                new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-name:"),
-                new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-name:"),
+            new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-tvdbId:")),
         OPEN_SUBTITLES("OpenSubtitles", SubtitleSource.OPENSUBTITLES,
-                new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-name:"),
-                new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-name:"),
+            new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-tvdbId:")),
         PODNAPISI("Podnapisi", SubtitleSource.PODNAPISI, new SelectionForKeyPrefix("", "PODNAPISI-serieName-name:"),
-                new SelectionForKeyPrefix("", "PODNAPISI-serieName-tvdbId:"));
+            new SelectionForKeyPrefix("", "PODNAPISI-serieName-tvdbId:"));
 
         public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<String, SerieMapping>>>
-                MAPPING_SUPPLIER;
+            MAPPING_SUPPLIER;
         @val String name;
         @val String providerName;
         @val String nameColumn;
@@ -104,10 +179,10 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
         static {
             MAPPING_SUPPLIER = (manager, selectionForKeyPrefix) -> manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
-                    .returnType(SerieMapping.class)
-                    .getEntries();
+                .cacheType(CacheType.DISK)
+                .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
+                .returnType(SerieMapping.class)
+                .getEntries();
         }
 
         MappingType(String name, SubtitleSource subtitleSource, SelectionForKeyPrefix... selectionForKeyPrefixList) {
@@ -117,9 +192,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         MappingType(String name, String providerName, SelectionForKeyPrefix... selectionForKeyPrefixList) {
             this.name = name;
             this.providerName = providerName;
-            this.nameColumn = Messages.getText("MappingEpisodeNameDialog.SceneShowName");
-            this.mappingColumn = Messages.getText("MappingEpisodeNameDialog.ProviderId");
-            this.providerNameColumn = Messages.getText("MappingEpisodeNameDialog.ProviderName");
+            this.nameColumn = getText("MappingEpisodeNameDialog.SceneShowName");
+            this.mappingColumn = getText("MappingEpisodeNameDialog.ProviderId");
+            this.providerNameColumn = getText("MappingEpisodeNameDialog.ProviderName");
             this.selectionForKeyPrefixList = selectionForKeyPrefixList;
         }
     }
@@ -137,7 +212,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         @var SerieMapping serieMapping;
 
         public Row(String key, String name, String providerId, String providerName, SerieMapping serieMapping,
-                SelectionForKeyPrefix selectionForKeyPrefix) {
+            SelectionForKeyPrefix selectionForKeyPrefix) {
             this.key = key;
             this.serieMapping = serieMapping;
             this.selectionForKeyPrefix = selectionForKeyPrefix;
@@ -153,154 +228,30 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         @val Manager manager;
 
         void setMappingType(MappingType mappingType) {
-            setDataVector(null, new String[]{ mappingType.nameColumn, mappingType.mappingColumn,
-                    mappingType.providerNameColumn });
+            setDataVector(null,
+                new String[]{ mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn });
             Arrays.stream(mappingType.selectionForKeyPrefixList)
-                    .flatMap(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
-                            .stream()
-                            .map(serieMappingPair -> {
-                                SerieMapping serieMapping = serieMappingPair.getValue();
-                                String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
-                                if (providerId.contains("/")) {
-                                    providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
-                                }
-                                providerId = providerId.replace(".html", "");
-                                return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
-                                        serieMapping.providerName, serieMapping, selectionForKeyPrefix);
-                            }))
-                    .sorted(Comparator.comparing(
-                            row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
-                                    row.serieMapping.name))
-                    .forEach(this::addRow);
+                .flatMap(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
+                    .stream()
+                    .map(serieMappingPair -> {
+                        SerieMapping serieMapping = serieMappingPair.getValue();
+                        String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
+                        if (providerId.contains("/")) {
+                            providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
+                        }
+                        providerId = providerId.replace(".html", "");
+                        return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
+                            serieMapping.providerName, serieMapping, selectionForKeyPrefix);
+                    }))
+                .sorted(Comparator.comparing(
+                    row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
+                        row.serieMapping.name))
+                .forEach(this::addRow);
         }
 
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
-        }
-    }
-
-    private void initialize() {
-        setResizable(true);
-        setBounds(150, 150, 650, 400);
-        getContentPane().setLayout(new BorderLayout());
-        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
-        GridBagLayout gblContentPanel = new GridBagLayout();
-        gblContentPanel.columnWidths = new int[]{ 0, 0 };
-        gblContentPanel.rowHeights = new int[]{ 0, 40, 0 };
-        gblContentPanel.columnWeights = new double[]{ 1.0, Double.MIN_VALUE };
-        gblContentPanel.rowWeights = new double[]{ 0.0, 1.0, Double.MIN_VALUE };
-        contentPanel.setLayout(gblContentPanel);
-        {
-            JPanel selectionPane = new JPanel();
-            contentPanel.add(selectionPane);
-
-            JLabel lblDefaultIncomingFolder = new JLabel(Messages.getText("MappingEpisodeNameDialog.SelectProvider"));
-            selectionPane.add(lblDefaultIncomingFolder);
-
-            JComboBox<MappingType> mappingTypeList = new JComboBox<>();
-            mappingTypeList.setModel(new DefaultComboBoxModel<>(MappingType.values()));
-            mappingTypeList.addItemListener(arg0 -> selectMappingType((MappingType) arg0.getItem()));
-            selectMappingType(MappingType.values()[0]);
-            selectionPane.add(mappingTypeList);
-        }
-        {
-            JPanel pnlButtons = new JPanel();
-            GridBagConstraints gbcPnlButtons = new GridBagConstraints();
-            gbcPnlButtons.insets = new Insets(0, 0, 5, 0);
-            gbcPnlButtons.fill = GridBagConstraints.BOTH;
-            gbcPnlButtons.gridx = 0;
-            gbcPnlButtons.gridy = 0;
-            contentPanel.add(pnlButtons, gbcPnlButtons);
-        }
-        {
-            JScrollPane scrollPane = new JScrollPane();
-            GridBagConstraints gbcScrollPane = new GridBagConstraints();
-            gbcScrollPane.fill = GridBagConstraints.BOTH;
-            gbcScrollPane.gridx = 0;
-            gbcScrollPane.gridy = 1;
-            contentPanel.add(scrollPane, gbcScrollPane);
-            {
-                table = new JTable();
-
-                table.setModel(mappingTableModel);
-                RowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
-                table.setRowSorter(sorter);
-                scrollPane.setViewportView(table);
-            }
-        }
-        {
-            JPanel buttonPane = new JPanel();
-            getContentPane().add(buttonPane, BorderLayout.SOUTH);
-            buttonPane.setLayout(new MigLayout("", "[25px][50px][grow][50px][grow][50px][25px]", "[][25px,grow,fill]"));
-
-            {
-                JButton btnDeleteSelectedRow = new JButton(Messages.getText("MappingEpisodeNameDialog.DeleteRow"));
-                btnDeleteSelectedRow.addActionListener(_ -> {
-                    int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
-                    MappingTableModel model = (MappingTableModel) table.getModel();
-
-                    Row row = (Row) model.getDataVector().get(rowNbr);
-                    String key = row.key;
-                    manager.valueBuilder().cacheType(CacheType.DISK).key(key).remove();
-                    if (row.selectionForKeyPrefix.deleteOtherFunction() != null) {
-                        manager.valueBuilder()
-                                .cacheType(CacheType.DISK)
-                                .key(row.selectionForKeyPrefix.deleteOtherFunction().apply(key))
-                                .remove();
-                    }
-                    model.removeRow(rowNbr);
-                });
-                buttonPane.add(btnDeleteSelectedRow, "skip");
-            }
-
-            {
-                btnAddCustomMapping.actionListener(() -> {
-                    int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
-                    MappingTableModel model = (MappingTableModel) table.getModel();
-
-                    Row row = (Row) model.getDataVector().get(rowNbr);
-                    String currentName = row.serieMapping.name;
-
-                    String message = Messages.getText("MappingEpisodeNameDialog.enterNewNameForSerie", currentName);
-                    selectedSubtitleProvider.ifPresent(
-                            provider -> userInteractionHandler.enter(message, message).ifPresent(newName -> {
-                                TvRelease tvRelease = TvRelease.builder()
-                                        .name(currentName)
-                                        .season(row.serieMapping.season)
-                                        .episode(1)
-                                        .originalName(currentName)
-                                        .customName(newName)
-                                        .build();
-                                try {
-                                    provider.getProviderSerieId(tvRelease).ifPresentOrElse(providerSerieId -> {
-                                        SerieMapping newSerieMapping =
-                                                new SerieMapping(currentName, providerSerieId.providerId,
-                                                        providerSerieId.providerName, providerSerieId.season);
-                                        row.serieMapping = newSerieMapping;
-                                        List<? extends SortKey> sortKeys = table.getRowSorter().getSortKeys();
-                                        selectMappingType(selectedMappingType);
-                                        table.getRowSorter().setSortKeys(sortKeys);
-                                    }, () -> userInteractionHandler.message(
-                                            Messages.getText("MappingEpisodeNameDialog.NoResultsFoundForSerieName",
-                                                    newName), Messages.getText("App.Info")));
-                                } catch (Exception e) {
-                                    userInteractionHandler.message(
-                                            Messages.getText("App.ErrorOccurred", e.getMessage()),
-                                            Messages.getText("App.Error"));
-                                }
-                            }));
-                });
-                buttonPane.add(btnAddCustomMapping, "skip");
-            }
-
-            {
-                new JButton(Messages.getText("App.Close")).defaultButtonFor(getRootPane())
-                        .actionListener(() -> setVisible(false))
-                        .actionCommand(Messages.getText("App.Close"))
-                        .addTo(buttonPane, "skip");
-            }
         }
     }
 }

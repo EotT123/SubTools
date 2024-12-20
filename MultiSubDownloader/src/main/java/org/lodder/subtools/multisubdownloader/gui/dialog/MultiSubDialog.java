@@ -23,8 +23,8 @@ public class MultiSubDialog extends JDialog {
 
     protected void setDialogLocation(Frame f) {
         Rectangle r = f.getBounds();
-        int x = r.x + (r.width - getSize().width) / 2;
-        int y = r.y + (r.height - getSize().height) / 2;
+        int x = r.x + (r.width - size.width) / 2;
+        int y = r.y + (r.height - size.height) / 2;
         setLocation(x, y);
     }
 

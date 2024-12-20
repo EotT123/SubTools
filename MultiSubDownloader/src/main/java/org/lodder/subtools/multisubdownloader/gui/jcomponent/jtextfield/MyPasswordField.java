@@ -5,6 +5,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.io.Serial;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -111,7 +112,7 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
         }
 
         if (valueVerifier != null || requireValue || valueChangedCallbackListener != null ||
-                validityChangedCallbackListeners != null) {
+            validityChangedCallbackListeners != null) {
             checkValidity(getRawText());
             getDocument().addDocumentListener(new DocumentListener() {
 
@@ -139,7 +140,7 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
         boolean valid = completeValueVerifier.test(text);
         setSuperBorder(valid ? MyPasswordField.getDefaultBorder(this) : ERROR_BORDER);
 
-        boolean changedValidity = validWrapper.value != valid;
+        boolean changedValidity = Objects.equals(validWrapper.value, valid);
         validWrapper.value = valid;
         if (changedValidity && validityChangedCallbackListeners != null) {
             validityChangedCallbackListeners.forEach(listener -> listener.accept(valid));

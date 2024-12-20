@@ -15,24 +15,24 @@ public class SubtitleTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 4205143311042280620L;
 
     private static final SubtitleTableColumnName[] COLUMNS =
-            Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED)
-                    .toArray(SubtitleTableColumnName[]::new);
+        Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED)
+            .toArray(SubtitleTableColumnName[]::new);
 
     public SubtitleTableModel(Object[][] data, String[] columnNames) {
         super(data, columnNames);
     }
 
-    public static SubtitleTableModel getDefaultSubtitleTableModel() {
+    public static SubtitleTableModel createDefaultSubtitleTableModel() {
         String[] columnNames = COLUMNS.stream().map(SubtitleTableColumnName::getColumnName).toArray(String[]::new);
         return new SubtitleTableModel(new Object[][]{}, columnNames);
     }
 
     public void addRow(Subtitle subtitle) {
         Object[] row = IntStream.range(0, getColumnCount())
-                .mapToObj(this::getColumnName)
-                .map(SubtitleTableColumnName::forColumnName)
-                .map(stcn -> stcn.getValue(subtitle))
-                .toArray(Object[]::new);
+            .mapToObj(this::getColumnName)
+            .map(SubtitleTableColumnName::forColumnName)
+            .map(stcn -> stcn.getValue(subtitle))
+            .toArray(Object[]::new);
         this.addRow(row);
     }
 

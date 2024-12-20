@@ -47,56 +47,56 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         this.settingsCtrl = settingsCtrl;
 
         JPanel settingsPanel = TitlePanel.title(getText("PreferenceDialog.Settings"))
-                .padding(0).paddingLeft(20).useGrid().fillContents(false)
-                .addTo(this, "span, grow, wrap");
+            .padding(0).paddingLeft(20).useGrid().fillContents(false)
+            .addTo(this, "span, grow, wrap");
         {
 
             // Language \\
 
             new JLabel(getText("PreferenceDialog.Language")).addTo(settingsPanel);
-            this.cbxLanguage = JComboBox.create(Messages.getAvailableLanguages())
-                    .toMessageStringRenderer(Language::getMsgCode)
-                    .addTo(settingsPanel, "wrap");
+            this.cbxLanguage = JComboBox.create(getAvailableLanguages())
+                .toMessageStringRenderer(Language::getMsgCode)
+                .addTo(settingsPanel, "wrap");
 
             // Default Incoming Folder \\
 
             new JLabel(getText("PreferenceDialog.DefaultIncomingFolder")).addTo(settingsPanel,
-                    "aligny center, span 1 2");
+                "aligny center, span 1 2");
 
             new JScrollPane()
-                    .viewportView(this.defaultIncomingFoldersList =
-                            JListWithImages.createForType(Path.class).distinctValues().build())
-                    .addTo(settingsPanel, "growx, span, wrap");
+                .viewportView(this.defaultIncomingFoldersList =
+                    JListWithImages.createForType(Path.class).distinctValues().build())
+                .addTo(settingsPanel, "growx, span, wrap");
 
             new JButton(getText("PreferenceDialog.AddFolder"))
-                    .actionListener(() -> MemoryFolderChooser.getInstance()
-                            .selectDirectory(settingsPanel, getText("PreferenceDialog.SelectFolder"))
-                            .map(Path::toAbsolutePath)
-                            .filter(path -> !defaultIncomingFoldersList.contains(path))
-                            .ifPresent(p -> defaultIncomingFoldersList.addItem(PathMatchType.FOLDER.image, p)))
-                    .addTo(settingsPanel, "span, split 2");
+                .actionListener(() -> MemoryFolderChooser.getInstance()
+                    .selectDirectory(settingsPanel, getText("PreferenceDialog.SelectFolder"))
+                    .map(Path::toAbsolutePath)
+                    .filter(path -> !defaultIncomingFoldersList.contains(path))
+                    .ifPresent(p -> defaultIncomingFoldersList.addItem(PathMatchType.FOLDER.image, p)))
+                .addTo(settingsPanel, "span, split 2");
 
             new JButton(getText("PreferenceDialog.DeleteFolder"))
-                    .actionListener(defaultIncomingFoldersList::removeSelectedItem)
-                    .addTo(settingsPanel, "wrap, gapbottom 10px");
+                .actionListener(defaultIncomingFoldersList::removeSelectedItem)
+                .addTo(settingsPanel, "wrap, gapbottom 10px");
 
             // Exclude List \\
 
             new JLabel(getText("PreferenceDialog.ExcludeList"))
-                    .addTo(settingsPanel, "aligny center, span 1 2");
+                .addTo(settingsPanel, "aligny center, span 1 2");
 
             new JScrollPane()
-                    .viewportView(this.excludeList =
-                            JListWithImages.createForType(PathOrRegex.class).distinctValues().build())
-                    .addTo(settingsPanel, "growx, span, wrap");
+                .viewportView(this.excludeList =
+                    JListWithImages.createForType(PathOrRegex.class).distinctValues().build())
+                .addTo(settingsPanel, "growx, span, wrap");
 
             Consumer<PathMatchType> addExcludeItemConsumer = type -> {
                 if (type == PathMatchType.FOLDER) {
                     MemoryFolderChooser.getInstance()
-                            .selectDirectory(settingsPanel, getText("PreferenceDialog.SelectExcludeFolder"))
-                            .map(Path::toAbsolutePath)
-                            .map(PathOrRegex::new)
-                            .ifPresent(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
+                        .selectDirectory(settingsPanel, getText("PreferenceDialog.SelectExcludeFolder"))
+                        .map(Path::toAbsolutePath)
+                        .map(PathOrRegex::new)
+                        .ifPresent(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
                 } else if (type == PathMatchType.REGEX) {
                     String regex = JOptionPane.showInputDialog(getText("PreferenceDialog.EnterRegex"));
                     if (StringUtils.isNotBlank(regex)) {
@@ -106,56 +106,56 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             };
 
             new JButton(getText("PreferenceDialog.AddFolder"))
-                    .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.FOLDER))
-                    .addTo(settingsPanel, "span, split 3");
+                .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.FOLDER))
+                .addTo(settingsPanel, "span, split 3");
 
             new JButton(getText("PreferenceDialog.DeleteFolder"))
-                    .actionListener(excludeList::removeSelectedItem)
-                    .addTo(settingsPanel);
+                .actionListener(excludeList::removeSelectedItem)
+                .addTo(settingsPanel);
 
             new JButton(getText("PreferenceDialog.RegexToevoegen"))
-                    .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.REGEX))
-                    .addTo(settingsPanel);
+                .actionListener(() -> addExcludeItemConsumer.accept(PathMatchType.REGEX))
+                .addTo(settingsPanel);
         }
 
         {
 
             JPanel updatePanel = TitlePanel.title(getText("PreferenceDialog.Update"))
-                    .padding(0)
-                    .paddingLeft(20)
-                    .useGrid()
-                    .fillContents(false)
-                    .addTo(this, "span, grow, wrap");
+                .padding(0)
+                .paddingLeft(20)
+                .useGrid()
+                .fillContents(false)
+                .addTo(this, "span, grow, wrap");
 
             new JLabel(getText("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
             this.cbxUpdateCheckPeriod = new JComboBox<>(UpdateCheckPeriod.values())
-                    .toMessageStringRenderer(UpdateCheckPeriod::getLangCode)
-                    .addTo(updatePanel, "wrap");
+                .toMessageStringRenderer(UpdateCheckPeriod::getLangCode)
+                .addTo(updatePanel, "wrap");
             new JLabel(getText("PreferenceDialog.UpdateType")).addTo(updatePanel);
             this.cbxUpdateType = new JComboBox<>(UpdateType.values())
-                    .toMessageStringRenderer(UpdateType::getMsgCode)
-                    .addTo(updatePanel);
+                .toMessageStringRenderer(UpdateType::getMsgCode)
+                .addTo(updatePanel);
         }
 
         {
 
             JPanel proxyPanel = TitlePanel.title(getText("PreferenceDialog.ConfigureProxy"))
-                    .padding(0)
-                    .paddingLeft(20)
-                    .fillContents(false)
-                    .addTo(this, "span, grow");
+                .padding(0)
+                .paddingLeft(20)
+                .fillContents(false)
+                .addTo(this, "span, grow");
 
             PanelCheckBox.checkbox(
-                            this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")))
-                    .panelOnSameLine()
-                    .panelLayout(new MigLayout("insets 0, fill"))
-                    .leftGap(0)
-                    .addTo(proxyPanel)
-                    .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
-                    .addComponent("wrap",
-                            this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))
-                    .addComponent(new JLabel(getText("PreferenceDialog.Port")))
-                    .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
+                    this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")))
+                .panelOnSameLine()
+                .panelLayout(new MigLayout("insets 0, fill"))
+                .leftGap(0)
+                .addTo(proxyPanel)
+                .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
+                .addComponent("wrap",
+                    this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))
+                .addComponent(new JLabel(getText("PreferenceDialog.Port")))
+                .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
         }
 
         loadPreferenceSettings();
@@ -179,7 +179,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         }
         List<Path> defaultIncomingFolders = defaultIncomingFoldersList.stream().map(LabelPanel::getObject).toList();
         List<PathOrRegex> exclList =
-                excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().value)).toList();
+            excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().value)).toList();
         settingsCtrl.settings.language = cbxLanguage.getSelectedValue();
         settingsCtrl.settings.defaultIncomingFolders = defaultIncomingFolders;
         settingsCtrl.settings.replaceExcludeList(exclList);

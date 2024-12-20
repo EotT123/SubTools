@@ -118,8 +118,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void checkUpdate(final boolean forceUpdateCheck) {
         UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
         Optional<String> updateUrl = (forceUpdateCheck && u.isNewVersionAvailable()) ||
-                (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.settings.updateCheckPeriod) &&
-                        u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : Optional.empty();
+            (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.settings.updateCheckPeriod) &&
+                u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : Optional.empty();
         if (updateUrl.isPresent()) {
             final JEditorPane editorPane = new JEditorPane();
             editorPane.setPreferredSize(new Dimension(800, 50));
@@ -127,11 +127,11 @@ public class GUI extends JFrame implements PropertyChangeListener {
             editorPane.setContentType("text/html");
 
             editorPane.setText("<html>" + getText("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl.get() + ">" +
-                    updateUrl.get() + "</a></html>");
+                updateUrl.get() + "</a></html>");
 
             editorPane.addHyperlinkListener(hyperlinkEvent -> {
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED &&
-                        Desktop.isDesktopSupported()) {
+                    Desktop.isDesktopSupported()) {
                     try {
                         Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
                     } catch (Exception e) {
@@ -140,10 +140,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 }
             });
             JOptionPane.showMessageDialog(this, editorPane, ConfigProperties.getInstance().getProperty("name"),
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.INFORMATION_MESSAGE);
         } else if (forceUpdateCheck) {
             JOptionPane.showMessageDialog(this, getText("MainWindow.NoUpdateAvailable"),
-                    ConfigProperties.getInstance().getProperty("name"), JOptionPane.INFORMATION_MESSAGE);
+                ConfigProperties.getInstance().getProperty("name"), JOptionPane.INFORMATION_MESSAGE);
         }
 
     }
@@ -205,38 +205,37 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void createMenu() {
         Settings settings = settingsControl.settings;
         BiConsumer<SearchColumnName, Boolean> visibilityFunction =
-                pnlSearchFile.resultPanel.getTable()::setColumnVisibility;
+            pnlSearchFile.resultPanel.getTable()::setColumnVisibility;
         BiConsumer<VideoType, String> showRenameDialog =
-                (videoType, title) -> new RenameDialog(self(), settings, videoType, title, manager,
-                        userInteractionHandler).setVisible(true);
+            (videoType, title) -> new RenameDialog(self(), settings, videoType, title, manager,
+                userInteractionHandler).setVisible(true);
         ExportImport exportImport = new ExportImport(manager, settingsControl, userInteractionHandler, this);
-        menuBar = new Menu().withShowOnlyFound(settings.optionsShowOnlyFound)
-                .withFileQuitAction(this::close)
-                .withViewFilenameAction(() -> visibilityFunction.accept(FILENAME, menuBar.isViewFilenameSelected()))
-                .withViewTypeAction(() -> visibilityFunction.accept(TYPE, menuBar.isViewTypeSelected()))
-                .withViewTitleAction(() -> visibilityFunction.accept(TITLE, menuBar.isViewTitleSelected()))
-                .withViewSeasonAction(() -> visibilityFunction.accept(SEASON, menuBar.isViewSeasonSelected()))
-                .withViewEpisodeAction(() -> visibilityFunction.accept(EPISODE, menuBar.isViewEpisodeSelected()))
-                .withViewShowOnlyFoundAction(() -> {
-                    settings.optionsShowOnlyFound = menuBar.isShowOnlyFound();
-                    ((VideoTableModel) pnlSearchFile.resultPanel.getTable().getModel())
-                            .setShowOnlyFound(menuBar.isShowOnlyFound());
-                })
-                .withViewClearLogAction(() -> pnlLogging.setLogText(""))
-                .withEditRenameTVAction(() -> showRenameDialog.accept(VideoType.EPISODE, getText("Menu.RenameSerie")))
-                .withEditRenameMovieAction(() -> showRenameDialog.accept(VideoType.MOVIE, getText("Menu.RenameMovie")))
-                .withEditPreferencesAction(
-                        () -> new PreferenceDialog(self(), settingsControl, (Emitter) app.make("EventEmitter"), manager,
-                                userInteractionHandler).setVisible(true))
-                .withTranslateShowNamesAction(this::showTranslateShowNames)
-                .withExportTranslationsAction(
-                        () -> exportImport.exportSettings(ExportImport.SettingsType.SERIE_MAPPING))
-                .withImportTranslationsAction(
-                        () -> exportImport.importSettings(ExportImport.SettingsType.SERIE_MAPPING))
-                .withExportPreferencesAction(() -> exportImport.exportSettings(ExportImport.SettingsType.PREFERENCES))
-                .withImportPreferencesAction(() -> exportImport.importSettings(ExportImport.SettingsType.PREFERENCES))
-                .withCheckUpdateAction(() -> checkUpdate(true))
-                .withAboutAction(this::showAbout);
+        menuBar = new Menu()
+            .withShowOnlyFound(settings.optionsShowOnlyFound)
+            .withFileQuitAction(this::close)
+            .withViewFilenameAction(() -> visibilityFunction.accept(FILENAME, menuBar.isViewFilenameSelected()))
+            .withViewTypeAction(() -> visibilityFunction.accept(TYPE, menuBar.isViewTypeSelected()))
+            .withViewTitleAction(() -> visibilityFunction.accept(TITLE, menuBar.isViewTitleSelected()))
+            .withViewSeasonAction(() -> visibilityFunction.accept(SEASON, menuBar.isViewSeasonSelected()))
+            .withViewEpisodeAction(() -> visibilityFunction.accept(EPISODE, menuBar.isViewEpisodeSelected()))
+            .withViewShowOnlyFoundAction(() -> {
+                settings.optionsShowOnlyFound = menuBar.isShowOnlyFound();
+                ((VideoTableModel) pnlSearchFile.resultPanel.getTable().getModel())
+                    .setShowOnlyFound(menuBar.isShowOnlyFound());
+            })
+            .withViewClearLogAction(() -> pnlLogging.setLogText(""))
+            .withEditRenameTVAction(() -> showRenameDialog.accept(VideoType.EPISODE, getText("Menu.RenameSerie")))
+            .withEditRenameMovieAction(() -> showRenameDialog.accept(VideoType.MOVIE, getText("Menu.RenameMovie")))
+            .withEditPreferencesAction(
+                () -> new PreferenceDialog(self(), settingsControl, (Emitter) app.make("EventEmitter"), manager,
+                    userInteractionHandler).setVisible(true))
+            .withTranslateShowNamesAction(this::showTranslateShowNames)
+            .withExportTranslationsAction(() -> exportImport.exportSettings(ExportImport.SettingsType.SERIE_MAPPING))
+            .withImportTranslationsAction(() -> exportImport.importSettings(ExportImport.SettingsType.SERIE_MAPPING))
+            .withExportPreferencesAction(() -> exportImport.exportSettings(ExportImport.SettingsType.PREFERENCES))
+            .withImportPreferencesAction(() -> exportImport.importSettings(ExportImport.SettingsType.PREFERENCES))
+            .withCheckUpdateAction(() -> checkUpdate(true))
+            .withAboutAction(this::showAbout);
     }
 
     private void createTextSearchPanel() {
@@ -248,17 +247,17 @@ public class GUI extends JFrame implements PropertyChangeListener {
         SearchTextInputPanel pnlSearchTextInput = new SearchTextInputPanel();
         pnlSearchText = new SearchPanel<>(pnlSearchTextInput, resultPanel);
         pnlSearchTextInput.setSelectedLanguage(
-                settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
+            settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
         resultPanel.showSelectFoundSubtitlesButton();
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(_ -> downloadText());
 
         TextGuiSearchAction searchAction = TextGuiSearchAction.createWithSettings(settings)
-                .subtitleProviderStore(subtitleProviderStore)
-                .mainWindow(this)
-                .searchPanel(pnlSearchText)
-                .releaseFactory(new ReleaseFactory(settings, (Manager) app.make("Manager")))
-                .build();
+            .subtitleProviderStore(subtitleProviderStore)
+            .mainWindow(this)
+            .searchPanel(pnlSearchText)
+            .releaseFactory(new ReleaseFactory(settings, (Manager) app.make("Manager")))
+            .build();
         pnlSearchTextInput.addSearchAction(searchAction);
     }
 
@@ -278,17 +277,17 @@ public class GUI extends JFrame implements PropertyChangeListener {
         pnlSearchFileInput = new SearchFileInputPanel();
         pnlSearchFileInput.setRecursiveSelected(settings.optionRecursive);
         pnlSearchFileInput.setSelectedLanguage(
-                settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
+            settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
         pnlSearchFile = new SearchPanel<>(pnlSearchFileInput, resultPanel);
 
         resultPanel.setTable(createVideoTable());
 
         FileGuiSearchAction searchAction = FileGuiSearchAction.createWithSettings(settings)
-                .subtitleProviderStore((SubtitleProviderStore) this.app.make("SubtitleProviderStore"))
-                .mainWindow(this)
-                .searchPanel(pnlSearchFile)
-                .releaseFactory(new ReleaseFactory(settings, (Manager) app.make("Manager")))
-                .build();
+            .subtitleProviderStore((SubtitleProviderStore) this.app.make("SubtitleProviderStore"))
+            .mainWindow(this)
+            .searchPanel(pnlSearchFile)
+            .releaseFactory(new ReleaseFactory(settings, (Manager) app.make("Manager")))
+            .build();
 
         pnlSearchFileInput.addSelectFolderAction(_ -> selectIncomingFolder());
         pnlSearchFileInput.addSearchAction(searchAction);
@@ -296,8 +295,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setDownloadAction(_ -> download());
         resultPanel.setMoveAction(_ -> {
             final int response = JOptionPane.showConfirmDialog(self(), getText("MainWindow.OnlyMoveToLibraryStructure"),
-                    getText("App.Confirm"), //$NON-NLS-2$
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                getText("App.Confirm"), //$NON-NLS-2$
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (response == JOptionPane.YES_OPTION) {
                 rename();
             }
@@ -333,15 +332,15 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void restoreScreenSettings() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
         TriConsumer<SearchColumnName, Boolean, Consumer<Boolean>> visibilityConsumer =
-                (searchColumn, hidden, setVisibleConsumer) -> {
-                    setVisibleConsumer.accept(!hidden);
-                    customTable.setColumnVisibility(searchColumn, !hidden);
-                };
+            (searchColumn, hidden, setVisibleConsumer) -> {
+                setVisibleConsumer.accept(!hidden);
+                customTable.setColumnVisibility(searchColumn, !hidden);
+            };
 
         ScreenSettings screenSettings = settingsControl.settings.screenSettings;
 
         visibilityConsumer.accept(SearchColumnName.EPISODE, screenSettings.hideEpisode,
-                menuBar::withViewEpisodeSelected);
+            menuBar::withViewEpisodeSelected);
         visibilityConsumer.accept(FILENAME, screenSettings.hideFilename, menuBar::withViewFileNameSelected);
         visibilityConsumer.accept(SearchColumnName.SEASON, screenSettings.hideSeason, menuBar::withViewSeasonSelected);
         visibilityConsumer.accept(SearchColumnName.TYPE, screenSettings.hideType, menuBar::withViewTypeSelected);
@@ -379,8 +378,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     protected void showTranslateShowNames() {
         final MappingEpisodeNameDialog tDialog =
-                new MappingEpisodeNameDialog(this, settingsControl, (Manager) this.app.make("Manager"),
-                        (SubtitleProviderStore) this.app.make("SubtitleProviderStore"), userInteractionHandler);
+            new MappingEpisodeNameDialog(this, (Manager) this.app.make("Manager"),
+                (SubtitleProviderStore) this.app.make("SubtitleProviderStore"), userInteractionHandler);
         tDialog.setVisible(true);
     }
 
@@ -392,13 +391,13 @@ public class GUI extends JFrame implements PropertyChangeListener {
             sb.append(" (%s)".formatted(PropertiesReader.getProperty("build.timestamp")));
         }
         JOptionPane.showConfirmDialog(this, sb.toString(), ConfigProperties.getInstance().getProperty("name"),
-                JOptionPane.CLOSED_OPTION);
+            JOptionPane.CLOSED_OPTION);
     }
 
     protected void rename() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
         RenameWorker renameWorker = new RenameWorker(customTable, settingsControl.settings,
-                (Manager) this.app.make("Manager"), userInteractionHandler);
+            (Manager) this.app.make("Manager"), userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
         pnlSearchFile.resultPanel.enableButtons();
         progressDialog = new ProgressDialog(this, renameWorker);
@@ -409,7 +408,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void download() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
         DownloadWorker downloadWorker =
-                new DownloadWorker(customTable, settingsControl.settings, (Manager) this.app.make("Manager"), this);
+            new DownloadWorker(customTable, settingsControl.settings, (Manager) this.app.make("Manager"), this);
         downloadWorker.addPropertyChangeListener(this);
         pnlSearchFile.resultPanel.disableButtons();
         progressDialog = new ProgressDialog(this, downloadWorker);
@@ -419,40 +418,40 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void downloadText() {
         MemoryFolderChooser.getInstance()
-                .selectDirectory(getContentPane(), getText("MainWindow.SelectFolder"))
-                .ifPresent(path -> {
-                    CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
-                    final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
-                    for (int i = 0; i < model.getRowCount(); i++) {
-                        if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
-                            final Subtitle subtitle = (Subtitle) model.getValueAt(i,
-                                    subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
-                            String filename = "";
-                            if (!subtitle.fileName.endsWith(".srt")) {
-                                filename = subtitle.fileName + ".srt";
-                            }
-                            if (OsCheck.operatingSystemType == OSType.WINDOWS) {
-                                filename = filename.removeIllegalWindowsChars();
-                            }
+            .selectDirectory(getContentPane(), getText("MainWindow.SelectFolder"))
+            .ifPresent(path -> {
+                CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
+                final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
+                        final Subtitle subtitle = (Subtitle) model.getValueAt(i,
+                            subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
+                        String filename = "";
+                        if (!subtitle.fileName.endsWith(".srt")) {
+                            filename = subtitle.fileName + ".srt";
+                        }
+                        if (OsCheck.operatingSystemType == OSType.WINDOWS) {
+                            filename = filename.removeIllegalWindowsChars();
+                        }
 
-                            try {
-                                if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
-                                    subtitle.file.copyToDir(path);
-                                } else {
-                                    String url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url :
-                                            subtitle.urlSupplier.get();
-                                    ((Manager) this.app.make("Manager")).store(url, path.resolve(filename));
-                                }
-                            } catch (IOException | ManagerException e) {
-                                LOGGER.error("downloadText", e);
-                            } catch (SubtitlesProviderException e) {
-                                LOGGER.error("Error while getting url for [%s] for subtitle provider [%s] (%s)"
-                                        .formatted(filename, e.getSubtitleProvider(), e.getMessage()), e);
-                                throw new RuntimeException(e);
+                        try {
+                            if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
+                                subtitle.file.copyToDir(path);
+                            } else {
+                                String url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url :
+                                    subtitle.urlSupplier.get();
+                                ((Manager) this.app.make("Manager")).store(url, path.resolve(filename));
                             }
+                        } catch (IOException | ManagerException e) {
+                            LOGGER.error("downloadText", e);
+                        } catch (SubtitlesProviderException e) {
+                            LOGGER.error("Error while getting url for [%s] for subtitle provider [%s] (%s)"
+                                .formatted(filename, e.getSubtitleProvider(), e.getMessage()), e);
+                            throw new RuntimeException(e);
                         }
                     }
-                });
+                }
+            });
 
     }
 
@@ -462,15 +461,15 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     public void showErrorMessage(String message) {
         JOptionPane.showConfirmDialog(this, message, ConfigProperties.getInstance().getProperty("name"),
-                JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     private void selectIncomingFolder() {
         MemoryFolderChooser.getInstance()
-                .selectDirectory(self(), getText("MainWindow.SelectFolder"))
-                .map(Path::toAbsolutePath)
-                .map(Path::toString)
-                .ifPresent(pnlSearchFileInput::setIncomingPath);
+            .selectDirectory(self(), getText("MainWindow.SelectFolder"))
+            .map(Path::toAbsolutePath)
+            .map(Path::toString)
+            .ifPresent(pnlSearchFileInput::setIncomingPath);
     }
 
     @Override

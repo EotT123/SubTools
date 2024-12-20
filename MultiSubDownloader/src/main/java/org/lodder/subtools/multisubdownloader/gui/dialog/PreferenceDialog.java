@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -7,7 +9,6 @@ import java.io.Serial;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lodder.subtools.multisubdownloader.GUI;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
 import org.lodder.subtools.multisubdownloader.framework.event.Event;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
@@ -33,73 +34,63 @@ public class PreferenceDialog extends MultiSubDialog {
     private final SerieProvidersPanel pnlSerieSources;
 
     public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Emitter eventEmitter, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
-        super(gui, Messages.getText("PreferenceDialog.Title"), true);
+        UserInteractionHandler userInteractionHandler) {
+        super(gui, getText("PreferenceDialog.Title"), true);
         this.settingsCtrl = settingsCtrl;
         this.eventEmitter = eventEmitter;
 
         setResizable(false);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setBounds(100, 100, 650, 700);
-        getContentPane().setLayout(new BorderLayout());
 
-        JPanel contentPanel = new JPanel().addTo(getContentPane(), BorderLayout.CENTER);
-        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPanel.setLayout(new BorderLayout(0, 0));
-        {
-            JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
-            AtomicInteger selectedIndex = new AtomicInteger();
-            tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-            tabbedPane.addChangeListener(l -> {
-                if (tabbedPane.getSelectedIndex() != selectedIndex.get()) {
-                    PreferencePanelIntf sourcePanel =
-                            (PreferencePanelIntf) tabbedPane.getComponentAt(selectedIndex.get());
-                    if (!sourcePanel.hasValidSettings()) {
-                        tabbedPane.setSelectedIndex(selectedIndex.get());
-                        JOptionPane.showMessageDialog(this, Messages.getText("PreferenceDialog.invalidInput"),
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        selectedIndex.set(tabbedPane.getSelectedIndex());
-                    }
-                }
-            });
-            contentPanel.add(tabbedPane);
-
-            this.pnlGeneral = new GeneralPanel(gui, settingsCtrl);
-            tabbedPane.addTab(Messages.getText("PreferenceDialog.TabGeneral"), null, pnlGeneral, null);
-
-            this.pnlEpisodeLibrary =
-                    new EpisodeLibraryPanel(settingsCtrl.settings.episodeLibrarySettings, manager, false,
-                            userInteractionHandler);
-            tabbedPane.addTab(Messages.getText("PreferenceDialog.SerieLibrary"), null, pnlEpisodeLibrary, null);
-
-            this.pnlMovieLibrary = new MovieLibraryPanel(settingsCtrl.settings.movieLibrarySettings, manager, false,
-                    userInteractionHandler);
-            tabbedPane.addTab(Messages.getText("PreferenceDialog.MovieLibrary"), null, pnlMovieLibrary, null);
-
-            this.pnlOptions = new OptionsPanel(settingsCtrl);
-            tabbedPane.addTab(Messages.getText("PreferenceDialog.Options"), null, pnlOptions, null);
-
-            this.pnlSerieSources = new SerieProvidersPanel(settingsCtrl);
-            tabbedPane.addTab(Messages.getText("PreferenceDialog.SerieSources"), null, pnlSerieSources, null);
-        }
-
-        {
-            new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
-                    .addTo(getContentPane(), BorderLayout.SOUTH)
-                    .addComponent(new JButton(Messages.getText("App.OK")).defaultButtonFor(getRootPane())
-                            .actionListener(this::testAndSaveValues)
-                            .actionCommand(Messages.getText("App.OK")))
-                    .addComponent(
-                            new JButton(Messages.getText("App.Cancel")).actionListener(() -> setVisible(false))
-                                    .actionCommand("Cancel"));
-        }
+        AtomicInteger selectedIdx = new AtomicInteger();
+        getContentPane()
+            .layout(new BorderLayout())
+            .addComponent(BorderLayout.CENTER, new JLabel()
+                .border(new EmptyBorder(5, 5, 5, 5))
+                .layout(new BorderLayout(0, 0))
+                .addComponent(new JTabbedPane(SwingConstants.TOP)
+                    .tabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT)
+                    .changeListener(tabbedPane -> {
+                        if (tabbedPane.selectedIndex != selectedIdx.get()) {
+                            var sourcePanel = (PreferencePanelIntf) tabbedPane.getComponentAt(selectedIdx.get());
+                            if (!sourcePanel.hasValidSettings()) {
+                                tabbedPane.selectedIndex = selectedIdx.get();
+                                JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                selectedIdx.set(tabbedPane.selectedIndex);
+                            }
+                        }
+                    })
+                    .withTab(getText("PreferenceDialog.TabGeneral"),
+                        pnlGeneral = new GeneralPanel(gui, settingsCtrl))
+                    .withTab(getText("PreferenceDialog.SerieLibrary"),
+                        pnlEpisodeLibrary = new EpisodeLibraryPanel(settingsCtrl.settings.episodeLibrarySettings,
+                            manager, false, userInteractionHandler))
+                    .withTab(getText("PreferenceDialog.MovieLibrary"),
+                        pnlMovieLibrary = new MovieLibraryPanel(settingsCtrl.settings.movieLibrarySettings,
+                            manager, false, userInteractionHandler))
+                    .withTab(getText("PreferenceDialog.Options"),
+                        pnlOptions = new OptionsPanel(settingsCtrl))
+                    .withTab(getText("PreferenceDialog.SerieSources"),
+                        pnlSerieSources = new SerieProvidersPanel(settingsCtrl)))
+            )
+            .addComponent(BorderLayout.SOUTH, new JPanel()
+                .layout(new FlowLayout(FlowLayout.RIGHT))
+                .addComponent(new JButton(getText("App.OK"))
+                    .defaultButtonFor(getRootPane())
+                    .actionListener(this::testAndSaveValues)
+                    .actionCommand(getText("App.OK")))
+                .addComponent(new JButton(getText("App.Cancel"))
+                    .actionListener(() -> setVisible(false))
+                    .actionCommand("Cancel")));
     }
 
     private void testAndSaveValues() {
         if (pnlGeneral.hasValidSettings() && pnlEpisodeLibrary.hasValidSettings() &&
-                pnlMovieLibrary.hasValidSettings() && pnlOptions.hasValidSettings() &&
-                pnlSerieSources.hasValidSettings()) {
+            pnlMovieLibrary.hasValidSettings() && pnlOptions.hasValidSettings() &&
+            pnlSerieSources.hasValidSettings()) {
             pnlGeneral.savePreferenceSettings();
             pnlEpisodeLibrary.savePreferenceSettings();
             pnlMovieLibrary.savePreferenceSettings();
@@ -109,8 +100,8 @@ public class PreferenceDialog extends MultiSubDialog {
             settingsCtrl.store();
             this.eventEmitter.fire(new Event("providers.settings.change"));
         } else {
-            JOptionPane.showMessageDialog(this, Messages.getText("PreferenceDialog.invalidInput"), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"), "Error",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 }
