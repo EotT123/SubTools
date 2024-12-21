@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.control;
 
+import static org.lodder.subtools.sublibrary.control.Tag.*;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class ReleaseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
+
     private NamedMatcher namedMatcher;
 
     public final Release parse(Path file) throws ReleaseParseException {
@@ -39,26 +42,26 @@ public class ReleaseParser {
     }
 
     private Release parsePatternResult(Path file, String fileParseName) throws ReleaseParseException {
-        List<String> namedGroups = namedMatcher.namedPattern().groupNames;
+        List<String> namedGroups = namedMatcher.parentPattern.groupNames;
         String seriesName = "";
         List<Integer> episodeNumbers = new ArrayList<>();
         int seasonNumber = 0;
-        Integer year = namedGroups.contains("year") ? Integer.parseInt(namedMatcher.group("year")) : null;
-        String description = namedGroups.contains("description") ? namedMatcher.group("description").substring(1) : "";
+        Integer year = namedGroups.contains(YEAR) ? Integer.parseInt(namedMatcher.group(YEAR)) : null;
+        String description = namedGroups.contains(DESCRIPTION) ? namedMatcher.group(DESCRIPTION).substring(1) : "";
 
-        if (namedGroups.contains("moviename")) {
+        if (namedGroups.contains(MOVIE_NAME)) {
             String movieName;
-            if (namedGroups.contains("part")) {
+            if (namedGroups.contains(PART)) {
                 String number = "";
-                if (namedGroups.contains("romanepisode")) {
-                    number = namedMatcher.group("romanepisode");
-                } else if (namedGroups.contains("partnumber")) {
-                    number = namedMatcher.group("partnumber");
+                if (namedGroups.contains(ROMAN_EPISODE)) {
+                    number = namedMatcher.group(ROMAN_EPISODE);
+                } else if (namedGroups.contains(PART_NUMBER)) {
+                    number = namedMatcher.group(PART_NUMBER);
                 }
-                movieName = cleanUnwantedChars(
-                    namedMatcher.group("moviename") + " " + namedMatcher.group("part") + " " + number);
+                movieName =
+                    cleanUnwantedChars(namedMatcher.group(MOVIE_NAME) + " " + namedMatcher.group(PART) + " " + number);
             } else {
-                movieName = cleanUnwantedChars(namedMatcher.group("moviename"));
+                movieName = cleanUnwantedChars(namedMatcher.group(MOVIE_NAME));
             }
             return MovieRelease.builder()
                 .name(movieName)
@@ -70,60 +73,67 @@ public class ReleaseParser {
                 .build();
         }
 
-        if (namedGroups.contains("episodenumber1")) {
-            LOGGER.trace("parsePatternResult: episodenumber1: {}", namedMatcher.group("episodenumber1"));
+        if (namedGroups.contains(EPISODE_NUMBER_1)) {
+            String value = namedMatcher.group(EPISODE_NUMBER_1);
+            LOGGER.trace("parsePatternResult: {}: {}", EPISODE_NUMBER_1, value);
             // Multiple episodes, have episodenumber1, 2 ....
             for (String group : namedGroups) {
-                Pattern pattern = Pattern.compile("episodenumber(\\d+)");
+                Pattern pattern = Pattern.compile(EPISODE_NUMBER + "(\\d+)");
                 Matcher match = pattern.matcher(group);
                 if (match.matches()) {
                     episodeNumbers.add(Integer.parseInt(namedMatcher.group(group)));
                 }
             }
             Collections.sort(episodeNumbers);
-        } else if (namedGroups.contains("episodenumberstart")) {
-            LOGGER.trace("parsePatternResult: episodenumberstart: {}", namedMatcher.group("episodenumberstart"));
+        } else if (namedGroups.contains(EPISODE_NUMBER_START)) {
+            String episodeNumberStart = namedMatcher.group(EPISODE_NUMBER_START);
+            LOGGER.trace("parsePatternResult: namedGroups: {}", namedGroups);
+            LOGGER.trace("parsePatternResult: {}: {}", EPISODE_NUMBER_START, episodeNumberStart);
             // Multiple episodes, regex specifies start and end number
-            int start = Integer.parseInt(namedMatcher.group("episodenumberstart"));
-            int end = Integer.parseInt(namedMatcher.group("episodenumberend"));
+            int start = Integer.parseInt(episodeNumberStart);
+            int end = Integer.parseInt(namedMatcher.group(EPISODE_NUMBER_END));
             if (start > end) {
                 int temp = start;
                 start = end;
                 end = temp;
             }
             IntStream.rangeClosed(start, end).forEach(episodeNumbers::add);
-        } else if (namedGroups.contains("episodenumber")) {
-            LOGGER.trace("parsePatternResult: episodenumber: {}", namedMatcher.group("episodenumber"));
-            episodeNumbers.add(Integer.parseInt(namedMatcher.group("episodenumber")));
-        } else if (namedGroups.contains("year") || namedGroups.contains("month") || namedGroups.contains("day")) {
+        } else if (namedGroups.contains(EPISODE_NUMBER)) {
+            String value = namedMatcher.group(EPISODE_NUMBER);
+            LOGGER.trace("parsePatternResult: {}: {}", EPISODE_NUMBER, value);
+            episodeNumbers.add(Integer.parseInt(value));
+        } else if (namedGroups.contains(YEAR) || namedGroups.contains(MONTH) || namedGroups.contains(DAY)) {
             // TODO: need to implement
-        } else if (namedGroups.contains("romanepisode") && !namedGroups.contains("year")) {
-            episodeNumbers.add(Roman.decode(namedMatcher.group("romanepisode")));
+        } else if (namedGroups.contains(ROMAN_EPISODE) && !namedGroups.contains(YEAR)) {
+            episodeNumbers.add(Roman.decode(namedMatcher.group(ROMAN_EPISODE)));
         }
 
-        if (namedGroups.contains("seriesname")) {
-            LOGGER.trace("parsePatternResult: seriesname: {}", namedMatcher.group("seriesname"));
-            seriesName = cleanUnwantedChars(namedMatcher.group("seriesname"));
-            if (namedGroups.contains("year")) {
-                seriesName = seriesName + " " + namedMatcher.group("year");
+        if (namedGroups.contains(SERIE_NAME)) {
+            String value = namedMatcher.group(SERIE_NAME);
+            LOGGER.trace("parsePatternResult: {}: {}", SERIE_NAME, value);
+            seriesName = cleanUnwantedChars(value);
+            if (namedGroups.contains(YEAR)) {
+                seriesName = seriesName + " " + namedMatcher.group(YEAR);
             }
         }
 
-        if (namedGroups.contains("seasonnumber")) {
-            LOGGER.trace("parsePatternResult: seasonnumber: {}", namedMatcher.group("seasonnumber"));
-            seasonNumber = Integer.parseInt(namedMatcher.group("seasonnumber"));
-        } else if (namedGroups.contains("part") && !namedGroups.contains("year")) {
+        if (namedGroups.contains(SEASON_NUMBER)) {
+            String value = namedMatcher.group(SEASON_NUMBER);
+            LOGGER.trace("parsePatternResult: {}: {}", SEASON_NUMBER, value);
+            seasonNumber = Integer.parseInt(value);
+        } else if (namedGroups.contains(PART) && !namedGroups.contains(YEAR)) {
             seasonNumber = 1;
-        } else if (namedGroups.contains("year") && namedGroups.contains("month") && namedGroups.contains("day")) {
+        } else if (namedGroups.contains(YEAR) && namedGroups.contains(MONTH) && namedGroups.contains(DAY)) {
             // need to implement
-        } else if (namedGroups.contains("season_episode")) {
-            LOGGER.trace("parsePatternResult: season_episode: {}", namedMatcher.group("season_episode"));
-            if (namedMatcher.group("season_episode").length() == 3) {
-                episodeNumbers.add(Integer.parseInt(namedMatcher.group("season_episode").substring(1, 3)));
-                seasonNumber = Integer.parseInt(namedMatcher.group("season_episode").substring(0, 1));
-            } else if (namedMatcher.group("season_episode").length() == 4) {
-                episodeNumbers.add(Integer.parseInt(namedMatcher.group("season_episode").substring(2, 4)));
-                seasonNumber = Integer.parseInt(namedMatcher.group("season_episode").substring(0, 2));
+        } else if (namedGroups.contains(SEASON_EPISODE)) {
+            String value = namedMatcher.group(SEASON_EPISODE);
+            LOGGER.trace("parsePatternResult: season_episode: {}", value);
+            if (value.length() == 3) {
+                episodeNumbers.add(Integer.parseInt(value.substring(1, 3)));
+                seasonNumber = Integer.parseInt(value.substring(0, 1));
+            } else if (value.length() == 4) {
+                episodeNumbers.add(Integer.parseInt(value.substring(2, 4)));
+                seasonNumber = Integer.parseInt(value.substring(0, 2));
             }
         } else {
             // No season number specified, usually for Anime
@@ -174,9 +184,11 @@ public class ReleaseParser {
         Matcher m = VideoPatterns.QUALITY_KEYWORDS_REGEX_PATTERN.matcher(name.trim().toLowerCase());
         StringBuilder builder = new StringBuilder();
         while (m.find()) {
-            builder.append(m.group(0).replace(".", " ")).append(" ");
+            builder.append(m.group().replace(".", " ")).append(" ");
         }
-        LOGGER.trace("getQualityKeyWords: keyswords: {}", builder.toString().trim());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getQualityKeyWords: keyswords: {}", builder.toString().trim());
+        }
         return builder.toString().trim();
     }
 
@@ -185,7 +197,7 @@ public class ReleaseParser {
         Matcher m = VideoPatterns.QUALITY_KEYWORDS_REGEX_PATTERN.matcher(name.trim().toLowerCase());
         List<String> keywords = new ArrayList<>();
         while (m.find()) {
-            keywords.add(m.group(0));
+            keywords.add(m.group());
         }
         LOGGER.trace("getQualityKeyWords: keywords: {}", keywords);
         return keywords;

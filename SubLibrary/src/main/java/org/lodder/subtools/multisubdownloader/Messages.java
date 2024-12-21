@@ -21,7 +21,7 @@ public class Messages {
     public static String getText(String key, Object... replacements) {
         try {
             String text = resourceBundle.getString(key);
-            return replacements == null ? text : text.formatted();
+            return replacements == null || replacements.isEmpty() ? text : text.formatted(replacements);
         } catch (MissingResourceException e) {
             return "!$key!";
         }

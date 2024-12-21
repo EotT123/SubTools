@@ -3,43 +3,20 @@ package org.lodder.subtools.sublibrary.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import manifold.ext.props.rt.api.val;
 import manifold.ext.rt.api.Self;
 
 public class NamedMatcher implements NamedMatchResult {
 
-    private Matcher matcher;
-    private NamedPattern parentPattern;
-
-    NamedMatcher() {
-    }
-
-    NamedMatcher(NamedPattern parentPattern, MatchResult matcher) {
-        this.parentPattern = parentPattern;
-        this.matcher = (Matcher) matcher;
-    }
+    private final Matcher matcher;
+    @val NamedPattern parentPattern;
 
     NamedMatcher(NamedPattern parentPattern, CharSequence input) {
         this.parentPattern = parentPattern;
         this.matcher = parentPattern.pattern.matcher(input);
-    }
-
-    public Pattern standardPattern() {
-        return matcher.pattern();
-    }
-
-    public NamedPattern namedPattern() {
-        return parentPattern;
-    }
-
-    public NamedMatcher usePattern(NamedPattern newPattern) {
-        this.parentPattern = newPattern;
-        matcher.usePattern(newPattern.pattern);
-        return this;
     }
 
     public NamedMatcher reset() {
@@ -56,29 +33,12 @@ public class NamedMatcher implements NamedMatchResult {
         return matcher.matches();
     }
 
-    public NamedMatchResult toMatchResult() {
-        return new NamedMatcher(this.parentPattern, matcher.toMatchResult());
-    }
-
     public boolean find() {
         return matcher.find();
     }
 
     public boolean find(int start) {
         return matcher.find(start);
-    }
-
-    public boolean lookingAt() {
-        return matcher.lookingAt();
-    }
-
-    public NamedMatcher appendReplacement(StringBuffer sb, String replacement) {
-        matcher.appendReplacement(sb, replacement);
-        return this;
-    }
-
-    public StringBuffer appendTail(StringBuffer sb) {
-        return matcher.appendTail(sb);
     }
 
     @Override
@@ -102,7 +62,7 @@ public class NamedMatcher implements NamedMatchResult {
     }
 
     @Override
-    public Map<String, Integer> namedGroups() {
+    public Map<String, Integer> getNamedGroups() {
         return IntStream.rangeClosed(1, groupCount()).sequential()
             .collect(LinkedHashMap::new, (map, i) -> map.put(parentPattern.groupNames.get(i - 1), i), Map::putAll);
     }
@@ -141,51 +101,8 @@ public class NamedMatcher implements NamedMatchResult {
         return end(groupIndex(groupName));
     }
 
-    public NamedMatcher region(int start, int end) {
-        matcher.region(start, end);
-        return this;
-    }
-
-    public int regionEnd() {
-        return matcher.regionEnd();
-    }
-
-    public int regionStart() {
-        return matcher.regionStart();
-    }
-
-    public boolean hitEnd() {
-        return matcher.hitEnd();
-    }
-
-    public boolean requireEnd() {
-        return matcher.requireEnd();
-    }
-
-    public boolean hasAnchoringBounds() {
-        return matcher.hasAnchoringBounds();
-    }
-
-    public boolean hasTransparentBounds() {
-        return matcher.hasTransparentBounds();
-    }
-
     public String replaceAll(String replacement) {
         return matcher.replaceAll(replacement);
-    }
-
-    public String replaceFirst(String replacement) {
-        return matcher.replaceFirst(replacement);
-    }
-
-    public NamedMatcher useAnchoringBounds(boolean b) {
-        matcher.useAnchoringBounds(b);
-        return this;
-    }
-
-    public NamedMatcher useTransparentBounds(boolean b) {
-        matcher.useTransparentBounds(b);
-        return this;
     }
 
     @Override
@@ -202,5 +119,4 @@ public class NamedMatcher implements NamedMatchResult {
     public String toString() {
         return matcher.toString();
     }
-
 }

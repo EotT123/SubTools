@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.val;
+import manifold.ext.rt.api.Self;
 import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 public class PathOrRegex implements Serializable {
@@ -65,7 +66,7 @@ public class PathOrRegex implements Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Self Object obj) {
         return obj instanceof PathOrRegex other && Objects.equals(value, other.value);
     }
 }

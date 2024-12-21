@@ -191,7 +191,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         getContentPane().add(pnlLogging, gbcPnlLogging);
 
         StatusLabel lblStatus = new StatusLabel("");
-        StatusMessenger.instance.addListener(lblStatus);
+        StatusMessenger.getInstance().addListener(lblStatus);
         final GridBagConstraints gbcLblStatus = new GridBagConstraints();
         gbcLblStatus.anchor = GridBagConstraints.SOUTHWEST;
         gbcLblStatus.gridx = 0;
