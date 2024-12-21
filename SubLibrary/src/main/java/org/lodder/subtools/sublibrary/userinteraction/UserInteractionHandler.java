@@ -2,10 +2,12 @@ package org.lodder.subtools.sublibrary.userinteraction;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.val;
+import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 
 public interface UserInteractionHandler {
@@ -17,7 +19,7 @@ public interface UserInteractionHandler {
     Optional<String> selectFromList(Collection<String> options, String message, String title);
 
     <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
-            Function<T, String> toStringMapper);
+        Function<T, String> toStringMapper);
 
     <T> Optional<T> choice(Collection<T> options, String message, String title);
 
@@ -28,6 +30,10 @@ public interface UserInteractionHandler {
     }
 
     Optional<String> enter(String title, String message, String errorMessage, Predicate<String> validator);
+
+    default OptionalInt enterNumber(String title, String message, String errorMessage) {
+        return enter(title, message, errorMessage, StringUtils::isNumeric).mapToInt(Integer::parseInt);
+    }
 
     void showMessage(String message, String title, MessageSeverity messageSeverity);
 

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -16,7 +18,6 @@ import java.util.function.Supplier;
 
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesHasher;
@@ -59,7 +60,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                     LOGGER.error("Error calculating file hash", e);
                 } catch (Exception e) {
                     LOGGER.error("API %s searchSubtitles using file hash for movie [%s] (%s)".formatted(
-                            subtitleSource.name, movieRelease.name, e.getMessage()), e);
+                        subtitleSource.name, movieRelease.name, e.getMessage()), e);
                 }
             }
         }
@@ -68,7 +69,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 subtitles.addAll(searchMovieSubtitlesWithId(imdbId, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(
-                        subtitleSource.name, imdbId, movieRelease.name, e.getMessage()), e);
+                    subtitleSource.name, imdbId, movieRelease.name, e.getMessage()), e);
             }
         });
         if (subtitles.isEmpty()) {
@@ -76,7 +77,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using title for movie [%s] (%s)".formatted(subtitleSource.name,
-                        movieRelease.name, e.getMessage()), e);
+                    movieRelease.name, e.getMessage()), e);
             }
         }
         return convertToSubtitles(movieRelease, subtitles, language);
@@ -97,9 +98,9 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
-                            TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisodeNumber),
-                            e.getMessage()),
-                    e);
+                    TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisodeNumber),
+                    e.getMessage()),
+                e);
             return Set.of();
         }
     }
@@ -121,28 +122,28 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     }
 
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, Function<TvRelease, String> nameFunction)
-            throws X {
+        throws X {
         return getProviderSerieId(tvRelease, nameFunction, nameFunction);
     }
 
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, Function<TvRelease, String> nameFunction,
-            Function<TvRelease, String> customNameFunction) throws X {
+        Function<TvRelease, String> customNameFunction) throws X {
         return getProviderSerieId(nameFunction.apply(tvRelease), customNameFunction.apply(tvRelease),
-                tvRelease.displayName, tvRelease.season, tvRelease.getTvdbIdOptional());
+            tvRelease.displayName, tvRelease.season, tvRelease.getTvdbIdOptional());
     }
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String displayName, int season,
-            OptionalInt tvdbIdOptional) throws X {
+        OptionalInt tvdbIdOptional) throws X {
         return getProviderSerieId(serieName, serieName, displayName, season, tvdbIdOptional);
     }
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
-            int season, OptionalInt tvdbIdOptional) throws X {
+        int season, OptionalInt tvdbIdOptional) throws X {
         Supplier<ValueBuilderIsPresentIntf<Serializable>> tvdbIdValueBuilder = () -> tvdbIdOptional.mapToObj(
-                tvdbId -> manager.valueBuilder()
-                        .cacheType(CacheType.DISK)
-                        .key("%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId,
-                                useSeasonForSerieId() ? season : -1))).orElseThrow();
+            tvdbId -> manager.valueBuilder()
+                .cacheType(CacheType.DISK)
+                .key("%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId,
+                    useSeasonForSerieId() ? season : -1))).orElseThrow();
         if (tvdbIdOptional.isPresent() && tvdbIdValueBuilder.get().isPresent()) {
             // if value using the tvdbId is present, return it
             return tvdbIdValueBuilder.get().returnType(SerieMapping.class).getOptional();
@@ -152,8 +153,8 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         }
         int seasonToUse = useSeasonForSerieId() ? season : 0;
         ValueBuilderIsPresentIntf<Serializable> serieNameValueBuilder = manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .key("%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
+            .cacheType(CacheType.DISK)
+            .key("%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
 
         if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameValueBuilder.isPresent()) {
             if (serieNameValueBuilder.isTemporaryObject()) {
@@ -162,9 +163,9 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 }
             } else {
                 Optional<SerieMapping> serieMapping =
-                        serieNameValueBuilder.returnType(SerieMapping.class).getOptional();
+                    serieNameValueBuilder.returnType(SerieMapping.class).getOptional();
                 serieMapping.ifPresent(providerSerieName -> tvdbIdOptional.ifPresent(
-                        tvdbId -> tvdbIdValueBuilder.get().value(providerSerieName).store()));
+                    tvdbId -> tvdbIdValueBuilder.get().value(providerSerieName).store()));
                 return serieMapping;
             }
         }
@@ -175,49 +176,48 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             // (so the provider isn't contacted every time this method is being called)
             // If a temporary expired value was already found, persist the null value with a doubled expiration time
             serieNameValueBuilder.value(new SerieMapping(serieName, null, null, seasonToUse))
-                    .storeTempNullValue()
-                    .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
-                            .map(v -> v * 2)
-                            .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
-                    .storeAsTempValue();
+                .storeTempNullValue()
+                .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
+                    .map(v -> v * 2)
+                    .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
+                .storeAsTempValue();
             return Optional.empty();
         }
 
         SerieMapping serieMapping;
         if (!getUserInteractionSettings().optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
             serieMapping =
-                    new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
+                new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
         } else {
             ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = manager.valueBuilder()
-                    .cacheType(CacheType.MEMORY)
-                    .key("%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(),
-                            seasonToUse));
+                .cacheType(CacheType.MEMORY)
+                .key("%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(),
+                    seasonToUse));
 
             boolean previousResultsPresent = previousResultsValueBuilder.isPresent();
             Optional<S> uriForSerie;
             // Check if the previous results were the same for the service. If so, don't ask the user to select again
             if (previousResultsPresent && previousResultsValueBuilder.returnType((Class<List<S>>) null, null)
-                    .getCollection()
-                    .equals(providerSerieIds)) {
+                .getCollection()
+                .equals(providerSerieIds)) {
                 uriForSerie = Optional.empty();
             } else {
                 // let the user select the correct provider serie id
                 uriForSerie = getUserInteractionHandler().selectFromList(providerSerieIds, useSeasonForSerieId() ?
-                                Messages.getText("SelectDialog.SelectSerieNameForNameWithSeason")
-                                        .formatted(displayName, seasonToUse) :
-                                Messages.getText("SelectDialog.SelectSerieNameForName").formatted(displayName),
-                        providerName, this::providerSerieIdToDisplayString);
+                        getText("SelectDialog.SelectSerieNameForNameWithSeason", displayName, seasonToUse) :
+                        getText("SelectDialog.SelectSerieNameForName", displayName),
+                    providerName, this::providerSerieIdToDisplayString);
             }
             if (uriForSerie.isEmpty()) {
                 if (serieNameToSearchFor.equals(serieName)) {
                     // if no provider serie id was selected, store a temporary null value with expiration time of 1 day,
                     // or the doubled previously temporary value (if present)
                     serieNameValueBuilder.value(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse))
-                            .storeTempNullValue()
-                            .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
-                                    .map(v -> v * 2)
-                                    .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
-                            .storeAsTempValue();
+                        .storeTempNullValue()
+                        .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
+                            .map(v -> v * 2)
+                            .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
+                        .storeAsTempValue();
                     previousResultsValueBuilder.collectionValue(providerSerieIds).store();
                 }
                 return Optional.empty();

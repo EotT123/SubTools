@@ -1,13 +1,13 @@
 package org.lodder.subtools.sublibrary.data.imdb;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalInt;
 
 import com.pivovarit.function.ThrowingBiFunction;
-import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
@@ -115,16 +115,15 @@ public class ImdbAdapter {
                             .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
                         .thenComparing(ProviderSerieId::getName))
                     .toList(),
-                Messages.getText("Prompter.SelectImdbMatchForSerie").formatted(title),
+                getText("Prompter.SelectImdbMatchForSerie", title),
                 PROVIDER_NAME,
                 ProviderSerieId::getName)
             .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.id));
     }
 
     private OptionalInt promptUserToEnterImdbId(String title, int year) {
-        return userInteractionHandler.enter(PROVIDER_NAME,
-            Messages.getText("Prompter.EnterImdbMatchForSerie").formatted(title),
-            Messages.getText("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
+        return userInteractionHandler.enterNumber(PROVIDER_NAME,
+            getText("Prompter.EnterImdbMatchForSerie", title), getText("Prompter.ValueIsNotValid"));
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {

@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.control;
 
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
+import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.util.NamedPattern;
 
@@ -19,38 +22,50 @@ public class VideoPatterns {
     public interface VideoPatternEnumIntf {
     }
 
+    public interface SinglePattern extends MultiplePatterns {
+        @val String value;
+
+        default String[] getValues() {
+            return new String[]{ value };
+        }
+    }
+
+    public interface MultiplePatterns {
+        @val String[] values;
+    }
+
     @AllArgsConstructor
-    public enum Quality implements VideoPatternEnumIntf {
+    public enum Quality implements VideoPatternEnumIntf, SinglePattern {
         Q1080P("1080p"),
         Q1080I("1080i"),
         Q720P("720p"),
         Q480P("480p");
 
-        @val String value;
+        @val @override String value;
     }
 
-    public enum VideoEncoding implements VideoPatternEnumIntf {
+    public enum VideoEncoding implements VideoPatternEnumIntf, MultiplePatterns {
         X264("x264", "h264"),
         X265("x265", "h265");
 
-        @val String[] values;
+        @val @override String[] values;
 
         VideoEncoding(String... values) {
             this.values = values;
         }
     }
 
-    public enum AudioEncoding implements VideoPatternEnumIntf {
+    public enum AudioEncoding implements VideoPatternEnumIntf, MultiplePatterns {
         DD5_1("dd5.1", "dd5-1");
 
-        @val String[] values;
+        @val @override String[] values;
 
         AudioEncoding(String... values) {
             this.values = values;
         }
     }
 
-    public enum Source implements VideoPatternEnumIntf {
+    public enum Source implements VideoPatternEnumIntf, MultiplePatterns {
         HDTV(false, "hdtv"),
         DVDRIP(false, "dvdrip"),
         BLURAY(false, "bluray"),
@@ -74,7 +89,7 @@ public class VideoPatterns {
         }
 
         @val boolean manyDifferentSources;
-        @val String[] values;
+        @val @override String[] values;
 
         Source(boolean manyDifferentSources, String... values) {
             this.manyDifferentSources = manyDifferentSources;
@@ -96,7 +111,7 @@ public class VideoPatterns {
     }
 
     @AllArgsConstructor
-    public enum VideoExtensions {
+    public enum VideoExtensions implements SinglePattern {
         MKV("mkv"),
         MP4("mp4"),
         AVI("avi"),
@@ -104,16 +119,17 @@ public class VideoPatterns {
         TS("ts"),
         M4V("m4v");
 
-        @val String value;
+        @val @override String value;
     }
 
-    private static final Set<String> QUALITY_KEYWORDS_SET = Set.of("hdtv", "dvdrip", "bluray",
-            "1080p", "ts", "dvdscreener", "r5", "bdrip", "brrip", "720p", "xvid", "cam", "480p", "x264", "x265",
-            "1080i", "pdtv", "divx", "webrip", "h264", "h265", "rerip", "webdl");
+    private static final Set<String> QUALITY_KEYWORDS_SET =
+        Stream.of(Quality.values(), Source.values(), VideoEncoding.values()).map(MultiplePatterns.class::cast)
+            .map(MultiplePatterns::getValues).flatMap(Arrays::stream).collect(Collectors.toSet());
 
     private static final Set<String> QUALITY_KEYWORDS_REGEX_SET = Set.of("web[ .-]dl", "dd5[ .]1");
 
-    public static final Set<String> EXTENSIONS = Set.of("mkv", "mp4", "avi", "wmv", "ts", "m4v");
+    public static final Set<String> EXTENSIONS =
+        VideoExtensions.values().stream().map(VideoExtensions::getValue).collect(Collectors.toSet());
 
     // order is important!!!!!!
     private static final String[] PATTERNS = {
@@ -184,10 +200,10 @@ public class VideoPatterns {
     // .stream()).toList();
 
     private static final String QUALITY_KEYWORDS_REGEX =
-            Stream.concat(QUALITY_KEYWORDS_SET.stream(), QUALITY_KEYWORDS_REGEX_SET.stream())
-                    .collect(Collectors.joining("|", "(", ")"));
+        Stream.concat(QUALITY_KEYWORDS_SET.stream(), QUALITY_KEYWORDS_REGEX_SET.stream())
+            .collect(Collectors.joining("|", "(", ")"));
 
     public static final Pattern QUALITY_KEYWORDS_REGEX_PATTERN =
-            Pattern.compile(QUALITY_KEYWORDS_REGEX, Pattern.CASE_INSENSITIVE);
+        Pattern.compile(QUALITY_KEYWORDS_REGEX, Pattern.CASE_INSENSITIVE);
 
 }

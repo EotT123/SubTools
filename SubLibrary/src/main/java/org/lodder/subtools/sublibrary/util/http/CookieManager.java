@@ -106,7 +106,7 @@ public class CookieManager {
         if (cookieMap == null || cookieMap.isEmpty()) {
             return;
         }
-        Map<String, Map<String, String>> domainStore = store.computeIfAbsent(domain, key -> new HashMap<>());
+        Map<String, Map<String, String>> domainStore = store.computeIfAbsent(domain, _ -> new HashMap<>());
         cookieMap.forEach((k, v) -> domainStore.put(k, Map.of(k, v)));
     }
 
@@ -121,8 +121,7 @@ public class CookieManager {
      */
     public void setCookies(URLConnection conn) throws IOException {
 
-        // let's determine the domain and path to retrieve the appropriate
-        // cookies
+        // let's determine the domain and path to retrieve the appropriate cookies
         URL url = conn.getURL();
         String domain = getDomainFromHost(url.getHost());
         String path = url.getPath();
@@ -152,11 +151,8 @@ public class CookieManager {
         try {
             conn.setRequestProperty(COOKIE, cookieStringBuffer.toString());
         } catch (java.lang.IllegalStateException ise) {
-            throw new IOException(
-                "Illegal State! Cookies cannot be set on a URLConnection that is already connected. "
-                    +
-                    "Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection" +
-                    ".connect().");
+            throw new IOException("Illegal State! Cookies cannot be set on a URLConnection that is already connected. "
+                + "Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection.connect().");
         }
     }
 

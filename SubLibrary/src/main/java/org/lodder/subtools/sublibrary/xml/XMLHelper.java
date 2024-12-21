@@ -3,32 +3,21 @@ package org.lodder.subtools.sublibrary.xml;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XMLHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLHelper.class);
 
     private static String xmlCleanup(String text) {
         return text.replace("&amp;", "&");
@@ -54,73 +43,10 @@ public class XMLHelper {
         return "";
     }
 
-    public static String getStringAttributeValue(String sTag, String sAttribute, Element eElement) {
-        LOGGER.trace("getStringAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
-        NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
-        return xmlCleanup(((Element) nlList).getAttribute(sAttribute));
-    }
-
     public static int getIntTagValue(String sTag, Element eElement) {
         LOGGER.trace("getIntTagValue: sTag [{}]", sTag);
         Node nValue = eElement.getElementsByTagName(sTag).item(0).getChildNodes().item(0);
         return nValue == null ? 0 : Integer.parseInt(nValue.getNodeValue());
-    }
-
-    public static boolean getBooleanTagValue(String sTag, Element eElement) {
-        LOGGER.trace("getBooleanTagValue: sTag [{}]", sTag);
-        Node nValue = eElement.getElementsByTagName(sTag).item(0).getChildNodes().item(0);
-        return nValue != null && Boolean.parseBoolean(nValue.getNodeValue());
-    }
-
-    public static boolean getBooleanAttributeValue(String sTag, String sAttribute, Element eElement) {
-        LOGGER.trace("getBooleanAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
-        NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
-        return ((Element) nlList).getAttribute(sAttribute) != null &&
-            Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
-    }
-
-    public static String cleanBadChars(String String) {
-        String text = String;
-        LOGGER.trace("cleanBadChars: string [{}]", text);
-        /* Remove bad chars for the find function of bierdopje api. */
-        text = text.toLowerCase().replace(" and ", " & ");
-        text = text.replace("&", "");
-        text = text.replace("#", "");
-        text = text.replace("*", "");
-        text = text.replace("!", "");
-        text = text.replace("$", "");
-        text = text.replace("  ", " ");
-        return text.trim();
-    }
-
-    public static void writeToFile(Path file, Document doc) throws Exception {
-        String xmlString = getXMLAsString(doc);
-        try (OutputStream os = Files.newOutputStream(file)) {
-            byte[] xmlStringContent = xmlString.getBytes(StandardCharsets.UTF_8);
-            os.write(xmlStringContent);
-        }
-    }
-
-    public static String getXMLAsString(Document doc) throws Exception {
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(doc);
-        transformer.transform(source, result);
-
-        return result.getWriter().toString();
-    }
-
-    public static String getXMLAsString(Element eElement) throws Exception {
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(eElement);
-        transformer.transform(source, result);
-
-        return result.getWriter().toString();
     }
 
     public static Document getDocument(String string) throws ParserConfigurationException, IOException {

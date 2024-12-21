@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -10,7 +12,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.ValueBuilderIsPresentIntf;
@@ -79,10 +80,9 @@ public class TheTvdbAdapter {
                     Comparator.reverseOrder())
                 .thenComparing(TheTvdbSerie::getFirstAired, Comparator.reverseOrder());
             try {
-                tvdbSerie = userInteractionHandler
-                    .selectFromList(serieIds.stream().sorted(comparator).toList(),
-                        Messages.getText("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
-                        PROVIDER_NAME, s -> "${s.serieName} (${s.firstAired})");
+                tvdbSerie = userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
+                    getText("Prompter.SelectTvdbMatchForSerie", serieName),
+                    PROVIDER_NAME, s -> "${s.serieName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
                     tvdbSerie = askUserToEnterTvdbId(serieName)
                         .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));

@@ -40,72 +40,72 @@ public class JPodnapisiApi implements SubtitleApi {
 
     public Optional<ProviderSerieId> getPodnapisiShowName(String showName) throws PodnapisiException {
         String url = DOMAIN + "/sl/ppodnapisi/search?sK=" + showName.trim().toLowerCase().urlEncode();
-        return getXml(url).selectFirstByClass("subtitle-entry") != null
-                ? Optional.of(new ProviderSerieId(showName, showName))
-                : Optional.empty();
+        return getXml(url).selectFirstByClass("subtitle-entry") != null ?
+            Optional.of(new ProviderSerieId(showName, showName)) : Optional.empty();
     }
 
     public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, int year, int season, int episode,
-            Language language)
-            throws PodnapisiException {
+        Language language) throws PodnapisiException {
         return getSubtitles(new SerieMapping(movieName, movieName, movieName, season), year, season, episode, language);
 
     }
 
     public List<PodnapisiSubtitleDescriptor> getSerieSubtitles(SerieMapping providerSerieId, int season, int episode,
-            Language language)
-            throws PodnapisiException {
+        Language language) throws PodnapisiException {
         return getSubtitles(providerSerieId, null, season, episode, language);
 
     }
 
     private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, Integer year, int season,
-            int episode, Language language)
-            throws PodnapisiException {
+        int episode, Language language) throws PodnapisiException {
         return manager.valueBuilder()
-                .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId,
-                        season, episode, language))
-                .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
-                    try {
-                        StringBuilder url = new StringBuilder("$DOMAIN/sl/ppodnapisi/search?sK=")
-                                .append(URLEncoder.encode(providerSerieId.providerId.trim().toLowerCase(),
-                                        StandardCharsets.UTF_8));
-                        if (PODNAPISI_LANGS.containsKey(language)) {
-                            url.append("&sJ=").append(PODNAPISI_LANGS.get(language));
-                        }
-                        if (year != null) {
-                            url.append("&sY=").append(year);
-                        }
-                        if (season > 0) {
-                            url.append("&sTS=").append(season).append("&sT=1"); // series
-                        } else {
-                            url.append("&sT=0"); // movies
-                        }
-                        if (episode > 0) {
-                            url.append("&sTE=").append(episode);
-                        }
-                        url.append("&sXML=1");
-
-                        return getXml(url.toString()).selectAllByTag("subtitle")
-                                .stream()
-                                .map(this::parsePodnapisiSubtitle)
-                                .toList();
-                    } catch (Exception e) {
-                        throw new PodnapisiException(e);
+            .memoryCache()
+            .key(
+                "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId, season, episode,
+                    language))
+            .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
+                try {
+                    StringBuilder url = new StringBuilder("$DOMAIN/sl/ppodnapisi/search?sK=").append(
+                        URLEncoder.encode(providerSerieId.providerId.trim().toLowerCase(), StandardCharsets.UTF_8));
+                    if (PODNAPISI_LANGS.containsKey(language)) {
+                        url.append("&sJ=").append(PODNAPISI_LANGS.get(language));
                     }
-                })
-                .getCollection();
+                    if (year != null) {
+                        url.append("&sY=").append(year);
+                    }
+                    if (season > 0) {
+                        url.append("&sTS=").append(season).append("&sT=1"); // series
+                    } else {
+                        url.append("&sT=0"); // movies
+                    }
+                    if (episode > 0) {
+                        url.append("&sTE=").append(episode);
+                    }
+                    url.append("&sXML=1");
+
+                    return getXml(url.toString()).selectAllByTag("subtitle")
+                        .stream()
+                        .map(this::parsePodnapisiSubtitle)
+                        .toList();
+                } catch (Exception e) {
+                    throw new PodnapisiException(e);
+                }
+            })
+            .getCollection();
     }
 
 
     protected @Nullable Document getXml(String url) throws PodnapisiException {
         try {
-            return manager.getPageContentBuilder().url(url).userAgent(userAgent).cacheType(CacheType.MEMORY).retries(1)
-                    .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
-                            httpClientException.getResponseCode() >= 500
-                            && httpClientException.getResponseCode() < 600)
-                    .retryWait(5).getAsJsoupDocument();
+            return manager.getPageContentBuilder()
+                .url(url)
+                .userAgent(userAgent)
+                .cacheType(CacheType.MEMORY)
+                .retries(1)
+                .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
+                    httpClientException.responseCode >= 500 && httpClientException.responseCode < 600)
+                .retryWait(5)
+                .getAsJsoupDocument();
         } catch (Exception e) {
             throw new PodnapisiException(e);
         }
@@ -114,87 +114,84 @@ public class JPodnapisiApi implements SubtitleApi {
     private PodnapisiSubtitleDescriptor parsePodnapisiSubtitle(Element elem) {
         Function<Element, String> getText = e -> e == null ? null : e.text();
         return PodnapisiSubtitleDescriptor.builder()
-                .hearingImpaired(elem.select("new_flags flags")
-                        .stream()
-                        .anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))
-                .language(languageIdToLanguage(elem.selectFirst("languageId").getText()))
-                .releaseString(
-                        elem.selectFirst("release").getText().length() > 10 ? elem.selectFirst("release").getText()
-                                : elem.selectFirst("title").getText().replace(":", "") + " " +
-                                elem.selectFirst("release").getText())
-                .uploaderName(elem.selectFirst("uploaderName").getText())
-                .url(elem.selectFirst("url").getText() + "/download?")
-                .subtitleId(elem.selectFirst("id").getText())
-                .year(getText.apply(elem.selectFirst("year")))
-                .imdb(getText.apply(elem.selectFirst("imdb")))
-                .omdb(getText.apply(elem.selectFirst("omdb")))
-                .build();
+            .hearingImpaired(elem.select("new_flags flags")
+                .stream()
+                .anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))
+            .language(languageIdToLanguage(elem.selectFirst("languageId").getText()))
+            .releaseString(elem.selectFirst("release").getText().length() > 10 ? elem.selectFirst("release").getText() :
+                elem.selectFirst("title").getText().replace(":", "") + " " + elem.selectFirst("release").getText())
+            .uploaderName(elem.selectFirst("uploaderName").getText())
+            .url(elem.selectFirst("url").getText() + "/download?")
+            .subtitleId(elem.selectFirst("id").getText())
+            .year(getText.apply(elem.selectFirst("year")))
+            .imdb(getText.apply(elem.selectFirst("imdb")))
+            .omdb(getText.apply(elem.selectFirst("omdb")))
+            .build();
     }
 
     private Language languageIdToLanguage(String languageId) {
         return PODNAPISI_LANGS.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().equals(languageId))
-                .map(Entry::getKey)
-                .findFirst()
-                .orElse(null);
+            .stream()
+            .filter(entry -> entry.getValue().equals(languageId))
+            .map(Entry::getKey)
+            .findFirst()
+            .orElse(null);
     }
 
-    private static final Map<Language, String> PODNAPISI_LANGS = Collections
-            .unmodifiableMap(new EnumMap<>(Language.class) {
-                @Serial
-                private static final long serialVersionUID = 2950169212654074275L;
+    private static final Map<Language, String> PODNAPISI_LANGS =
+        Collections.unmodifiableMap(new EnumMap<>(Language.class) {
+            @Serial private static final long serialVersionUID = 2950169212654074275L;
 
-                {
-                    put(Language.SLOVENIAN, "1");
-                    put(Language.ENGLISH, "2");
-                    put(Language.NORWEGIAN, "3");
-                    put(Language.KOREAN, "4");
-                    put(Language.GERMAN, "5");
-                    put(Language.ICELANDIC, "6");
-                    put(Language.CZECH, "7");
-                    put(Language.FRENCH, "8");
-                    put(Language.ITALIAN, "9");
-                    put(Language.BOSNIAN, "10");
-                    put(Language.JAPANESE, "11");
-                    put(Language.ARABIC, "12");
-                    put(Language.ROMANIAN, "13");
-                    put(Language.SPANISH, "14"); // es-ar Spanish (Argentina)
-                    put(Language.HUNGARIAN, "15");
-                    put(Language.GREEK, "16");
-                    put(Language.CHINESE_SIMPLIFIED, "17");
-                    put(Language.LITHUANIAN, "19");
-                    put(Language.ESTONIAN, "20");
-                    put(Language.LATVIAN, "21");
-                    put(Language.HEBREW, "22");
-                    put(Language.DUTCH, "23");
-                    put(Language.DANISH, "24");
-                    put(Language.SWEDISH, "25");
-                    put(Language.POLISH, "26");
-                    put(Language.RUSSIAN, "27");
-                    put(Language.SPANISH, "28");
-                    put(Language.ALBANIAN, "29");
-                    put(Language.TURKISH, "30");
-                    put(Language.FINNISH, "31");
-                    put(Language.PORTUGUESE, "32");
-                    put(Language.BULGARIAN, "33");
-                    put(Language.MACEDONIAN, "35");
-                    put(Language.SLOVAK, "37");
-                    put(Language.CROATIAN, "38");
-                    put(Language.CHINESE_SIMPLIFIED, "40");
-                    put(Language.HINDI, "42");
-                    put(Language.THAI, "44");
-                    put(Language.UKRAINIAN, "46");
-                    put(Language.SERBIAN, "47");
-                    put(Language.PORTUGUESE, "48"); // Portuguese (Brazil)
-                    put(Language.IRISH, "49");
-                    put(Language.BELARUSIAN, "50");
-                    put(Language.VIETNAMESE, "51");
-                    put(Language.PERSIAN, "52");
-                    put(Language.CATALAN, "53");
-                    put(Language.INDONESIAN, "54");
+            {
+                put(Language.SLOVENIAN, "1");
+                put(Language.ENGLISH, "2");
+                put(Language.NORWEGIAN, "3");
+                put(Language.KOREAN, "4");
+                put(Language.GERMAN, "5");
+                put(Language.ICELANDIC, "6");
+                put(Language.CZECH, "7");
+                put(Language.FRENCH, "8");
+                put(Language.ITALIAN, "9");
+                put(Language.BOSNIAN, "10");
+                put(Language.JAPANESE, "11");
+                put(Language.ARABIC, "12");
+                put(Language.ROMANIAN, "13");
+                put(Language.SPANISH, "14"); // es-ar Spanish (Argentina)
+                put(Language.HUNGARIAN, "15");
+                put(Language.GREEK, "16");
+                put(Language.CHINESE_SIMPLIFIED, "17");
+                put(Language.LITHUANIAN, "19");
+                put(Language.ESTONIAN, "20");
+                put(Language.LATVIAN, "21");
+                put(Language.HEBREW, "22");
+                put(Language.DUTCH, "23");
+                put(Language.DANISH, "24");
+                put(Language.SWEDISH, "25");
+                put(Language.POLISH, "26");
+                put(Language.RUSSIAN, "27");
+                put(Language.SPANISH, "28");
+                put(Language.ALBANIAN, "29");
+                put(Language.TURKISH, "30");
+                put(Language.FINNISH, "31");
+                put(Language.PORTUGUESE, "32");
+                put(Language.BULGARIAN, "33");
+                put(Language.MACEDONIAN, "35");
+                put(Language.SLOVAK, "37");
+                put(Language.CROATIAN, "38");
+                put(Language.CHINESE_SIMPLIFIED, "40");
+                put(Language.HINDI, "42");
+                put(Language.THAI, "44");
+                put(Language.UKRAINIAN, "46");
+                put(Language.SERBIAN, "47");
+                put(Language.PORTUGUESE, "48"); // Portuguese (Brazil)
+                put(Language.IRISH, "49");
+                put(Language.BELARUSIAN, "50");
+                put(Language.VIETNAMESE, "51");
+                put(Language.PERSIAN, "52");
+                put(Language.CATALAN, "53");
+                put(Language.INDONESIAN, "54");
 
-                }
-            });
+            }
+        });
 
 }

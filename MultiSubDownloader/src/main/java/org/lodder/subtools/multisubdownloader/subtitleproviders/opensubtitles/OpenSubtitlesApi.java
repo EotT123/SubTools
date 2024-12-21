@@ -44,8 +44,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
     public void login(String userName, String password) throws OpenSubtitlesException {
         try {
             Login200Response loginResponse =
-                    new AuthenticationApi(API_CLIENT).login("application/json", USER_AGENT,
-                            new LoginRequest().username(userName).password(password));
+                new AuthenticationApi(API_CLIENT).login("application/json", USER_AGENT,
+                    new LoginRequest().username(userName).password(password));
             API_CLIENT.setBearerToken(loginResponse.getToken());
         } catch (ApiException e) {
             throw new OpenSubtitlesException(e);
@@ -55,7 +55,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     public static boolean isValidCredentials(String userName, String password) {
         try {
             new AuthenticationApi(API_CLIENT).login("application/json", USER_AGENT,
-                    new LoginRequest().username(userName).password(password));
+                new LoginRequest().username(userName).password(password));
             return true;
         } catch (ApiException e) {
             return false;
@@ -73,19 +73,19 @@ public class OpenSubtitlesApi implements SubtitleApi {
     public List<OpensubtitleSerieId> getProviderSerieIds(String serieName) throws OpenSubtitlesException {
         try {
             return manager.getPageContentBuilder()
-                    .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                            + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
-                    .userAgent("")
-                    .cacheType(CacheType.MEMORY)
-                    .retries(1)
-                    .retryPredicate(exc -> exc instanceof HttpClientException e && e.getResponseCode() == 429)
-                    .retryWait(5)
-                    .getAsJsonArray()
-                    .stream()
-                    .filter(show -> "tv".equals(show.getString("kind")))
-                    .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
-                            show.getString("year")))
-                    .toList();
+                .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
+                    + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
+                .userAgent("")
+                .cacheType(CacheType.MEMORY)
+                .retries(1)
+                .retryPredicate(exc -> exc instanceof HttpClientException e && e.responseCode == 429)
+                .retryWait(5)
+                .getAsJsonArray()
+                .stream()
+                .filter(show -> "tv".equals(show.getString("kind")))
+                .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
+                    show.getString("year")))
+                .toList();
         } catch (Exception e) {
             throw new OpenSubtitlesException(e);
         }

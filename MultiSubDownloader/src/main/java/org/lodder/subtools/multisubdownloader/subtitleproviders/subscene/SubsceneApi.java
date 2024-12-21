@@ -44,7 +44,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
         case HttpClientException httpClientException ->
-                httpClientException.getResponseCode() == 409 || httpClientException.getResponseCode() == 429;
+            httpClientException.responseCode == 409 || httpClientException.responseCode == 429;
         case ManagerException managerException -> managerException.getMessage().contains("409 Conflict");
         default -> false;
     };
@@ -72,53 +72,53 @@ public class SubsceneApi extends Html implements SubtitleApi {
             }
             String url = "$DOMAIN/subtitles/searchbytitle?query=" + serieName.urlEncode();
             return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
-                    .stream()
-                    .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
-                            titleElement.nextElementSibling().selectAllByTag("a").stream().map(elem -> {
-                                Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
-                                int season = 0;
-                                if (matcher.matches()) {
-                                    season = OrdinalNumber.optionalFromValue(matcher.group(1))
-                                            .mapToInt(OrdinalNumber::getNumber).orElse(-1);
-                                }
-                                return new SubSceneSerieId(elem.text(), elem.attr("href"), season);
-                            }).toList())));
+                .stream()
+                .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
+                    titleElement.nextElementSibling().selectAllByTag("a").stream().map(elem -> {
+                        Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
+                        int season = 0;
+                        if (matcher.matches()) {
+                            season = OrdinalNumber.optionalFromValue(matcher.group(1))
+                                .mapToInt(OrdinalNumber::getNumber).orElse(-1);
+                        }
+                        return new SubSceneSerieId(elem.text(), elem.attr("href"), season);
+                    }).toList())));
         } catch (Exception e) {
             throw new SubsceneException(e);
         }
     }
 
     public List<SubsceneSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
-            Language language) throws SubsceneException {
+        Language language) throws SubsceneException {
         return manager.valueBuilder()
-                .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name, providerSerieId.providerId, season,
-                        episode, language))
-                .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
-                    setLanguageWithCookie(language);
-                    try {
-                        return getJsoupDocument(DOMAIN + providerSerieId.providerId)
-                                .selectAllByCss("td.a1")
-                                .stream()
-                                .map(Element::parent)
-                                .map(row -> new SubsceneSubtitleDescriptor().setLanguage(
-                                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").getText().trim())
-                                                        .orElse(null))
-                                        .setUrlSupplier(() -> getDownloadUrl(
-                                                DOMAIN + row.selectAllByCss(".a1 > a").getAttr("href").trim()))
-                                        .setName(row.selectAllByCss(".a1 span:not(.l)").getText().trim())
-                                        .setHearingImpaired(row.selectFirstByCss(".a41") != null)
-                                        .setUploader(row.selectFirstByCss(".a5 > a").getText().trim())
-                                        .setComment(row.selectFirstByCss(".a6 > div").getText().trim()))
-                                .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
-                                        subDescriptor.getSeasonEpisode().episodes.stream()
-                                                .anyMatch(ep -> ep == episode))
-                                .toList();
-                    } catch (Exception e) {
-                        throw new SubsceneException(e);
-                    }
-                })
-                .getCollection();
+            .memoryCache()
+            .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name, providerSerieId.providerId, season,
+                episode, language))
+            .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
+                setLanguageWithCookie(language);
+                try {
+                    return getJsoupDocument(DOMAIN + providerSerieId.providerId)
+                        .selectAllByCss("td.a1")
+                        .stream()
+                        .map(Element::parent)
+                        .map(row -> new SubsceneSubtitleDescriptor().setLanguage(
+                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").getText().trim())
+                                    .orElse(null))
+                            .setUrlSupplier(() -> getDownloadUrl(
+                                DOMAIN + row.selectAllByCss(".a1 > a").getAttr("href").trim()))
+                            .setName(row.selectAllByCss(".a1 span:not(.l)").getText().trim())
+                            .setHearingImpaired(row.selectFirstByCss(".a41") != null)
+                            .setUploader(row.selectFirstByCss(".a5 > a").getText().trim())
+                            .setComment(row.selectFirstByCss(".a6 > div").getText().trim()))
+                        .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
+                            subDescriptor.getSeasonEpisode().episodes.stream()
+                                .anyMatch(ep -> ep == episode))
+                        .toList();
+                } catch (Exception e) {
+                    throw new SubsceneException(e);
+                }
+            })
+            .getCollection();
     }
 
     private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
@@ -138,10 +138,10 @@ public class SubsceneApi extends Html implements SubtitleApi {
             sleepSeconds(1);
         }
         Document document = super.getHtml(url)
-                .retries(1)
-                .retryPredicate(RETRY_PREDICATE)
-                .retryWait(RATE_DURATION_LONG)
-                .getAsJsoupDocument();
+            .retries(1)
+            .retryPredicate(RETRY_PREDICATE)
+            .retryWait(RATE_DURATION_LONG)
+            .getAsJsoupDocument();
         lastRequest = LocalDateTime.now();
         return document;
     }
@@ -172,90 +172,90 @@ public class SubsceneApi extends Html implements SubtitleApi {
     }
 
     private static final Map<Language, Integer> SUBSCENE_LANGS =
-            Collections.unmodifiableMap(new EnumMap<>(Language.class) {
-                @Serial private static final long serialVersionUID = 2950169212654074275L;
+        Collections.unmodifiableMap(new EnumMap<>(Language.class) {
+            @Serial private static final long serialVersionUID = 2950169212654074275L;
 
-                {
-                    put(Language.ARABIC, 2);
-                    put(Language.BENGALI, 54);
-                    put(Language.PORTUGUESE, 4); // BRAZILLIAN PORTUGUESE
-                    put(Language.CHINESE_SIMPLIFIED, 7);
-                    put(Language.CZECH, 9);
-                    put(Language.DANISH, 10);
-                    put(Language.DUTCH, 11);
-                    put(Language.ENGLISH, 13);
-                    // put(Language.FARSI / PERSIAN, 46);
-                    put(Language.FINNISH, 17);
-                    put(Language.FRENCH, 18);
-                    put(Language.GERMAN, 19);
-                    put(Language.GREEK, 21);
-                    put(Language.HEBREW, 22);
-                    put(Language.INDONESIAN, 44);
-                    put(Language.ITALIAN, 26);
-                    put(Language.KOREAN, 28);
-                    put(Language.MALAY, 50);
-                    put(Language.NORWEGIAN, 30);
-                    put(Language.POLISH, 31);
-                    put(Language.PORTUGUESE, 32);
-                    put(Language.ROMANIAN, 33);
-                    put(Language.SPANISH, 38);
-                    put(Language.SWEDISH, 39);
-                    put(Language.THAI, 40);
-                    put(Language.TURKISH, 41);
-                    put(Language.VIETNAMESE, 45);
-                    put(Language.ALBANIAN, 1);
-                    put(Language.ARMENIAN, 73);
-                    put(Language.AZERBAIJANI, 55);
-                    // put(Language.BASQUE, 74);
-                    put(Language.BELARUSIAN, 68);
-                    put(Language.CHINESE_SIMPLIFIED, 3); // BIG 5 CODE
-                    put(Language.BOSNIAN, 60);
-                    put(Language.BULGARIAN, 5);
-                    // put(Language.BULGARIAN / ENGLISH, 6);
-                    // put(Language.BURMESE, 61);
-                    // put(Language.CAMBODIAN / KHMER, 79);
-                    put(Language.CATALAN, 49);
-                    put(Language.CROATIAN, 8);
-                    // put(Language.DUTCH / ENGLISH, 12);
-                    // put(Language.ENGLISH / GERMAN, 15);
-                    // put(Language.ESPERANTO, 47);
-                    put(Language.ESTONIAN, 16);
-                    // put(Language.GEORGIAN, 62);
-                    // put(Language.GREENLANDIC, 57);
-                    put(Language.HINDI, 51);
-                    put(Language.HUNGARIAN, 23);
-                    // put(Language.HUNGARIAN / ENGLISH, 24);
-                    put(Language.ICELANDIC, 25);
-                    put(Language.JAPANESE, 27);
-                    put(Language.KANNADA, 78);
-                    // put(Language.KINYARWANDA, 81);
-                    // put(Language.KURDISH, 52);
-                    put(Language.LATVIAN, 29);
-                    put(Language.LITHUANIAN, 43);
-                    put(Language.MACEDONIAN, 48);
-                    put(Language.MALAYALAM, 64);
-                    // put(Language.MANIPURI, 65);
-                    // put(Language.MONGOLIAN, 72);
-                    // put(Language.NEPALI, 80);
-                    // put(Language.PASHTO, 67);
-                    // put(Language.PUNJABI, 66);
-                    put(Language.RUSSIAN, 34);
-                    put(Language.SERBIAN, 35);
-                    put(Language.SINHALA, 58);
-                    put(Language.SLOVAK, 36);
-                    put(Language.SLOVENIAN, 37);
-                    // put(Language.SOMALI, 70);
-                    // put(Language.SUNDANESE, 76);
-                    // put(Language.SWAHILI, 75);
-                    put(Language.TAGALOG, 53);
-                    put(Language.TAMIL, 59);
-                    put(Language.TELUGU, 63);
-                    put(Language.UKRAINIAN, 56);
-                    // put(Language.URDU, 42);
-                    // put(Language.YORUBA, 71);
+            {
+                put(Language.ARABIC, 2);
+                put(Language.BENGALI, 54);
+                put(Language.PORTUGUESE, 4); // BRAZILLIAN PORTUGUESE
+                put(Language.CHINESE_SIMPLIFIED, 7);
+                put(Language.CZECH, 9);
+                put(Language.DANISH, 10);
+                put(Language.DUTCH, 11);
+                put(Language.ENGLISH, 13);
+                // put(Language.FARSI / PERSIAN, 46);
+                put(Language.FINNISH, 17);
+                put(Language.FRENCH, 18);
+                put(Language.GERMAN, 19);
+                put(Language.GREEK, 21);
+                put(Language.HEBREW, 22);
+                put(Language.INDONESIAN, 44);
+                put(Language.ITALIAN, 26);
+                put(Language.KOREAN, 28);
+                put(Language.MALAY, 50);
+                put(Language.NORWEGIAN, 30);
+                put(Language.POLISH, 31);
+                put(Language.PORTUGUESE, 32);
+                put(Language.ROMANIAN, 33);
+                put(Language.SPANISH, 38);
+                put(Language.SWEDISH, 39);
+                put(Language.THAI, 40);
+                put(Language.TURKISH, 41);
+                put(Language.VIETNAMESE, 45);
+                put(Language.ALBANIAN, 1);
+                put(Language.ARMENIAN, 73);
+                put(Language.AZERBAIJANI, 55);
+                // put(Language.BASQUE, 74);
+                put(Language.BELARUSIAN, 68);
+                put(Language.CHINESE_SIMPLIFIED, 3); // BIG 5 CODE
+                put(Language.BOSNIAN, 60);
+                put(Language.BULGARIAN, 5);
+                // put(Language.BULGARIAN / ENGLISH, 6);
+                // put(Language.BURMESE, 61);
+                // put(Language.CAMBODIAN / KHMER, 79);
+                put(Language.CATALAN, 49);
+                put(Language.CROATIAN, 8);
+                // put(Language.DUTCH / ENGLISH, 12);
+                // put(Language.ENGLISH / GERMAN, 15);
+                // put(Language.ESPERANTO, 47);
+                put(Language.ESTONIAN, 16);
+                // put(Language.GEORGIAN, 62);
+                // put(Language.GREENLANDIC, 57);
+                put(Language.HINDI, 51);
+                put(Language.HUNGARIAN, 23);
+                // put(Language.HUNGARIAN / ENGLISH, 24);
+                put(Language.ICELANDIC, 25);
+                put(Language.JAPANESE, 27);
+                put(Language.KANNADA, 78);
+                // put(Language.KINYARWANDA, 81);
+                // put(Language.KURDISH, 52);
+                put(Language.LATVIAN, 29);
+                put(Language.LITHUANIAN, 43);
+                put(Language.MACEDONIAN, 48);
+                put(Language.MALAYALAM, 64);
+                // put(Language.MANIPURI, 65);
+                // put(Language.MONGOLIAN, 72);
+                // put(Language.NEPALI, 80);
+                // put(Language.PASHTO, 67);
+                // put(Language.PUNJABI, 66);
+                put(Language.RUSSIAN, 34);
+                put(Language.SERBIAN, 35);
+                put(Language.SINHALA, 58);
+                put(Language.SLOVAK, 36);
+                put(Language.SLOVENIAN, 37);
+                // put(Language.SOMALI, 70);
+                // put(Language.SUNDANESE, 76);
+                // put(Language.SWAHILI, 75);
+                put(Language.TAGALOG, 53);
+                put(Language.TAMIL, 59);
+                put(Language.TELUGU, 63);
+                put(Language.UKRAINIAN, 56);
+                // put(Language.URDU, 42);
+                // put(Language.YORUBA, 71);
 
-                }
-            });
+            }
+        });
 
     @Getter
     @RequiredArgsConstructor
@@ -299,8 +299,8 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
         public static Optional<OrdinalNumber> optionalFromValue(String value) {
             return Stream.of(OrdinalNumber.values())
-                    .filter(ordinalNumber -> StringUtils.equalsIgnoreCase(value, ordinalNumber.getValue()))
-                    .findAny();
+                .filter(ordinalNumber -> StringUtils.equalsIgnoreCase(value, ordinalNumber.getValue()))
+                .findAny();
         }
     }
 

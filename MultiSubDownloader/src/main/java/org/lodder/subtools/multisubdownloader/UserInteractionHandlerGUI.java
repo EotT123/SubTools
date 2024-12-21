@@ -11,7 +11,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 @Getter
 public class UserInteractionHandlerGUI extends org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandlerGUI
-        implements UserInteractionHandler {
+    implements UserInteractionHandler {
 
     public UserInteractionHandlerGUI(UserInteractionSettingsIntf settings, JFrame frame) {
         super(settings, frame);
@@ -20,13 +20,12 @@ public class UserInteractionHandlerGUI extends org.lodder.subtools.sublibrary.us
     @Override
     public List<Subtitle> selectSubtitles(Release release) {
         List<Integer> selection = new SelectDialog(frame, release.getMatchingSubs(), release).getSelection();
-        return selection.stream().map(i -> release.getMatchingSubs().get(i)).toList();
+        return selection.stream().map(release.getMatchingSubs()::get).toList();
 
     }
 
     @Override
     public void dryRunOutput(Release release) {
         // TODO Auto-generated method stub
-
     }
 }

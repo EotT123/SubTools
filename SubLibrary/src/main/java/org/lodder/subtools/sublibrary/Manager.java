@@ -281,8 +281,7 @@ public class Manager {
                     return getContentWithoutCache(urlString, userAgent);
                 }
                 throw new ManagerException(
-                    "Error occurred with httpclient response: %s %s".formatted(e.getResponseCode(),
-                        e.getResponseMessage()), e);
+                    "Error occurred with httpclient response: %s %s".formatted(e.responseCode, e.responseMessage), e);
             } catch (IOException e) {
                 if (retries-- > 0 && retryPredicate.test(e)) {
                     return getContentWithoutCache(urlString, userAgent);

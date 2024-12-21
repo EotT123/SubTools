@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.val;
+
 public class PropertiesReader {
 
     private static PropertiesReader propertiesReaderInstance;
@@ -27,7 +30,14 @@ public class PropertiesReader {
         return propertiesReaderInstance;
     }
 
-    public static String getProperty(String propertyName) {
-        return PropertiesReader.getPropertiesReader().properties.getProperty(propertyName);
+    public static String getProperty(PomPropery property) {
+        return PropertiesReader.getPropertiesReader().properties.getProperty(property.value);
+    }
+
+    @AllArgsConstructor
+    public enum PomPropery {
+        BUILD_TIMESTAMP("build.timestamp");
+
+        @val String value;
     }
 }

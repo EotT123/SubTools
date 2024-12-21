@@ -54,7 +54,9 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.util.ExportImport;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader;
+import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomPropery;
 import org.lodder.subtools.sublibrary.ConfigProperties;
+import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
@@ -94,7 +96,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         this.manager = (Manager) this.app.make("Manager");
         this.settings = (Settings) this.app.make("Settings");
         this.userInteractionHandler = new UserInteractionHandlerGUI(settingsControl.settings, this);
-        setTitle(ConfigProperties.getInstance().getProperty("name"));
+        setTitle(ConfigProperties.getProperty(Property.NAME));
         /*
          * setIconImage(Toolkit.getDefaultToolkit().getImage(
          * getClass().getResource("/resources/Bierdopje_bigger.png")));
@@ -139,11 +141,11 @@ public class GUI extends JFrame implements PropertyChangeListener {
                     }
                 }
             });
-            JOptionPane.showMessageDialog(this, editorPane, ConfigProperties.getInstance().getProperty("name"),
+            JOptionPane.showMessageDialog(this, editorPane, ConfigProperties.getProperty(Property.NAME),
                 JOptionPane.INFORMATION_MESSAGE);
         } else if (forceUpdateCheck) {
             JOptionPane.showMessageDialog(this, getText("MainWindow.NoUpdateAvailable"),
-                ConfigProperties.getInstance().getProperty("name"), JOptionPane.INFORMATION_MESSAGE);
+                ConfigProperties.getProperty(Property.NAME), JOptionPane.INFORMATION_MESSAGE);
         }
 
     }
@@ -384,13 +386,14 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     private void showAbout() {
-        String version = ConfigProperties.getInstance().getProperty(getText("MainWindow.Version"));
-        StringBuilder sb = new StringBuilder();
-        sb.append(getText("MainWindow.CurrentVersion")).append(": ").append(version);
+        String version = ConfigProperties.getProperty(Property.VERSION);
+        String currentVersionText = getText("MainWindow.CurrentVersion");
+        String buildTimestamp = PropertiesReader.getProperty(PomPropery.BUILD_TIMESTAMP);
+        String text = "$currentVersionText: $version";
         if (version.contains("-SNAPSHOT")) {
-            sb.append(" (%s)".formatted(PropertiesReader.getProperty("build.timestamp")));
+            text += " ($buildTimestamp)";
         }
-        JOptionPane.showConfirmDialog(this, sb.toString(), ConfigProperties.getInstance().getProperty("name"),
+        JOptionPane.showConfirmDialog(this, text, ConfigProperties.getProperty(Property.NAME),
             JOptionPane.CLOSED_OPTION);
     }
 
@@ -452,7 +455,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
                     }
                 }
             });
-
     }
 
     protected GUI self() {
@@ -460,7 +462,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     public void showErrorMessage(String message) {
-        JOptionPane.showConfirmDialog(this, message, ConfigProperties.getInstance().getProperty("name"),
+        JOptionPane.showConfirmDialog(this, message, ConfigProperties.getProperty(Property.NAME),
             JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
