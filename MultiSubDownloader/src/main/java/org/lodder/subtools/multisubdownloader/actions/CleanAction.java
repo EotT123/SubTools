@@ -25,31 +25,31 @@ public class CleanAction {
     private final LibrarySettings librarySettings;
 
     public void cleanUpFiles(Release release, Path destination, String videoFileName) throws IOException {
-        LOGGER.trace("cleanUpFiles: LibraryOtherFileAction {}", librarySettings.getLibraryOtherFileAction());
+        LOGGER.trace("cleanUpFiles: LibraryOtherFileAction {}", librarySettings.otherFileAction);
         if (!destination.isDirectory()) {
             throw new IllegalArgumentException("Destination [%s] is not a folder".formatted(destination));
         }
 
         release.getPath().list().asThrowingStream(IOException.class)
-                .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
-                        || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
-                .forEach(p -> {
-                    switch (librarySettings.libraryOtherFileAction) {
-                        case MOVE -> move(p, destination);
-                        case MOVEANDRENAME -> moveAndRename(p, destination, videoFileName);
-                        case REMOVE -> delete(p);
-                        case RENAME -> rename(p, destination, videoFileName);
+            .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
+                || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
+            .forEach(p -> {
+                switch (librarySettings.otherFileAction) {
+                    case MOVE -> move(p, destination);
+                    case MOVEANDRENAME -> moveAndRename(p, destination, videoFileName);
+                    case REMOVE -> delete(p);
+                    case RENAME -> rename(p, destination, videoFileName);
                         case NOTHING -> { }
                         default -> { }
                     }
-                });
+            });
     }
 
     private void rename(Path path, Path destinationFolder, String videoFileName) throws IOException {
         if (path.isRegularFile()) {
             String fileName =
-                    path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
-                            StringUtils.substringBeforeLast(videoFileName, ".");
+                path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
+                    StringUtils.substringBeforeLast(videoFileName, ".");
             String extension = path.getExtension();
             if (!extension.isBlank()) {
                 extension = "." + extension;
@@ -67,8 +67,8 @@ public class CleanAction {
     private void moveAndRename(Path path, Path destinationFolder, String videoFileName) throws IOException {
         if (path.isRegularFile()) {
             String fileName =
-                    path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
-                            StringUtils.substringBeforeLast(videoFileName, ".");
+                path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
+                    StringUtils.substringBeforeLast(videoFileName, ".");
             String extension = path.getExtension();
             if (!extension.isBlank()) {
                 extension = "." + extension;
@@ -82,5 +82,4 @@ public class CleanAction {
     private void move(Path origin, Path destinationFolder) throws IOException {
         origin.moveToDir(destinationFolder, StandardCopyOption.REPLACE_EXISTING);
     }
-
 }

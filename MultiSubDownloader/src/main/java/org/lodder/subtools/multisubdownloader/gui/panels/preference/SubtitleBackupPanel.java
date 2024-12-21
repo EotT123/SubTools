@@ -26,39 +26,39 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
         this.librarySettings = librarySettings;
 
         JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.SubtitlesBackup"))
-                .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
+            .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
 
         {
             this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().columns(20);
 
             PanelCheckBox.checkbox(this.chkBackupSubtitle = new JCheckBox(getText("PreferenceDialog.BackupSubtitles")))
-                    .panelOnNewLine()
-                    .addTo(titlePanel, "span, wrap, growx")
-                    .addComponent("split 3, shrink", new JLabel(getText("PreferenceDialog.Location")))
-                    .addComponent("growx", txtBackupSubtitlePath)
-                    .addComponent("shrink",
-                            new JButton(getText("App.Browse"))
-                                    .actionListener(_ -> MemoryFolderChooser.getInstance()
-                                            .selectDirectory(this, getText("PreferenceDialog.SubtitleBackupFolder"))
-                                            .ifPresent(txtBackupSubtitlePath::setObject)));
+                .panelOnNewLine()
+                .addTo(titlePanel, "span, wrap, growx")
+                .addComponent("split 3, shrink", new JLabel(getText("PreferenceDialog.Location")))
+                .addComponent("growx", txtBackupSubtitlePath)
+                .addComponent("shrink",
+                    new JButton(getText("App.Browse"))
+                        .actionListener(_ -> MemoryFolderChooser.getInstance()
+                            .selectDirectory(this, getText("PreferenceDialog.SubtitleBackupFolder"))
+                            .ifPresent(txtBackupSubtitlePath::setObject)));
 
             chkBackupUseSourceFileName =
-                    new JCheckBox(getText("PreferenceDialog.IncludeSourceInFileName")).addTo(titlePanel);
+                new JCheckBox(getText("PreferenceDialog.IncludeSourceInFileName")).addTo(titlePanel);
         }
 
         loadPreferenceSettings();
     }
 
     public void loadPreferenceSettings() {
-        chkBackupSubtitle.setSelected(librarySettings.libraryBackupSubtitle);
-        txtBackupSubtitlePath.setObject(librarySettings.libraryBackupSubtitlePath);
-        chkBackupUseSourceFileName.setSelected(librarySettings.libraryBackupUseWebsiteFileName);
+        chkBackupSubtitle.setSelected(librarySettings.backupSubtitle);
+        txtBackupSubtitlePath.setObject(librarySettings.backupSubtitlePath);
+        chkBackupUseSourceFileName.setSelected(librarySettings.backupUseWebsiteFileName);
     }
 
     public void savePreferenceSettings() {
-        librarySettings.libraryBackupSubtitle = chkBackupSubtitle.isSelected();
-        librarySettings.libraryBackupSubtitlePath = txtBackupSubtitlePath.getObject();
-        librarySettings.libraryBackupUseWebsiteFileName = chkBackupUseSourceFileName.isSelected();
+        librarySettings.backupSubtitle = chkBackupSubtitle.isSelected();
+        librarySettings.backupSubtitlePath = txtBackupSubtitlePath.getObject();
+        librarySettings.backupUseWebsiteFileName = chkBackupUseSourceFileName.isSelected();
     }
 
     @Override

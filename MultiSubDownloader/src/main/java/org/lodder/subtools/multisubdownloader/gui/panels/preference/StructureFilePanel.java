@@ -43,53 +43,53 @@ public class StructureFilePanel extends JPanel {
     private final LanguageMapping languageMapping = new LanguageMapping();
 
     public StructureFilePanel(LibrarySettings librarySettings, VideoType videoType, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
         JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.RenameFiles"))
-                .margin(0)
-                .padding(0)
-                .marginLeft(20)
-                .paddingLeft(20)
-                .addTo(this, "span, grow");
+            .margin(0)
+            .padding(0)
+            .marginLeft(20)
+            .paddingLeft(20)
+            .addTo(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
         this.txtFileStructure =
-                MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+            MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
         new JButton(getText("StructureBuilderDialog.Structure"))
-                .actionListener(() -> {
-                    StructureBuilderDialog sDialog =
-                            new StructureBuilderDialog(null, getText("PreferenceDialog.StructureBuilderTitle"),
-                                    true, videoType, StructureBuilderDialog.StructureType.FILE, manager,
-                                    userInteractionHandler, getLibraryStructureBuilder());
-                    String value = sDialog.showDialog(txtFileStructure.getText());
-                    if (!value.isEmpty()) {
-                        txtFileStructure.setText(value);
-                    }
+            .actionListener(() -> {
+                StructureBuilderDialog sDialog =
+                    new StructureBuilderDialog(null, getText("PreferenceDialog.StructureBuilderTitle"),
+                        true, videoType, StructureBuilderDialog.StructureType.FILE, manager,
+                        userInteractionHandler, getLibraryStructureBuilder());
+                String value = sDialog.showDialog(txtFileStructure.getText());
+                if (!value.isEmpty()) {
+                    txtFileStructure.setText(value);
+                }
 
-                }).addTo(titlePanel, "shrink, wrap");
+            }).addTo(titlePanel, "shrink, wrap");
 
         this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith"));
 
         PanelCheckBox.checkbox(chkReplaceSpace)
-                .panelOnSameLine()
-                .addTo(titlePanel, "wrap")
-                .addComponent("width pref+10px, wrap",
-                        this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
+            .panelOnSameLine()
+            .addTo(titlePanel, "wrap")
+            .addComponent("width pref+10px, wrap",
+                this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         this.chkIncludeLanguageCode =
-                new JCheckBox(getText("PreferenceDialog.IncludeLanguageInFileName"))
-                        .selectedListener(languageMapping::refreshState).addTo(titlePanel, "wrap");
+            new JCheckBox(getText("PreferenceDialog.IncludeLanguageInFileName"))
+                .selectedListener(languageMapping::refreshState).addTo(titlePanel, "wrap");
 
         JPanel languagePanelRoot = PanelCheckBox.checkbox(chkIncludeLanguageCode)
-                .panelOnNewLine()
-                .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
-                .addTo(titlePanel, "span, growx");
+            .panelOnNewLine()
+            .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
+            .addTo(titlePanel, "span, growx");
         {
             JPanel languagePanel = new JPanel(new MigLayout("insets 0, novisualpadding", "[][][][20px]"));
             JScrollPane languageScrollPane =
-                    new JScrollPane(languagePanel).addTo(languagePanelRoot, "span, growx, wrap, hidemode 3");
+                new JScrollPane(languagePanel).addTo(languagePanelRoot, "span, growx, wrap, hidemode 3");
             languageScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
             languageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             languageScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -99,18 +99,18 @@ public class StructureFilePanel extends JPanel {
             addLanguageSupplier = () -> {
                 int id = langId.getAndIncrement();
                 JComboBox<Language> cmbLanguage = new JComboBox<>(Language.values())
-                        .toMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
+                    .toMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
                 MyTextFieldString txtLanguage = MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
                 JButton btnDelete = new JButton(getText("StructureFilePanel.Delete"))
-                        .actionListenerSelf(delBtn -> {
-                            languagePanel.remove(cmbLanguage);
-                            languagePanel.remove(txtLanguage);
-                            languagePanel.remove(delBtn);
-                            languageMapping.remove(id);
-                            languageScrollPane.setVisible(!languageMapping.isEmpty());
-                            languagePanelRoot.repaint();
-                            languagePanelRoot.revalidate();
-                        }).addTo(languagePanel, "wrap");
+                    .actionListenerSelf(delBtn -> {
+                        languagePanel.remove(cmbLanguage);
+                        languagePanel.remove(txtLanguage);
+                        languagePanel.remove(delBtn);
+                        languageMapping.remove(id);
+                        languageScrollPane.setVisible(!languageMapping.isEmpty());
+                        languagePanelRoot.repaint();
+                        languagePanelRoot.revalidate();
+                    }).addTo(languagePanel, "wrap");
                 LanguageComponents languageComponents = new LanguageComponents(cmbLanguage, txtLanguage, btnDelete);
                 languageMapping.put(id, languageComponents);
 
@@ -120,14 +120,14 @@ public class StructureFilePanel extends JPanel {
                 return languageComponents;
             };
             new JButton(getText("StructureFilePanel.AddLanguage")).actionListener(
-                    addLanguageSupplier::get).addTo(languagePanelRoot);
+                addLanguageSupplier::get).addTo(languagePanelRoot);
         }
 
         loadPreferenceSettings();
     }
 
     private record LanguageComponents(JComboBox<Language> cmbLanguage, MyTextFieldString txtLanguage,
-            JButton btnDelete) {
+        JButton btnDelete) {
 
         public void setValue(Language language, String langCode) {
             cmbLanguage.setSelectedItem(language);
@@ -151,15 +151,15 @@ public class StructureFilePanel extends JPanel {
 
     private Function<String, FilenameLibraryBuilder> getLibraryStructureBuilder() {
         return structure -> FilenameLibraryBuilder.builder()
-                .structure(structure)
-                .replaceSpace(chkReplaceSpace.isSelected())
-                .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
-                .includeLanguageCode(chkIncludeLanguageCode.isSelected())
-                .languageTags(languageMapping.toSettingsMap())
-                .useTvdbName(false)
-                .tvdbAdapter(null)
-                .rename(true)
-                .build();
+            .structure(structure)
+            .replaceSpace(chkReplaceSpace.isSelected())
+            .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
+            .includeLanguageCode(chkIncludeLanguageCode.isSelected())
+            .languageTags(languageMapping.toSettingsMap())
+            .useTvdbName(false)
+            .tvdbAdapter(null)
+            .rename(true)
+            .build();
     }
 
     @Override
@@ -169,17 +169,17 @@ public class StructureFilePanel extends JPanel {
     }
 
     public void loadPreferenceSettings() {
-        txtFileStructure.setText(librarySettings.libraryFilenameStructure);
-        chkReplaceSpace.setSelected(librarySettings.libraryFilenameReplaceSpace);
-        cbxReplaceSpaceChar.setSelectedItem(librarySettings.libraryFilenameReplacingSpaceChar);
-        chkIncludeLanguageCode.setSelected(librarySettings.libraryIncludeLanguageCode);
+        txtFileStructure.setText(librarySettings.filenameStructure);
+        chkReplaceSpace.setSelected(librarySettings.filenameReplaceSpace);
+        cbxReplaceSpaceChar.setSelectedItem(librarySettings.filenameReplacingSpaceChar);
+        chkIncludeLanguageCode.setSelected(librarySettings.includeLanguageCode);
         librarySettings.langCodeMap.forEach(this::addLanguage);
     }
 
     public void savePreferenceSettings() {
-        librarySettings.libraryFilenameStructure = txtFileStructure.getText();
-        librarySettings.libraryFilenameReplaceSpace = chkReplaceSpace.isSelected();
-        librarySettings.libraryFilenameReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedValue();
+        librarySettings.filenameStructure = txtFileStructure.getText();
+        librarySettings.filenameReplaceSpace = chkReplaceSpace.isSelected();
+        librarySettings.filenameReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedValue();
         librarySettings.langCodeMap = languageMapping.toSettingsMap();
     }
 
@@ -214,8 +214,8 @@ public class StructureFilePanel extends JPanel {
 
         public boolean hasValidSettings() {
             return languageComponentsMap.values().stream().allMatch(LanguageComponents::hasValidValue) &&
-                    languageComponentsMap.values().stream().map(LanguageComponents::getLanguage).distinct().count() ==
-                            languageComponentsMap.size();
+                languageComponentsMap.values().stream().map(LanguageComponents::getLanguage).distinct().count() ==
+                    languageComponentsMap.size();
         }
 
         private Stream<LanguageComponents> getLanguageComponentsForLanguageStream(Language language) {
@@ -228,21 +228,21 @@ public class StructureFilePanel extends JPanel {
 
         public Map<Language, String> toSettingsMap() {
             return languageComponentsMap.values()
-                    .stream()
-                    .collect(Collectors.toMap(langComps -> langComps.cmbLanguage().getSelectedValue(),
-                            langComps -> langComps.txtLanguage().getText(), (v1, _) -> v1, LinkedHashMap::new));
+                .stream()
+                .collect(Collectors.toMap(langComps -> langComps.cmbLanguage().getSelectedValue(),
+                    langComps -> langComps.txtLanguage().getText(), (v1, _) -> v1, LinkedHashMap::new));
         }
 
         public void refreshState(boolean enabled) {
             if (enabled) {
                 languageComponentsMap.values()
-                        .stream()
-                        .map(langComp -> langComp.cmbLanguage.getSelectedValue())
-                        .distinct()
-                        .forEach(this::updateBorder);
+                    .stream()
+                    .map(langComp -> langComp.cmbLanguage.getSelectedValue())
+                    .distinct()
+                    .forEach(this::updateBorder);
             } else {
                 languageComponentsMap.values()
-                        .forEach(langComps -> langComps.cmbLanguage.setBorder(getDefaultBorder(langComps)));
+                    .forEach(langComps -> langComps.cmbLanguage.setBorder(getDefaultBorder(langComps)));
             }
         }
 
@@ -257,6 +257,6 @@ public class StructureFilePanel extends JPanel {
 
     public boolean hasValidSettings() {
         return !isVisible() || (txtFileStructure.hasValidValue() &&
-                (!chkIncludeLanguageCode.isSelected() || languageMapping.hasValidSettings()));
+            (!chkIncludeLanguageCode.isSelected() || languageMapping.hasValidSettings()));
     }
 }

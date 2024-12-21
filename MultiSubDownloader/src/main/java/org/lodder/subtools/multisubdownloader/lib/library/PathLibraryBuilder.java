@@ -25,7 +25,7 @@ public class PathLibraryBuilder extends LibraryBuilder {
     private final boolean move;
 
     private PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar, boolean useTvdb,
-            TheTvdbAdapter tvdbAdapter, Path libraryFolder, boolean move) {
+        TheTvdbAdapter tvdbAdapter, Path libraryFolder, boolean move) {
         super(useTvdb, tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
@@ -35,16 +35,16 @@ public class PathLibraryBuilder extends LibraryBuilder {
     }
 
     public static PathLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         return PathLibraryBuilder.builder()
-                .structure(librarySettings.libraryFolderStructure)
-                .replaceSpace(librarySettings.libraryFolderReplaceSpace)
-                .replacingSpaceChar(librarySettings.libraryFolderReplacingSpaceChar)
-                .useTvdbName(librarySettings.libraryUseTVDBNaming)
-                .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
-                .libraryFolder(librarySettings.libraryFolder)
-                .move(librarySettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVEANDRENAME))
-                .build();
+            .structure(librarySettings.folderStructure)
+            .replaceSpace(librarySettings.folderReplaceSpace)
+            .replacingSpaceChar(librarySettings.folderReplacingSpaceChar)
+            .useTvdbName(librarySettings.useTVDBNaming)
+            .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
+            .libraryFolder(librarySettings.folder)
+            .move(librarySettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVEANDRENAME))
+            .build();
     }
 
     public static PathLibraryBuilderStructureIntf builder() {
@@ -86,10 +86,10 @@ public class PathLibraryBuilder extends LibraryBuilder {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class PathLibraryBuilderBuilder
-            implements PathLibraryBuilderStructureIntf, PathLibraryBuilderReplaceSpaceIntf,
-            PathLibraryBuilderReplaceSpaceCharIntf, PathLibraryBuilderUseTvdbNameIntf,
-            PathLibraryBuilderTvdbAdapterIntf, PathLibraryBuilderLibraryFolderIntf, PathLibraryBuilderMoveIntf,
-            PathLibraryBuilderBuildIntf {
+        implements PathLibraryBuilderStructureIntf, PathLibraryBuilderReplaceSpaceIntf,
+        PathLibraryBuilderReplaceSpaceCharIntf, PathLibraryBuilderUseTvdbNameIntf,
+        PathLibraryBuilderTvdbAdapterIntf, PathLibraryBuilderLibraryFolderIntf, PathLibraryBuilderMoveIntf,
+        PathLibraryBuilderBuildIntf {
         private String structure;
 
         private boolean replaceSpace;
@@ -105,7 +105,7 @@ public class PathLibraryBuilder extends LibraryBuilder {
         @Override
         public PathLibraryBuilder build() {
             return new PathLibraryBuilder(structure, replaceSpace, replacingSpaceChar, useTvdbName, tvdbAdapter,
-                    libraryFolder, move);
+                libraryFolder, move);
         }
     }
 
@@ -126,11 +126,11 @@ public class PathLibraryBuilder extends LibraryBuilder {
         String folder = structure;
 
         folder = folder.replace(SerieStructureTag.SHOW_NAME.label, getShowName(tvRelease.name))
-                .removeIllegalWindowsChars();
+            .removeIllegalWindowsChars();
         // order is important!
         folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers, true);
         folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers,
-                false);
+            false);
         folder = replace(folder, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
         folder = replace(folder, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
         folder = replace(folder, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));

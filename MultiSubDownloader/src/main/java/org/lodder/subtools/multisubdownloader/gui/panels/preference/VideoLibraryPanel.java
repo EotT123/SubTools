@@ -20,7 +20,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @ExtensionMethod({ Files.class })
 public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
-        permits EpisodeLibraryPanel, MovieLibraryPanel {
+    permits EpisodeLibraryPanel, MovieLibraryPanel {
 
     @Serial private static final long serialVersionUID = -9175813173306481849L;
 
@@ -33,35 +33,35 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     protected final StructureFilePanel pnlStructureFile;
 
     VideoLibraryPanel(LibrarySettings librarySettings, VideoType videoType, Manager manager, boolean renameMode,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         super(new MigLayout("fillx, nogrid"));
         this.librarySettings = librarySettings;
 
         this.pnlBackup = renameMode ? null : new SubtitleBackupPanel(librarySettings).addTo(this, "wrap, span, growx");
 
         JPanel performActionPanel = TitlePanel.title(getText("PreferenceDialog.PerformActions"))
-                .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
+            .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
         {
 
             this.chkUseTVDBNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
-                    VideoType.EPISODE == videoType).addTo(performActionPanel, "hidemode 3, wrap");
+                VideoType.EPISODE == videoType).addTo(performActionPanel, "hidemode 3, wrap");
 
             new JLabel(getText("PreferenceDialog.ActionForShowFiles")).addTo(performActionPanel);
             this.cbxLibraryAction = new JComboBox<>(LibraryActionType.values())
-                    .toMessageStringRenderer(LibraryActionType::getMsgCode)
-                    .addTo(performActionPanel, "wrap");
+                .toMessageStringRenderer(LibraryActionType::getMsgCode)
+                .addTo(performActionPanel, "wrap");
 
             this.pnlStructureFolder =
-                    new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
-                            .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
+                new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
+                    .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
             this.pnlStructureFile =
-                    new StructureFilePanel(librarySettings, videoType, manager, userInteractionHandler)
-                            .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
+                new StructureFilePanel(librarySettings, videoType, manager, userInteractionHandler)
+                    .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
 
             JLabel lblActionForOtherFiles =
-                    new JLabel(getText("PreferenceDialog.ActionForOtherFiles")).addTo(performActionPanel);
+                new JLabel(getText("PreferenceDialog.ActionForOtherFiles")).addTo(performActionPanel);
             this.cbxLibraryOtherFileAction =
-                    PartialDisableComboBox.of(LibraryOtherFileActionType.values()).addTo(performActionPanel);
+                PartialDisableComboBox.of(LibraryOtherFileActionType.values()).addTo(performActionPanel);
 
             //
             this.cbxLibraryAction.selectedItemConsumer(action -> {
@@ -88,9 +88,9 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             LibraryOtherFileActionType ofa = cbxLibraryOtherFileAction.getItemAt(i);
             boolean enabled = switch (libraryActionType) {
                 case MOVE ->
-                        LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.RENAME != ofa;
+                    LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.RENAME != ofa;
                 case RENAME ->
-                        LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.MOVE != ofa;
+                    LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.MOVE != ofa;
                 case MOVEANDRENAME -> true;
                 case NOTHING -> LibraryOtherFileActionType.NOTHING == ofa;
             };
@@ -118,9 +118,9 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     }
 
     public void loadPreferenceSettings() {
-        cbxLibraryAction.setSelectedItem(librarySettings.libraryAction);
-        chkUseTVDBNaming.setSelected(librarySettings.libraryUseTVDBNaming);
-        cbxLibraryOtherFileAction.setSelectedItem(librarySettings.libraryOtherFileAction);
+        cbxLibraryAction.setSelectedItem(librarySettings.action);
+        chkUseTVDBNaming.setSelected(librarySettings.useTVDBNaming);
+        cbxLibraryOtherFileAction.setSelectedItem(librarySettings.otherFileAction);
 
         checkEnableStatusPanel();
         checkPossibleOtherFileActions();
@@ -130,9 +130,9 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
         if (pnlBackup != null) {
             pnlBackup.savePreferenceSettings();
         }
-        librarySettings.libraryAction = this.cbxLibraryAction.getSelectedValue();
-        librarySettings.libraryUseTVDBNaming = this.chkUseTVDBNaming.isSelected();
-        librarySettings.libraryOtherFileAction = this.cbxLibraryOtherFileAction.getSelectedValue();
+        librarySettings.action = this.cbxLibraryAction.getSelectedValue();
+        librarySettings.useTVDBNaming = this.chkUseTVDBNaming.isSelected();
+        librarySettings.otherFileAction = this.cbxLibraryOtherFileAction.getSelectedValue();
 
         pnlStructureFolder.savePreferenceSettings();
         pnlStructureFile.savePreferenceSettings();
@@ -141,7 +141,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     @Override
     public boolean hasValidSettings() {
         return pnlStructureFolder.hasValidSettings() && pnlStructureFile.hasValidSettings() &&
-                (pnlBackup == null || pnlBackup.hasValidSettings());
+            (pnlBackup == null || pnlBackup.hasValidSettings());
     }
 
 }

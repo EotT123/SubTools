@@ -46,8 +46,8 @@ public class DownloadAction {
     }
 
     private void download(Release release, Subtitle subtitle, LibrarySettings librarySettings, Integer version)
-            throws IOException, ManagerException {
-        LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.getLibraryAction());
+        throws IOException, ManagerException {
+        LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
         Path path = PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
         if (!path.exists()) {
             LOGGER.debug("Download creating folder [{}] ", path.toAbsolutePath());
@@ -58,7 +58,8 @@ public class DownloadAction {
             }
         }
 
-        FilenameLibraryBuilder filenameLibraryBuilder = FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
+        FilenameLibraryBuilder filenameLibraryBuilder =
+            FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
         String videoFileName = filenameLibraryBuilder.build(release).toString();
         String subFileName = filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, version);
         Path subFile = path.resolve(subFileName);
@@ -68,14 +69,14 @@ public class DownloadAction {
             subtitle.file.copyToDir(path);
             success = true;
         } else {
-            String url;
             try {
-                url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url : subtitle.urlSupplier.get();
+                String url =
+                    subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url : subtitle.urlSupplier.get();
                 success = manager.store(url, subFile);
                 LOGGER.debug("doDownload file was [{}] ", success);
             } catch (SubtitlesProviderException e) {
                 LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
-                             "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
+                    "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
                 throw new RuntimeException(e);
             }
         }
@@ -90,14 +91,15 @@ public class DownloadAction {
                         CleanAction cleanAction = new CleanAction(librarySettings);
                         cleanAction.cleanUpFiles(release, path, videoFileName);
                     }
-                    if (librarySettings.isLibraryRemoveEmptyFolders() && release.path.isEmptyDir()) {
+                    if (librarySettings.removeEmptyFolders && release.path.isEmptyDir()) {
                         release.path.deletePath();
                     }
                 }
             }
-            if (librarySettings.isLibraryBackupSubtitle()) {
-                String langFolder = subtitle.language == null ? Language.ENGLISH.getName() : subtitle.language.getName();
-                Path backupPath = librarySettings.getLibraryBackupSubtitlePath().resolve(langFolder);
+            if (librarySettings.backupSubtitle) {
+                String langFolder =
+                    subtitle.language == null ? Language.ENGLISH.getName() : subtitle.language.getName();
+                Path backupPath = librarySettings.backupSubtitlePath.resolve(langFolder);
 
                 if (!backupPath.exists()) {
                     try {
@@ -107,7 +109,7 @@ public class DownloadAction {
                     }
                 }
 
-                if (librarySettings.isLibraryBackupUseWebsiteFileName()) {
+                if (librarySettings.backupUseWebsiteFileName) {
                     subFile.copyToDirAndRename(backupPath, subtitle.fileName);
                 } else {
                     subFile.copyToDirAndRename(backupPath, subFileName);

@@ -33,7 +33,7 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
     @get(Protected) @override UserInteractionHandlerGUI userInteractionHandler;
 
     GuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore,
-            GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
+        GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
         super(settings, subtitleProviderStore);
         this.mainWindow = mainWindow;
         this.searchPanel = searchPanel;
@@ -65,7 +65,7 @@ public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction
             return;
         }
 
-        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
+        VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.table.model;
 
         if (model.getRowCount() > 0) {
             searchPanel.resultPanel.enableButtons();

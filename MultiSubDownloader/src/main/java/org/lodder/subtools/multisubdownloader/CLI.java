@@ -90,7 +90,7 @@ public class CLI {
                 this.download(release);
             } catch (Exception e) {
                 LOGGER.error("Error while downloading subtitle for ${release.releaseDescription} (%${e.getMessage()})",
-                        e);
+                    e);
             }
         }
     }
@@ -98,21 +98,21 @@ public class CLI {
     public void search() {
         try {
             CliSearchAction
-                    .createWithSettings(settings)
-                    .subtitleProviderStore((SubtitleProviderStore) app.make("SubtitleProviderStore"))
-                    .indexingProgressListener(new CLIFileIndexerProgress().verbose(verboseProgress))
-                    .searchProgressListener(new CLISearchProgress().verbose(verboseProgress))
-                    .cli(this)
-                    .fileListAction(new FileListAction(this.settings))
-                    .language(language)
-                    .releaseFactory(new ReleaseFactory(this.settings, (Manager) app.make("Manager")))
-                    .filtering(new SubtitleFiltering(this.settings))
-                    .folders(folders)
-                    .recursive(recursive)
-                    .overwriteSubtitles(force)
-                    .build()
-                    /* CLI has no benefit of running this in a separate Thread */
-                    .run();
+                .createWithSettings(settings)
+                .subtitleProviderStore((SubtitleProviderStore) app.make("SubtitleProviderStore"))
+                .indexingProgressListener(new CLIFileIndexerProgress().verbose(verboseProgress))
+                .searchProgressListener(new CLISearchProgress().verbose(verboseProgress))
+                .cli(this)
+                .fileListAction(new FileListAction(this.settings))
+                .language(language)
+                .releaseFactory(new ReleaseFactory(this.settings, (Manager) app.make("Manager")))
+                .filtering(new SubtitleFiltering(this.settings))
+                .folders(folders)
+                .recursive(recursive)
+                .overwriteSubtitles(force)
+                .build()
+                /* CLI has no benefit of running this in a separate Thread */
+                .run();
         } catch (SearchSetupException e) {
             LOGGER.error("executeArgs: search (%s)".formatted(e.getMessage()), e);
         }
@@ -137,8 +137,8 @@ public class CLI {
                     downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
                 } catch (IOException | ManagerException e) {
                     LOGGER.error(
-                            "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})",
-                            e);
+                        "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})",
+                        e);
                 }
             });
         }
@@ -156,9 +156,9 @@ public class CLI {
         if (line.hasCliOption(CliOption.LANGUAGE)) {
             String languageString = line.getCliOptionValue(CliOption.LANGUAGE);
             return Language.values().stream()
-                    .filter(lang -> lang.name().equalsIgnoreCase(languageString))
-                    .findAny()
-                    .orElseThrow(() -> new CliException(Messages.getText("App.NoValidLanguage")));
+                .filter(lang -> lang.name().equalsIgnoreCase(languageString))
+                .findAny()
+                .orElseThrow(() -> new CliException(Messages.getText("App.NoValidLanguage")));
         } else {
             return Language.ENGLISH;
         }

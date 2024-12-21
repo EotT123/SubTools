@@ -11,25 +11,25 @@ import org.lodder.subtools.sublibrary.Language;
 
 public class LibrarySettings {
 
-    @var String libraryFilenameStructure = "";
-    @var String libraryFolderStructure = "";
-    @var Path libraryFolder;
-    @var boolean libraryFilenameReplaceSpace;
-    @var boolean libraryFolderReplaceSpace;
-    @var boolean libraryIncludeLanguageCode;
-    @var boolean libraryRemoveEmptyFolders;
-    @var boolean libraryUseTVDBNaming;
-    @var LibraryActionType libraryAction = LibraryActionType.NOTHING;
-    @var LibraryOtherFileActionType libraryOtherFileAction = LibraryOtherFileActionType.NOTHING;
-    @var Character libraryFilenameReplacingSpaceChar;
-    @var Character libraryFolderReplacingSpaceChar;
-    @var boolean libraryBackupSubtitle;
-    @var boolean libraryBackupUseWebsiteFileName;
-    @var Path libraryBackupSubtitlePath;
+    @var String filenameStructure = "";
+    @var String folderStructure = "";
+    @var Path folder;
+    @var boolean filenameReplaceSpace;
+    @var boolean folderReplaceSpace;
+    @var boolean includeLanguageCode;
+    @var boolean removeEmptyFolders;
+    @var boolean useTVDBNaming;
+    @var LibraryActionType action = LibraryActionType.NOTHING;
+    @var LibraryOtherFileActionType otherFileAction = LibraryOtherFileActionType.NOTHING;
+    @var Character filenameReplacingSpaceChar;
+    @var Character folderReplacingSpaceChar;
+    @var boolean backupSubtitle;
+    @var boolean backupUseWebsiteFileName;
+    @var Path backupSubtitlePath;
     @var Map<Language, String> langCodeMap = new LinkedHashMap<>();
 
     public boolean hasLibraryAction(LibraryActionType libraryAction) {
-        return this.libraryAction == libraryAction;
+        return this.action == libraryAction;
     }
 
     public boolean hasAnyLibraryAction(LibraryActionType... libraryActions) {
@@ -37,6 +37,6 @@ public class LibrarySettings {
     }
 
     public boolean hasLibraryOtherFileAction(LibraryOtherFileActionType libraryOtherFileAction) {
-        return this.libraryOtherFileAction == libraryOtherFileAction;
+        return this.otherFileAction == libraryOtherFileAction;
     }
 }

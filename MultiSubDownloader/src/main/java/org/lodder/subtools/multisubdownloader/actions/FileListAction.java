@@ -35,18 +35,13 @@ public class FileListAction {
 
 
     public List<Path> getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
-        LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]", dir,
-                recursive, language,
-                forceSubtitleOverwrite);
+        LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]",
+            dir, recursive, language, forceSubtitleOverwrite);
         /* Reset progress counters */
         this.progressFileIndex = 0;
         this.progressFilesTotal = 0;
 
         /* Start listing process */
-        return this._getFileListing(dir, recursive, language, forceSubtitleOverwrite);
-    }
-
-    private List<Path> _getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
         final List<Path> filelist = new ArrayList<>();
         List<Path> contents;
         try {
@@ -116,9 +111,9 @@ public class FileListAction {
     public boolean fileHasSubtitles(Path file, Language language) throws IOException {
         String extension = file.getExtension();
         Optional<String> subtitleNameOptional = VideoPatterns.EXTENSIONS.stream()
-                .filter(extension::equals)
-                .map(x -> file.changeExtension(SUBTITLE_EXTENSION))
-                .findAny();
+            .filter(extension::equals)
+            .map(x -> file.changeExtension(SUBTITLE_EXTENSION))
+            .findAny();
 
         if (subtitleNameOptional.isEmpty()) {
             return false;
@@ -133,17 +128,17 @@ public class FileListAction {
             Set<String> langCodes = new HashSet<>();
             langCodes.add(language.langCode);
             langCodes.addAll(language.langCodesOther);
-            String customLangCode = settings.episodeLibrarySettings.getLangCodeMap().get(language);
+            String customLangCode = settings.episodeLibrarySettings.langCodeMap.get(language);
             if (!StringUtils.isBlank(customLangCode)) {
                 langCodes.add(customLangCode);
             }
             List<String> filters = langCodes.stream().map(word -> word + "." + SUBTITLE_EXTENSION).toList();
             String subtitleNameWithoutExtension = subtitleName.replace(subtitleExtensionWithDot, "");
             return file.getParent()
-                    .list()
-                    .map(PathExt::getFileNameAsString)
-                    .filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
-                    .anyMatch(fileName -> fileName.contains(subtitleNameWithoutExtension));
+                .list()
+                .map(PathExt::getFileNameAsString)
+                .filter(fileName -> filters.stream().anyMatch(fileName::endsWith))
+                .anyMatch(fileName -> fileName.contains(subtitleNameWithoutExtension));
         }
     }
 }

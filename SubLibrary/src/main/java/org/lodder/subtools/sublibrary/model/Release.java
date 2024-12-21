@@ -1,7 +1,6 @@
 package org.lodder.subtools.sublibrary.model;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +22,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     }
 
     public List<Subtitle> getMatchingSubs() {
-        return new ArrayList<>(matchingSubsSet);
+        return List.copyOf(matchingSubsSet);
     }
 
     public int getMatchingSubCount() {

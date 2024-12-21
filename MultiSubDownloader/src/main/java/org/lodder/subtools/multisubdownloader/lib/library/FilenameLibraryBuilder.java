@@ -27,8 +27,8 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     private final boolean rename;
 
     private FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-            boolean includeLanguageCode, Map<Language, String> languageTags, boolean useTvdb,
-            TheTvdbAdapter tvdbAdapter, boolean rename) {
+        boolean includeLanguageCode, Map<Language, String> languageTags, boolean useTvdb,
+        TheTvdbAdapter tvdbAdapter, boolean rename) {
         super(useTvdb, tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
@@ -39,17 +39,17 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     }
 
     public static FilenameLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         return FilenameLibraryBuilder.builder()
-                .structure(librarySettings.libraryFolderStructure)
-                .replaceSpace(librarySettings.libraryFolderReplaceSpace)
-                .replacingSpaceChar(librarySettings.libraryFolderReplacingSpaceChar)
-                .includeLanguageCode(librarySettings.libraryIncludeLanguageCode)
-                .languageTags(librarySettings.langCodeMap)
-                .useTvdbName(librarySettings.libraryUseTVDBNaming)
-                .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
-                .rename(librarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME))
-                .build();
+            .structure(librarySettings.folderStructure)
+            .replaceSpace(librarySettings.folderReplaceSpace)
+            .replacingSpaceChar(librarySettings.folderReplacingSpaceChar)
+            .includeLanguageCode(librarySettings.includeLanguageCode)
+            .languageTags(librarySettings.langCodeMap)
+            .useTvdbName(librarySettings.useTVDBNaming)
+            .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
+            .rename(librarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME))
+            .build();
     }
 
     public static FilenameLibraryBuilderStructureIntf builder() {
@@ -95,10 +95,10 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class FilenameLibraryBuilderBuilder
-            implements FilenameLibraryBuilderStructureIntf, FilenameLibraryBuilderReplaceSpaceIntf,
-            FilenameLibraryBuilderReplaceSpaceCharIntf, FilenameLibraryBuilderIncludeLanguageCodeIntf,
-            FilenameLibraryBuilderLanguageTagIntf, FilenameLibraryBuilderUseTvdbNameIntf,
-            FilenameLibraryBuilderTvdbAdapterIntf, FilenameLibraryBuilderRenameIntf, FilenameLibraryBuilderBuildIntf {
+        implements FilenameLibraryBuilderStructureIntf, FilenameLibraryBuilderReplaceSpaceIntf,
+        FilenameLibraryBuilderReplaceSpaceCharIntf, FilenameLibraryBuilderIncludeLanguageCodeIntf,
+        FilenameLibraryBuilderLanguageTagIntf, FilenameLibraryBuilderUseTvdbNameIntf,
+        FilenameLibraryBuilderTvdbAdapterIntf, FilenameLibraryBuilderRenameIntf, FilenameLibraryBuilderBuildIntf {
         private String structure;
 
         private boolean replaceSpace;
@@ -115,7 +115,7 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
         @Override
         public FilenameLibraryBuilder build() {
             return new FilenameLibraryBuilder(structure, replaceSpace, replacingSpaceChar, includeLanguageCode,
-                    languageTags, useTvdbName, tvdbAdapter, rename);
+                languageTags, useTvdbName, tvdbAdapter, rename);
         }
     }
 
