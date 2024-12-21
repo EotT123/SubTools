@@ -30,16 +30,13 @@ public class FileListAction {
 
     private final Settings settings;
     @set IndexingProgressListener indexingProgressListener;
-    private int progressFileIndex;
-    private int progressFilesTotal;
 
 
     public List<Path> getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
         LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]",
             dir, recursive, language, forceSubtitleOverwrite);
-        /* Reset progress counters */
-        this.progressFileIndex = 0;
-        this.progressFilesTotal = 0;
+        int progressFileIndex = 0;
+        int progressFilesTotal = 0;
 
         /* Start listing process */
         final List<Path> filelist = new ArrayList<>();
@@ -52,20 +49,19 @@ public class FileListAction {
         }
 
         /* Increase progressTotalFiles count */
-        this.progressFilesTotal += contents.size();
+        progressFilesTotal += contents.size();
 
         if (this.indexingProgressListener != null) {
             this.indexingProgressListener.progress(dir.toString());
         }
 
         for (Path file : contents) {
-            /* Increase progressFileIndex */
-            this.progressFileIndex++;
+            progressFileIndex++;
 
             /* Update progressListener */
             if (this.indexingProgressListener != null) {
                 /* Tell the progress listener the overall progress */
-                int progress = (int) Math.floor((float) this.progressFileIndex / this.progressFilesTotal * 100);
+                int progress = (int) Math.floor((float) progressFileIndex / progressFilesTotal * 100);
                 this.indexingProgressListener.progress(progress);
             }
 

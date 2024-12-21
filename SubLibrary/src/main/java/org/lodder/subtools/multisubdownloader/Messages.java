@@ -12,23 +12,16 @@ public class Messages {
     private static final String BUNDLE_NAME = "messages";
     private static final Language DEFAULT_LANGUAGE = Language.ENGLISH;
     private static ResourceBundle resourceBundle =
-            ResourceBundle.getBundle(BUNDLE_NAME, Locale.forLanguageTag(DEFAULT_LANGUAGE.langCode));
+        ResourceBundle.getBundle(BUNDLE_NAME, Locale.forLanguageTag(DEFAULT_LANGUAGE.langCode));
     static @var Language language;
 
     private Messages() {
     }
 
-    public static String getText(String key) {
-        try {
-            return resourceBundle.getString(key);
-        } catch (MissingResourceException e) {
-            return "!$key!";
-        }
-    }
-
     public static String getText(String key, Object... replacements) {
         try {
-            return resourceBundle.getString(key).formatted(replacements);
+            String text = resourceBundle.getString(key);
+            return replacements == null ? text : text.formatted();
         } catch (MissingResourceException e) {
             return "!$key!";
         }

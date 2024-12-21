@@ -38,80 +38,80 @@ public abstract sealed class DiskCache<K, V> extends Cache<K, V> permits Seriali
     protected abstract @val Class<K> dbKeyType;
     protected abstract @val Class<V> dbValueType;
     private final LazyBiFunction<DiskCache<K, V>, String, Connection> connection =
-            new LazyBiFunction<>((cache, tableName) -> {
-                try {
-                    synchronized (cache.cacheMap) {
-                        Path path = Path.of(System.getProperty("user.home")).resolve(".MultiSubDownloader");
-                        if (!Files.exists(path)) {
-                            try {
-                                Files.createDirectory(path);
-                            } catch (IOException e) {
-                                throw new RuntimeException("Could not create folder $path", e);
-                            }
+        new LazyBiFunction<>((cache, tableName) -> {
+            try {
+                synchronized (cache.cacheMap) {
+                    Path path = Path.of(System.getProperty("user.home")).resolve(".MultiSubDownloader");
+                    if (!Files.exists(path)) {
+                        try {
+                            Files.createDirectory(path);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Could not create folder $path", e);
                         }
-                        Class.forName("org.hsqldb.jdbcDriver");
-                        Connection connection = DriverManager.getConnection(
-                                "jdbc:hsqldb:file:$path/diskcache.hsqldb;hsqldb.write_delay=false;shutdown=true",
-                                "user", "pass");
+                    }
+                    Class.forName("org.hsqldb.jdbcDriver");
+                    Connection connection = DriverManager.getConnection(
+                        "jdbc:hsqldb:file:$path/diskcache.hsqldb;hsqldb.write_delay=false;shutdown=true",
+                        "user", "pass");
 
-                        try (Statement stmt = connection.createStatement()) {
-                            stmt.execute("create table IF NOT EXISTS $tableName (key %s, cacheobject %s);".formatted(
-                                    dbKeyType == String.class ? "VARCHAR(32768)" : "OBJECT",
-                                    dbValueType == String.class ? "VARCHAR(32768)" : "OBJECT"));
-                        }
+                    try (Statement stmt = connection.createStatement()) {
+                        stmt.execute("create table IF NOT EXISTS $tableName (key %s, cacheobject %s);".formatted(
+                            dbKeyType == String.class ? "VARCHAR(32768)" : "OBJECT",
+                            dbValueType == String.class ? "VARCHAR(32768)" : "OBJECT"));
+                    }
 
-                        boolean errorWhileReadingCacheFile = false;
-                        try (Statement stmt = connection.createStatement();
-                             ResultSet rs = stmt.executeQuery("SELECT key, cacheobject FROM $tableName;")) {
-                            Multimap<K, CacheObject<V>> tempCache = MultimapBuilder.hashKeys()
-                                    .treeSetValues(Comparator.comparingLong((CacheObject<V> value) -> value.getAge())
-                                            .reversed())
-                                    .build();
-                            synchronized (cache.cacheMap) {
-                                while (rs.next()) {
-                                    try {
-                                        tempCache.put(cache.diskObjectToKey(rs.getObject("key")),
-                                                cache.diskCacheObjectToValue(rs.getObject("cacheobject")));
-                                    } catch (SQLException e2) {
-                                        LOGGER.error("Unable to insert object in disk cache. (${e2.getMessage()})", e2);
-                                        errorWhileReadingCacheFile = true;
-                                    }
+                    boolean errorWhileReadingCacheFile = false;
+                    try (Statement stmt = connection.createStatement();
+                         ResultSet rs = stmt.executeQuery("SELECT key, cacheobject FROM $tableName;")) {
+                        Multimap<K, CacheObject<V>> tempCache = MultimapBuilder.hashKeys()
+                            .treeSetValues(Comparator.comparingLong((CacheObject<V> value) -> value.age).reversed())
+                            .build();
+                        synchronized (cache.cacheMap) {
+                            while (rs.next()) {
+                                try {
+                                    tempCache.put(cache.diskObjectToKey(rs.getObject("key")),
+                                        cache.diskCacheObjectToValue(rs.getObject("cacheobject")));
+                                } catch (SQLException e2) {
+                                    LOGGER.error("Unable to insert object in disk cache. (${e2.getMessage()})", e2);
+                                    errorWhileReadingCacheFile = true;
                                 }
-                                Map<K, Collection<CacheObject<V>>> map = tempCache.asMap();
-                                map.entrySet().stream().filter(entry -> entry.getValue().size() > 1).forEach(entry -> {
+                            }
+                            Map<K, Collection<CacheObject<V>>> map = tempCache.asMap();
+                            map.entrySet().stream()
+                                .filter(entry -> entry.getValue().size() > 1)
+                                .forEach(entry -> {
                                     doublesToRemove.add(entry.getKey());
                                     removedToAdd.put(entry.getKey(), entry.getValue().iterator().next());
                                 });
-                                map.entrySet()
-                                        .stream()
-                                        .sorted(Comparator.comparingLong(
-                                                entry -> entry.getValue().iterator().next().getAge()))
-                                        .forEach(entry -> put(entry.getKey(), entry.getValue().iterator().next()));
-                            }
-                        } catch (SQLException e) {
-                            LOGGER.error("Unable while insert objects in disk cache! (${e.getMessage()})", e);
+                            map.entrySet()
+                                .stream()
+                                .sorted(Comparator.comparingLong(entry -> entry.getValue().iterator().next().age))
+                                .forEach(entry -> put(entry.getKey(), entry.getValue().iterator().next()));
                         }
-                        if (errorWhileReadingCacheFile) {
-                            LOGGER.error("Deleting cache file to fix errors");
-                            connection.close();
-                            try {
-                                path.deletePath();
-                            } catch (IOException e) {
-                                LOGGER.error("Error while deleting the cache file, please delete it yourself: $path " +
-                                             "(${e.getMessage()})", e);
-                            }
-                            connection = DriverManager.getConnection(
-                                    "jdbc:hsqldb:file:$path/diskcache.hsqldb;hsqldb.write_delay=false;shutdown=true",
-                                    "user", "pass");
-                        }
-                        return connection;
+                    } catch (SQLException e) {
+                        LOGGER.error("Unable while insert objects in disk cache! (${e.getMessage()})", e);
                     }
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException("Unable to load jdbcdriver for diskcache");
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    if (errorWhileReadingCacheFile) {
+                        LOGGER.error("Deleting cache file to fix errors");
+                        connection.close();
+                        try {
+                            path.deletePath();
+                        } catch (IOException e) {
+                            LOGGER.error("Error while deleting the cache file, please delete it yourself: $path " +
+                                "(${e.getMessage()})", e);
+                        }
+                        connection = DriverManager.getConnection(
+                            "jdbc:hsqldb:file:$path/diskcache.hsqldb;hsqldb.write_delay=false;shutdown=true",
+                            "user", "pass");
+                    }
+                    return connection;
                 }
-            });
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("Unable to load jdbcdriver for diskcache");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     private final String tableName;
 
     private Connection getConnection() {
@@ -199,7 +199,7 @@ public abstract sealed class DiskCache<K, V> extends Cache<K, V> permits Seriali
     private void putFromMemoryCache(K key) {
         synchronized (LOCK) {
             try (PreparedStatement prep = getConnection().prepareCall(
-                    "INSERT INTO $tableName (key,cacheobject) VALUES (?,?)")) {
+                "INSERT INTO $tableName (key,cacheobject) VALUES (?,?)")) {
                 prep.clearParameters();
                 prep.setObject(1, keyToDiskObject(key));
                 synchronized (cacheMap) {

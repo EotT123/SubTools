@@ -2,6 +2,7 @@ package org.lodder.subtools.sublibrary.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,7 +104,7 @@ public class NamedMatcher implements NamedMatchResult {
     @Override
     public Map<String, Integer> namedGroups() {
         return IntStream.rangeClosed(1, groupCount()).sequential()
-                .collect(LinkedHashMap::new, (map, i) -> map.put(parentPattern.groupNames.get(i - 1), i), Map::putAll);
+            .collect(LinkedHashMap::new, (map, i) -> map.put(parentPattern.groupNames.get(i - 1), i), Map::putAll);
     }
 
     private int groupIndex(String groupName) {
@@ -189,7 +190,7 @@ public class NamedMatcher implements NamedMatchResult {
 
     @Override
     public boolean equals(@Self Object obj) {
-        return matcher.equals(obj);
+        return obj instanceof NamedMatcher nm && Objects.equals(matcher, nm.matcher);
     }
 
     @Override

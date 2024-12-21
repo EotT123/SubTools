@@ -21,7 +21,6 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
 
     @Serial
     private static final long serialVersionUID = -1331536352530988442L;
-    private final Cancelable searchAction;
     private final GUI window;
     private final SearchProgressTableModel tableModel;
     private final JProgressBar progressBar;
@@ -29,7 +28,6 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
 
     public SearchProgressDialog(GUI window, Cancelable searchAction) {
         super(window, getText("SearchProgressDialog.Title"), false);
-        this.searchAction = searchAction;
         this.window = window;
         this.completed = false;
 

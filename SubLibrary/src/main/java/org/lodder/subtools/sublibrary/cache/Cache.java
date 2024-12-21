@@ -17,7 +17,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
-    @val(Protected) Map<K, CacheObject<V>> cacheMap;
+    @val(Protected) final Map<K, CacheObject<V>> cacheMap;
 
     protected Cache(Integer maxItems) {
         this.cacheMap = maxItems != null ? new LRUMap<>(maxItems) : new HashMap<>();
