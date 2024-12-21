@@ -30,9 +30,9 @@ public class SortWeight {
         this.weights.clear();
 
         /* make a clone, so we can't mess up the defined weights */
-        defaultWeights = new HashMap<>(defaultWeights); // clone
+        Map<String, Integer> defaultWeightsNew = new HashMap<>(defaultWeights); // clone
 
-        replaceReservedKeywords(release, defaultWeights);
+        replaceReservedKeywords(release, defaultWeightsNew);
 
         /* get a list of tags */
         List<String> tags = ReleaseParser.getQualityKeyWords(release.quality);
@@ -41,11 +41,11 @@ public class SortWeight {
         }
 
         /* only store tags for which we have a weight defined */
-        tags.retainAll(defaultWeights.keySet());
+        tags.retainAll(defaultWeightsNew.keySet());
 
         /* store weights for this release */
         for (String tag : tags) {
-            int weight = defaultWeights.get(tag);
+            int weight = defaultWeightsNew.get(tag);
             this.maxScore += weight;
             this.weights.put(tag, weight);
         }

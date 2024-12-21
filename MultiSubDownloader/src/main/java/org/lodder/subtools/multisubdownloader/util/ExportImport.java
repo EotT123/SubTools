@@ -59,42 +59,42 @@ public class ExportImport {
         chooseFile(listType.fileType).ifPresent(path -> {
             if (Files.notExists(path)) {
                 userInteractionHandler.showMessage(Messages.getText("ImportExport.FileDoesNotExist"),
-                        Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
+                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
                 return;
             }
             try {
                 switch (listType) {
                     case PREFERENCES ->
-                            ExportImportPreferences.importSettings(path, userInteractionHandler, settingsControl);
+                        ExportImportPreferences.importSettings(path, userInteractionHandler, settingsControl);
                     case SERIE_MAPPING ->
-                            ExportImportSerieMapping.importSettings(path, userInteractionHandler, manager);
+                        ExportImportSerieMapping.importSettings(path, userInteractionHandler, manager);
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                 }
             } catch (CorruptSettingsFileException e) {
                 userInteractionHandler.showMessage(Messages.getText("ImportExport.ImportCorruptFile"),
-                        Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             } catch (Exception e) {
                 userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileImporting"),
-                        Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             }
         });
     }
 
     public void exportSettings(SettingsType listType) {
         chooseFile(listType.fileType).map(path -> path.toString().endsWith(listType.fileType.extension) ? path :
-                        path.getParent().resolve(path.getFileName().toString() + listType.fileType.extension))
-                .ifPresent(path -> {
-                    try {
-                        switch (listType) {
-                            case PREFERENCES -> ExportImportPreferences.exportSettings(path, settingsControl);
-                            case SERIE_MAPPING -> ExportImportSerieMapping.exportSettings(path, manager);
-                            default -> throw new IllegalArgumentException("Unexpected value: " + listType);
-                        }
-                    } catch (Exception e) {
-                        userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileExporting"),
-                                Messages.getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
+                path.getParent().resolve(path.getFileName().toString() + listType.fileType.extension))
+            .ifPresent(path -> {
+                try {
+                    switch (listType) {
+                        case PREFERENCES -> ExportImportPreferences.exportSettings(path, settingsControl);
+                        case SERIE_MAPPING -> ExportImportSerieMapping.exportSettings(path, manager);
+                        default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                     }
-                });
+                } catch (Exception e) {
+                    userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileExporting"),
+                        Messages.getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
+                }
+            });
     }
 
     @UtilityClass
@@ -105,7 +105,7 @@ public class ExportImport {
         }
 
         public void importSettings(Path path, UserInteractionHandler userInteractionHandler,
-                SettingsControl settingsControl) throws CorruptSettingsFileException {
+            SettingsControl settingsControl) throws CorruptSettingsFileException {
             try {
                 settingsControl.importPreferences(path);
             } catch (IOException | BackingStoreException | InvalidPreferencesFormatException e) {
@@ -119,45 +119,55 @@ public class ExportImport {
 
         public void exportSettings(Path path, Manager manager) throws IOException {
             List<SeriemappingWithKey> serieMappingsWithKey = MappingType.values().stream()
-                    .map(MappingType::getSelectionForKeyPrefixList)
-                    .flatMap(Arrays::stream)
-                    .flatMap(selectionForKeyPrefix -> manager.valueBuilder()
-                            .cacheType(CacheType.DISK)
-                            .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
-                            .returnType(SerieMapping.class)
-                            .getEntries()
-                            .stream()
-                            .map(pair -> new SeriemappingWithKey(pair.getKey(), pair.getValue())))
-                    .toList();
+                .map(MappingType::getSelectionForKeyPrefixList)
+                .flatMap(Arrays::stream)
+                .flatMap(selectionForKeyPrefix -> manager.valueBuilder()
+                    .cacheType(CacheType.DISK)
+                    .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
+                    .returnType(SerieMapping.class)
+                    .getEntries()
+                    .stream()
+                    .map(pair -> new SeriemappingWithKey(pair.getKey(), pair.getValue())))
+                .toList();
             Files.writeString(path, new GsonBuilder().setPrettyPrinting().create().toJson(serieMappingsWithKey));
         }
 
         public void importSettings(Path path, UserInteractionHandler userInteractionHandler, Manager manager)
-                throws CorruptSettingsFileException {
+            throws CorruptSettingsFileException {
             SeriemappingWithKey[] serieMappings;
             try {
                 serieMappings = new GsonFireBuilder().enableHooks(SerieMapping.class)
-                        .createGson()
-                        .fromJson(Files.readString(path), SeriemappingWithKey[].class);
+                    .createGson()
+                    .fromJson(Files.readString(path), SeriemappingWithKey[].class);
             } catch (IOException e) {
                 throw new CorruptSettingsFileException(e);
             }
             getImportStyle(userInteractionHandler).ifPresent(importStyle -> {
                 if (importStyle == ImportStyle.OVERWRITE) {
                     MappingType.values().stream()
-                            .map(MappingType::getSelectionForKeyPrefixList)
-                            .flatMap(Arrays::stream)
-                            .forEach(selectionForKeyPrefix -> manager.clearExpiredCacheBuilder()
-                                    .cacheType(CacheType.DISK)
-                                    .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
-                                    .clear());
+                        .map(MappingType::getSelectionForKeyPrefixList)
+                        .flatMap(Arrays::stream)
+                        .forEach(selectionForKeyPrefix -> manager.clearExpiredCacheBuilder()
+                            .cacheType(CacheType.DISK)
+                            .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
+                            .clear());
                 }
                 serieMappings.forEach(serieMapping -> manager.valueBuilder()
-                        .cacheType(CacheType.DISK)
-                        .key(serieMapping.key)
-                        .value(serieMapping.serieMapping)
-                        .store());
+                    .cacheType(CacheType.DISK)
+                    .key(serieMapping.key)
+                    .value(serieMapping.serieMapping)
+                    .store());
             });
+        }
+
+        private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
+            return userInteractionHandler.choice(Arrays.asList(ImportStyle.values()),
+                Messages.getText("ImportExport.OverwriteOrAdd"),
+                Messages.getText("ImportExport.OverwriteOrAddTitle"),
+                option -> switch (option) {
+                    case OVERWRITE -> Messages.getText("ImportExport.Overwrite");
+                    case APPEND -> Messages.getText("ImportExport.Add");
+                });
         }
 
         @AllArgsConstructor
@@ -180,15 +190,6 @@ public class ExportImport {
         } else {
             return Optional.empty();
         }
-    }
-
-    private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
-        return userInteractionHandler.choice(Arrays.asList(ImportStyle.values()),
-                Messages.getText("ImportExport.OverwriteOrAdd"),
-                Messages.getText("ImportExport.OverwriteOrAddTitle"), option -> switch (option) {
-                    case OVERWRITE -> Messages.getText("ImportExport.Overwrite");
-                    case APPEND -> Messages.getText("ImportExport.Add");
-                });
     }
 
     private enum ImportStyle {

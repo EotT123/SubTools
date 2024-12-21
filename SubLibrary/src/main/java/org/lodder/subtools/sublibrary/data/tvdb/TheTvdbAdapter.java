@@ -29,11 +29,11 @@ import org.slf4j.LoggerFactory;
 public class TheTvdbAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheTvdbAdapter.class);
+    private static final String PROVIDER_NAME = "TVDB";
     private static TheTvdbAdapter instance;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
     private final LazySupplier<TheTvdbApi> jtvapi;
-    private final String providerName = "TVDB";
 
     private TheTvdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
@@ -42,7 +42,7 @@ public class TheTvdbAdapter {
             try {
                 return new TheTvdbApi(manager, "A1720D2DDFDCE82D");
             } catch (Exception e) {
-                throw new SubtitlesProviderInitException(providerName, e);
+                throw new SubtitlesProviderInitException(PROVIDER_NAME, e);
             }
         });
     }
@@ -54,8 +54,8 @@ public class TheTvdbAdapter {
     public Optional<TheTvdbSerie> getSerie(String serieName) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
         ValueBuilderIsPresentIntf<Serializable> valueBuilder = manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .key("$providerName-tvdbSerie-$encodedSerieName");
+            .cacheType(CacheType.DISK)
+            .key("$PROVIDER_NAME-tvdbSerie-$encodedSerieName");
         if (valueBuilder.isPresent() && (!valueBuilder.isTemporaryObject() || !valueBuilder.isExpiredTemporary())) {
             return valueBuilder.returnType(TheTvdbSerie.class).getOptional();
         }
@@ -74,18 +74,18 @@ public class TheTvdbAdapter {
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");
             Comparator<TheTvdbSerie> comparator = Comparator
-                    .comparing((TheTvdbSerie s) -> formattedSerieName.equalsIgnoreCase(
-                                    s.serieName.replaceAll("[^A-Za-z]", "")),
-                            Comparator.reverseOrder())
-                    .thenComparing(TheTvdbSerie::getFirstAired, Comparator.reverseOrder());
+                .comparing((TheTvdbSerie s) -> formattedSerieName.equalsIgnoreCase(
+                        s.serieName.replaceAll("[^A-Za-z]", "")),
+                    Comparator.reverseOrder())
+                .thenComparing(TheTvdbSerie::getFirstAired, Comparator.reverseOrder());
             try {
                 tvdbSerie = userInteractionHandler
-                        .selectFromList(serieIds.stream().sorted(comparator).toList(),
-                                Messages.getText("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
-                                providerName, s -> "${s.serieName} (${s.firstAired})");
+                    .selectFromList(serieIds.stream().sorted(comparator).toList(),
+                        Messages.getText("Prompter.SelectTvdbMatchForSerie").formatted(serieName),
+                        PROVIDER_NAME, s -> "${s.serieName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
                     tvdbSerie = askUserToEnterTvdbId(serieName)
-                            .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));
+                        .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));
                 }
             } catch (TheTvdbException e) {
                 tvdbSerie = Optional.empty();
@@ -93,41 +93,41 @@ public class TheTvdbAdapter {
         }
         if (tvdbSerie.isEmpty()) {
             valueBuilder.optionalValue(tvdbSerie)
-                    .storeTempNullValue()
-                    .timeToLive(valueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
-                            .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
-                    .storeAsTempValue();
+                .storeTempNullValue()
+                .timeToLive(valueBuilder.getTemporaryTimeToLive().map(v -> v * 2)
+                    .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
+                .storeAsTempValue();
         } else {
             valueBuilder.optionalValue(tvdbSerie).store();
             manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .key("$providerName-serieId-$encodedSerieName")
-                    .optionalValue(tvdbSerie.map(tvdbS -> new SerieMapping(serieName, tvdbS.id, tvdbS.serieName)))
-                    .storeTempNullValue()
-                    .store();
+                .cacheType(CacheType.DISK)
+                .key("$PROVIDER_NAME-serieId-$encodedSerieName")
+                .optionalValue(tvdbSerie.map(tvdbS -> new SerieMapping(serieName, tvdbS.id, tvdbS.serieName)))
+                .storeTempNullValue()
+                .store();
         }
         return tvdbSerie;
     }
 
     public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode) {
         return manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .key("%s-episode-%s-%s-%s".formatted(providerName, tvdbId, season, episode))
-                .optionalSupplier(() -> {
-                    try {
-                        return getApi().getEpisode(tvdbId, season, episode, Language.ENGLISH);
-                    } catch (TheTvdbException e) {
-                        LOGGER.error(
-                                "API $providerName getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
-                                        TvRelease.formatSeasonEpisode(season, episode)), e);
-                        return Optional.empty();
-                    }
-                }).storeTempNullValue().getOptional();
+            .cacheType(CacheType.DISK)
+            .key("%s-episode-%s-%s-%s".formatted(PROVIDER_NAME, tvdbId, season, episode))
+            .optionalSupplier(() -> {
+                try {
+                    return getApi().getEpisode(tvdbId, season, episode, Language.ENGLISH);
+                } catch (TheTvdbException e) {
+                    LOGGER.error(
+                        "API $PROVIDER_NAME getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
+                            TvRelease.formatSeasonEpisode(season, episode)), e);
+                    return Optional.empty();
+                }
+            }).storeTempNullValue().getOptional();
 
     }
 
     public static synchronized TheTvdbAdapter getInstance(Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         if (instance == null) {
             instance = new TheTvdbAdapter(manager, userInteractionHandler);
         }

@@ -22,9 +22,9 @@ public class SelectDialog extends MultiSubDialog {
     @Serial private static final long serialVersionUID = -4092909537478305235L;
 
     private final List<Subtitle> subtitles;
+    private final CustomTable customTable;
 
     private List<Integer> selectedSubtitleIdxs;
-    private CustomTable customTable;
 
     /**
      * Create the dialog.

@@ -96,7 +96,7 @@ public class CookieManager {
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
                     cookie.put(token.substring(0, token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
-                            token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1));
+                        token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1));
                 }
             }
         }
@@ -138,8 +138,8 @@ public class CookieManager {
             // check cookie to ensure path matches and cookie is not expired
             // if all is cool, add cookie to header string
             if (comparePaths(cookie.get(PATH), path)
-                    && isNotExpired(cookie.get(EXPIRES))) {
-                if (cookieStringBuffer.length() > 0) {
+                && isNotExpired(cookie.get(EXPIRES))) {
+                if (!cookieStringBuffer.isEmpty()) {
                     cookieStringBuffer.append(SET_COOKIE_SEPARATOR);
                 }
 
@@ -153,10 +153,10 @@ public class CookieManager {
             conn.setRequestProperty(COOKIE, cookieStringBuffer.toString());
         } catch (java.lang.IllegalStateException ise) {
             throw new IOException(
-                    "Illegal State! Cookies cannot be set on a URLConnection that is already connected. "
-                            +
-                            "Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection" +
-                            ".connect().");
+                "Illegal State! Cookies cannot be set on a URLConnection that is already connected. "
+                    +
+                    "Only call setCookies(java.net.URLConnection) AFTER calling java.net.URLConnection" +
+                    ".connect().");
         }
     }
 
@@ -171,7 +171,7 @@ public class CookieManager {
     private boolean isNotExpired(String cookieExpires) {
         try {
             return cookieExpires == null ||
-                    LocalDateTime.now().isBefore(LocalDateTime.parse(cookieExpires, DATE_FORMATTER));
+                LocalDateTime.now().isBefore(LocalDateTime.parse(cookieExpires, DATE_FORMATTER));
         } catch (DateTimeParseException e) {
             e.printStackTrace();
             return false;
@@ -180,7 +180,7 @@ public class CookieManager {
 
     private boolean comparePaths(String cookiePath, String targetPath) {
         return cookiePath == null || "/".equals(cookiePath) ||
-                targetPath.regionMatches(0, cookiePath, 0, cookiePath.length());
+            targetPath.regionMatches(0, cookiePath, 0, cookiePath.length());
     }
 
     /**

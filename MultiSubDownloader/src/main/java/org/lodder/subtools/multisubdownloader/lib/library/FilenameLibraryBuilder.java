@@ -158,21 +158,21 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
 
     public String buildSubtitle(Release release, String filename, Language language, Integer version) {
         final String extension = "." + release.extension;
+        String subFileName = filename;
         if (version != null) {
-            filename = filename.substring(0, filename.indexOf(extension)) + "-v$version.${release.extension}";
+            subFileName = subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version.${release.extension}";
         }
         if (includeLanguageCode) {
             String langCode = language == null ? "" : languageTags.getOrDefault(language, language.langCode);
-            filename = changeExtension(filename, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
+            subFileName = changeExtension(subFileName, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
         } else {
-            filename = changeExtension(filename, ".srt");
+            subFileName = changeExtension(subFileName, ".srt");
         }
-
-        filename = filename.removeIllegalWindowsChars();
+        subFileName = subFileName.removeIllegalWindowsChars();
         if (replaceSpace) {
-            filename = filename.replace(' ', replacingSpaceChar);
+            subFileName = subFileName.replace(' ', replacingSpaceChar);
         }
-        return filename;
+        return subFileName;
     }
 
     /**

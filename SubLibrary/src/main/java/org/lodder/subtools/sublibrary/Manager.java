@@ -97,8 +97,8 @@ public class Manager {
     @Accessors(chain = true, fluent = true)
     @RequiredArgsConstructor
     public static class PostBuilder
-            implements PostBuilderUrlIntf, PostBuilderUserAgentIntf, PostBuilderDataMapIntf, PostBuilderDataIntf,
-            PostBuilderPostIntf {
+        implements PostBuilderUrlIntf, PostBuilderUserAgentIntf, PostBuilderDataMapIntf, PostBuilderDataIntf,
+        PostBuilderPostIntf {
         private final HttpClient httpClient;
         private String url;
         private String userAgent;
@@ -171,7 +171,7 @@ public class Manager {
         Document getAsDocument() throws ParserConfigurationException, ManagerException, IOException;
 
         Document getAsDocument(Predicate<String> emptyResultPredicate)
-                throws ParserConfigurationException, ManagerException, IOException;
+            throws ParserConfigurationException, ManagerException, IOException;
 
         org.jsoup.nodes.Document getAsJsoupDocument() throws ManagerException;
 
@@ -186,9 +186,9 @@ public class Manager {
     @Accessors(chain = true, fluent = true)
     @RequiredArgsConstructor
     public static class PageContentBuilder
-            implements PageContentBuilderGetIntf, PageContentBuilderCacheTypeIntf, PageContentBuilderUserAgentIntf,
-            PageContentBuilderUrlIntf, PageContentBuilderRetryIntf, PageContentBuilderRetryConditionIntf,
-            PageContentBuilderRetryWaitIntf {
+        implements PageContentBuilderGetIntf, PageContentBuilderCacheTypeIntf, PageContentBuilderUserAgentIntf,
+        PageContentBuilderUrlIntf, PageContentBuilderRetryIntf, PageContentBuilderRetryConditionIntf,
+        PageContentBuilderRetryWaitIntf {
         private final HttpClient httpClient;
         private final InMemoryCache<String, String> inMemoryCache;
         private String url;
@@ -231,10 +231,10 @@ public class Manager {
 
         @Override
         public Document getAsDocument(Predicate<String> emptyResultPredicate)
-                throws ParserConfigurationException, ManagerException, IOException {
+            throws ParserConfigurationException, ManagerException, IOException {
             String html = get();
             return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
-                    null : XMLHelper.getDocument(html);
+                null : XMLHelper.getDocument(html);
         }
 
         @Override
@@ -244,10 +244,10 @@ public class Manager {
 
         @Override
         public org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate)
-                throws ManagerException {
+            throws ManagerException {
             String html = get();
             return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
-                    null : Jsoup.parse(html);
+                null : Jsoup.parse(html);
         }
 
         @Override
@@ -281,8 +281,8 @@ public class Manager {
                     return getContentWithoutCache(urlString, userAgent);
                 }
                 throw new ManagerException(
-                        "Error occurred with httpclient response: %s %s".formatted(e.getResponseCode(),
-                                e.getResponseMessage()), e);
+                    "Error occurred with httpclient response: %s %s".formatted(e.getResponseCode(),
+                        e.getResponseMessage()), e);
             } catch (IOException e) {
                 if (retries-- > 0 && retryPredicate.test(e)) {
                     return getContentWithoutCache(urlString, userAgent);
@@ -322,8 +322,8 @@ public class Manager {
     @RequiredArgsConstructor
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static class ClearExpiredCacheBuilder<K>
-            implements ClearExpiredCacheBuilderCacheTypeIntf, ClearExpiredCacheBuilderKeyFilterIntf,
-            ClearExpiredCacheBuilderClearIntf {
+        implements ClearExpiredCacheBuilderCacheTypeIntf, ClearExpiredCacheBuilderKeyFilterIntf,
+        ClearExpiredCacheBuilderClearIntf {
         private final InMemoryCache inMemoryCache;
         private final DiskCache diskCache;
         private CacheType cacheType;
@@ -357,7 +357,7 @@ public class Manager {
 
         <T extends Serializable> ValueBuilderKeyIntf<T> cacheType(CacheType cacheType);
 
-        <T extends Object> ValueBuilderKeyIntf<T> memoryCache();
+        <T> ValueBuilderKeyIntf<T> memoryCache();
 
         <T extends Serializable> ValueBuilderKeyIntf<T> diskCache();
     }
@@ -382,7 +382,7 @@ public class Manager {
         <S extends T> ValueBuilderGetOptionalIntf<S, Nothing> returnType(Class<S> returnType);
 
         <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> returnType(
-                Class<C> collectionReturnType, Class<S> returnType);
+            Class<C> collectionReturnType, Class<S> returnType);
 
         void remove();
     }
@@ -397,7 +397,7 @@ public class Manager {
         ValueBuilderGetOptionalIntStoreTempValueIntf<Nothing> optionalIntValue(OptionalInt optionalIntValue);
 
         <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> collectionValue(
-                C collectionValue);
+            C collectionValue);
     }
 
     public interface ValueBuilderRetryConditionIntf<T> {
@@ -411,25 +411,25 @@ public class Manager {
     public interface ValueBuilderValueSupplierIntf<T> {
 
         <S extends T, X extends Exception> ValueBuilderGetValueStoreTempValueIntf<S, X> valueSupplier(
-                ThrowingSupplier<S, X> valueSupplier);
+            ThrowingSupplier<S, X> valueSupplier);
 
         <C extends Collection<S>, S extends T, X extends Exception> ValueBuilderGetCollectionIntf<C, S, X> collectionSupplier(
-                Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
+            Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
 
         <S extends T, X extends Exception> ValueBuilderGetOptionalStoreTempValueIntf<S, X> optionalSupplier(
-                ThrowingSupplier<Optional<S>, X> valueSupplier);
+            ThrowingSupplier<Optional<S>, X> valueSupplier);
 
         <X extends Exception> ValueBuilderGetOptionalIntStoreTempValueIntf<X> optionalIntSupplier(
-                ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
+            ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
     }
 
     public interface ValueBuilderGetValueStoreTempValueIntf<T, X extends Exception>
-            extends ValueBuilderGetValueIntf<T, X> {
+        extends ValueBuilderGetValueIntf<T, X> {
         ValueBuilderGetValueStoreTempValueTtlIntf<T, X> storeTempNullValue();
     }
 
     public interface ValueBuilderGetValueStoreTempValueTtlIntf<T, X extends Exception>
-            extends ValueBuilderGetValueIntf<T, X> {
+        extends ValueBuilderGetValueIntf<T, X> {
         ValueBuilderGetValueIntf<T, X> timeToLive(long seconds);
 
         ValueBuilderGetValueIntf<T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
@@ -440,12 +440,12 @@ public class Manager {
     }
 
     public interface ValueBuilderGetOptionalStoreTempValueIntf<T, X extends Exception>
-            extends ValueBuilderGetOptionalIntf<T, X> {
+        extends ValueBuilderGetOptionalIntf<T, X> {
         ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X> storeTempNullValue();
     }
 
     public interface ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X extends Exception>
-            extends ValueBuilderGetOptionalIntf<T, X> {
+        extends ValueBuilderGetOptionalIntf<T, X> {
         ValueBuilderGetOptionalIntf<T, X> timeToLive(long seconds);
 
         ValueBuilderGetOptionalIntf<T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
@@ -458,12 +458,12 @@ public class Manager {
     }
 
     public interface ValueBuilderGetOptionalIntStoreTempValueIntf<X extends Exception>
-            extends ValueBuilderGetOptionalIntIntf<X> {
+        extends ValueBuilderGetOptionalIntIntf<X> {
         ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X> storeTempNullValue();
     }
 
     public interface ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X extends Exception>
-            extends ValueBuilderGetOptionalIntIntf<X> {
+        extends ValueBuilderGetOptionalIntIntf<X> {
         ValueBuilderGetOptionalIntIntf<X> timeToLive(long seconds);
 
         ValueBuilderGetOptionalIntIntf<X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
@@ -486,7 +486,7 @@ public class Manager {
     // }
 
     public interface ValueBuilderGetCollectionIntf<C extends Collection<T>, T, X extends Exception>
-            extends ValueBuilderStoreIntf<X> {
+        extends ValueBuilderStoreIntf<X> {
         C getCollection() throws X;
     }
 
@@ -501,14 +501,14 @@ public class Manager {
     @RequiredArgsConstructor
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static class ValueBuilder<C extends Collection<T>, T, X extends Exception>
-            implements ValueBuilderGetOptionalIntf<T, X>, ValueBuilderCacheTypeIntf, ValueBuilderValueSupplierIntf<T>,
-            ValueBuilderKeyIntf<T>, ValueBuilderGetCollectionIntf<C, T, X>, ValueBuilderGetOptionalIntIntf<X>,
-            ValueBuilderRetryIntf<T>, ValueBuilderRetryConditionIntf<T>, ValueBuilderRetryWaitIntf<T>,
-            ValueBuilderIsPresentIntf<T>, ValuesBuilderCacheTypeIntf<T>, ValueBuilderStoreIntf<X>,
-            ValueBuilderGetOptionalIntStoreTempValueIntf<X>, ValueBuilderGetOptionalStoreTempValueIntf<T, X>,
-            ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X>, ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X>,
-            ValueBuilderGetValueStoreTempValueIntf<T, X>, ValueBuilderGetValueStoreTempValueTtlIntf<T, X>,
-            ValueBuilderGetValueIntf<T, X> {
+        implements ValueBuilderGetOptionalIntf<T, X>, ValueBuilderCacheTypeIntf, ValueBuilderValueSupplierIntf<T>,
+        ValueBuilderKeyIntf<T>, ValueBuilderGetCollectionIntf<C, T, X>, ValueBuilderGetOptionalIntIntf<X>,
+        ValueBuilderRetryIntf<T>, ValueBuilderRetryConditionIntf<T>, ValueBuilderRetryWaitIntf<T>,
+        ValueBuilderIsPresentIntf<T>, ValuesBuilderCacheTypeIntf<T>, ValueBuilderStoreIntf<X>,
+        ValueBuilderGetOptionalIntStoreTempValueIntf<X>, ValueBuilderGetOptionalStoreTempValueIntf<T, X>,
+        ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X>, ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X>,
+        ValueBuilderGetValueStoreTempValueIntf<T, X>, ValueBuilderGetValueStoreTempValueTtlIntf<T, X>,
+        ValueBuilderGetValueIntf<T, X> {
         private final InMemoryCache inMemoryCache;
         private final DiskCache diskCache;
         private String key;
@@ -572,35 +572,35 @@ public class Manager {
 
         @Override
         public <L extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<L, S, Nothing> returnType(
-                Class<L> collectionReturnType, Class<S> returnType) {
+            Class<L> collectionReturnType, Class<S> returnType) {
             this.returnType = (Class<T>) returnType;
             return (ValueBuilder<L, S, Nothing>) this;
         }
 
         @Override
         public <S extends T, E extends Exception> ValueBuilder<?, S, E> valueSupplier(
-                ThrowingSupplier<S, E> valueSupplier) {
+            ThrowingSupplier<S, E> valueSupplier) {
             this.valueSupplier = (ThrowingSupplier<T, X>) valueSupplier;
             return (ValueBuilder<?, S, E>) this;
         }
 
         @Override
         public <S extends T, E extends Exception> ValueBuilder<?, S, E> optionalSupplier(
-                ThrowingSupplier<Optional<S>, E> valueSupplier) {
+            ThrowingSupplier<Optional<S>, E> valueSupplier) {
             this.optionalSupplier = (ThrowingSupplier) valueSupplier;
             return (ValueBuilder<?, S, E>) this;
         }
 
         @Override
         public <E extends Exception> ValueBuilder<?, Integer, E> optionalIntSupplier(
-                ThrowingSupplier<OptionalInt, E> optionalIntSupplier) {
+            ThrowingSupplier<OptionalInt, E> optionalIntSupplier) {
             this.optionalIntSupplier = (ThrowingSupplier) optionalIntSupplier;
             return (ValueBuilder<?, Integer, E>) this;
         }
 
         @Override
         public <L extends Collection<S>, S extends T, E extends Exception> ValueBuilder<L, S, E> collectionSupplier(
-                Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
+            Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
             this.collectionSupplier = (ThrowingSupplier<C, X>) collectionSupplier;
             return (ValueBuilder<L, S, E>) this;
         }
@@ -931,8 +931,8 @@ public class Manager {
 
         private long calculateTtl() {
             return getTemporaryTimeToLive().mapToObj(
-                            v -> timeToLiveFunction != null ? timeToLiveFunction.applyAsLong(v) : v * 2)
-                    .orElseGet(() -> timeToLive != null ? timeToLive : MILLISECONDS.convert(1, DAYS));
+                    v -> timeToLiveFunction != null ? timeToLiveFunction.applyAsLong(v) : v * 2)
+                .orElseGet(() -> timeToLive != null ? timeToLive : MILLISECONDS.convert(1, DAYS));
         }
     }
 }

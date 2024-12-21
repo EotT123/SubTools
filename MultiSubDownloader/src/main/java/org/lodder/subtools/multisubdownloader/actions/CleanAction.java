@@ -39,9 +39,11 @@ public class CleanAction {
                     case MOVEANDRENAME -> moveAndRename(p, destination, videoFileName);
                     case REMOVE -> delete(p);
                     case RENAME -> rename(p, destination, videoFileName);
-                        case NOTHING -> { }
-                        default -> { }
+                    case NOTHING -> {
                     }
+                    default -> {
+                    }
+                }
             });
     }
 

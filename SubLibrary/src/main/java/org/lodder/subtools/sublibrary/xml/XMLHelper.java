@@ -76,20 +76,21 @@ public class XMLHelper {
         LOGGER.trace("getBooleanAttributeValue: sTag [{}], sAttribute [{}]", sTag, sAttribute);
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
         return ((Element) nlList).getAttribute(sAttribute) != null &&
-                Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
+            Boolean.parseBoolean(((Element) nlList).getAttribute(sAttribute));
     }
 
-    public static String cleanBadChars(String string) {
-        LOGGER.trace("cleanBadChars: string [{}]", string);
+    public static String cleanBadChars(String String) {
+        String text = String;
+        LOGGER.trace("cleanBadChars: string [{}]", text);
         /* Remove bad chars for the find function of bierdopje api. */
-        string = string.toLowerCase().replace(" and ", " & ");
-        string = string.replace("&", "");
-        string = string.replace("#", "");
-        string = string.replace("*", "");
-        string = string.replace("!", "");
-        string = string.replace("$", "");
-        string = string.replace("  ", " ");
-        return string.trim();
+        text = text.toLowerCase().replace(" and ", " & ");
+        text = text.replace("&", "");
+        text = text.replace("#", "");
+        text = text.replace("*", "");
+        text = text.replace("!", "");
+        text = text.replace("$", "");
+        text = text.replace("  ", " ");
+        return text.trim();
     }
 
     public static void writeToFile(Path file, Document doc) throws Exception {

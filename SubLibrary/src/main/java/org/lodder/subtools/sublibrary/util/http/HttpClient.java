@@ -63,8 +63,8 @@ public class HttpClient {
 
         try {
             String urlParameters = data.entrySet().stream()
-                    .map(entry -> entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&"));
+                .map(entry -> entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
 
             conn = (HttpURLConnection) url.openConnection();
             cookieManager.setCookies(conn);
@@ -74,7 +74,7 @@ public class HttpClient {
             }
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestProperty("Content-Length",
-                    String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length));
+                String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length));
             conn.setUseCaches(false);
             conn.setDoInput(true);
             conn.setDoOutput(true);
@@ -108,10 +108,9 @@ public class HttpClient {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
         boolean success = true;
 
-        try (InputStream in = url.getFile().endsWith(".gz") ? new GZIPInputStream(url.openStream()) :
-                getInputStream(url)) {
+        try (InputStream in = url.getFile().endsWith(".gz") ?
+            new GZIPInputStream(url.openStream()) : getInputStream(url)) {
             byte[] data = in.readAllBytes();
-            in.close();
 
             if (url.getFile().endsWith(".zip") || PathExt.isZipFile(new ByteArrayInputStream(data))) {
                 PathExt.unzip(new ByteArrayInputStream(data), file, ".srt");
@@ -125,7 +124,7 @@ public class HttpClient {
                     success = false;
                 } else {
                     Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-                            StandardOpenOption.WRITE);
+                        StandardOpenOption.WRITE);
                 }
             }
         } catch (Exception e) {
@@ -148,16 +147,17 @@ public class HttpClient {
 
         if (status != HttpURLConnection.HTTP_OK) {
             if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
-                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                URL newUrl;
                 if (HttpClient.isUrl(conn.getHeaderField("Location"))) {
-                    url = new URI(conn.getHeaderField("Location")).toURL();
+                    newUrl = new URI(conn.getHeaderField("Location")).toURL();
                 } else {
                     String protocol = url.getProtocol();
                     String host = conn.getURL().getHost();
-                    url = new URI("%s://%s/%s".formatted(protocol, host,
-                            conn.getHeaderField("Location").trim().replace(" ", "%20"))).toURL();
+                    newUrl = new URI("%s://%s/%s".formatted(protocol, host,
+                        conn.getHeaderField("Location").trim().replace(" ", "%20"))).toURL();
                 }
-                return getInputStream(url);
+                return getInputStream(newUrl);
             }
 
             throw new Exception("error: " + status);
@@ -168,15 +168,15 @@ public class HttpClient {
 
     public static boolean isUrl(String str) {
         Pattern urlPattern = Pattern.compile(
-                "((https?|ftp|gopher|telnet|file):((//)|(\\\\\\\\))+[\\\\w\\\\d:#@%/;$()~_?\\\\+-=\\\\\\\\\\\\.&]*)",
-                Pattern.CASE_INSENSITIVE);
+            "((https?|ftp|gopher|telnet|file):((//)|(\\\\\\\\))+[\\\\w\\\\d:#@%/;$()~_?\\\\+-=\\\\\\\\\\\\.&]*)",
+            Pattern.CASE_INSENSITIVE);
         Matcher matcher = urlPattern.matcher(str);
         return matcher.find();
     }
 
     public String downloadText(String url) throws IOException {
         try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(new URI(url).toURL().openStream(), StandardCharsets.UTF_8))) {
+            new InputStreamReader(new URI(url).toURL().openStream(), StandardCharsets.UTF_8))) {
             return in.lines().collect(Collectors.joining());
         } catch (URISyntaxException e) {
             throw new IOException(e.getMessage(), e);

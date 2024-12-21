@@ -620,7 +620,7 @@ public enum SettingValue {
                     super.storeValueFunction((settingsControl, preferences) -> {
                         T value = valueGetter.apply(getRootElement(settingsControl));
                         if (!Objects.equal(value, getDefaultValue()) &&
-                            !(value instanceof String text && "".equals(text))) {
+                            !(value instanceof String text && text.isEmpty())) {
                             preferencesSetter.accept(preferences, key, value);
                         }
                     });

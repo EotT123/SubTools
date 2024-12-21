@@ -56,18 +56,18 @@ public class ReleaseParser {
                     number = namedMatcher.group("partnumber");
                 }
                 movieName = cleanUnwantedChars(
-                        namedMatcher.group("moviename") + " " + namedMatcher.group("part") + " " + number);
+                    namedMatcher.group("moviename") + " " + namedMatcher.group("part") + " " + number);
             } else {
                 movieName = cleanUnwantedChars(namedMatcher.group("moviename"));
             }
             return MovieRelease.builder()
-                    .name(movieName)
-                    .file(file)
-                    .year(year)
-                    .description(description)
-                    .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
-                    .quality(getQualityKeyword(fileParseName))
-                    .build();
+                .name(movieName)
+                .file(file)
+                .year(year)
+                .description(description)
+                .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
+                .quality(getQualityKeyword(fileParseName))
+                .build();
         }
 
         if (namedGroups.contains("episodenumber1")) {
@@ -131,41 +131,42 @@ public class ReleaseParser {
             throw new ReleaseParseException("Unable to parse the namedmatcher");
         }
         return TvRelease.builder()
-                .name(seriesName)
-                .season(seasonNumber)
-                .episodes(episodeNumbers)
-                .file(file)
-                .description(PathExt.withoutExtension(description))
-                .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
-                .special(isSpecialEpisode(seasonNumber, episodeNumbers))
-                .quality(getQualityKeyword(fileParseName))
-                .build();
+            .name(seriesName)
+            .season(seasonNumber)
+            .episodes(episodeNumbers)
+            .file(file)
+            .description(PathExt.withoutExtension(description))
+            .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
+            .special(isSpecialEpisode(seasonNumber, episodeNumbers))
+            .quality(getQualityKeyword(fileParseName))
+            .build();
     }
 
     private String cleanUnwantedChars(String text) {
-        if (text.contains("cd1")) {
-            text = text.replace("cd1", " ");
+        String newText = text;
+        if (newText.contains("cd1")) {
+            newText = newText.replace("cd1", " ");
         }
-        if (text.contains("cd2")) {
-            text = text.replace("cd2", " ");
+        if (newText.contains("cd2")) {
+            newText = newText.replace("cd2", " ");
         }
 
-        text = text.replace(".", " "); // remove point bones.01x01
-        text = text.replace("_", " "); // remove underscore bones_01x01
-        text = text.replace(" -", " "); // remove space dash "ncis - 01x01"
-        text = text.replace(":", ""); // remove double point "CSI: NY"
-        text = text.replace("(", ""); // remove ( for castle (2009)
-        text = text.replace(")", ""); // remove ) for castle (2009)
-        text = text.replace("'", "");
+        newText = newText.replace(".", " "); // remove point bones.01x01
+        newText = newText.replace("_", " "); // remove underscore bones_01x01
+        newText = newText.replace(" -", " "); // remove space dash "ncis - 01x01"
+        newText = newText.replace(":", ""); // remove double point "CSI: NY"
+        newText = newText.replace("(", ""); // remove ( for castle (2009)
+        newText = newText.replace(")", ""); // remove ) for castle (2009)
+        newText = newText.replace("'", "");
 
-        if (text.endsWith("-")) { // implemented if for "hawaii five-0"
-            text = text.replace("-", ""); // remove space dash "altiplano-cd1"
+        if (newText.endsWith("-")) { // implemented if for "hawaii five-0"
+            newText = newText.replace("-", ""); // remove space dash "altiplano-cd1"
         }
 
         // remove multiple spaces between text Back to the Future[][]Part II
-        text = text.replaceAll(" +", " ");
+        newText = newText.replaceAll(" +", " ");
 
-        return text.trim();
+        return newText.trim();
     }
 
     public static String getQualityKeyword(String name) {

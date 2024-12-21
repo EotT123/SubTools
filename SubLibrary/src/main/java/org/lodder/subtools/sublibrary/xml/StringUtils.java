@@ -79,20 +79,19 @@ public class StringUtils {
      */
 
     public static String unescapeHTML(String source) {
-        int i, j;
-
         boolean continueLoop;
         int skip = 0;
+        String text = source;
         do {
             continueLoop = false;
-            i = source.indexOf("&", skip);
+            int i = text.indexOf("&", skip);
             if (i > -1) {
-                j = source.indexOf(";", i);
+                int j = text.indexOf(";", i);
                 if (j > i) {
-                    String entityToLookFor = source.substring(i, j + 1);
+                    String entityToLookFor = text.substring(i, j + 1);
                     String value = htmlEntities.get(entityToLookFor);
                     if (value != null) {
-                        source = source.substring(0, i) + value + source.substring(j + 1);
+                        text = text.substring(0, i) + value + text.substring(j + 1);
                     } else {
                         skip = i + 1;
                     }
@@ -100,7 +99,7 @@ public class StringUtils {
                 }
             }
         } while (continueLoop);
-        return source;
+        return text;
     }
 
 }

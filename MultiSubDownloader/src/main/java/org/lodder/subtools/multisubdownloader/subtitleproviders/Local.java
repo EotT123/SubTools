@@ -51,8 +51,8 @@ public class Local implements SubtitleProvider {
 
     private List<Path> getPossibleSubtitles(String filter) {
         return settings.localSourcesFolders.stream()
-                .flatMap(local -> getAllSubtitlesFiles(local, filter).stream())
-                .toList();
+            .flatMap(local -> getAllSubtitlesFiles(local, filter).stream())
+            .toList();
     }
 
     @Override
@@ -60,39 +60,35 @@ public class Local implements SubtitleProvider {
         Set<Subtitle> listFoundSubtitles = new HashSet<>();
         ReleaseParser vfp = new ReleaseParser();
 
-        String filter;
-        if (tvRelease.originalName.length() > 0) {
-            filter = tvRelease.originalName.replaceAll("[^A-Za-z]", "").trim();
-        } else {
-            filter = tvRelease.name.replaceAll("[^A-Za-z]", "").trim();
-        }
+        String name = !tvRelease.originalName.isEmpty() ? tvRelease.originalName : tvRelease.name;
+        String filter = name.replaceAll("[^A-Za-z]", "").trim();
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 Release release = vfp.parse(fileSub);
                 if ((release.videoType == VideoType.EPISODE)
-                        && (((TvRelease) release).season == tvRelease.season &&
-                        new HashSet<>(((TvRelease) release).episodeNumbers).containsAll(tvRelease.episodeNumbers))) {
+                    && (((TvRelease) release).season == tvRelease.season &&
+                    new HashSet<>(((TvRelease) release).episodeNumbers).containsAll(tvRelease.episodeNumbers))) {
 
                     TvReleaseControl epCtrl =
-                            new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
+                        new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
                     epCtrl.process();
                     if (((TvRelease) release).tvdbIdOptional.equals(tvRelease.tvdbIdOptional)) {
                         Language detectedLang = DetectLanguage.execute(fileSub);
                         if (detectedLang == language) {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
                             listFoundSubtitles.add(
-                                    Subtitle.downloadSource(fileSub)
-                                            .subtitleSource(subtitleSource)
-                                            .fileName(fileSub.getFileNameAsString())
-                                            .language(language)
-                                            .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
-                                            .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                            .releaseGroup(
-                                                    ReleaseParser.extractReleaseGroup(fileSub.getFileNameAsString(),
-                                                            true))
-                                            .uploader(fileSub.toAbsolutePath().toString())
-                                            .hearingImpaired(false));
+                                Subtitle.downloadSource(fileSub)
+                                    .subtitleSource(subtitleSource)
+                                    .fileName(fileSub.getFileNameAsString())
+                                    .language(language)
+                                    .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
+                                    .subtitleMatchType(SubtitleMatchType.EVERYTHING)
+                                    .releaseGroup(
+                                        ReleaseParser.extractReleaseGroup(fileSub.getFileNameAsString(),
+                                            true))
+                                    .uploader(fileSub.toAbsolutePath().toString())
+                                    .hearingImpaired(false));
                         }
                     }
                 }
@@ -120,20 +116,20 @@ public class Local implements SubtitleProvider {
                 switch (releaseParser.parse(fileSub)) {
                     case MovieRelease release -> {
                         MovieReleaseControl movieCtrl =
-                                new MovieReleaseControl(release, settings, manager, userInteractionHandler);
+                            new MovieReleaseControl(release, settings, manager, userInteractionHandler);
                         movieCtrl.process();
                         if (release.getImdbId().equals(movieRelease.getImdbId())
-                                && DetectLanguage.execute(fileSub) == language) {
+                            && DetectLanguage.execute(fileSub) == language) {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(Subtitle.downloadSource(fileSub)
-                                    .subtitleSource(subtitleSource)
-                                    .fileName(fileSub.getFileNameAsString())
-                                    .language(language) // TODO previously: language(""). This was not correct?
-                                    .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
-                                    .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                    .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))
-                                    .uploader(fileSub.toAbsolutePath().toString())
-                                    .hearingImpaired(false));
+                                .subtitleSource(subtitleSource)
+                                .fileName(fileSub.getFileNameAsString())
+                                .language(language) // TODO previously: language(""). This was not correct?
+                                .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
+                                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
+                                .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))
+                                .uploader(fileSub.toAbsolutePath().toString())
+                                .hearingImpaired(false));
                         }
                     }
                     default -> {
@@ -154,12 +150,12 @@ public class Local implements SubtitleProvider {
     private List<Path> getAllSubtitlesFiles(Path dir, String filter) {
         try {
             return dir.list().filter(Files::isRegularFile)
-                    .filter(file -> file.hasExtension("srt"))
-                    .filter(file -> file.getFileNameAsString()
-                            .replaceAll("[^A-Za-z]", "")
-                            .toLowerCase()
-                            .contains(filter.toLowerCase()))
-                    .toList();
+                .filter(file -> file.hasExtension("srt"))
+                .filter(file -> file.getFileNameAsString()
+                    .replaceAll("[^A-Za-z]", "")
+                    .toLowerCase()
+                    .contains(filter.toLowerCase()))
+                .toList();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
             return List.of();

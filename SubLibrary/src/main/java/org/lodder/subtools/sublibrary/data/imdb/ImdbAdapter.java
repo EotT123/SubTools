@@ -23,12 +23,12 @@ import org.slf4j.LoggerFactory;
 public class ImdbAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImdbAdapter.class);
+    private static final String PROVIDER_NAME = "IMDB";
     private static ImdbAdapter instance;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
     private final LazySupplier<ImdbApi> imdbApi;
     private final LazySupplier<ImdbSearchIdApi> imdbSearchIdApi;
-    private final String providerName = "IMDB";
 
     private ImdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
@@ -37,45 +37,45 @@ public class ImdbAdapter {
             try {
                 return new ImdbApi(manager);
             } catch (Exception e) {
-                throw new SubtitlesProviderInitException(providerName, e);
+                throw new SubtitlesProviderInitException(PROVIDER_NAME, e);
             }
         });
         this.imdbSearchIdApi = new LazySupplier<>(() -> {
             try {
                 return new ImdbSearchIdApi(manager);
             } catch (Exception e) {
-                throw new SubtitlesProviderInitException(providerName, e);
+                throw new SubtitlesProviderInitException(PROVIDER_NAME, e);
             }
         });
     }
 
     public Optional<ImdbDetails> getMovieDetails(int imdbId) {
         return manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .key("%s-MovieDetails:%s".formatted(providerName, imdbId))
-                .optionalSupplier(() -> {
-                    try {
-                        return imdbApi.get().getMovieDetails(imdbId);
-                    } catch (ImdbException e) {
-                        LOGGER.error("API %s getMovieDetails for id [%s] (%s)".formatted(providerName, imdbId,
-                                e.getMessage()), e);
-                        return Optional.empty();
-                    }
-                }).getOptional();
+            .cacheType(CacheType.DISK)
+            .key("%s-MovieDetails:%s".formatted(PROVIDER_NAME, imdbId))
+            .optionalSupplier(() -> {
+                try {
+                    return imdbApi.get().getMovieDetails(imdbId);
+                } catch (ImdbException e) {
+                    LOGGER.error("API %s getMovieDetails for id [%s] (%s)".formatted(PROVIDER_NAME, imdbId,
+                        e.getMessage()), e);
+                    return Optional.empty();
+                }
+            }).getOptional();
     }
 
     public OptionalInt getImdbId(String title, Integer year) {
         try {
             return manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .key("%s-id-%s-%s".formatted(providerName, title, year))
-                    .optionalIntSupplier(() -> getImdbIdOnImdb(title, year)
-                            .orElseMap(() -> getImdbIdOnGoogle(title, year))
-                            .orElseMap(() -> getImdbIdOnYahoo(title, year))
-                            .orElseMap(() -> promptUserToEnterImdbId(title, year)))
-                    .storeTempNullValue().getOptionalInt();
+                .cacheType(CacheType.DISK)
+                .key("%s-id-%s-%s".formatted(PROVIDER_NAME, title, year))
+                .optionalIntSupplier(() -> getImdbIdOnImdb(title, year)
+                    .orElseMap(() -> getImdbIdOnGoogle(title, year))
+                    .orElseMap(() -> getImdbIdOnYahoo(title, year))
+                    .orElseMap(() -> promptUserToEnterImdbId(title, year)))
+                .storeTempNullValue().getOptionalInt();
         } catch (Exception e) {
-            LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(providerName, title, e.getMessage()), e);
+            LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(PROVIDER_NAME, title, e.getMessage()), e);
             return OptionalInt.empty();
         }
     }
@@ -93,13 +93,13 @@ public class ImdbAdapter {
     }
 
     private OptionalInt getImdbIdCommon(String title, Integer year,
-            ThrowingBiFunction<String, Integer, Collection<ProviderSerieId>, ImdbSearchIdException> providerSerieIdSupplier) {
+        ThrowingBiFunction<String, Integer, Collection<ProviderSerieId>, ImdbSearchIdException> providerSerieIdSupplier) {
         Collection<ProviderSerieId> providerSerieIds;
         try {
             providerSerieIds = providerSerieIdSupplier.apply(title, year);
         } catch (ImdbSearchIdException e) {
-            LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(providerName, title, year,
-                    e.getMessage()), e);
+            LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(PROVIDER_NAME, title, year,
+                e.getMessage()), e);
             return OptionalInt.empty();
         }
         if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
@@ -108,23 +108,23 @@ public class ImdbAdapter {
         }
         String formattedTitle = title.replaceAll("[^A-Za-z]", "");
         return userInteractionHandler
-                .selectFromList(
-                        providerSerieIds.stream().sorted(Comparator
-                                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.name.replaceAll(
-                                                        "[^A-Za-z]", "")
-                                                .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
-                                        .thenComparing(ProviderSerieId::getName))
-                                .toList(),
-                        Messages.getText("Prompter.SelectImdbMatchForSerie").formatted(title),
-                        providerName,
-                        ProviderSerieId::getName)
-                .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.id));
+            .selectFromList(
+                providerSerieIds.stream().sorted(Comparator
+                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.name.replaceAll(
+                                "[^A-Za-z]", "")
+                            .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
+                        .thenComparing(ProviderSerieId::getName))
+                    .toList(),
+                Messages.getText("Prompter.SelectImdbMatchForSerie").formatted(title),
+                PROVIDER_NAME,
+                ProviderSerieId::getName)
+            .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.id));
     }
 
     private OptionalInt promptUserToEnterImdbId(String title, int year) {
-        return userInteractionHandler.enter(providerName,
-                Messages.getText("Prompter.EnterImdbMatchForSerie").formatted(title),
-                Messages.getText("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
+        return userInteractionHandler.enter(PROVIDER_NAME,
+            Messages.getText("Prompter.EnterImdbMatchForSerie").formatted(title),
+            Messages.getText("Prompter.ValueIsNotValid"), StringUtils::isNumeric).mapToInt(Integer::parseInt);
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
