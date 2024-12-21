@@ -22,7 +22,6 @@ import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
@@ -51,7 +50,7 @@ public class CLI {
     public CLI(SettingsControl settingControl, Container app) {
         this.app = app;
         this.settings = settingControl.getSettings();
-        Manager manager = (Manager) this.app.make("Manager");
+        Manager manager = app.makeManager();
         checkUpdate(manager);
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(settings, userInteractionHandler);
@@ -99,13 +98,13 @@ public class CLI {
         try {
             CliSearchAction
                 .createWithSettings(settings)
-                .subtitleProviderStore((SubtitleProviderStore) app.make("SubtitleProviderStore"))
+                .subtitleProviderStore(app.makeSubtitleProviderStore())
                 .indexingProgressListener(new CLIFileIndexerProgress().verbose(verboseProgress))
                 .searchProgressListener(new CLISearchProgress().verbose(verboseProgress))
                 .cli(this)
                 .fileListAction(new FileListAction(this.settings))
                 .language(language)
-                .releaseFactory(new ReleaseFactory(this.settings, (Manager) app.make("Manager")))
+                .releaseFactory(new ReleaseFactory(this.settings, app.makeManager()))
                 .filtering(new SubtitleFiltering(this.settings))
                 .folders(folders)
                 .recursive(recursive)

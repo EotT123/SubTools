@@ -1,13 +1,10 @@
 package org.lodder.subtools.multisubdownloader.serviceproviders;
 
-import java.util.prefs.Preferences;
-
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
-import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
@@ -28,7 +25,7 @@ public class Addic7edServiceProvider implements ServiceProvider {
         this.app = app;
 
         /* Resolve the SubtitleProviderStore from the IoC Container */
-        final SubtitleProviderStore subtitleProviderStore = (SubtitleProviderStore) app.make("SubtitleProviderStore");
+        final SubtitleProviderStore subtitleProviderStore = app.makeSubtitleProviderStore();
 
         /* Create the SubtitleProvider */
         subtitleProvider = createProvider(userInteractionHandler);
@@ -41,9 +38,8 @@ public class Addic7edServiceProvider implements ServiceProvider {
     }
 
     private SubtitleProvider createProvider(UserInteractionHandler userInteractionHandler) {
-        Settings settings = (Settings) this.app.make("Settings");
-        Preferences preferences = (Preferences) this.app.make("Preferences");
-        Manager manager = (Manager) this.app.make("Manager");
+        Settings settings = app.makeSettings();
+        Manager manager = app.makeManager();
 
         boolean loginEnabled = false;
         String username = "";
@@ -58,19 +54,18 @@ public class Addic7edServiceProvider implements ServiceProvider {
         if (settings.serieSourceAddic7edProxy) {
             return new JAddic7edViaProxyAdapter(manager, userInteractionHandler);
         } else {
-            return new JAddic7edAdapter(loginEnabled, username, password, preferences.getBoolean("speedy", false),
-                    manager, userInteractionHandler);
+            return new JAddic7edAdapter(loginEnabled, username, password,
+                app.makePreferences().getBoolean("speedy", false),
+                manager, userInteractionHandler);
         }
     }
 
     // TODO is this still needed?
     private void registerListener(SubtitleProviderStore subtitleProviderStore,
-            UserInteractionHandler userInteractionHandler) {
-        /* Resolve the EventEmitter from the IoC Container */
-        Emitter emitter = (Emitter) app.make("EventEmitter");
+        UserInteractionHandler userInteractionHandler) {
 
         /* Listen for settings-change */
-        emitter.listen("providers.settings.change", _ -> {
+        app.makeEventEmitter().listen("providers.settings.change", _ -> {
             /* Change occurred, delete outdated provider from store */
             subtitleProviderStore.deleteProvider(subtitleProvider);
 

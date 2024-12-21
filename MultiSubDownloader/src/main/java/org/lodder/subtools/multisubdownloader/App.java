@@ -25,7 +25,6 @@ import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Splash;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
@@ -115,9 +114,8 @@ public class App {
             });
         }
         new Thread(() -> {
-            SubtitleProviderStore subtitleProviderStore = (SubtitleProviderStore) app.make("SubtitleProviderStore");
             List<String> providerNames =
-                subtitleProviderStore.getAllProviders().stream().map(SubtitleProvider::getProviderName)
+                app.makeSubtitleProviderStore().getAllProviders().stream().map(SubtitleProvider::getProviderName)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
             manager.clearExpiredCacheBuilder()

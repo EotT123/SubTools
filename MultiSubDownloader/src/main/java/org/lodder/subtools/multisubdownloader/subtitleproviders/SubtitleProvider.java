@@ -47,19 +47,17 @@ public interface SubtitleProvider {
             };
         } catch (Exception e) {
             LoggerFactory.getLogger(SubtitleProvider.class)
-                    .error("Error in %s API: %s".formatted(getName(), e.getMessage()), e);
+                .error("Error in %s API: %s".formatted(getName(), e.getMessage()), e);
         }
         return Set.of();
     }
 
     default void clearCache() {
         manager.clearExpiredCacheBuilder()
-                .cacheType(CacheType.DISK)
-                .keyFilter((String k) -> k.startsWith(providerName + "-"))
-                .clear();
+            .cacheType(CacheType.DISK)
+            .keyFilter((String k) -> k.startsWith(providerName + "-"))
+            .clear();
     }
 
-
     <X extends Exception> Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X;
-
 }
