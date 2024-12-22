@@ -133,64 +133,109 @@ public class VideoPatterns {
     public static final Set<String> EXTENSIONS =
         VideoExtensions.values().stream().map(VideoExtensions::getValue).collect(Collectors.toSet());
 
+    private static String REGEX_ANY_WORDS_INCLUDING_DASH = "['\\w\\s:&()!.,_-]+";
+    private static String REGEX_ANY_WORDS = "['\\w\\s:&()!.,_]";
+    private static String REGEX_PART = "Pt|Part|pt|part|Ep";
+    private static String REGEX_ROMAN_NUMBER = "[I|V|X]+";
+    private static String REGEX_YEAR = "19\\d{2}|20\\d{2}";
+    private static String REGEX_PART_NUMBER = "[\\d]{1}";
+    private static String REGEX_2_CHAR_NUMBER = "[\\d]{1,2}";
+    private static String REGEX_SEASON_EPISODE = "[\\d]{3,4}";
+
+
     // order is important!!!!!!
     private static final String[] PATTERNS = {
         // example:
         // Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)(?<${Tag.ROMAN_EPISODE}>[I|V|X]+)" +
-            "[. ](?<${Tag.YEAR}>19\\d{2}|20\\d{2})(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)[.](?<${Tag.ROMAN_EPISODE}>" +
-            "[I|V|X]+)[. ](?<${Tag.YEAR}>19\\d{2}|20\\d{2})" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.MOVIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)" +
+            "(?<${Tag.ROMAN_EPISODE}>$REGEX_ROMAN_NUMBER+)[. ]" +
+            "(?<${Tag.YEAR}>$REGEX_YEAR)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "(?<${Tag.MOVIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)[.]" +
+            "(?<${Tag.ROMAN_EPISODE}>$REGEX_ROMAN_NUMBER+)[. ]" +
+            "(?<${Tag.YEAR}>$REGEX_YEAR)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // The.Hunger.Games.Mockingjay.Part.1..2014.720p.BluRay.x264-SPARKS.mkv
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)" +
-            "(?<${Tag.PART_NUMBER}>[\\d]{1})[. ](?<${Tag.YEAR}>19\\d{2}|20\\d{2})" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)[.]" +
-            "(?<${Tag.PART_NUMBER}>[\\d]{1})[. ](?<${Tag.YEAR}>19\\d{2}|20\\d{2})" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.MOVIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)" +
+            "(?<${Tag.PART_NUMBER}>$REGEX_PART_NUMBER)[. ]" +
+            "(?<${Tag.YEAR}>$REGEX_YEAR)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "(?<${Tag.MOVIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)[.]" +
+            "(?<${Tag.PART_NUMBER}>$REGEX_PART_NUMBER)[. ]" +
+            "(?<${Tag.YEAR}>$REGEX_YEAR)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // serie
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[Ss. _](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[XxEe]{1,2}" +
-            "(?<${Tag.EPISODE_NUMBER_START}>[\\d]{1,2})(?<${Tag.EPISODE_BETWEEN}>[XxEe][\\d]{1,2})*[XxEe]" +
-            "(?<${Tag.EPISODE_NUMBER_END}>[\\d]{1,2})(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[Ss. _](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[XxEe]{1,2}" +
-            "(?<${Tag.EPISODE_NUMBER}>[\\d]{1,3})(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[Ss. _]" +
+            "(?<${Tag.SEASON_NUMBER}>$REGEX_2_CHAR_NUMBER)[XxEe]{1,2}" +
+            "(?<${Tag.EPISODE_NUMBER_START}>$REGEX_2_CHAR_NUMBER)" +
+            "(?<${Tag.EPISODE_BETWEEN}>[XxEe]$REGEX_2_CHAR_NUMBER)*[XxEe]" +
+            "(?<${Tag.EPISODE_NUMBER_END}>$REGEX_2_CHAR_NUMBER)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[Ss. _]" +
+            "(?<${Tag.SEASON_NUMBER}>$REGEX_2_CHAR_NUMBER)[XxEe]{1,2}" +
+            "(?<${Tag.EPISODE_NUMBER}>[\\d]{1,3})" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // sXeX - Serienaam - Titel ex: S04E02 - White Collar - Most Wanted.mkv
-        "[Ss. _](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[XxEe]{1,2}(?<${Tag.EPISODE_NUMBER_START}>[\\d]{1,2})" +
-            "(?<${Tag.EPISODE_BETWEEN}>[XxEe][\\d]{1,2})*[XxEe](?<${Tag.EPISODE_NUMBER_END}>[\\d]{1,2})\\s?+-?\\s?+" +
-            "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_]+)\\s?+-?\\s?+(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_]+)",
-        "[Ss. _](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[XxEe]{1,2}(?<${Tag.EPISODE_NUMBER}>[\\d]{1,2})\\s?+-?\\s?+" +
-            "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_]+)\\s?+-?\\s?+(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_]+)",
+        "[Ss. _](?<${Tag.SEASON_NUMBER}>$REGEX_2_CHAR_NUMBER)[XxEe]{1,2}" +
+            "(?<${Tag.EPISODE_NUMBER_START}>$REGEX_2_CHAR_NUMBER)" +
+            "(?<${Tag.EPISODE_BETWEEN}>[XxEe]$REGEX_2_CHAR_NUMBER)*[XxEe]" +
+            "(?<${Tag.EPISODE_NUMBER_END}>$REGEX_2_CHAR_NUMBER)\\s?+-?\\s?+" +
+            "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS+)\\s?+-?\\s?+" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS+)",
+        "[Ss. _](?<${Tag.SEASON_NUMBER}>$REGEX_2_CHAR_NUMBER)[XxEe]{1,2}" +
+            "(?<${Tag.EPISODE_NUMBER}>$REGEX_2_CHAR_NUMBER)\\s?+-?\\s?+" +
+            "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS+)\\s?+-?\\s?+" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS+)",
         // example: hawaii.five-0.2010.410.hdtv-lol.mp4
         // example:
         // Spartacus.Gods.of.The.Arena.Pt.I.720p.HDTV.X264-DIMENSION.mkv
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)(?<${Tag.ROMAN_EPISODE}>[I|V|X]+)" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)[.](?<${Tag.ROMAN_EPISODE}>" +
-            "[I|V|X]+)(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)(?<${Tag.EPISODE_NUMBER}>" +
-            "[\\d]{1,2})(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)(?<${Tag.PART}>Pt|Part|pt|part|Ep)[.](?<${Tag.EPISODE_NUMBER}>" +
-            "[\\d]{1,2})(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)" +
+            "(?<${Tag.ROMAN_EPISODE}>$REGEX_ROMAN_NUMBER+)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)[.]" +
+            "(?<${Tag.ROMAN_EPISODE}>$REGEX_ROMAN_NUMBER+)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)" +
+            "(?<${Tag.EPISODE_NUMBER}>$REGEX_2_CHAR_NUMBER)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)" +
+            "(?<${Tag.PART}>$REGEX_PART)[.]" +
+            "(?<${Tag.EPISODE_NUMBER}>$REGEX_2_CHAR_NUMBER)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // example hawaii.five-0.2010.410.hdtv-lol.mp4
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[. ](?<${Tag.YEAR}>19\\d{2}|20\\d{2})[. ]" +
-            "(?<${Tag.SEASON_EPISODE}>[\\d]{3,4})[. ](?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[. ]" +
+            "(?<${Tag.YEAR}>$REGEX_YEAR)[. ]" +
+            "(?<${Tag.SEASON_EPISODE}>$REGEX_SEASON_EPISODE)[. ]" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // format movietitle.year
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}(?<${Tag.YEAR}>19\\d{2}|20\\d{2})" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.MOVIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[\\.|\\[|\\(| ]{1}" +
+            "(?<${Tag.YEAR}>$REGEX_YEAR)" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // format episode.0101.title
         // format episode.101.title
         // exclude format movietitle.720p
-        "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[. ](?<${Tag.SEASON_EPISODE}>[\\d]{3,4})[. ]" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[. ]" +
+            "(?<${Tag.SEASON_EPISODE}>$REGEX_SEASON_EPISODE)[. ]" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // format (2-11) Joey and the High School Friend
-        "[(](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[-](?<${Tag.EPISODE_NUMBER}>[\\d]{1,2})[) ]" +
-            "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[ ]and(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
-        "[(](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[-](?<${Tag.EPISODE_NUMBER}>[\\d]{1,2})[) ]" +
-            "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[ ]And(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+        "[(](?<${Tag.SEASON_NUMBER}>$REGEX_2_CHAR_NUMBER)[-]" +
+            "(?<${Tag.EPISODE_NUMBER}>$REGEX_2_CHAR_NUMBER)[) ]" +
+            "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[ ]and" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
+        "[(](?<${Tag.SEASON_NUMBER}>$REGEX_2_CHAR_NUMBER)[-]" +
+            "(?<${Tag.EPISODE_NUMBER}>$REGEX_2_CHAR_NUMBER)[) ]" +
+            "(?<${Tag.SERIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[ ]And" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)",
         // take the rest and treat as movie
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}[720P|1080P]" +
-            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)"
+        "(?<${Tag.MOVIE_NAME}>$REGEX_ANY_WORDS_INCLUDING_DASH)[\\.|\\[|\\(| ]{1}[720P|1080P]" +
+            "(?<${Tag.DESCRIPTION}>$REGEX_ANY_WORDS_INCLUDING_DASH)"
     };
 
     public static final List<NamedPattern> COMPILED_PATTERNS =
