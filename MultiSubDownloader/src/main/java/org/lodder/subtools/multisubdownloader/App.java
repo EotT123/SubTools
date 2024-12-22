@@ -59,8 +59,7 @@ public class App {
         }
 
         if (!line.hasCliOption(CliOption.NO_GUI)) {
-            splash = new Splash();
-            splash.showSplash();
+            splash = new Splash().showSplash();
         }
 
         Preferences preferences = Preferences.userRoot();
@@ -148,15 +147,14 @@ public class App {
 
     public static Options getCLIOptions() {
         Options options = new Options();
-        CliOption.values().forEach(
-            cliOption -> options.addOption(cliOption.value, cliOption.longValue, cliOption.hasArg,
-                cliOption.description));
+        CliOption.values().forEach(cliOption -> options.addOption(cliOption.value, cliOption.longValue,
+            cliOption.hasArg, cliOption.description));
         return options;
     }
 
     private static Manager createManager(boolean useGui) {
         if (splash != null) {
-            splash.setProgressMsg(Messages.getText("App.Starting"));
+            splash.progressMsg = Messages.getText("App.Starting");
         }
         DiskCache<String, Serializable> diskCache =
             SerializableDiskCache.cacheBuilder().keyType(String.class).valueType(Serializable.class)

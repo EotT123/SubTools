@@ -44,7 +44,7 @@ public class PreferenceDialog extends MultiSubDialog {
         setBounds(100, 100, 650, 700);
 
         AtomicInteger selectedIdx = new AtomicInteger();
-        getContentPane()
+        contentPane
             .layout(new BorderLayout())
             .addComponent(BorderLayout.CENTER, new JLabel()
                 .border(new EmptyBorder(5, 5, 5, 5))

@@ -12,23 +12,19 @@ public class Splash extends JWindow {
 
     @Serial
     private static final long serialVersionUID = -7795482367449509520L;
-    private JProgressBar progressBar;
+    private final JProgressBar progressBar;
 
     public Splash() {
-        initializeUi();
-    }
-
-    public void initializeUi() {
         setBounds(100, 100, 501, 100);
-        getContentPane().setLayout(new MigLayout("", "[][475px,center][]", "[][40px:n]"));
+        contentPane.setLayout(new MigLayout("", "[][475px,center][]", "[][40px:n]"));
 
         JLabel label = new JLabel(getText("Splash.starting"));
-        getContentPane().add(label, "cell 1 0 2 1,alignx left");
+        contentPane.add(label, "cell 1 0 2 1,alignx left");
 
         progressBar = new JProgressBar(0, 100);
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
-        getContentPane().add(progressBar, "cell 1 1,grow");
+        contentPane.add(progressBar, "cell 1 1,grow");
 
         Rectangle r = getBounds();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -38,9 +34,10 @@ public class Splash extends JWindow {
 
     }
 
-    public void showSplash() {
+    public Splash showSplash() {
         setVisible(true);
         toFront();
+        return this;
     }
 
     public void setProgressMsg(String msg) {

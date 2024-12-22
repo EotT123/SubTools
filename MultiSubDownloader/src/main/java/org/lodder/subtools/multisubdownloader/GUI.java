@@ -111,7 +111,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     public void redraw() {
         close();
         // setVisible(false);
-        getContentPane().removeAll();
+        contentPane.removeAll();
         initialize();
     }
 
@@ -166,7 +166,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         gridBagLayout.rowHeights = new int[]{ 0, 125, 15, 0 };
         gridBagLayout.columnWeights = new double[]{ 1.0, Double.MIN_VALUE };
         gridBagLayout.rowWeights = new double[]{ 1.0, 1.0, 0.0, Double.MIN_VALUE };
-        getContentPane().setLayout(gridBagLayout);
+        contentPane.setLayout(gridBagLayout);
 
         JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
         GridBagConstraints gbcTabbedPane = new GridBagConstraints();
@@ -174,7 +174,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         gbcTabbedPane.fill = GridBagConstraints.BOTH;
         gbcTabbedPane.gridx = 0;
         gbcTabbedPane.gridy = 0;
-        getContentPane().add(tabbedPane, gbcTabbedPane);
+        contentPane.add(tabbedPane, gbcTabbedPane);
 
         createFileSearchPanel();
         tabbedPane.addTab(getText("MainWindow.SearchOnFile"), null, pnlSearchFile, null);
@@ -188,7 +188,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         gbcPnlLogging.insets = new Insets(0, 0, 5, 0);
         gbcPnlLogging.gridx = 0;
         gbcPnlLogging.gridy = 1;
-        getContentPane().add(pnlLogging, gbcPnlLogging);
+        contentPane.add(pnlLogging, gbcPnlLogging);
 
         StatusLabel lblStatus = new StatusLabel("");
         StatusMessenger.getInstance().addListener(lblStatus);
@@ -196,7 +196,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         gbcLblStatus.anchor = GridBagConstraints.SOUTHWEST;
         gbcLblStatus.gridx = 0;
         gbcLblStatus.gridy = 2;
-        getContentPane().add(lblStatus, gbcLblStatus);
+        contentPane.add(lblStatus, gbcLblStatus);
 
         createMenu();
         setJMenuBar(menuBar);
@@ -417,7 +417,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void downloadText() {
         MemoryFolderChooser.getInstance()
-            .selectDirectory(getContentPane(), getText("MainWindow.SelectFolder"))
+            .selectDirectory(contentPane, getText("MainWindow.SelectFolder"))
             .ifPresent(path -> {
                 CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
                 final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();

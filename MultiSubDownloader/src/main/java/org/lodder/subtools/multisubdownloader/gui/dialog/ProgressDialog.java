@@ -42,7 +42,7 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
         });
         setBounds(100, 100, 501, 151);
 
-        getContentPane()
+        contentPane
             .layout(new MigLayout("", "[][475px,center][]", "[][40px:n][][]"))
             .addComponent("cell 1 0 2 1,alignx left", label = new JLabel(""))
             .addComponent("cell 1 1,grow", progressBar = new JProgressBar(0, 100).indeterminate((true)))

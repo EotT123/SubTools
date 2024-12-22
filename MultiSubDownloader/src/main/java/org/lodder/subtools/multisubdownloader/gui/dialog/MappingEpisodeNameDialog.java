@@ -51,7 +51,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
         table = new JTable().model(mappingTableModel).rowSorter(TableRowSorter::new);
 
-        getContentPane()
+        contentPane
             .layout(new BorderLayout())
             .addComponent(BorderLayout.CENTER, new JPanel()
                 .border(new EmptyBorder(5, 5, 5, 5))

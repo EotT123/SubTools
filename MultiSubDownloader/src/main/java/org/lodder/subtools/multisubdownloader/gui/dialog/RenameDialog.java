@@ -46,43 +46,43 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
     private ProgressDialog progressDialog;
 
     public RenameDialog(JFrame frame, Settings settings, VideoType videoType, String title, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         super(frame, title, false);
         setResizable(false);
         setBounds(100, 100, 650, 680);
-        getContentPane().setLayout(new MigLayout("fill, nogrid", "[]", "[][]20:push[]"));
+        contentPane.setLayout(new MigLayout("fill, nogrid", "[]", "[][]20:push[]"));
 
         TitlePanel.title(Messages.getText("PreferenceDialog.Settings"))
-                .padding(0)
-                .paddingLeft(20)
-                .fillContents(true)
-                .addTo(getContentPane(), "span, grow, wrap")
-                .addComponent("shrink", new JLabel(Messages.getText("PreferenceDialog.Location")))
-                .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().columns(20))
-                .addComponent("shrink, wrap", new JButton(Messages.getText("App.Browse")).actionListener(
-                        () -> MemoryFolderChooser.getInstance()
-                                .selectDirectory(getContentPane(),
-                                        Messages.getText("PreferenceDialog.SelectFolderForRenameReplace"))
-                                .ifPresent(txtFolder::setObject)))
-                .addComponent("wrap",
-                        this.chkRecursive = new JCheckBox(Messages.getText("RenameDialog.RecursiveSearch")));
+            .padding(0)
+            .paddingLeft(20)
+            .fillContents(true)
+            .addTo(contentPane, "span, grow, wrap")
+            .addComponent("shrink", new JLabel(Messages.getText("PreferenceDialog.Location")))
+            .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().columns(20))
+            .addComponent("shrink, wrap", new JButton(Messages.getText("App.Browse")).actionListener(
+                () -> MemoryFolderChooser.getInstance()
+                    .selectDirectory(contentPane,
+                        Messages.getText("PreferenceDialog.SelectFolderForRenameReplace"))
+                    .ifPresent(txtFolder::setObject)))
+            .addComponent("wrap",
+                this.chkRecursive = new JCheckBox(Messages.getText("RenameDialog.RecursiveSearch")));
 
         if (videoType == VideoType.EPISODE) {
             pnlLibrary = new EpisodeLibraryPanel(settings.episodeLibrarySettings, manager, true,
-                    userInteractionHandler).addTo(getContentPane(), "grow");
+                userInteractionHandler).addTo(contentPane, "grow");
         } else {
             pnlLibrary =
-                    new MovieLibraryPanel(settings.movieLibrarySettings, manager, true, userInteractionHandler).addTo(
-                            getContentPane(), "grow");
+                new MovieLibraryPanel(settings.movieLibrarySettings, manager, true, userInteractionHandler).addTo(
+                    contentPane, "grow");
         }
 
         new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
-                .addTo(getContentPane(), BorderLayout.SOUTH)
-                .addComponent(new JButton(Messages.getText("RenameDialog.Rename")).defaultButtonFor(getRootPane())
-                        .actionListener(() -> rename(videoType, settings, manager, userInteractionHandler))
-                        .actionCommand("Rename"))
-                .addComponent(new JButton(Messages.getText("App.Cancel")).actionListener(() -> setVisible(false))
-                        .actionCommand("Cancel"));
+            .addTo(contentPane, BorderLayout.SOUTH)
+            .addComponent(new JButton(Messages.getText("RenameDialog.Rename")).defaultButtonFor(getRootPane())
+                .actionListener(() -> rename(videoType, settings, manager, userInteractionHandler))
+                .actionCommand("Rename"))
+            .addComponent(new JButton(Messages.getText("App.Cancel")).actionListener(() -> setVisible(false))
+                .actionCommand("Cancel"));
     }
 
     private boolean hasValidSettings() {
@@ -90,18 +90,18 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
     }
 
     private void rename(VideoType videoType, Settings settings, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
 
         if (!hasValidSettings()) {
             JOptionPane.showMessageDialog(this, Messages.getText("PreferenceDialog.invalidInput"), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.ERROR_MESSAGE);
             return;
         }
         setVisible(false);
         pnlLibrary.savePreferenceSettings();
         TypedRenameWorker renameWorker =
-                new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.librarySettings, videoType,
-                        this.chkRecursive.isSelected(), manager, userInteractionHandler);
+            new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.librarySettings, videoType,
+                this.chkRecursive.isSelected(), manager, userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
         renameWorker.releaseFactory = new ReleaseFactory(settings, manager);
         progressDialog = new ProgressDialog(renameWorker);
@@ -134,10 +134,10 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         @set ReleaseFactory releaseFactory;
 
         public TypedRenameWorker(Path dir, LibrarySettings librarySettings, VideoType videoType, boolean isRecursive,
-                Manager manager, UserInteractionHandler userInteractionHandler) {
+            Manager manager, UserInteractionHandler userInteractionHandler) {
             this.userInteractionHandler = userInteractionHandler;
             this.extensions = Streams.concat(VideoPatterns.EXTENSIONS.stream(), Stream.of("srt"))
-                    .collect(Collectors.toUnmodifiableSet());
+                .collect(Collectors.toUnmodifiableSet());
             this.dir = dir;
             this.videoType = videoType;
             this.isRecursive = isRecursive;

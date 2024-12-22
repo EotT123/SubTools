@@ -416,7 +416,6 @@ public class SettingsControl {
             String providerId = pair.getValue().providerId;
             String providerName = pair.getValue().providerName;
             SerieMapping serieMapping = new SerieMapping(name, providerId, providerName, season);
-            System.out.println(serieMapping);
             return Pair.of(pair.getKey(), serieMapping);
         }).toList();
         editedEntries.forEach(entry -> {
