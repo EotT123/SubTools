@@ -5,6 +5,7 @@ import static java.util.function.Predicate.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -18,7 +19,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
 public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final SettingsControl settingsCtrl;
     private final ScrollTable<Source> unusedPatternsTable;
@@ -29,11 +30,11 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         this.settingsCtrl = settingsCtrl;
 
         unusedPatternsTable =
-                ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUnused"), Source.class)
-                        .add(this, "spany 2");
+            ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUnused"), Source.class)
+                .add(this, "spany 2");
         new ArrowButton(SwingConstants.EAST, 1, 10).actionListener(this::addPattern).addTo(this);
         usedPatternsTable = ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUsed"), Source.class)
-                .add(this, "spany 2");
+            .add(this, "spany 2");
         new ArrowButton(SwingConstants.NORTH, 1, 10).actionListener(this::moveRuleRowUp).addTo(this, "wrap");
 
         new ArrowButton(SwingConstants.WEST, 1, 10).actionListener(this::removePattern).addTo(this, "skip");
@@ -44,7 +45,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
     private static class ScrollTable<E> extends Container {
 
-        private static final long serialVersionUID = 1L;
+        @Serial private static final long serialVersionUID = 1L;
 
         private final JScrollPane scrollPane;
         private final JTable table;
@@ -179,7 +180,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
     public void loadPreferenceSettings() {
         Source.values().stream().filter(not(settingsCtrl.settings.optionsDefaultSelectionQualityList::contains))
-                .forEach(unusedPatternsTable::addItem);
+            .forEach(unusedPatternsTable::addItem);
         settingsCtrl.settings.optionsDefaultSelectionQualityList.forEach(usedPatternsTable::addItem);
     }
 

@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.util;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -173,7 +174,7 @@ public class ExportImport {
         @AllArgsConstructor
         @Data
         private static class SeriemappingWithKey implements Serializable {
-            private static final long serialVersionUID = 1L;
+            @Serial private static final long serialVersionUID = 1L;
             private String key;
             private SerieMapping serieMapping;
         }

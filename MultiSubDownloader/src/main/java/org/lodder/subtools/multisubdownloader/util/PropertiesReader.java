@@ -30,12 +30,12 @@ public class PropertiesReader {
         return propertiesReaderInstance;
     }
 
-    public static String getProperty(PomPropery property) {
+    public static String getProperty(PomProperty property) {
         return PropertiesReader.getPropertiesReader().properties.getProperty(property.value);
     }
 
     @AllArgsConstructor
-    public enum PomPropery {
+    public enum PomProperty {
         BUILD_TIMESTAMP("build.timestamp");
 
         @val String value;

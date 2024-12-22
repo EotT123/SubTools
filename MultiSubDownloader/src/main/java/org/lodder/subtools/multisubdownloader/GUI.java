@@ -52,7 +52,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.ScreenSettings;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.util.ExportImport;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader;
-import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomPropery;
+import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomProperty;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
@@ -384,7 +384,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void showAbout() {
         String version = ConfigProperties.getProperty(Property.VERSION);
         String currentVersionText = getText("MainWindow.CurrentVersion");
-        String buildTimestamp = PropertiesReader.getProperty(PomPropery.BUILD_TIMESTAMP);
+        String buildTimestamp = PropertiesReader.getProperty(PomProperty.BUILD_TIMESTAMP);
         String text = "$currentVersionText: $version";
         if (version.contains("-SNAPSHOT")) {
             text += " ($buildTimestamp)";

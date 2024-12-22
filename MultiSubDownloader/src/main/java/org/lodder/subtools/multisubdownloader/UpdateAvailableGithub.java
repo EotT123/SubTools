@@ -16,7 +16,7 @@ import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader;
-import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomPropery;
+import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomProperty;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
@@ -147,7 +147,7 @@ public class UpdateAvailableGithub {
     }
 
     private LocalDateTime getBuildTista() {
-        String timestamp = PropertiesReader.getProperty(PomPropery.BUILD_TIMESTAMP);
+        String timestamp = PropertiesReader.getProperty(PomProperty.BUILD_TIMESTAMP);
         return zonedDateTimeStringToLocalDateTime(timestamp);
     }
 

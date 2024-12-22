@@ -59,7 +59,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
     public void addItem(Image image, T value) {
         if (!distinctValues || !contains(value)) {
             ((DefaultListModel<LabelPanel<T>>) getModel()).addElement(
-                    new LabelPanel<>(image, value, toStringMapper, SwingConstants.LEFT));
+                new LabelPanel<>(image, value, toStringMapper, SwingConstants.LEFT));
         }
     }
 
@@ -93,7 +93,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     public static class LabelPanel<T> extends JPanel {
 
-        private static final long serialVersionUID = 1L;
+        @Serial private static final long serialVersionUID = 1L;
         @val Label<T> label;
 
         LabelPanel(Image image, T object, Function<T, String> toStringMapper, int horizontalAlignment) {
@@ -112,7 +112,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
     }
 
     private static class Label<T> extends JLabel {
-        private static final long serialVersionUID = 1L;
+        @Serial private static final long serialVersionUID = 1L;
         @val T object;
         @val Image image;
 

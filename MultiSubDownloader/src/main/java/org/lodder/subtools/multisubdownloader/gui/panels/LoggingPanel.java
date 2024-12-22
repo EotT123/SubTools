@@ -16,8 +16,8 @@ public class LoggingPanel extends JPanel {
 
     private final JTextArea txtLogging;
     private final ch.qos.logback.classic.Logger ROOT =
-            (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(
-                    ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(
+            ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 
     public LoggingPanel() {
         this.setLayout(new MigLayout("", "[698px,grow][]", "[][70px,grow]"));
@@ -28,8 +28,8 @@ public class LoggingPanel extends JPanel {
 
         Level[] logLevels = { Level.ALL, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR };
         JComboBox<Level> cbxLogLevel = new JComboBox<>(logLevels)
-                .selectedValue(ROOT.getLevel())
-                .selectedItemConsumer(ROOT::setLevel);
+            .selectedValue(ROOT.getLevel())
+            .selectedItemConsumer(ROOT::setLevel);
         this.add(cbxLogLevel, "cell 1 0,alignx right");
         this.add(scrollPane, "cell 0 1 2 1,grow");
 

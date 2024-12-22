@@ -136,8 +136,7 @@ public class CLI {
                     downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
                 } catch (IOException | ManagerException e) {
                     LOGGER.error(
-                        "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})",
-                        e);
+                        "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})", e);
                 }
             });
         }

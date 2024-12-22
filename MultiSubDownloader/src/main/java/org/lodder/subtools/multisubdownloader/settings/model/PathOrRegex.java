@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
 import java.awt.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -15,7 +16,7 @@ import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 public class PathOrRegex implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @val String value;
     @val transient Image image;

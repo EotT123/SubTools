@@ -20,11 +20,11 @@ public class PanelCheckBox extends JPanel {
     @val JPanel panel;
 
     private PanelCheckBox(JCheckBox checkbox, boolean panelOnNewLine, LayoutManager panelLayout,
-            boolean addVerticalSeparator, int leftGap) {
+        boolean addVerticalSeparator, int leftGap) {
         super(new MigLayout("insets 0, novisualpadding, fillx"));
         this.checkbox = checkbox;
         this.panel = new JPanel(panelLayout) {
-            private static final long serialVersionUID = 1L;
+            @Serial private static final long serialVersionUID = 1L;
 
             @Override
             protected void addImpl(Component comp, Object constraints, int index) {
@@ -98,9 +98,9 @@ public class PanelCheckBox extends JPanel {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class Builder implements
-            BuilderPanelNewLineIntf,
-            BuilderSeparatorIntf,
-            BuilderOtherIntf {
+        BuilderPanelNewLineIntf,
+        BuilderSeparatorIntf,
+        BuilderOtherIntf {
         private final JCheckBox checkbox;
         private boolean panelOnNewLine;
         private LayoutManager panelLayout = new MigLayout("insets 0, novisualpadding, fillx");

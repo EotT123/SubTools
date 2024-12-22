@@ -123,8 +123,10 @@ public class VideoPatterns {
     }
 
     private static final Set<String> QUALITY_KEYWORDS_SET =
-        Stream.of(Quality.values(), Source.values(), VideoEncoding.values()).map(MultiplePatterns.class::cast)
-            .map(MultiplePatterns::getValues).flatMap(Arrays::stream).collect(Collectors.toSet());
+        Stream.of(Quality.values(), Source.values(), VideoEncoding.values())
+            .flatMap(e -> e.stream().map(MultiplePatterns::getValues))
+            .flatMap(Arrays::stream)
+            .collect(Collectors.toSet());
 
     private static final Set<String> QUALITY_KEYWORDS_REGEX_SET = Set.of("web[ .-]dl", "dd5[ .]1");
 
@@ -183,12 +185,12 @@ public class VideoPatterns {
             "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
         // format (2-11) Joey and the High School Friend
         "[(](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[-](?<${Tag.EPISODE_NUMBER}>[\\d]{1,2})[) ]" +
-            "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[]and(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
+            "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[ ]and(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
         "[(](?<${Tag.SEASON_NUMBER}>[\\d]{1,2})[-](?<${Tag.EPISODE_NUMBER}>[\\d]{1,2})[) ]" +
             "(?<${Tag.SERIE_NAME}>['\\w\\s:&()!.,_-]+)[ ]And(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)",
         // take the rest and treat as movie
-        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}[720P|1080P](?<${Tag.DESCRIPTION}>['\\w\\s:&()!.," +
-            "_-]+)"
+        "(?<${Tag.MOVIE_NAME}>['\\w\\s:&()!.,_-]+)[\\.|\\[|\\(| ]{1}[720P|1080P]" +
+            "(?<${Tag.DESCRIPTION}>['\\w\\s:&()!.,_-]+)"
     };
 
     public static final List<NamedPattern> COMPILED_PATTERNS =
