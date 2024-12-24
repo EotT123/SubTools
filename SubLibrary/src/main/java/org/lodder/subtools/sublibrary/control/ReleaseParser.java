@@ -105,24 +105,30 @@ public class ReleaseParser {
         // for movies.
         parserResults.parseWithoutRemoving(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
 
+        // Parse the season + episode numbers (using format SxxExx), and the title
         parserResults.parse(seasonSxxExx_name_titleRegex(), name_season_episode_title_Regex(SeasonEpisodeType.SXXEXX));
 
         if (parserResults.containsNone(SEASON, EPISODES_TEXT)) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
+                // If the season and episode numbers are not found, and neither are the Arabic or Roman numbers, try to
+                // parse the season + episode numbers (using less 'safe' formats 'see' and 's_ee'), and the title
                 parserResults.parse(name_season_episode_title_Regex(SeasonEpisodeType.X_XX),
                     name_season_episode_title_Regex(SeasonEpisodeType.XXX),
                     season_episode_name_title_Regex(SeasonEpisodeType.X_XX),
                     season_episode_name_title_Regex(SeasonEpisodeType.XXX));
             }
             if (parserResults.containsNone(SEASON, EPISODES_TEXT, EPISODE)) {
+                // If still no episode numbers are found, try to parse the year
                 parserResults.parse(yearRegex());
+
+                // If the year is found, or the source is likely a movie release and not a TV show release, create a
+                // MovieRelease object
                 if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE)
                     .map(source -> source.likelyMovieRelease || !source.likelyTvRelease)
                     .orElse(true)) {
                     if (StringUtils.equals(parserResults.parts.first, fileParseName)) {
                         throw new ReleaseParseException("Could not parse " + fileParseName);
                     }
-
                     return MovieRelease.builder()
                         .name(cleanUnwantedChars(parserResults.parts.first))
                         .file(file)
@@ -135,13 +141,18 @@ public class ReleaseParser {
             }
         }
 
+        // the file is considered a tv show at this point.
+
         Integer season;
         List<Integer> episodes = new ArrayList<>();
         if (!parserResults.contains(SEASON) || (parserResults.containsNone(EPISODE, EPISODES_TEXT))) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
                 throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
             }
+            // Parse the number parts. They are still present at this point, because they were not removed from the
+            // remaining parts earlier
             parserResults.parse(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
+            // When using the part numbers, assume only one season exists for the TV show
             season = 1;
             episodes.add(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER));
         } else {
@@ -149,15 +160,19 @@ public class ReleaseParser {
             episodes.addAll(Objects.requireNonNull(parserResults.getNamedMatchValue(EPISODE, EPISODES_TEXT)));
         }
 
+        // if no serie name was yet found, use the first remaining part as the serie name
         String name =
             parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
+        // create a new parser to parse a potential year in the title (only at the end of the name)
         parserResults.createWithNewText(name)
             .parse(Regex.builder()
                 .startOfText()
                 .tag(NAME)
                 .regex(".*")
                 .regex(DELIMITER)
+                .regexOptional("\\(")
                 .regex(yearRegex().create())
+                .regexOptional("\\)")
                 .endOfText());
         name = parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
 
@@ -183,14 +198,18 @@ public class ReleaseParser {
 
     @AllArgsConstructor
     enum SeasonEpisodeType {
-        SXXEXX(Regex.builder().regex("s").tag(SEASON).regex("\\d{1,2}").tag(EPISODES_TEXT).regex("([xe]\\d{1,2})*")),
-        XXX(Regex.builder().tag(SEASON).regex("\\d").tag(EPISODES_TEXT).regex("\\d{2}")), X_XX(Regex.builder()
+        SXXEXX(Regex.builder()
+            .regex("s")
+            .tag(SEASON).regex("\\d{1,2}")
+            .tag(EPISODES_TEXT).regex("([xe]\\d{1,2})*")),
+        XXX(Regex.builder()
+            .tag(SEASON).regex("\\d")
+            .tag(EPISODES_TEXT).regex("\\d{2}")),
+        X_XX(Regex.builder()
             .regex("\\(")
-            .tag(SEASON)
-            .regex("\\d{1,2}")
+            .tag(SEASON).regex("\\d{1,2}")
             .regex("-")
-            .tag(EPISODE)
-            .regex("\\d{2}")
+            .tag(EPISODE).regex("\\d{2}")
             .regex("\\)"));
 
         @val RegexNext regex;
@@ -198,7 +217,9 @@ public class ReleaseParser {
 
     @AllArgsConstructor
     enum NumberType {
-        ARABIC(Regex.builder().tag(ARABIC_NUMBER).regex("\\d{1,2}")), ROMAN(Regex.builder()
+        ARABIC(Regex.builder()
+            .tag(ARABIC_NUMBER).regex("\\d{1,2}")),
+        ROMAN(Regex.builder()
             .tag(ROMAN_NUMBER)
             .regex("[" + RomanNumeral.values().stream().map(RomanNumeral::name).collect(Collectors.joining()) + "]+"));
 
@@ -233,13 +254,11 @@ public class ReleaseParser {
             .regex(SeasonEpisodeType.SXXEXX.regex.create())
             .regexOptional("\\)")
             .regex(DELIMITER)
-            .tag(NAME)
-            .regex(".*")
+            .tag(NAME).regex(".*")
             .regex(DELIMITER)
             .regex("-")
             .regex(DELIMITER)
-            .tag(TITLE)
-            .regex(".*")
+            .tag(TITLE).regex(".*")
             .endOfText()
             .create();
     }
@@ -248,8 +267,7 @@ public class ReleaseParser {
         return Regex.builder()
             .startOfText()
             .regex(seasonEpisodeType.regex.create())
-            .tag(NAME)
-            .regex(".*")
+            .tag(NAME).regex(".*")
             .regexOptional(DELIMITER + titleRegex().create())
             .endOfText()
             .create();
