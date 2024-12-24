@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.lodder.subtools.multisubdownloader.gui.panels.SearchTextInputPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
+import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoExtensions;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -94,7 +97,10 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
                 .quality(inputPanel.quality)
                 .build();
             case MOVIE -> MovieRelease.builder().name(name).quality(inputPanel.quality).build();
-            default -> releaseFactory.createRelease(name, userInteractionHandler);
+            default -> releaseFactory.createRelease(Path.of(
+                    name + (Arrays.stream(VideoExtensions.values()).anyMatch(ext -> name.endsWith("." + ext)) ? "" :
+                        ".")),
+                userInteractionHandler);
         };
         return release != null ? List.of(release) : List.of();
     }

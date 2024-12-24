@@ -19,7 +19,6 @@ import org.lodder.subtools.sublibrary.DetectLanguage;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.control.ReleaseParser.FileObject;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
@@ -66,7 +65,7 @@ public class Local implements SubtitleProvider {
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                Release release = vfp.parse(new FileObject(fileSub));
+                Release release = vfp.parse(fileSub);
                 if ((release.videoType == VideoType.EPISODE)
                     && (((TvRelease) release).season == tvRelease.season &&
                     new HashSet<>(((TvRelease) release).episodeNumbers).containsAll(tvRelease.episodeNumbers))) {
@@ -112,7 +111,7 @@ public class Local implements SubtitleProvider {
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                switch (releaseParser.parse(new FileObject(fileSub))) {
+                switch (releaseParser.parse(fileSub)) {
                     case MovieRelease release -> {
                         MovieReleaseControl movieCtrl =
                             new MovieReleaseControl(release, settings, manager, userInteractionHandler);

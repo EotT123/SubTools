@@ -8,7 +8,6 @@ import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.control.ReleaseParser.FileObject;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
@@ -33,21 +32,13 @@ public class ReleaseFactory {
     }
 
     public Release createRelease(Path file, UserInteractionHandler userInteractionHandler) {
-        return createRelease(new FileObject(file), userInteractionHandler, true);
+        return createRelease(file, userInteractionHandler, true);
     }
 
-    public Release createRelease(String name, UserInteractionHandler userInteractionHandler) {
-        return createRelease(name, userInteractionHandler, true);
-    }
-
-    public Release createRelease(String name, UserInteractionHandler userInteractionHandler, boolean validate) {
-        return createRelease(new FileObject(name), userInteractionHandler, validate);
-    }
-
-    public Release createRelease(FileObject fileObject, UserInteractionHandler userInteractionHandler,
+    public Release createRelease(Path file, UserInteractionHandler userInteractionHandler,
         boolean validate) {
         try {
-            ReleaseControl releaseControl = switch (releaseParser.parse(fileObject)) {
+            ReleaseControl releaseControl = switch (releaseParser.parse(file)) {
                 case TvRelease tvRelease -> new TvReleaseControl(tvRelease, settings, manager, userInteractionHandler);
                 case MovieRelease movieRelease -> new MovieReleaseControl(movieRelease, settings, manager,
                     userInteractionHandler);

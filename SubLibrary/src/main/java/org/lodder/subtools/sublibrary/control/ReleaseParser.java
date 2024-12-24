@@ -40,25 +40,14 @@ public class ReleaseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
 
-    public record FileObject(Path file, String extension) {
-        public FileObject(Path file) {
-            this(file, file.extension);
-        }
-
-        public FileObject(String name) {
-            this(Path.of(name), null);
-        }
-    }
-
     /**
      * Parses the provided file path to determine the release type (movie or TV show) and its details.
      *
-     * @param fileObject The file objects, which contains the path to parse and the extension of the file.
+     * @param file The file to parse.
      * @return A Release object representing the parsed data.
      * @throws ReleaseParseException if the file's name cannot be parsed.
      */
-    public final Release parse(FileObject fileObject) throws ReleaseParseException {
-        Path file = fileObject.file;
+    public final Release parse(Path file) throws ReleaseParseException {
         if (file.getParent() != null) {
             try {
                 return parsePatternResult(file, file.getParent().fileName.toString(), null);
@@ -67,10 +56,8 @@ public class ReleaseParser {
             }
         }
         try {
-            String fileNameWithoutExtension = StringUtils.isNotBlank(fileObject.extension) ?
-                StringUtils.substringBeforeLast(file.fileName.toString(), "." + fileObject.extension) :
-                file.fileName.toString();
-            return parsePatternResult(file, fileNameWithoutExtension, fileObject.extension);
+            var fileNameAndExtension = file.fileName.splitExtension();
+            return parsePatternResult(file, fileNameAndExtension.filename, fileNameAndExtension.extension);
         } catch (Exception e) {
             throw new ReleaseParseException("Unknown format, can't be parsed: ${file.toAbsolutePath()}");
         }

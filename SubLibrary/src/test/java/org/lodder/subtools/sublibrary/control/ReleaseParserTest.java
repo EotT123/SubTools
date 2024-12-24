@@ -6,7 +6,6 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.lodder.subtools.sublibrary.control.ReleaseParser.FileObject;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -34,13 +33,12 @@ class ReleaseParserTest {
     void testListGetQualityKeyWords() throws Exception {
         ReleaseParser releaseparser = new ReleaseParser();
 
-        FileObject file = new FileObject(Path.of("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv"), "mkv");
+        Path file = Path.of("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv");
         Release release = releaseparser.parse(file);
 
-        assertThat(ReleaseParser.getQualityKeyWords(release.quality))
-            .containsExactly("720p", "hdtv", "x264");
+        assertThat(ReleaseParser.getQualityKeyWords(release.quality)).containsExactly("720p", "hdtv", "x264");
 
-        file = new FileObject(Path.of("The.Drop.2014.1080p.WEB-DL.DD5.1.H264-RARBG.mkv"), "mkv");
+        file = Path.of("The.Drop.2014.1080p.WEB-DL.DD5.1.H264-RARBG.mkv");
         release = releaseparser.parse(file);
 
         assertThat(ReleaseParser.getQualityKeyWords(release.quality))
@@ -58,7 +56,7 @@ class ReleaseParserTest {
 
             @Test
             void StartsWithSeasonEpisode1() throws Exception {
-                FileObject file = new FileObject(Path.of("S04E02 - White Collar - Most Wanted.mkv"), "mkv");
+                Path file = Path.of("S04E02 - White Collar - Most Wanted.mkv");
                 Release release = releaseparser.parse(file);
 
                 assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -77,7 +75,7 @@ class ReleaseParserTest {
 
             @Test
             void StartsWithSeasonEpisode2() throws Exception {
-                FileObject file = new FileObject(Path.of("(S04E02) - White Collar - Most Wanted.mkv"), "mkv");
+                Path file = Path.of("(S04E02) - White Collar - Most Wanted.mkv");
                 Release release = releaseparser.parse(file);
 
                 assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -96,7 +94,7 @@ class ReleaseParserTest {
 
             @Test
             void StartsWithSeasonEpisode3() throws Exception {
-                FileObject file = new FileObject(Path.of("(S04E02) White Collar - Most Wanted.mkv"), "mkv");
+                Path file = Path.of("(S04E02) White Collar - Most Wanted.mkv");
                 Release release = releaseparser.parse(file);
 
                 assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -117,7 +115,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV1() throws Exception {
-            FileObject file = new FileObject(Path.of("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv"), "mkv");
+            Path file = Path.of("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -137,8 +135,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV4() throws Exception {
-            FileObject file =
-                new FileObject(Path.of("Spartacus.Gods.of.The.Arena.Pt.IV.720p.HDTV.X264-DIMENSION.mkv"), "mkv");
+            Path file = Path.of("Spartacus.Gods.of.The.Arena.Pt.IV.720p.HDTV.X264-DIMENSION.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -157,7 +154,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV5() throws Exception {
-            FileObject file = new FileObject(Path.of("hawaii.five-0.2010.410.hdtv-lol.mp4"), "mp4");
+            Path file = Path.of("hawaii.five-0.2010.410.hdtv-lol.mp4");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -177,7 +174,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV6() throws Exception {
-            FileObject file = new FileObject(Path.of("Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv"), "mkv");
+            Path file = Path.of("Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -196,8 +193,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV7() throws Exception {
-            FileObject file =
-                new FileObject(Path.of("Greys.Anatomy.S10E01E02 Seal Our Fate 720p.HDTV.X264-DIMENSION.mkv"), "mkv");
+            Path file = Path.of("Greys.Anatomy.S10E01E02 Seal Our Fate 720p.HDTV.X264-DIMENSION.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -218,7 +214,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV8() throws Exception {
-            FileObject file = new FileObject(Path.of("(2-11) Joey and the High School Friend.mkv"), "mkv");
+            Path file = Path.of("(2-11) Joey and the High School Friend.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -237,9 +233,7 @@ class ReleaseParserTest {
 
         @Test
         void testTV9() throws Exception {
-            FileObject file =
-                new FileObject(
-                    Path.of("The.Boys.S04E05.Beware.the.jabberwock.my.son.1080p.web.dl.hevc.x265.rmteam.mkv"), "mkv");
+            Path file = Path.of("The.Boys.S04E05.Beware.the.jabberwock.my.son.1080p.web.dl.hevc.x265.rmteam.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.EPISODE);
@@ -260,10 +254,10 @@ class ReleaseParserTest {
 
     @Test
     void testReleaseParseExceptionMessage() {
-        FileObject file = new FileObject(Path.of("exceptiontesting.mkv"), "mkv");
+        Path file = Path.of("exceptiontesting.mkv");
 
         assertThatExceptionOfType(ReleaseParseException.class).isThrownBy(() -> new ReleaseParser().parse(file))
-            .withMessage("Unknown format, can't be parsed: " + file.file.toAbsolutePath());
+            .withMessage("Unknown format, can't be parsed: " + file.toAbsolutePath());
     }
 
     @Nested
@@ -272,8 +266,7 @@ class ReleaseParserTest {
 
         @Test
         void testMovie1() throws Exception {
-            FileObject file =
-                new FileObject(Path.of("Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv"), "mkv");
+            Path file = Path.of("Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
@@ -290,8 +283,7 @@ class ReleaseParserTest {
 
         @Test
         void testMovie2() throws Exception {
-            FileObject file =
-                new FileObject(Path.of("Back.to.the.Future.Part.21.1989.720p.BluRay.X264-AMIABLE.mkv"), "mkv");
+            Path file = Path.of("Back.to.the.Future.Part.21.1989.720p.BluRay.X264-AMIABLE.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
@@ -308,7 +300,7 @@ class ReleaseParserTest {
 
         @Test
         void testMovie3() throws Exception {
-            FileObject file = new FileObject(Path.of("The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv"), "mkv");
+            Path file = Path.of("The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
@@ -325,8 +317,7 @@ class ReleaseParserTest {
 
         @Test
         void testMovie4() throws Exception {
-            FileObject file =
-                new FileObject(Path.of("The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv"), "mkv");
+            Path file = Path.of("The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
@@ -343,7 +334,7 @@ class ReleaseParserTest {
 
         @Test
         void testMovie5() throws Exception {
-            FileObject file = new FileObject(Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED.mkv"), "mkv");
+            Path file = Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
@@ -360,29 +351,12 @@ class ReleaseParserTest {
 
         @Test
         void testMovie6() throws Exception {
-            FileObject file = new FileObject(Path.of("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv"), "mkv");
+            Path file = Path.of("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv");
             Release release = releaseparser.parse(file);
 
             assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
             assertThat(release.extension).isEqualTo("mkv");
             assertThat(release.getFileName()).isEqualTo("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv");
-            assertThat(release.releaseGroup).isEqualTo("TWiZTED");
-            assertThat(release.quality).isEqualTo("720p bluray x264");
-
-            MovieRelease movieRelease = (MovieRelease) release;
-
-            assertThat(movieRelease.year).isEqualTo(2011);
-            assertThat(movieRelease.name).isEqualTo("Final Destination 5");
-        }
-
-        @Test
-        void testMovie7() throws Exception {
-            FileObject file = new FileObject("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED");
-            Release release = releaseparser.parse(file);
-
-            assertThat(release.videoType).isEqualTo(VideoType.MOVIE);
-            assertThat(release.extension).isNull();
-            assertThat(release.getFileName()).isEqualTo("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED");
             assertThat(release.releaseGroup).isEqualTo("TWiZTED");
             assertThat(release.quality).isEqualTo("720p bluray x264");
 

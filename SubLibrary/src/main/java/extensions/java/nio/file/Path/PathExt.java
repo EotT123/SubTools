@@ -44,6 +44,13 @@ public class PathExt {
         return changeExtension(path, "");
     }
 
+    public record FilenameAndExtension(String filename, String extension) {}
+
+    public static FilenameAndExtension splitExtension(@This Path path) {
+        return new FilenameAndExtension(StringUtils.substringBeforeLast(path.getFileName().toString(), "."),
+            StringUtils.substringAfterLast(path.getFileName().toString(), "."));
+    }
+
     public static String withoutExtension(String path) {
         return StringUtils.substringBeforeLast(path, ".");
     }
@@ -55,8 +62,8 @@ public class PathExt {
     /**
      * Moves a file or a complete directory tree.
      * <p>
-     * This method moves the given {@link Path} to the specified destination. Depending on whether
-     * the path is a directory or a regular file, the behavior of the method is as follows:
+     * This method moves the given {@link Path} to the specified destination. Depending on whether the path is a
+     * directory or a regular file, the behavior of the method is as follows:
      * <ul>
      * <li>If the {@link Path} is a directory, it will recursively move all files and subdirectories
      * within the directory hierarchy, starting from and including the given path, to the
@@ -68,25 +75,22 @@ public class PathExt {
      * existing file or directory, using the {@link StandardCopyOption} enum. These options are
      * applied to all files and directories being moved.
      *
-     * @param source
-     *        the path to be moved
-     * @param destinationDir
-     *        the destination directory
-     * @param copyOptions
-     *        optional move options to apply while moving the path
+     * @param source the path to be moved
+     * @param destinationDir the destination directory
+     * @param copyOptions optional move options to apply while moving the path
      * @return the destination
-     * @throws IOException
-     *         if an I/O error occurs while moving the path
+     * @throws IOException if an I/O error occurs while moving the path
      */
-    public static Path moveToDir(@This Path source, Path destinationDir, StandardCopyOption... copyOptions) throws IOException {
+    public static Path moveToDir(@This Path source, Path destinationDir, StandardCopyOption... copyOptions)
+        throws IOException {
         return moveToDirAndRename(source, destinationDir, source.getFileName().toString(), copyOptions);
     }
 
     /**
      * Moves a file or a complete directory tree.
      * <p>
-     * This method moves the given {@link Path} to the specified destination. Depending on whether
-     * the path is a directory or a regular file, the behavior of the method is as follows:
+     * This method moves the given {@link Path} to the specified destination. Depending on whether the path is a
+     * directory or a regular file, the behavior of the method is as follows:
      * <ul>
      * <li>If the {@link Path} is a directory, it will recursively move all files and subdirectories
      * within the directory hierarchy, starting from and including the given path, to the
@@ -99,20 +103,16 @@ public class PathExt {
      * existing file or directory, using the {@link StandardCopyOption} enum. These options are
      * applied to all files and directories being moved.
      *
-     * @param source
-     *        the path to be moved
-     * @param destinationDir
-     *        the destination directory
-     * @param newFileName
-     *        the new file name
-     * @param copyOptions
-     *        optional move options to apply while moving the path
+     * @param source the path to be moved
+     * @param destinationDir the destination directory
+     * @param newFileName the new file name
+     * @param copyOptions optional move options to apply while moving the path
      * @return the destination
-     * @throws IOException
-     *         if an I/O error occurs while moving the path
+     * @throws IOException if an I/O error occurs while moving the path
      */
-    public static Path moveToDirAndRename(@This Path source, Path destinationDir, String newFileName, StandardCopyOption... copyOptions)
-            throws IOException {
+    public static Path moveToDirAndRename(@This Path source, Path destinationDir, String newFileName,
+        StandardCopyOption... copyOptions)
+        throws IOException {
         Files.createDirectories(destinationDir);
         if (Files.isRegularFile(source)) {
             Files.move(source, destinationDir.resolve(newFileName), copyOptions);
@@ -127,7 +127,8 @@ public class PathExt {
         return destinationDir.resolve(newFileName);
     }
 
-    private static Path moveNonEmptyDirectory(Path sourceDir, Path targetDir, StandardCopyOption... copyOptions) throws IOException {
+    private static Path moveNonEmptyDirectory(Path sourceDir, Path targetDir, StandardCopyOption... copyOptions)
+        throws IOException {
         if (Files.isDirectory(sourceDir)) {
             return moveNonEmptyDirectoryRecursively(sourceDir, targetDir, copyOptions);
         } else {
@@ -135,9 +136,10 @@ public class PathExt {
         }
     }
 
-    private static Path moveNonEmptyDirectoryRecursively(Path source, Path target, StandardCopyOption... copyOptions) throws IOException {
+    private static Path moveNonEmptyDirectoryRecursively(Path source, Path target, StandardCopyOption... copyOptions)
+        throws IOException {
         foreachSubfile(source, s -> s.asThrowingStream(IOException.class)
-                .forEach(child -> moveNonEmptyDirectory(child, target.resolve(source.getFileName()), copyOptions)));
+            .forEach(child -> moveNonEmptyDirectory(child, target.resolve(source.getFileName()), copyOptions)));
         Files.delete(source);
         return target;
     }
@@ -145,18 +147,16 @@ public class PathExt {
     /**
      * Deletes a {@link Path}.
      * <p>
-     * If the {@link Path} exists, this method will delete it without any possibility of recovery.
-     * This method behaves as follows:
+     * If the {@link Path} exists, this method will delete it without any possibility of recovery. This method behaves
+     * as follows:
      * <ul>
      * <li>If the {@link Path} is a directory, it will recursively delete all files and
      * subdirectories within the directory, starting from and including the given path.</li>
      * <li>If the {@link Path} is a regular file, it will be deleted.</li>
      * </ul>
      *
-     * @param path
-     *        the path to delete
-     * @throws IOException
-     *         if an I/O error occurs while deleting the path
+     * @param path the path to delete
+     * @throws IOException if an I/O error occurs while deleting the path
      */
     // TODO change name? (nameclash)
     public static void deletePath(@This Path path) throws IOException {
@@ -166,8 +166,8 @@ public class PathExt {
     /**
      * Copies a file or a complete directory tree.
      * <p>
-     * This method copies the given {@link Path} to the specified destination. Depending on whether
-     * the path is a directory or a regular file, the behavior of the method is as follows:
+     * This method copies the given {@link Path} to the specified destination. Depending on whether the path is a
+     * directory or a regular file, the behavior of the method is as follows:
      * <ul>
      * <li>If the {@link Path} is a directory, it will recursively copy all files and subdirectories
      * within the directory hierarchy, starting from and including the given path, to the
@@ -179,25 +179,22 @@ public class PathExt {
      * existing file or directory, using the {@link StandardCopyOption} enum. These options are
      * applied to all files and directories being copied.
      *
-     * @param source
-     *        the path to be copied
-     * @param destinationDir
-     *        the destination directory
-     * @param copyOptions
-     *        optional copy options to apply while copying the path
+     * @param source the path to be copied
+     * @param destinationDir the destination directory
+     * @param copyOptions optional copy options to apply while copying the path
      * @return the location of the copied path
-     * @throws IOException
-     *         if an I/O error occurs while deleting the path
+     * @throws IOException if an I/O error occurs while deleting the path
      */
-    public static Path copyToDir(@This Path source, Path destinationDir, StandardCopyOption... copyOptions) throws IOException {
+    public static Path copyToDir(@This Path source, Path destinationDir, StandardCopyOption... copyOptions)
+        throws IOException {
         return copyToDirAndRename(source, destinationDir, source.getFileName().toString(), copyOptions);
     }
 
     /**
      * Copies a file or a complete directory tree.
      * <p>
-     * This method copies the given {@link Path} to the specified destination. Depending on whether
-     * the path is a directory or a regular file, the behavior of the method is as follows:
+     * This method copies the given {@link Path} to the specified destination. Depending on whether the path is a
+     * directory or a regular file, the behavior of the method is as follows:
      * <ul>
      * <li>If the {@link Path} is a directory, it will recursively copy all files and subdirectories
      * within the directory hierarchy, starting from and including the given path, to the
@@ -210,20 +207,16 @@ public class PathExt {
      * existing file or directory, using the {@link StandardCopyOption} enum. These options are
      * applied to all files and directories being copied.
      *
-     * @param source
-     *        the path to be copied
-     * @param destinationDir
-     *        the destination directory
-     * @param newFileName
-     *        the new file name
-     * @param copyOptions
-     *        optional copy options to apply while copying the path
+     * @param source the path to be copied
+     * @param destinationDir the destination directory
+     * @param newFileName the new file name
+     * @param copyOptions optional copy options to apply while copying the path
      * @return the location of the copied path
-     * @throws IOException
-     *         if an I/O error occurs while deleting the path
+     * @throws IOException if an I/O error occurs while deleting the path
      */
-    public static Path copyToDirAndRename(@This Path source, Path destinationDir, String newFileName, StandardCopyOption... copyOptions)
-            throws IOException {
+    public static Path copyToDirAndRename(@This Path source, Path destinationDir, String newFileName,
+        StandardCopyOption... copyOptions)
+        throws IOException {
         if (Files.isRegularFile(source)) {
             Files.createDirectories(destinationDir);
             Path destinationFile = destinationDir.resolve(newFileName);
@@ -254,13 +247,15 @@ public class PathExt {
         return applySubfiles(path, children -> children.findAny().isEmpty());
     }
 
-    public static <T, X extends Exception> T applySubfiles(@This Path path, ThrowingFunction<Stream<Path>, T, X> function) throws IOException, X {
+    public static <T, X extends Exception> T applySubfiles(@This Path path,
+        ThrowingFunction<Stream<Path>, T, X> function) throws IOException, X {
         try (Stream<Path> pathStream = Files.list(path)) {
             return function.apply(pathStream);
         }
     }
 
-    public static <X extends Exception> void foreachSubfile(@This Path path, ThrowingConsumer<Stream<Path>, X> consumer) throws IOException, X {
+    public static <X extends Exception> void foreachSubfile(@This Path path, ThrowingConsumer<Stream<Path>, X> consumer)
+        throws IOException, X {
         try (Stream<Path> pathStream = Files.list(path)) {
             consumer.accept(pathStream);
         }
@@ -316,13 +311,13 @@ public class PathExt {
             return false;
         } else {
             return bytes[0] == (byte) GZIPInputStream.GZIP_MAGIC
-                    && bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
+                && bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
         }
     }
 
     public static byte[] decompressGZip(byte[] data) throws IOException {
         try (ByteArrayInputStream binput = new ByteArrayInputStream(data);
-                GZIPInputStream gzinput = new GZIPInputStream(binput)) {
+             GZIPInputStream gzinput = new GZIPInputStream(binput)) {
             return gzinput.readAllBytes();
         }
     }
