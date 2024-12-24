@@ -48,7 +48,7 @@ public class SearchTextInputPanel extends InputPanel {
     }
 
     private void createComponents() {
-        cbxVideoType = new JComboBox<>(values()).toStringRenderer(VideoSearchType::getMsgCode);
+        cbxVideoType = new JComboBox<>(values()).toStringRenderer(t -> getText(t.msgCode));
         txtInputVideoName = new JTextField().columns(10);
         txtQualityVersion = new JTextField().columns(10);
         txtInputSeason = new JTextField().columns(10);
