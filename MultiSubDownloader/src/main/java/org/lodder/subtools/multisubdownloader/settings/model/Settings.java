@@ -67,11 +67,8 @@ public class Settings implements UserInteractionSettingsIntf {
         // TODO: user should be able to edit/add these through a panel
         Map<String, Integer> sortWeightsTemp = new HashMap<>();
         sortWeightsTemp.put("%GROUP%", 5);
-        VideoPatterns.Source.values().stream()
-                .forEach(source -> source.values.stream()
-                        .forEach(keyword -> sortWeightsTemp.put(keyword, source.manyDifferentSources ? 1 : 2)));
-        VideoPatterns.AudioEncoding.values().stream()
-                .forEach(encoding -> encoding.values.stream().forEach(keyword -> sortWeightsTemp.put(keyword, 2)));
+        VideoPatterns.Source.values().forEach(source -> sortWeightsTemp.put(source.regex, 2));
+        VideoPatterns.AudioEncoding.values().forEach(encoding -> sortWeightsTemp.put(encoding.regex, 2));
         this.sortWeights = Collections.unmodifiableMap(sortWeightsTemp);
     }
 

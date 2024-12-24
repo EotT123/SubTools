@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -51,9 +50,9 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class TextGuiSearchActionBuilder
-            implements TextGuiSearchActionBuilderBuild, TextGuiSearchActionBuilderReleaseFactory,
-            TextGuiSearchActionBuilderSearchPanel, TextGuiSearchActionBuilderGUI,
-            TextGuiSearchActionBuilderSubtitleProviderStore {
+        implements TextGuiSearchActionBuilderBuild, TextGuiSearchActionBuilderReleaseFactory,
+        TextGuiSearchActionBuilderSearchPanel, TextGuiSearchActionBuilderGUI,
+        TextGuiSearchActionBuilderSubtitleProviderStore {
         private final Settings settings;
         private SubtitleProviderStore subtitleProviderStore;
         private GUI mainWindow;
@@ -67,7 +66,7 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
     }
 
     private TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
-            SearchPanel<SearchTextInputPanel> searchPanel, ReleaseFactory releaseFactory) {
+        SearchPanel<SearchTextInputPanel> searchPanel, ReleaseFactory releaseFactory) {
         super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
     }
 
@@ -89,13 +88,13 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
         // TODO: Redefine what a "release" is.
         Release release = switch (type) {
             case EPISODE -> TvRelease.builder()
-                    .name(name)
-                    .season(inputPanel.season)
-                    .episode(inputPanel.episode)
-                    .quality(inputPanel.quality)
-                    .build();
+                .name(name)
+                .season(inputPanel.season)
+                .episode(inputPanel.episode)
+                .quality(inputPanel.quality)
+                .build();
             case MOVIE -> MovieRelease.builder().name(name).quality(inputPanel.quality).build();
-            default -> releaseFactory.createRelease(Path.of(name), userInteractionHandler);
+            default -> releaseFactory.createRelease(name, userInteractionHandler);
         };
         return release != null ? List.of(release) : List.of();
     }
@@ -105,7 +104,7 @@ public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
         VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
         List<Subtitle> subtitlesFiltered = filtering != null ?
-                subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
+            subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
         subtitlesFiltered.forEach(release::addMatchingSub);
 
         // use automatic selection to reduce the selection for the user

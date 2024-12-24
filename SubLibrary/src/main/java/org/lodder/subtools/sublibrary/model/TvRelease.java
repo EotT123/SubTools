@@ -57,8 +57,6 @@ public final class TvRelease extends Release {
 
         TvReleaseBuilderOther quality(String quality);
 
-        TvReleaseBuilderOther description(String description);
-
         TvReleaseBuilderOther special(boolean special);
 
         TvReleaseBuilderOther releaseGroup(String releaseGroup);
@@ -68,6 +66,8 @@ public final class TvRelease extends Release {
         TvReleaseBuilderOther customName(String customName);
 
         TvReleaseBuilderOther originalName(String originalName);
+
+        TvReleaseBuilderOther extension(String extension);
 
         TvRelease build();
     }
@@ -79,16 +79,16 @@ public final class TvRelease extends Release {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class TvReleaseBuilder
-            implements TvReleaseBuilderOther, TvReleaseBuilderEpisode, TvReleaseBuilderSeason,
-            TvReleaseBuilderShowName {
+        implements TvReleaseBuilderOther, TvReleaseBuilderEpisode, TvReleaseBuilderSeason,
+        TvReleaseBuilderShowName {
         private String name;
         private String title;
         private int season;
         private List<Integer> episodes;
         private boolean special;
         private String quality;
+        private String extension;
         private Path file;
-        private String description;
         private String releaseGroup;
         private String customName;
         private String originalName;
@@ -107,15 +107,15 @@ public final class TvRelease extends Release {
 
         @Override
         public TvRelease build() {
-            return new TvRelease(file, description, releaseGroup, quality, name, originalName, customName, title,
-                    season, episodes, special);
+            return new TvRelease(file, releaseGroup, quality, extension, name, originalName, customName, title, season,
+                episodes, special);
         }
     }
 
-    private TvRelease(Path file, String description, String releaseGroup, String quality, String name,
-            String originalName, String customName, String title, int season, List<Integer> episodeNumbers,
-            boolean special) {
-        super(VideoType.EPISODE, file, description, releaseGroup, quality);
+    private TvRelease(Path file, String releaseGroup, String quality, String extension, String name,
+        String originalName, String customName, String title, int season, List<Integer> episodeNumbers,
+        boolean special) {
+        super(VideoType.EPISODE, file, releaseGroup, quality, extension);
         this.name = name;
         this.title = title;
         this.season = season;

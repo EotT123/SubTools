@@ -15,7 +15,7 @@ public enum SerieStructureTag implements StructureTag {
     SEASON_LONG("%SS%", "StructureBuilderDialog.NumberOfSeasonLeading"),
     SEASON_SHORT("%S%", "StructureBuilderDialog.NumberOfSeasonsWithoutLeading"),
     QUALITY("%QUALITY%", "StructureBuilderDialog.QualityOfRelease"),
-    DESCRIPTION("%DESCRIPTION%", "StructureBuilderDialog.Description");
+    RELEASE_GROUP("%RELEASE GROUP%", "StructureBuilderDialog.ReleaseGroup");
 
     @val @override String label;
     @val @override String description;

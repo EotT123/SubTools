@@ -14,8 +14,8 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     @val VideoType videoType;
     @val Path filePath;
     @val String quality;
-    @val String description;
     @val String releaseGroup;
+    @val String extension;
 
     public void addMatchingSub(Subtitle sub) {
         matchingSubsSet.add(sub);
@@ -29,12 +29,12 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return matchingSubsSet.size();
     }
 
-    protected Release(VideoType videoType, Path filePath, String description, String releaseGroup, String quality) {
+    protected Release(VideoType videoType, Path filePath, String releaseGroup, String quality, String extension) {
         this.videoType = videoType;
         this.filePath = filePath;
-        this.description = description;
         this.releaseGroup = releaseGroup;
         this.quality = quality;
+        this.extension = extension;
     }
 
     public String getFileName() {
@@ -46,11 +46,11 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     }
 
     public String getExtension() {
-        return StringUtils.substringAfterLast(fileName, ".");
+        return extension;
     }
 
     public boolean hasExtension(String extension) {
-        return StringUtils.endsWith(fileName, "." + extension);
+        return StringUtils.isNotBlank(extension);
     }
 
     @Override

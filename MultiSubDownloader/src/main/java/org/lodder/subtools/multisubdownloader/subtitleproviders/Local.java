@@ -19,6 +19,7 @@ import org.lodder.subtools.sublibrary.DetectLanguage;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.control.ReleaseParser.FileObject;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
@@ -65,7 +66,7 @@ public class Local implements SubtitleProvider {
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                Release release = vfp.parse(fileSub);
+                Release release = vfp.parse(new FileObject(fileSub));
                 if ((release.videoType == VideoType.EPISODE)
                     && (((TvRelease) release).season == tvRelease.season &&
                     new HashSet<>(((TvRelease) release).episodeNumbers).containsAll(tvRelease.episodeNumbers))) {
@@ -80,13 +81,11 @@ public class Local implements SubtitleProvider {
                             listFoundSubtitles.add(
                                 Subtitle.downloadSource(fileSub)
                                     .subtitleSource(subtitleSource)
-                                    .fileName(fileSub.getFileNameAsString())
+                                    .fileName(fileSub.fileNameAsString)
                                     .language(language)
-                                    .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
+                                    .quality(ReleaseParser.getQualityKeyword(fileSub.fileNameAsString))
                                     .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                    .releaseGroup(
-                                        ReleaseParser.extractReleaseGroup(fileSub.getFileNameAsString(),
-                                            true))
+                                    .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))
                                     .uploader(fileSub.toAbsolutePath().toString())
                                     .hearingImpaired(false));
                         }
@@ -113,7 +112,7 @@ public class Local implements SubtitleProvider {
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                switch (releaseParser.parse(fileSub)) {
+                switch (releaseParser.parse(new FileObject(fileSub))) {
                     case MovieRelease release -> {
                         MovieReleaseControl movieCtrl =
                             new MovieReleaseControl(release, settings, manager, userInteractionHandler);
@@ -123,9 +122,9 @@ public class Local implements SubtitleProvider {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(Subtitle.downloadSource(fileSub)
                                 .subtitleSource(subtitleSource)
-                                .fileName(fileSub.getFileNameAsString())
+                                .fileName(fileSub.fileNameAsString)
                                 .language(language) // TODO previously: language(""). This was not correct?
-                                .quality(ReleaseParser.getQualityKeyword(fileSub.getFileNameAsString()))
+                                .quality(ReleaseParser.getQualityKeyword(fileSub.fileNameAsString))
                                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)
                                 .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))
                                 .uploader(fileSub.toAbsolutePath().toString())

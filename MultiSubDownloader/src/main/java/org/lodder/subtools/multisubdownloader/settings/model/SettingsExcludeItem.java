@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.get;
-import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 @Deprecated(since = "Settings version 6")
 public class SettingsExcludeItem {
@@ -20,9 +19,8 @@ public class SettingsExcludeItem {
         this.isExcludedPredicate = switch (type) {
             case FOLDER, FILE -> Path.of(description)::equals;
             case REGEX -> {
-                NamedPattern np =
-                        NamedPattern.compile(description.replace("*", ".*") + ".*$", Pattern.CASE_INSENSITIVE);
-                yield file -> np.matcher(file.getFileName().toString()).find();
+                Pattern pattern = Pattern.compile(description.replace("*", ".*") + ".*$", Pattern.CASE_INSENSITIVE);
+                yield file -> pattern.matcher(file.getFileName().toString()).find();
             }
         };
     }

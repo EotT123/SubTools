@@ -137,7 +137,7 @@ public class PathLibraryBuilder extends LibraryBuilder {
         folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
         folder = replace(folder, SerieStructureTag.TITLE, tvRelease.title);
         folder = replace(folder, SerieStructureTag.QUALITY, tvRelease.quality);
-        folder = replace(folder, SerieStructureTag.DESCRIPTION, tvRelease.description);
+        folder = replace(folder, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
         if (replaceSpace) {
             folder = folder.replace(' ', replacingSpaceChar);
         }

@@ -23,11 +23,11 @@ public final class MovieRelease extends Release {
 
         MovieReleaseBuilderOther quality(String quality);
 
-        MovieReleaseBuilderOther description(String description);
-
         MovieReleaseBuilderOther releaseGroup(String releaseGroup);
 
         MovieReleaseBuilderOther year(Integer year);
+        
+        MovieReleaseBuilderOther extension(String extension);
 
         MovieRelease build();
     }
@@ -44,17 +44,17 @@ public final class MovieRelease extends Release {
 
         private String quality;
         private Path file;
-        private String description;
         private String releaseGroup;
+        private String extension;
 
         @Override
         public MovieRelease build() {
-            return new MovieRelease(file, description, releaseGroup, quality, name, year == null ? 0 : year);
+            return new MovieRelease(file, releaseGroup, quality, extension, name, year == null ? 0 : year);
         }
     }
 
-    private MovieRelease(Path file, String description, String releaseGroup, String quality, String name, int year) {
-        super(VideoType.MOVIE, file, description, releaseGroup, quality);
+    private MovieRelease(Path file, String releaseGroup, String quality, String extension, String name, int year) {
+        super(VideoType.MOVIE, file, releaseGroup, quality, extension);
         this.name = name;
         this.year = year;
     }

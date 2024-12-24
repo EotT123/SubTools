@@ -10,9 +10,9 @@
     <artifactId>multisubdownloader</artifactId>
     <name>MultiSubDownloader</name>
 
-    <properties>
-        <build.timestamp>${maven.build.timestamp}</build.timestamp>
-    </properties>
+    <!--    <properties>-->
+    <!--        <build.timestamp>${maven.build.timestamp}</build.timestamp>-->
+    <!--    </properties>-->
 
     <dependencies>
         <dependency>

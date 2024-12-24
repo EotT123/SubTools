@@ -1,7 +1,5 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
-import static org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag.*;
-
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -9,9 +7,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
+import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
+import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
+import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -121,27 +122,44 @@ public class FilenameLibraryBuilder extends LibraryBuilder {
 
     @Override
     public Path build(Release release) {
-        if (rename) {
+        if (rename && StringUtils.isNotBlank(structure)) {
             String filename = switch (release) {
-                case TvRelease tvRelease when StringUtils.isNotBlank(structure) -> {
+                case TvRelease tvRelease -> {
                     String fName = structure;
                     // order is important!
-                    fName = replace(fName, SHOW_NAME, getShowName(tvRelease.name));
-                    fName = replaceFormattedEpisodeNumber(fName, EPISODES_LONG, tvRelease.episodeNumbers, true);
-                    fName = replaceFormattedEpisodeNumber(fName, EPISODES_SHORT, tvRelease.episodeNumbers, false);
-                    fName = replace(fName, SEASON_LONG, formattedNumber(tvRelease.season, true));
-                    fName = replace(fName, SEASON_SHORT, formattedNumber(tvRelease.season, false));
-                    fName = replace(fName, EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
-                    fName = replace(fName, EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
-                    fName = replace(fName, TITLE, tvRelease.title);
-                    fName = replace(fName, QUALITY, release.quality);
-                    fName = replace(fName, DESCRIPTION, release.description);
+                    fName = replace(fName, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
+                    fName =
+                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers,
+                            true);
+                    fName =
+                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers,
+                            false);
+                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
+                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
+                    fName = replace(fName, SerieStructureTag.EPISODE_LONG,
+                        formattedNumber(tvRelease.firstEpisodeNumber, true));
+                    fName = replace(fName, SerieStructureTag.EPISODE_SHORT,
+                        formattedNumber(tvRelease.firstEpisodeNumber, false));
+                    fName = replace(fName, SerieStructureTag.TITLE, tvRelease.title);
+                    fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
+                    fName = replace(fName, SerieStructureTag.RELEASE_GROUP, release.releaseGroup);
 
                     fName += "." + release.extension;
                     yield fName;
                 }
-                default -> release.fileName;
+                case MovieRelease movieRelease -> {
+                    String fName = structure;
+                    // order is important!
+                    fName = replace(fName, MovieStructureTag.MOVIE_TITLE, getShowName(movieRelease.name));
+                    fName = replace(fName, MovieStructureTag.YEAR, formattedNumber(movieRelease.year, false));
+                    fName = replace(fName, MovieStructureTag.QUALITY, release.quality);
+                    fName = replace(fName, MovieStructureTag.RELEASE_GROUP, release.releaseGroup);
+
+                    fName += "." + release.extension;
+                    yield fName;
+                }
             };
+
             filename = filename.removeIllegalWindowsChars();
             if (replaceSpace) {
                 filename = filename.replace(' ', replacingSpaceChar);

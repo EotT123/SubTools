@@ -1,166 +1,400 @@
 package org.lodder.subtools.sublibrary.control;
 
-import static org.lodder.subtools.sublibrary.control.Tag.*;
+import static org.lodder.subtools.sublibrary.control.RegexUtils.*;
+import static org.lodder.subtools.sublibrary.control.Tags.*;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import extensions.java.nio.file.Path.PathExt;
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.val;
+import org.apache.commons.lang3.StringUtils;
+import org.lodder.subtools.sublibrary.control.Roman.RomanNumeral;
+import org.lodder.subtools.sublibrary.control.VideoPatterns.AudioEncoding;
+import org.lodder.subtools.sublibrary.control.VideoPatterns.Quality;
+import org.lodder.subtools.sublibrary.control.VideoPatterns.RegexPattern;
+import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
+import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoEncoding;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.util.NamedMatcher;
-import org.lodder.subtools.sublibrary.util.NamedPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class parses a file's name and its metadata to determine the release type (movie or TV series), creating a
+ * {@link Release} object containing the metadata
+ */
 public class ReleaseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
 
-    private NamedMatcher namedMatcher;
-
-    public final Release parse(Path file) throws ReleaseParseException {
-        String folderName = file.getParent() != null ? file.getParent().getFileName().toString() : "";
-
-        for (String fileParseName : List.of(file.fileName.toString(), folderName)) {
-            for (NamedPattern np : VideoPatterns.COMPILED_PATTERNS) {
-                namedMatcher = np.matcher(fileParseName);
-                if (namedMatcher.find()) {
-                    LOGGER.trace("Parsing match found using file name: {}", fileParseName);
-                    return parsePatternResult(file, fileParseName);
-                }
-            }
+    public record FileObject(Path file, String extension) {
+        public FileObject(Path file) {
+            this(file, file.extension);
         }
-        throw new ReleaseParseException("Unknown format, can't be parsed: ${file.toAbsolutePath()}");
+
+        public FileObject(String name) {
+            this(Path.of(name), null);
+        }
     }
 
-    private Release parsePatternResult(Path file, String fileParseName) throws ReleaseParseException {
-        List<String> namedGroups = namedMatcher.parentPattern.groupNames;
-        String seriesName = "";
-        List<Integer> episodeNumbers = new ArrayList<>();
-        int seasonNumber = 0;
-        Integer year = namedGroups.contains(YEAR) ? Integer.parseInt(namedMatcher.group(YEAR)) : null;
-        String description = namedGroups.contains(DESCRIPTION) ? namedMatcher.group(DESCRIPTION).substring(1) : "";
+    /**
+     * Parses the provided file path to determine the release type (movie or TV show) and its details.
+     *
+     * @param fileObject The file objects, which contains the path to parse and the extension of the file.
+     * @return A Release object representing the parsed data.
+     * @throws ReleaseParseException if the file's name cannot be parsed.
+     */
+    public final Release parse(FileObject fileObject) throws ReleaseParseException {
+        Path file = fileObject.file;
+        if (file.getParent() != null) {
+            try {
+                return parsePatternResult(file, file.getParent().fileName.toString(), null);
+            } catch (Exception e) {
+                // Continue to next name
+            }
+        }
+        try {
+            String fileNameWithoutExtension = StringUtils.isNotBlank(fileObject.extension) ?
+                StringUtils.substringBeforeLast(file.fileName.toString(), "." + fileObject.extension) :
+                file.fileName.toString();
+            return parsePatternResult(file, fileNameWithoutExtension, fileObject.extension);
+        } catch (Exception e) {
+            throw new ReleaseParseException("Unknown format, can't be parsed: ${file.toAbsolutePath()}");
+        }
+    }
 
-        if (namedGroups.contains(MOVIE_NAME)) {
-            String movieName;
-            if (namedGroups.contains(PART)) {
-                String number = "";
-                if (namedGroups.contains(ROMAN_EPISODE)) {
-                    number = namedMatcher.group(ROMAN_EPISODE);
-                } else if (namedGroups.contains(PART_NUMBER)) {
-                    number = namedMatcher.group(PART_NUMBER);
+    /**
+     * Parses the given file's name using a series of regex patterns to extract relevant metadata and constructs the
+     * corresponding {@link Release} object (either a {@link MovieRelease} or {@link TvRelease}). The method attempts to
+     * identify and parse key details such as the release type, season, episodes, quality, and release group from the
+     * filename.
+     *
+     * @param file The file path being parsed.
+     * @param fileParseName The file name (without extension) or the parent directory name.
+     * @param extension The extension of the file, or null for a parent directory.
+     * @return A {@link Release} object representing the parsed release information (either a movie or TV show).
+     * @throws ReleaseParseException If the file name cannot be parsed into a valid release format.
+     */
+    private Release parsePatternResult(Path file, String fileParseName, String extension) throws ReleaseParseException {
+        ParserResults parserResults = new ParserResults(fileParseName);
+
+        parseReleaseType(parserResults);
+        String quality = String.join(" ", getQualityKeyWordsAlreadyParsed(parserResults));
+
+        // When quality parts are found, the filename is split into multiple parts. Consider the last part as the
+        // release group
+        String releaseGroup = parserResults.parts.size() > 1 ? parserResults.parts.last : "";
+        if (StringUtils.isNotBlank(releaseGroup)) {
+            parserResults.removeLastPart();
+        }
+
+        // Parse the number part, but don't remove it from the remaining parts, as it should be included in the title
+        // for movies.
+        parserResults.parseWithoutRemoving(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
+
+        parserResults.parse(seasonSxxExx_name_titleRegex(), name_season_episode_title_Regex(SeasonEpisodeType.SXXEXX));
+
+        if (parserResults.containsNone(SEASON, EPISODES_TEXT)) {
+            if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
+                parserResults.parse(name_season_episode_title_Regex(SeasonEpisodeType.X_XX),
+                    name_season_episode_title_Regex(SeasonEpisodeType.XXX),
+                    season_episode_name_title_Regex(SeasonEpisodeType.X_XX),
+                    season_episode_name_title_Regex(SeasonEpisodeType.XXX));
+            }
+            if (parserResults.containsNone(SEASON, EPISODES_TEXT, EPISODE)) {
+                parserResults.parse(yearRegex());
+                if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE)
+                    .map(source -> source.likelyMovieRelease || !source.likelyTvRelease)
+                    .orElse(true)) {
+                    if (StringUtils.equals(parserResults.parts.first, fileParseName)) {
+                        throw new ReleaseParseException("Could not parse " + fileParseName);
+                    }
+
+                    return MovieRelease.builder()
+                        .name(cleanUnwantedChars(parserResults.parts.first))
+                        .file(file)
+                        .year(parserResults.getNamedMatchValue(YEAR))
+                        .releaseGroup(releaseGroup)
+                        .quality(StringUtils.toRootLowerCase(quality))
+                        .extension(extension)
+                        .build();
                 }
-                movieName =
-                    cleanUnwantedChars(namedMatcher.group(MOVIE_NAME) + " " + namedMatcher.group(PART) + " " + number);
-            } else {
-                movieName = cleanUnwantedChars(namedMatcher.group(MOVIE_NAME));
-            }
-            return MovieRelease.builder()
-                .name(movieName)
-                .file(file)
-                .year(year)
-                .description(description)
-                .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
-                .quality(getQualityKeyword(fileParseName))
-                .build();
-        }
-
-        if (namedGroups.contains(EPISODE_NUMBER_1)) {
-            String value = namedMatcher.group(EPISODE_NUMBER_1);
-            LOGGER.trace("parsePatternResult: {}: {}", EPISODE_NUMBER_1, value);
-            // Multiple episodes, have episodenumber1, 2 ....
-            for (String group : namedGroups) {
-                Pattern pattern = Pattern.compile(EPISODE_NUMBER + "(\\d+)");
-                Matcher match = pattern.matcher(group);
-                if (match.matches()) {
-                    episodeNumbers.add(Integer.parseInt(namedMatcher.group(group)));
-                }
-            }
-            Collections.sort(episodeNumbers);
-        } else if (namedGroups.contains(EPISODE_NUMBER_START)) {
-            String episodeNumberStart = namedMatcher.group(EPISODE_NUMBER_START);
-            LOGGER.trace("parsePatternResult: namedGroups: {}", namedGroups);
-            LOGGER.trace("parsePatternResult: {}: {}", EPISODE_NUMBER_START, episodeNumberStart);
-            // Multiple episodes, regex specifies start and end number
-            int start = Integer.parseInt(episodeNumberStart);
-            int end = Integer.parseInt(namedMatcher.group(EPISODE_NUMBER_END));
-            if (start > end) {
-                int temp = start;
-                start = end;
-                end = temp;
-            }
-            IntStream.rangeClosed(start, end).forEach(episodeNumbers::add);
-        } else if (namedGroups.contains(EPISODE_NUMBER)) {
-            String value = namedMatcher.group(EPISODE_NUMBER);
-            LOGGER.trace("parsePatternResult: {}: {}", EPISODE_NUMBER, value);
-            episodeNumbers.add(Integer.parseInt(value));
-        } else if (namedGroups.contains(YEAR) || namedGroups.contains(MONTH) || namedGroups.contains(DAY)) {
-            // TODO: need to implement
-        } else if (namedGroups.contains(ROMAN_EPISODE) && !namedGroups.contains(YEAR)) {
-            episodeNumbers.add(Roman.decode(namedMatcher.group(ROMAN_EPISODE)));
-        }
-
-        if (namedGroups.contains(SERIE_NAME)) {
-            String value = namedMatcher.group(SERIE_NAME);
-            LOGGER.trace("parsePatternResult: {}: {}", SERIE_NAME, value);
-            seriesName = cleanUnwantedChars(value);
-            if (namedGroups.contains(YEAR)) {
-                seriesName = seriesName + " " + namedMatcher.group(YEAR);
             }
         }
 
-        if (namedGroups.contains(SEASON_NUMBER)) {
-            String value = namedMatcher.group(SEASON_NUMBER);
-            LOGGER.trace("parsePatternResult: {}: {}", SEASON_NUMBER, value);
-            seasonNumber = Integer.parseInt(value);
-        } else if (namedGroups.contains(PART) && !namedGroups.contains(YEAR)) {
-            seasonNumber = 1;
-        } else if (namedGroups.contains(YEAR) && namedGroups.contains(MONTH) && namedGroups.contains(DAY)) {
-            // need to implement
-        } else if (namedGroups.contains(SEASON_EPISODE)) {
-            String value = namedMatcher.group(SEASON_EPISODE);
-            LOGGER.trace("parsePatternResult: season_episode: {}", value);
-            if (value.length() == 3) {
-                episodeNumbers.add(Integer.parseInt(value.substring(1, 3)));
-                seasonNumber = Integer.parseInt(value.substring(0, 1));
-            } else if (value.length() == 4) {
-                episodeNumbers.add(Integer.parseInt(value.substring(2, 4)));
-                seasonNumber = Integer.parseInt(value.substring(0, 2));
+        Integer season;
+        List<Integer> episodes = new ArrayList<>();
+        if (!parserResults.contains(SEASON) || (parserResults.containsNone(EPISODE, EPISODES_TEXT))) {
+            if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
+                throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
             }
+            parserResults.parse(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
+            season = 1;
+            episodes.add(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER));
         } else {
-            // No season number specified, usually for Anime
-            // TODO: need to implement
-            throw new ReleaseParseException("Unable to parse the namedmatcher");
+            season = parserResults.getNamedMatchValue(SEASON);
+            episodes.addAll(Objects.requireNonNull(parserResults.getNamedMatchValue(EPISODE, EPISODES_TEXT)));
         }
+
+        String name =
+            parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
+        parserResults.createWithNewText(name)
+            .parse(Regex.builder()
+                .startOfText()
+                .tag(NAME)
+                .regex(".*")
+                .regex(DELIMITER)
+                .regex(yearRegex().create())
+                .endOfText());
+        name = parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
+
+        if (StringUtils.equals(name, fileParseName)) {
+            throw new ReleaseParseException("Could not parse " + fileParseName);
+        }
+        if (season == null || episodes.isEmpty()) {
+            throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
+        }
+
         return TvRelease.builder()
-            .name(seriesName)
-            .season(seasonNumber)
-            .episodes(episodeNumbers)
+            .name(cleanUnwantedChars(name))
+            .season(season)
+            .episodes(episodes)
             .file(file)
-            .description(PathExt.withoutExtension(description))
-            .releaseGroup(extractReleaseGroup(file.getFileName().toString(), true))
-            .special(isSpecialEpisode(seasonNumber, episodeNumbers))
-            .quality(getQualityKeyword(fileParseName))
+            .title(cleanUnwantedChars(parserResults.getNamedMatchValue(TITLE)))
+            .releaseGroup(releaseGroup)
+            .special(isSpecialEpisode(season, episodes))
+            .quality(StringUtils.toRootLowerCase(quality))
+            .extension(extension)
             .build();
     }
 
-    private String cleanUnwantedChars(String text) {
-        String newText = text;
-        if (newText.contains("cd1")) {
-            newText = newText.replace("cd1", " ");
-        }
-        if (newText.contains("cd2")) {
-            newText = newText.replace("cd2", " ");
+    @AllArgsConstructor
+    enum SeasonEpisodeType {
+        SXXEXX(Regex.builder().regex("s").tag(SEASON).regex("\\d{1,2}").tag(EPISODES_TEXT).regex("([xe]\\d{1,2})*")),
+        XXX(Regex.builder().tag(SEASON).regex("\\d").tag(EPISODES_TEXT).regex("\\d{2}")), X_XX(Regex.builder()
+            .regex("\\(")
+            .tag(SEASON)
+            .regex("\\d{1,2}")
+            .regex("-")
+            .tag(EPISODE)
+            .regex("\\d{2}")
+            .regex("\\)"));
+
+        @val RegexNext regex;
+    }
+
+    @AllArgsConstructor
+    enum NumberType {
+        ARABIC(Regex.builder().tag(ARABIC_NUMBER).regex("\\d{1,2}")), ROMAN(Regex.builder()
+            .tag(ROMAN_NUMBER)
+            .regex("[" + RomanNumeral.values().stream().map(RomanNumeral::name).collect(Collectors.joining()) + "]+"));
+
+        @val RegexNext regex;
+    }
+
+    /**
+     * Returns a regular expression pattern for matching years (e.g., 1990, 2023).
+     *
+     * @return A RegexNext object representing the year regex.
+     */
+    private static RegexNext yearRegex() {
+        return Regex.builder().tag(YEAR).regex("19\\d{2}|20\\d{2}");
+    }
+
+    private static String name_season_episode_title_Regex(SeasonEpisodeType seasonEpisodeType) {
+        return Regex.builder()
+            .startOfText()
+            .tag(NAME)
+            .regex(".*")
+            .regex(DELIMITER)
+            .regex(seasonEpisodeType.regex.create())
+            .regexOptional(DELIMITER + titleRegex().create())
+            .endOfText()
+            .create();
+    }
+
+    private static String seasonSxxExx_name_titleRegex() {
+        return Regex.builder()
+            .startOfText()
+            .regexOptional("\\(")
+            .regex(SeasonEpisodeType.SXXEXX.regex.create())
+            .regexOptional("\\)")
+            .regex(DELIMITER)
+            .tag(NAME)
+            .regex(".*")
+            .regex(DELIMITER)
+            .regex("-")
+            .regex(DELIMITER)
+            .tag(TITLE)
+            .regex(".*")
+            .endOfText()
+            .create();
+    }
+
+    private static String season_episode_name_title_Regex(SeasonEpisodeType seasonEpisodeType) {
+        return Regex.builder()
+            .startOfText()
+            .regex(seasonEpisodeType.regex.create())
+            .tag(NAME)
+            .regex(".*")
+            .regexOptional(DELIMITER + titleRegex().create())
+            .endOfText()
+            .create();
+    }
+
+    /**
+     * Helper method to generate a title regex.
+     *
+     * @return A RegexNext object for matching a title.
+     */
+    private static RegexNext titleRegex() {
+        return Regex.builder().tag(TITLE).regex(".*");
+    }
+
+    private static RegexNext part_number_Regex(NumberType numberType) {
+        return Regex.builder().regex("(pt|part|ep)").regex(DELIMITER).regex(numberType.regex.create());
+    }
+
+
+    private static void parseReleaseType(ParserResults parseResults) {
+        parseResults.parse(Regex.builder().tag(QUALITY).regex(Quality.class, Quality::getRegex));
+        parseResults.parse(Regex.builder().tag(SOURCE).regex(Source.class, Source::getRegex));
+        parseResults.parse(Regex.builder().tag(AUDIO_ENCODING).regex(AudioEncoding.class, AudioEncoding::getRegex));
+        parseResults.parse(Regex.builder().tag(VIDEO_ENCODING).regex(VideoEncoding.class, VideoEncoding::getRegex));
+    }
+
+    static class ParserResults {
+        @val List<String> parts = new ArrayList<>();
+        private final NamedMatches namedMatches;
+
+        public ParserResults(String text) {
+            this(text, new NamedMatches());
         }
 
+        private ParserResults(String text, NamedMatches namedMatches) {
+            parts.add(text);
+            this.namedMatches = namedMatches;
+        }
+
+        public ParserResults createWithNewText(String text) {
+            return new ParserResults(text, namedMatches);
+        }
+
+        public boolean parse(RegexBuilderBuild... regexBuilders) {
+            return parse(true, regexBuilders);
+        }
+
+        public boolean parseWithoutRemoving(RegexBuilderBuild... regexBuilders) {
+            return parse(false, regexBuilders);
+        }
+
+        public boolean parse(String... regexes) {
+            return parse(true, regexes);
+        }
+
+        public boolean parseWithoutRemoving(String... regexes) {
+            return parse(false, regexes);
+        }
+
+        private boolean parse(boolean removeMatchedParts, RegexBuilderBuild... regexBuilders) {
+            for (RegexBuilderBuild regexBuilder : regexBuilders) {
+                boolean hasMatch = regexBuilder.createWithDelimiter()
+                    .stream()
+                    .map(v -> parsePrivate(v, removeMatchedParts))
+                    .reduce(false, Boolean::logicalOr);
+                if (hasMatch) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean parse(boolean removeMatchedParts, String... regexes) {
+            return regexes.stream()
+                .map(regex -> parsePrivate(regex, removeMatchedParts))
+                .reduce(false, Boolean::logicalOr);
+        }
+
+        public boolean parsePrivate(String regex, boolean removeMatchedParts) {
+            Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+            for (String part : parts) {
+                Matcher matcher = pattern.matcher(part);
+                if (matcher.find()) {
+                    Map<String, Integer> namedGroupMap = matcher.namedGroups();
+                    namedGroupMap.entrySet().forEach(entry -> namedMatches.put(entry.key, matcher.group(entry.value)));
+                    String match = matcher.group();
+                    if (removeMatchedParts) {
+                        List<String> remainingParts = parts.stream()
+                            .flatMap(p -> p.split(Pattern.quote(match)).stream().filter(StringUtils::isNotBlank))
+                            .toList();
+                        parts.clear();
+                        parts.addAll(remainingParts);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void removeLastPart() {
+            parts.removeLast();
+        }
+
+        public boolean contains(Tag<?> tag) {
+            return getNamedMatch(tag).isPresent();
+        }
+
+        public boolean containsNone(Tag<?>... tags) {
+            return tags.stream().noneMatch(this::contains);
+        }
+
+        @SafeVarargs
+        public final <T> T getNamedMatchValue(Tag<T>... tags) {
+            for (Tag<T> tag : tags) {
+                Optional<T> namedMatch = getNamedMatch(tag, tag.mapper);
+                if (namedMatch.isPresent()) {
+                    return namedMatch.get();
+                }
+            }
+            return null;
+        }
+
+        public <T> Optional<T> getNamedMatch(Tag<T> tag) {
+            return getNamedMatch(tag, tag.mapper);
+        }
+
+        public <T> Optional<T> getNamedMatch(Tag<T> tag, Function<String, T> mapper) {
+            String value = namedMatches.get(tag);
+            return value == null ? Optional.empty() : Optional.of(mapper.apply(value));
+        }
+    }
+
+
+    /**
+     * Cleans unwanted characters from a string (e.g., underscores, extra spaces).
+     *
+     * @param text The input text to clean.
+     * @return The cleaned text.
+     */
+    private String cleanUnwantedChars(String text) {
+        if (text == null) {
+            return null;
+        }
+        String newText = text;
+        newText = newText.replace("cd1", " ").replace("cd2", " ");
         newText = newText.replace(".", " "); // remove point bones.01x01
         newText = newText.replace("_", " "); // remove underscore bones_01x01
         newText = newText.replace(" -", " "); // remove space dash "ncis - 01x01"
@@ -168,6 +402,9 @@ public class ReleaseParser {
         newText = newText.replace("(", ""); // remove ( for castle (2009)
         newText = newText.replace(")", ""); // remove ) for castle (2009)
         newText = newText.replace("'", "");
+        if (newText.startsWith("- ")) {
+            newText = newText.substring(2);
+        }
 
         if (newText.endsWith("-")) { // implemented if for "hawaii five-0"
             newText = newText.replace("-", ""); // remove space dash "altiplano-cd1"
@@ -180,36 +417,31 @@ public class ReleaseParser {
     }
 
     public static String getQualityKeyword(String name) {
-        LOGGER.trace("getQualityKeyword: name: {}", name);
-        Matcher m = VideoPatterns.QUALITY_KEYWORDS_REGEX_PATTERN.matcher(name.trim().toLowerCase());
-        StringBuilder builder = new StringBuilder();
-        while (m.find()) {
-            builder.append(m.group().replace(".", " ")).append(" ");
-        }
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getQualityKeyWords: keyswords: {}", builder.toString().trim());
-        }
-        return builder.toString().trim();
+        return String.join(" ", getQualityKeyWords(name));
     }
 
     public static List<String> getQualityKeyWords(String name) {
-        LOGGER.trace("getQualityKeyWords: name: {}", name);
-        Matcher m = VideoPatterns.QUALITY_KEYWORDS_REGEX_PATTERN.matcher(name.trim().toLowerCase());
-        List<String> keywords = new ArrayList<>();
-        while (m.find()) {
-            keywords.add(m.group());
-        }
-        LOGGER.trace("getQualityKeyWords: keywords: {}", keywords);
-        return keywords;
+        ParserResults parserResults = new ParserResults(name);
+        parseReleaseType(parserResults);
+        return getQualityKeyWordsAlreadyParsed(parserResults);
+    }
+
+    private static List<String> getQualityKeyWordsAlreadyParsed(ParserResults parserResults) {
+        return Stream.of(parserResults.getNamedMatch(QUALITY), parserResults.getNamedMatch(SOURCE),
+                parserResults.getNamedMatch(AUDIO_ENCODING), parserResults.getNamedMatch(VIDEO_ENCODING))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(RegexPattern::getValue)
+            .toList();
     }
 
     public static String extractReleaseGroup(final String fileName, boolean hasExtension) {
         LOGGER.trace("extractReleaseGroup: name: {} , hasExtension: {}", fileName, hasExtension);
         Pattern releaseGroupPattern;
         if (hasExtension) {
-            releaseGroupPattern = Pattern.compile("-([\\w]+).[\\w]+$");
+            releaseGroupPattern = Pattern.compile("-(\\w+)\\.\\w+$");
         } else {
-            releaseGroupPattern = Pattern.compile("-([\\w]+)$");
+            releaseGroupPattern = Pattern.compile("-(\\w+)$");
         }
         Matcher matcher = releaseGroupPattern.matcher(fileName);
         String releaseGroup = "";
@@ -222,9 +454,21 @@ public class ReleaseParser {
     }
 
     public static boolean isSpecialEpisode(final int season, final List<Integer> episodeNumbers) {
-        if (season == 0) {
-            return true;
+        return season == 0 || (episodeNumbers.size() == 1 && episodeNumbers.first == 0);
+    }
+
+    /**
+     * Helper class for storing and retrieving named regular expression matches.
+     */
+    private static class NamedMatches {
+        private final Map<String, String> map = new HashMap<>();
+
+        public void put(String key, String value) {
+            map.put(key, value);
         }
-        return episodeNumbers.size() == 1 && episodeNumbers.first == 0;
+
+        public String get(Tag<?> tag) {
+            return map.get(tag.value);
+        }
     }
 }

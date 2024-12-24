@@ -21,6 +21,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStru
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.control.ReleaseParser.FileObject;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -65,7 +66,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
 
         contentPane
             .layout(new MigLayout("insets 10, nogrid"))
-            .addComponent("wrap", new JLabel(getText("StructureBuilderDialog.AvailableTags")))
+            .addComponent("wrap", new JLabel(getText("StructureBuilderDialog.AvailableTagsClickToAdd")))
             .addComponent("grow, wrap",
                 tagPanel = new JPanel(new MigLayout("flowy, wrap 5", "[150px][150px][150px]")))
             .addComponent(new JLabel(getText("StructureBuilderDialog.Structure")))
@@ -104,9 +105,11 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         ReleaseFactory releaseFactory = new ReleaseFactory(new Settings(), manager);
         switch (videoType) {
             case EPISODE -> tvRelease = (TvRelease) releaseFactory.createRelease(
-                Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"), userInteractionHandler);
+                new FileObject(Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"), "mkv"),
+                userInteractionHandler, false);
             case MOVIE -> movieRelease = (MovieRelease) releaseFactory.createRelease(
-                Path.of("Final.Destination.5.720p.Bluray.x264-TWiZTED"), userInteractionHandler);
+                new FileObject(Path.of("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv"), "mkv"),
+                userInteractionHandler, false);
         }
     }
 

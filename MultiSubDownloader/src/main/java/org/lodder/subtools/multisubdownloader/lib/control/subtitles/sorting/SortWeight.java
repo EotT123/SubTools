@@ -2,9 +2,11 @@ package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting;
 
 import static manifold.ext.props.rt.api.PropOption.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
@@ -35,20 +37,22 @@ public class SortWeight {
         replaceReservedKeywords(release, defaultWeightsNew);
 
         /* get a list of tags */
-        List<String> tags = ReleaseParser.getQualityKeyWords(release.quality);
+        List<String> tags = new ArrayList<>(ReleaseParser.getQualityKeyWords(release.quality));
         if (StringUtils.isNotBlank(release.releaseGroup)) {
             tags.add(release.releaseGroup.toLowerCase());
         }
 
-        /* only store tags for which we have a weight defined */
-        tags.retainAll(defaultWeightsNew.keySet());
-
         /* store weights for this release */
-        for (String tag : tags) {
-            int weight = defaultWeightsNew.get(tag);
-            this.maxScore += weight;
-            this.weights.put(tag, weight);
-        }
+        tags.forEach(tag ->
+            defaultWeightsNew.entrySet().stream()
+                /* only store tags for which we have a weight defined */
+                .filter(entry -> Pattern.compile(entry.getKey()).matcher(tag).find())
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .ifPresent(weight -> {
+                    this.maxScore += weight;
+                    this.weights.put(tag, weight);
+                }));
     }
 
     private void replaceReservedKeywords(Release release, Map<String, Integer> weights) {

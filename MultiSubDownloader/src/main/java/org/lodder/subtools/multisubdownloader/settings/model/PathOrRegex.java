@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.rt.api.Self;
-import org.lodder.subtools.sublibrary.util.NamedPattern;
 
 public class PathOrRegex implements Serializable {
 
@@ -40,8 +39,8 @@ public class PathOrRegex implements Serializable {
         }
         if (regex) {
             this.image = PathMatchType.REGEX.image;
-            NamedPattern np = NamedPattern.compile(value.replace("*", ".*") + ".*$", Pattern.CASE_INSENSITIVE);
-            this.isExcludedPathPredicate = p -> np.matcher(p.getFileName().toString()).find();
+            Pattern pattern = Pattern.compile(value.replace("*", ".*") + ".*$", Pattern.CASE_INSENSITIVE);
+            this.isExcludedPathPredicate = p -> pattern.matcher(p.getFileName().toString()).find();
         } else {
             this.image = getImage(path);
             this.isExcludedPathPredicate = path::equals;
