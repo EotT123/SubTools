@@ -82,20 +82,20 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
 
         /* Create a new SearchManager. */
         this.searchManager =
-                SearchManager.createWithSettings(this.settings)
-                        /* Tell the manager which language we want */
-                        .language(language)
-                        /* Tell the manager where to push progressUpdates */
-                        .progressListener(searchProgressListener)
-                        /* Tell the manager how to handle user interactions */
-                        .userInteractionHandler(userInteractionHandler)
-                        /* Listen for when the manager tells us Subtitles are found */
-                        .onFound(this);
+            SearchManager.createWithSettings(this.settings)
+                /* Tell the manager which language we want */
+                .language(language)
+                /* Tell the manager where to push progressUpdates */
+                .progressListener(searchProgressListener)
+                /* Tell the manager how to handle user interactions */
+                .userInteractionHandler(userInteractionHandler)
+                /* Listen for when the manager tells us Subtitles are found */
+                .onFound(this);
 
         /* Tell the manager which providers to use */
         this.subtitleProviderStore.getAllProviders().stream()
-                .filter(subtitleProvider -> settings.isSerieSource(subtitleProvider.getSubtitleSource()))
-                .forEach(searchManager::addProvider);
+            .filter(subtitleProvider -> settings.isSerieSource(subtitleProvider.subtitleSource))
+            .forEach(searchManager::addProvider);
 
         /* Tell the manager which releases to search. */
         this.releases.forEach(searchManager::addRelease);

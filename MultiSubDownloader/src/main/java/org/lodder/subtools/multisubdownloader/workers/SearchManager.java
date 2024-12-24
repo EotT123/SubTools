@@ -48,8 +48,8 @@ public class SearchManager implements Cancelable {
     @Setter
     @Accessors(fluent = true)
     public static class SearchManagerBuilder
-            implements SearchManagerOnFound, SearchManagerUserInteractionHandler, SearchManagerProgressListener,
-            SearchManagerLanguage {
+        implements SearchManagerOnFound, SearchManagerUserInteractionHandler, SearchManagerProgressListener,
+        SearchManagerLanguage {
         private Settings settings;
         private Language language;
         private SearchProgressListener progressListener;
@@ -74,7 +74,7 @@ public class SearchManager implements Cancelable {
     @val UserInteractionHandler userInteractionHandler;
 
     public SearchManager(Settings settings, SearchHandler onFound, Language language,
-            SearchProgressListener progressListener, UserInteractionHandler userInteractionHandler) {
+        SearchProgressListener progressListener, UserInteractionHandler userInteractionHandler) {
         this.settings = settings;
         this.onFound = onFound;
         this.language = language;
@@ -95,7 +95,7 @@ public class SearchManager implements Cancelable {
     }
 
     public void addRelease(Release release) {
-        this.queue.forEach((key, value) -> queue.get(key).add(release));
+        this.queue.forEach((key, _) -> queue.get(key).add(release));
         /* Create a scoreCalculator so we can score subtitles for this release */
         // TODO: extract to factory
         SortWeight weights = new SortWeight(release, this.settings.sortWeights);
