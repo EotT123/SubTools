@@ -75,6 +75,7 @@ public class CLISearchProgress extends CLIProgress implements SearchProgressList
     }
 
     // TODO: remove this when https://github.com/manifold-systems/manifold/issues/642 is fixed
+    @Override
     public CLISearchProgress verbose(boolean verbose) {
         super.verbose(verbose);
         return this;

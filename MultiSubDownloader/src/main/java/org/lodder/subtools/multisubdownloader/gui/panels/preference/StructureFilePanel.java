@@ -91,8 +91,8 @@ public class StructureFilePanel extends JPanel {
             JScrollPane languageScrollPane =
                 new JScrollPane(languagePanel).addTo(languagePanelRoot, "span, growx, wrap, hidemode 3");
             languageScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-            languageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            languageScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            languageScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            languageScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             languageScrollPane.setVisible(false);
 
             AtomicInteger langId = new AtomicInteger();

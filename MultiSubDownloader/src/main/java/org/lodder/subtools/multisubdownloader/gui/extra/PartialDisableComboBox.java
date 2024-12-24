@@ -27,7 +27,7 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
 
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                    boolean cellHasFocus) {
+                boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 boolean disabled = index >= 0 && index < itemsState.size() && !itemsState.get(index);
                 c.setEnabled(!disabled);
@@ -103,6 +103,7 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
         return index;
     }
 
+    @Override
     public T getSelectedItem() {
         return (T) super.getSelectedItem();
     }

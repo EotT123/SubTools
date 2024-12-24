@@ -70,6 +70,7 @@ public class CLIFileIndexerProgress extends CLIProgress implements IndexingProgr
     }
 
     // TODO: remove this when https://github.com/manifold-systems/manifold/issues/642 is fixed
+    @Override
     public CLIFileIndexerProgress verbose(boolean verbose) {
         super.verbose(verbose);
         return this;

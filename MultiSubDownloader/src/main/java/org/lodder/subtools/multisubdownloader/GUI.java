@@ -76,10 +76,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private final UserInteractionHandlerGUI userInteractionHandler;
     private final SettingsControl settingsControl;
     private ProgressDialog progressDialog;
-    private MyPopupMenu popupMenu;
     private SearchPanel<SearchFileInputPanel> pnlSearchFile;
     private SearchPanel<SearchTextInputPanel> pnlSearchText;
-    private LoggingPanel pnlLogging;
     private SearchFileInputPanel pnlSearchFileInput;
     private Menu menuBar;
     private IndexingProgressDialog fileIndexerProgressDialog;
@@ -182,7 +180,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         createTextSearchPanel();
         tabbedPane.addTab(getText("MainWindow.SearchOnName"), null, pnlSearchText, null);
 
-        pnlLogging = new LoggingPanel();
+        LoggingPanel pnlLogging = new LoggingPanel();
         final GridBagConstraints gbcPnlLogging = new GridBagConstraints();
         gbcPnlLogging.fill = GridBagConstraints.BOTH;
         gbcPnlLogging.insets = new Insets(0, 0, 5, 0);
@@ -347,7 +345,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     private void initPopupMenu() {
-        popupMenu = new MyPopupMenu();
+        MyPopupMenu popupMenu = new MyPopupMenu();
         JMenuItem menuItem = new JMenuItem(getText("App.Copy"));
         menuItem.addActionListener(_ -> {
             final CustomTable t = (CustomTable) popupMenu.getInvoker();

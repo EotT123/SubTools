@@ -42,6 +42,7 @@ public class SettingsControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);
     private static final String BACKING_STORE_AVAIL = "BackingStoreAvail";
+    public static final String DATABASE_VERSION_KEY = "DATABSE_VERSION";
 
     private final Manager manager;
     private final Preferences preferences;
@@ -383,7 +384,7 @@ public class SettingsControl {
 
     private void migrateDatabase() {
         int version =
-            manager.valueBuilder().cacheType(CacheType.DISK).key("DATABSE_VERSION").valueSupplier(() -> 0).get();
+            manager.valueBuilder().cacheType(CacheType.DISK).key(DATABASE_VERSION_KEY).valueSupplier(() -> 0).get();
         if (version == 0) {
             migrateDatabaseV0ToV1();
         }
@@ -395,7 +396,7 @@ public class SettingsControl {
     private void migrateDatabaseV0ToV1() {
         manager.valueBuilder().cacheType(CacheType.DISK).keyFilter(k -> k.startsWith("TVDB-SerieMapping-")).remove();
         manager.valueBuilder().cacheType(CacheType.DISK).keyFilter(k -> k.startsWith("TVDB-SerieId-")).remove();
-        manager.valueBuilder().cacheType(CacheType.DISK).key("DATABSE_VERSION").value(1).store();
+        manager.valueBuilder().cacheType(CacheType.DISK).key(DATABASE_VERSION_KEY).value(1).store();
     }
 
     private void migrateDatabaseV1ToV2() {
@@ -422,6 +423,6 @@ public class SettingsControl {
             manager.valueBuilder().cacheType(CacheType.DISK).key(entry.getKey()).remove();
             manager.valueBuilder().cacheType(CacheType.DISK).key(entry.getKey()).value(entry.getValue()).store();
         });
-        manager.valueBuilder().cacheType(CacheType.DISK).key("DATABSE_VERSION").value(2).store();
+        manager.valueBuilder().cacheType(CacheType.DISK).key(DATABASE_VERSION_KEY).value(2).store();
     }
 }
