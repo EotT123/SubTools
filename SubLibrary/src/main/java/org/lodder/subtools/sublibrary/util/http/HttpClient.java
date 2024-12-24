@@ -133,35 +133,31 @@ public class HttpClient {
 
     private InputStream getInputStream(URL url) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        try {
-            cookieManager.setCookies(conn);
-            conn.addRequestProperty(HttpHeaders.USER_AGENT, "Mozilla");
-            conn.addRequestProperty("Referer", url.toString());
-            conn.setInstanceFollowRedirects(false);
+        cookieManager.setCookies(conn);
+        conn.addRequestProperty(HttpHeaders.USER_AGENT, "Mozilla");
+        conn.addRequestProperty("Referer", url.toString());
+        conn.setInstanceFollowRedirects(false);
 
-            int status = conn.getResponseCode();
+        int status = conn.getResponseCode();
 
-            cookieManager.storeCookies(conn);
+        cookieManager.storeCookies(conn);
 
-            if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
-                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
-                    String locationHeader = conn.getHeaderField(HttpHeaders.LOCATION);
-                    URL newUrl;
-                    if (HttpClient.isUrl(locationHeader)) {
-                        newUrl = new URI(locationHeader).toURL();
-                    } else {
-                        newUrl = new URI("%s://%s/%s".formatted(url.protocol, conn.getURL().host,
-                            locationHeader.trim().replace(" ", "%20"))).toURL();
-                    }
-                    return getInputStream(newUrl);
+        if (status != HttpURLConnection.HTTP_OK) {
+            if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
+                || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                String locationHeader = conn.getHeaderField(HttpHeaders.LOCATION);
+                URL newUrl;
+                if (HttpClient.isUrl(locationHeader)) {
+                    newUrl = new URI(locationHeader).toURL();
+                } else {
+                    newUrl = new URI("%s://%s/%s".formatted(url.protocol, conn.getURL().host,
+                        locationHeader.trim().replace(" ", "%20"))).toURL();
                 }
-                throw new Exception("error: " + status);
-            } else {
-                return conn.getInputStream();
+                return getInputStream(newUrl);
             }
-        } finally {
-            conn.disconnect();
+            throw new Exception("error: " + status);
+        } else {
+            return conn.getInputStream();
         }
     }
 
