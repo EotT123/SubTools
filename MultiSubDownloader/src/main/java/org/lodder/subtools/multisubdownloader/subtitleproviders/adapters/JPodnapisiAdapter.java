@@ -28,8 +28,8 @@ import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JPodnapisiAdapter
-        extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
+public final class JPodnapisiAdapter
+    extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPodnapisiAdapter.class);
 
@@ -66,57 +66,57 @@ public class JPodnapisiAdapter
 
     @Override
     public List<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithName(String name, int year, Language language)
-            throws PodnapisiException {
+        throws PodnapisiException {
         return getApi().getMovieSubtitles(name, year, 0, 0, language);
     }
 
     @Override
     public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<PodnapisiSubtitleDescriptor> subtitles,
-            Language language) {
+        Language language) {
         return buildListSubtitles(language, subtitles);
     }
 
     @Override
     public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
-            throws PodnapisiException {
+        throws PodnapisiException {
         return getProviderSerieId(tvRelease).map(
-                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
-                    try {
-                        return api.getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                    } catch (PodnapisiException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
-                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                                e.getMessage()), e);
-                        return Stream.empty();
-                    }
-                }).collect(Collectors.toSet())).orElseGet(Set::of);
+            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                try {
+                    return api.getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
+                } catch (PodnapisiException e) {
+                    LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
+                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                        e.getMessage()), e);
+                    return Stream.empty();
+                }
+            }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<PodnapisiSubtitleDescriptor> subtitles,
-            Language language) {
+        Language language) {
         return buildListSubtitles(language, subtitles);
     }
 
     private Set<Subtitle> buildListSubtitles(Language language, Collection<PodnapisiSubtitleDescriptor> lSubtitles) {
         return lSubtitles.stream()
-                .filter(ossd -> StringUtils.isNotBlank(ossd.releaseString))
-                .map(ossd -> Subtitle.downloadSource(ossd.url)
-                        .subtitleSource(subtitleSource)
-                        .fileName(ossd.releaseString)
-                        .language(language)
-                        .quality(ReleaseParser.getQualityKeyword(ossd.releaseString))
-                        .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleaseGroup(ossd.releaseString,
-                                StringUtils.endsWith(ossd.releaseString, ".srt")))
-                        .uploader(ossd.uploaderName)
-                        .hearingImpaired(ossd.hearingImpaired))
-                .collect(Collectors.toSet());
+            .filter(ossd -> StringUtils.isNotBlank(ossd.releaseString))
+            .map(ossd -> Subtitle.downloadSource(ossd.url)
+                .subtitleSource(subtitleSource)
+                .fileName(ossd.releaseString)
+                .language(language)
+                .quality(ReleaseParser.getQualityKeyword(ossd.releaseString))
+                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
+                .releaseGroup(ReleaseParser.extractReleaseGroup(ossd.releaseString,
+                    StringUtils.endsWith(ossd.releaseString, ".srt")))
+                .uploader(ossd.uploaderName)
+                .hearingImpaired(ossd.hearingImpaired))
+            .collect(Collectors.toSet());
     }
 
     @Override
     public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
-            throws PodnapisiException {
+        throws PodnapisiException {
         return getApi().getPodnapisiShowName(serieName).stream().toList();
     }
 

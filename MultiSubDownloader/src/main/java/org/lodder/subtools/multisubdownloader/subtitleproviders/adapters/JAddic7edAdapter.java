@@ -31,7 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor, ProviderSerieId, Addic7edException> {
+public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor, ProviderSerieId,
+    Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edAdapter.class);
 

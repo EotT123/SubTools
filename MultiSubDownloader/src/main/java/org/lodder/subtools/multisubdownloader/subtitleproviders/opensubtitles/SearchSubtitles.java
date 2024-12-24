@@ -26,7 +26,7 @@ import org.opensubtitles.model.Subtitles200Response;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class SearchSubtitles extends OpenSubtitlesExecuter {
+public final class SearchSubtitles extends OpenSubtitlesExecuter {
     private final Manager manager;
     private final ApiClient apiClient;
 
@@ -80,26 +80,27 @@ public class SearchSubtitles extends OpenSubtitlesExecuter {
 
     public Subtitles200Response searchSubtitles() throws OpenSubtitlesException {
         return manager.valueBuilder()
-                .cacheType(CacheType.MEMORY)
-                .key("OpenSubtitles-subtitles-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s".formatted(
-                        id, imdbId, tmdbId, type, query, language, movieHash, userId, hearingImpaired, foreignPartsOnly,
-                        trustedSources, machineTranslated, aiTranslated, orderBy, orderDirection, parentFeatureId,
-                        parentImdbId, parentTmdbId, season, episode, year, movieHashMatch, page))
-                .valueSupplier(() -> {
-                    try {
-                        return execute(
-                                () -> new SubtitlesApi(apiClient).subtitles(id, imdbId, tmdbId, getValue(type), query,
-                                        language != null ? language.langCode : null, movieHash, userId,
-                                        getValue(hearingImpaired), getValue(foreignPartsOnly), getValue(trustedSources),
-                                        getValue(machineTranslated), getValue(aiTranslated),
-                                        orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
-                                        parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
-                                        getValue(movieHashMatch), page, userAgent));
-                    } catch (Exception e) {
-                        throw new OpenSubtitlesException(e);
-                    }
-                })
-                .get();
+            .cacheType(CacheType.MEMORY)
+            .key(
+                "OpenSubtitles-subtitles-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s".formatted(
+                    id, imdbId, tmdbId, type, query, language, movieHash, userId, hearingImpaired, foreignPartsOnly,
+                    trustedSources, machineTranslated, aiTranslated, orderBy, orderDirection, parentFeatureId,
+                    parentImdbId, parentTmdbId, season, episode, year, movieHashMatch, page))
+            .valueSupplier(() -> {
+                try {
+                    return execute(
+                        () -> new SubtitlesApi(apiClient).subtitles(id, imdbId, tmdbId, getValue(type), query,
+                            language != null ? language.langCode : null, movieHash, userId,
+                            getValue(hearingImpaired), getValue(foreignPartsOnly), getValue(trustedSources),
+                            getValue(machineTranslated), getValue(aiTranslated),
+                            orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
+                            parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
+                            getValue(movieHashMatch), page, userAgent));
+                } catch (Exception e) {
+                    throw new OpenSubtitlesException(e);
+                }
+            })
+            .get();
     }
 
     private String getValue(ParamIntf param) {

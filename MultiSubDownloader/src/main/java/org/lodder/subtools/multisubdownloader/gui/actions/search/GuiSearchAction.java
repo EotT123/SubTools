@@ -22,7 +22,8 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-public abstract class GuiSearchAction<P extends InputPanel> extends SearchAction {
+public abstract sealed class GuiSearchAction<P extends InputPanel> extends SearchAction
+    permits FileGuiSearchAction, TextGuiSearchAction {
 
     @get(Protected) GUI mainWindow;
     @get(Protected) SearchPanel<P> searchPanel;

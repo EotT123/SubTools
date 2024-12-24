@@ -23,7 +23,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
-public class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
+public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
 
     public interface TextGuiSearchActionBuilderSubtitleProviderStore {
         TextGuiSearchActionBuilderGUI subtitleProviderStore(SubtitleProviderStore subtitleProviderStore);

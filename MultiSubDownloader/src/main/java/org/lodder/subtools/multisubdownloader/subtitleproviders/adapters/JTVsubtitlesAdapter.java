@@ -31,8 +31,8 @@ import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JTVsubtitlesAdapter
-        extends AbstractAdapter<TVsubtitlesSubtitleDescriptor, ProviderSerieId, TvSubtitlesException> {
+public final class JTVsubtitlesAdapter
+    extends AbstractAdapter<TVsubtitlesSubtitleDescriptor, ProviderSerieId, TvSubtitlesException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JTVsubtitlesAdapter.class);
 
@@ -77,60 +77,60 @@ public class JTVsubtitlesAdapter
 
     @Override
     public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<TVsubtitlesSubtitleDescriptor> subtitles,
-            Language language) {
+        Language language) {
         // TODO implement this
         return Set.of();
     }
 
     @Override
     public Set<TVsubtitlesSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
-            throws TvSubtitlesException {
+        throws TvSubtitlesException {
         return getProviderSerieId(tvRelease).map(
-                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
-                    try {
-                        return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                    } catch (TvSubtitlesException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
-                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                                e.getMessage()), e);
-                        return Stream.empty();
-                    }
-                }).collect(Collectors.toSet())).orElseGet(Set::of);
+            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                try {
+                    return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
+                } catch (TvSubtitlesException e) {
+                    LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
+                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                        e.getMessage()), e);
+                    return Stream.empty();
+                }
+            }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<TVsubtitlesSubtitleDescriptor> subtitles,
-            Language language) {
+        Language language) {
         return subtitles.stream()
-                .map(sub -> Subtitle.downloadSource(sub.url)
-                        .subtitleSource(subtitleSource)
-                        .fileName(sub.filename)
-                        .language(language)
-                        .quality(ReleaseParser.getQualityKeyword(sub.filename + " " + sub.rip))
-                        .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                        .releaseGroup(ReleaseParser.extractReleaseGroup(sub.filename,
-                                StringUtils.endsWith(sub.filename, ".srt")))
-                        .uploader(sub.author)
-                        .hearingImpaired(false))
-                .collect(Collectors.toSet());
+            .map(sub -> Subtitle.downloadSource(sub.url)
+                .subtitleSource(subtitleSource)
+                .fileName(sub.filename)
+                .language(language)
+                .quality(ReleaseParser.getQualityKeyword(sub.filename + " " + sub.rip))
+                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
+                .releaseGroup(ReleaseParser.extractReleaseGroup(sub.filename,
+                    StringUtils.endsWith(sub.filename, ".srt")))
+                .uploader(sub.author)
+                .hearingImpaired(false))
+            .collect(Collectors.toSet());
     }
 
     @Override
     public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
-            throws TvSubtitlesException {
+        throws TvSubtitlesException {
         Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
         return getApi().getUrisForSerieName(serieName)
-                .stream()
-                .sorted(Comparator.comparing((ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
-                                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                        .thenComparing((ProviderSerieId providerSerieId) -> {
-                            Matcher matcher = yearPatter.matcher(providerSerieId.name);
-                            if (matcher.find()) {
-                                return Integer.parseInt(matcher.group(2));
-                            }
-                            return 0;
-                        }, Comparator.reverseOrder()))
-                .toList();
+            .stream()
+            .sorted(Comparator.comparing((ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                    .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
+                .thenComparing((ProviderSerieId providerSerieId) -> {
+                    Matcher matcher = yearPatter.matcher(providerSerieId.name);
+                    if (matcher.find()) {
+                        return Integer.parseInt(matcher.group(2));
+                    }
+                    return 0;
+                }, Comparator.reverseOrder()))
+            .toList();
     }
 
     @Override

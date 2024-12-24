@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class MyTextFieldPath extends MyTextFieldCommon<Path, MyTextFieldPath> {
+public final class MyTextFieldPath extends MyTextFieldCommon<Path, MyTextFieldPath> {
     @Serial
     private static final long serialVersionUID = -8526638589445703452L;
 

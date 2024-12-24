@@ -22,8 +22,10 @@ import org.lodder.subtools.sublibrary.data.ProviderSerieId;
  * @param <X> type of the exception thrown by the api
  */
 @AllArgsConstructor
-abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception>
-        implements Adapter<T, S, X>, SubtitleProvider {
+abstract sealed class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception>
+    implements Adapter<T, S, X>, SubtitleProvider
+    permits JAddic7edAdapter, JAddic7edViaProxyAdapter, JOpenSubAdapter, JPodnapisiAdapter, JSubsceneAdapter,
+    JTVsubtitlesAdapter {
 
     @val @override Manager manager;
     @val @override UserInteractionHandler userInteractionHandler;
@@ -37,7 +39,7 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
         private final List<HandleException<T, X>> exceptionHandlers = new ArrayList<>();
 
         private record HandleException<T, X extends Exception>(Predicate<X> predicate,
-                Function<X, T> exceptionFunction) {}
+            Function<X, T> exceptionFunction) {}
 
         public @Self ExecuteCall<T, X> retryWhenException(Predicate<X> predicate) {
             retryPredicates.add(predicate);
@@ -96,10 +98,10 @@ abstract class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception
                 } else {
                     try {
                         return exceptionHandlers.stream()
-                                .filter(handleException -> handleException.predicate().test(exception))
-                                .findAny()
-                                .map(handleException -> handleException.exceptionFunction().apply(exception))
-                                .orElseThrow(() -> e);
+                            .filter(handleException -> handleException.predicate().test(exception))
+                            .findAny()
+                            .map(handleException -> handleException.exceptionFunction().apply(exception))
+                            .orElseThrow(() -> e);
                     } catch (Exception e1) {
                         throw (X) e1;
                     }

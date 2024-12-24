@@ -9,16 +9,16 @@ import java.io.Serial;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
-public class SearchTextInputPanel extends InputPanel {
+public final class SearchTextInputPanel extends InputPanel {
 
     @Serial
     private static final long serialVersionUID = 7030171360517948253L;
 
     private JComboBox<VideoSearchType> cbxVideoType;
     private JTextField txtInputVideoName;
-    protected JTextField txtInputSeason;
-    protected JTextField txtInputEpisode;
-    protected JTextField txtQualityVersion;
+    private JTextField txtInputSeason;
+    private JTextField txtInputEpisode;
+    private JTextField txtQualityVersion;
 
     public SearchTextInputPanel() {
         super();

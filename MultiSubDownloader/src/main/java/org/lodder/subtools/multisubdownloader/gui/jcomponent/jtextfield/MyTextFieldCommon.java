@@ -14,10 +14,11 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.BooleanConsumer;
 
-public abstract class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> extends JTextField implements
-        MyTextFieldToStringMapperIntf<T, R>,
-        MyTextFieldToObjectMapperIntf<T, R>,
-        MyTextFieldOthersIntf<T, R> {
+public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> extends JTextField implements
+    MyTextFieldToStringMapperIntf<T, R>,
+    MyTextFieldToObjectMapperIntf<T, R>,
+    MyTextFieldOthersIntf<T, R>
+    permits MyTextFieldInteger, MyTextFieldPath, MyTextFieldString {
 
     @Serial
     private static final long serialVersionUID = -393882042554264226L;
@@ -134,7 +135,7 @@ public abstract class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> ex
         }
 
         if (valueVerifier != null || requireValue || valueChangedCallbackListener != null ||
-                validityChangedCallbackListeners != null) {
+            validityChangedCallbackListeners != null) {
             checkValidity(getText());
             getDocument().addDocumentListener(new DocumentListener() {
 

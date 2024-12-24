@@ -3,7 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 import com.pivovarit.function.ThrowingSupplier;
 import org.opensubtitles.invoker.ApiException;
 
-public abstract class OpenSubtitlesExecuter {
+public abstract sealed class OpenSubtitlesExecuter permits DownloadSubtitle, SearchSubtitles {
 
     protected <T> T execute(ThrowingSupplier<T, ApiException> callable) throws ApiException {
         try {

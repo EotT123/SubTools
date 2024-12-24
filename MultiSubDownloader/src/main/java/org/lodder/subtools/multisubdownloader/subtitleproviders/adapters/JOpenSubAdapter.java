@@ -33,8 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public class JOpenSubAdapter
-        extends AbstractAdapter<org.opensubtitles.model.Subtitle, OpensubtitleSerieId, OpenSubtitlesException> {
+public final class JOpenSubAdapter
+    extends AbstractAdapter<org.opensubtitles.model.Subtitle, OpensubtitleSerieId, OpenSubtitlesException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JOpenSubAdapter.class);
 
@@ -43,7 +43,7 @@ public class JOpenSubAdapter
     @val @override String providerName = subtitleSource.name();
 
     public JOpenSubAdapter(boolean isLoginEnabled, String username, String password, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
+        UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         if (osApi == null) {
             osApi = new LazySupplier<>(() -> {
@@ -66,92 +66,92 @@ public class JOpenSubAdapter
 
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithHash(String hash, Language language)
-            throws OpenSubtitlesException {
+        throws OpenSubtitlesException {
         return getApi().searchSubtitles().movieHash(hash).language(language).searchSubtitles().getData();
     }
 
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(int tvdbId, Language language)
-            throws OpenSubtitlesException {
+        throws OpenSubtitlesException {
         return getApi().searchSubtitles().imdbId(tvdbId).language(language).searchSubtitles().getData();
     }
 
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithName(String name, int year, Language language)
-            throws OpenSubtitlesException {
+        throws OpenSubtitlesException {
         return getApi().searchSubtitles().query(name).language(language).searchSubtitles().getData();
     }
 
     @Override
     public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<org.opensubtitles.model.Subtitle> subtitles,
-            Language language) {
+        Language language) {
         return subtitles.stream()
-                .map(org.opensubtitles.model.Subtitle::getAttributes)
-                .filter(attributes -> movieRelease.year == attributes.getFeatureDetails().getYear().intValue())
-                .flatMap(attributes -> attributes.getFiles().stream().map(file -> createSubtitle(file, attributes)))
-                .collect(Collectors.toSet());
+            .map(org.opensubtitles.model.Subtitle::getAttributes)
+            .filter(attributes -> movieRelease.year == attributes.getFeatureDetails().getYear().intValue())
+            .flatMap(attributes -> attributes.getFiles().stream().map(file -> createSubtitle(file, attributes)))
+            .collect(Collectors.toSet());
     }
 
     @Override
     public Set<org.opensubtitles.model.Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language)
-            throws OpenSubtitlesException {
+        throws OpenSubtitlesException {
         return getProviderSerieId(tvRelease).map(
-                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
-                    try {
-                        return getApi().searchSubtitles()
-                                .query(providerSerieId.name)
-                                .season(tvRelease.season)
-                                .episode(episode)
-                                .language(language)
-                                .searchSubtitles()
-                                .getData()
-                                .stream();
-                    } catch (OpenSubtitlesException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
-                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                                e.getMessage()), e);
-                        return Stream.empty();
-                    }
-                }).collect(Collectors.toSet())).orElseGet(Set::of);
+            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                try {
+                    return getApi().searchSubtitles()
+                        .query(providerSerieId.name)
+                        .season(tvRelease.season)
+                        .episode(episode)
+                        .language(language)
+                        .searchSubtitles()
+                        .getData()
+                        .stream();
+                } catch (OpenSubtitlesException e) {
+                    LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
+                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                        e.getMessage()), e);
+                    return Stream.empty();
+                }
+            }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<org.opensubtitles.model.Subtitle> subtitles,
-            Language language) {
+        Language language) {
         String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
         String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName, "[^A-Za-z]", ""));
         return subtitles.stream()
-                .map(org.opensubtitles.model.Subtitle::getAttributes)
-                .flatMap(attributes -> attributes.getFiles().stream().filter(file -> {
-                    String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
-                    return subFileName.contains(name) ||
-                            (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
-                }).map(file -> createSubtitle(file, attributes)))
-                .collect(Collectors.toSet());
+            .map(org.opensubtitles.model.Subtitle::getAttributes)
+            .flatMap(attributes -> attributes.getFiles().stream().filter(file -> {
+                String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
+                return subFileName.contains(name) ||
+                    (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
+            }).map(file -> createSubtitle(file, attributes)))
+            .collect(Collectors.toSet());
     }
 
     private Subtitle createSubtitle(SubtitleAttributesFilesInner file, SubtitleAttributes attributes) {
         return Subtitle.downloadSource(
-                        () -> getApi().downloadSubtitle().fileId(file.getFileId().intValue()).download().getLink())
-                .subtitleSource(subtitleSource)
-                .fileName(file.getFileName())
-                .language(Language.fromIdOptional(attributes.getLanguage()).orElse(null))
-                .quality(ReleaseParser.getQualityKeyword(file.getFileName()))
-                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleaseGroup(file.fileName, file.fileName.endsWith(".srt")))
-                .uploader(attributes.getUploader() != null ? attributes.getUploader().getName() : null)
-                .hearingImpaired(Boolean.TRUE == attributes.isHearingImpaired());
+                () -> getApi().downloadSubtitle().fileId(file.getFileId().intValue()).download().getLink())
+            .subtitleSource(subtitleSource)
+            .fileName(file.getFileName())
+            .language(Language.fromIdOptional(attributes.getLanguage()).orElse(null))
+            .quality(ReleaseParser.getQualityKeyword(file.getFileName()))
+            .subtitleMatchType(SubtitleMatchType.EVERYTHING)
+            .releaseGroup(ReleaseParser.extractReleaseGroup(file.fileName, file.fileName.endsWith(".srt")))
+            .uploader(attributes.getUploader() != null ? attributes.getUploader().getName() : null)
+            .hearingImpaired(Boolean.TRUE == attributes.isHearingImpaired());
     }
 
     @Override
     public List<OpensubtitleSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
-            throws OpenSubtitlesException {
+        throws OpenSubtitlesException {
         return getApi().getProviderSerieIds(serieName)
-                .stream()
-                .sorted(Comparator.comparing((OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
-                                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                        .thenComparing(OpensubtitleSerieId::getYear, Comparator.reverseOrder()))
-                .toList();
+            .stream()
+            .sorted(Comparator.comparing((OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                    .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
+                .thenComparing(OpensubtitleSerieId::getYear, Comparator.reverseOrder()))
+            .toList();
     }
 
     @Override

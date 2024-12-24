@@ -196,11 +196,11 @@ public class GUI extends JFrame implements PropertyChangeListener {
         gbcLblStatus.gridy = 2;
         contentPane.add(lblStatus, gbcLblStatus);
 
-        createMenu();
+        createMenu(pnlLogging);
         setJMenuBar(menuBar);
     }
 
-    private void createMenu() {
+    private void createMenu(LoggingPanel pnlLogging) {
         Settings settings = settingsControl.settings;
         BiConsumer<SearchColumnName, Boolean> visibilityFunction =
             pnlSearchFile.resultPanel.getTable()::setColumnVisibility;

@@ -12,7 +12,7 @@ import org.opensubtitles.model.DownloadRequest;
 @Accessors(fluent = true, chain = true)
 @Setter
 @RequiredArgsConstructor
-public class DownloadSubtitle extends OpenSubtitlesExecuter {
+public final class DownloadSubtitle extends OpenSubtitlesExecuter {
     private final ApiClient apiClient;
 
     private int fileId;
@@ -20,7 +20,7 @@ public class DownloadSubtitle extends OpenSubtitlesExecuter {
     public Download200Response download() throws OpenSubtitlesException {
         try {
             return execute(() -> new DownloadApi(apiClient).download("SubTools",
-                    new DownloadRequest().fileId(fileId)));
+                new DownloadRequest().fileId(fileId)));
         } catch (Exception e) {
             throw new OpenSubtitlesException(e);
         }

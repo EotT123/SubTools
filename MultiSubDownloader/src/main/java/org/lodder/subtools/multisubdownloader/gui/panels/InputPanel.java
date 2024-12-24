@@ -7,7 +7,7 @@ import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
 import org.lodder.subtools.sublibrary.Language;
 
-public abstract class InputPanel extends JPanel {
+public abstract sealed class InputPanel extends JPanel permits SearchFileInputPanel, SearchTextInputPanel {
 
     @Serial
     private static final long serialVersionUID = 7753220002440733463L;

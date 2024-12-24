@@ -12,7 +12,7 @@ import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
 import org.lodder.subtools.sublibrary.model.Release;
 
 @RequiredArgsConstructor
-public abstract class LibraryBuilder {
+public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, PathLibraryBuilder {
 
     private final boolean useTvdb;
     private final TheTvdbAdapter tvdbAdapter;
@@ -28,7 +28,7 @@ public abstract class LibraryBuilder {
     }
 
     protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers,
-            boolean leadingZero) {
+        boolean leadingZero) {
         if (structure.contains(tag.label)) {
             String afterLabel = StringUtils.substringAfter(structure, tag.label);
             String separator = StringUtils.isNotEmpty(afterLabel) ? afterLabel.substring(0, 1) : "";
@@ -36,8 +36,8 @@ public abstract class LibraryBuilder {
                 separator = "";
             }
             String formattedEpisodeNumber = episodeNumbers.stream()
-                    .map(episode -> formattedNumber(episode, leadingZero))
-                    .collect(Collectors.joining(separator));
+                .map(episode -> formattedNumber(episode, leadingZero))
+                .collect(Collectors.joining(separator));
             return structure.replace(tag.label, formattedEpisodeNumber);
         }
         return structure;

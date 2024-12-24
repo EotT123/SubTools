@@ -4,7 +4,7 @@ import java.io.Serial;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class MyTextFieldString extends MyTextFieldCommon<String, MyTextFieldString> {
+public final class MyTextFieldString extends MyTextFieldCommon<String, MyTextFieldString> {
     @Serial
     private static final long serialVersionUID = -8526638589445703452L;
 
@@ -18,9 +18,9 @@ public class MyTextFieldString extends MyTextFieldCommon<String, MyTextFieldStri
 
     public static MyTextFieldOthersIntf<String, MyTextFieldString> builder() {
         return new MyTextFieldString()
-                .withToStringMapper(TO_STRING_MAPPER)
-                .withToObjectMapper(TO_OBJECT_MAPPER)
-                .withValueVerifier(VERIFIER);
+            .withToStringMapper(TO_STRING_MAPPER)
+            .withToObjectMapper(TO_OBJECT_MAPPER)
+            .withValueVerifier(VERIFIER);
     }
 
     public static MyTextFieldOthersIntf<String, MyTextFieldString> create() {

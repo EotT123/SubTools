@@ -8,7 +8,7 @@ import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
 
-public class SearchFileInputPanel extends InputPanel {
+public final class SearchFileInputPanel extends InputPanel {
 
     @Serial
     private static final long serialVersionUID = 6522020963519514345L;

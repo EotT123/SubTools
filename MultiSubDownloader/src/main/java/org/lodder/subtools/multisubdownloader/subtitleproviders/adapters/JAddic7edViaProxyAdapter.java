@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, ProviderSerieId, ApiException> {
+public final class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, ProviderSerieId, ApiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edViaProxyAdapter.class);
 
@@ -73,52 +73,52 @@ public class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Provider
     @Override
     public Set<Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language) throws ApiException {
         return getProviderSerieId(tvRelease).map(
-                providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
-                    try {
-                        return new ExecuteCall<>(
-                                () -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language))
-                                .message("getSubtitles: [%s]".formatted(
-                                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode)))
-                                .retryWhenHttpCode(ReturnCode.REFRESHING)
-                                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                                .execute()
-                                .stream();
-                    } catch (ApiException e) {
-                        LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
-                                TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                                e.getMessage()), e);
-                        return Stream.empty();
-                    }
-                }).collect(Collectors.toSet())).orElseGet(Set::of);
+            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+                try {
+                    return new ExecuteCall<>(
+                        () -> getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language))
+                        .message("getSubtitles: [%s]".formatted(
+                            TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode)))
+                        .retryWhenHttpCode(ReturnCode.REFRESHING)
+                        .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                        .execute()
+                        .stream();
+                } catch (ApiException e) {
+                    LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
+                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
+                        e.getMessage()), e);
+                    return Stream.empty();
+                }
+            }).collect(Collectors.toSet())).orElseGet(Set::of);
     }
 
     @Override
     public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
-            throws ApiException {
+        throws ApiException {
         List<ProviderSerieId> serieIds = tvdbIdOptional.mapToObj(
-                tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId)).message(
-                                "getProviderSerieName: [$tvdbId]")
-                        .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                        .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                            LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(providerName, tvdbId));
-                            return List.of();
-                        })
-                        .execute()).orElseGet(List::of);
+            tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId)).message(
+                    "getProviderSerieName: [$tvdbId]")
+                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
+                    LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(providerName, tvdbId));
+                    return List.of();
+                })
+                .execute()).orElseGet(List::of);
 
         if (serieIds.isEmpty()) {
             serieIds = new ExecuteCall<>(() -> getApi().getProviderSerieName(serieName)).message(
-                            "getProviderSerieName: [$serieName]")
-                    .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                    .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                        LOGGER.info("API $providerName - Could not find serie name [$serieName]");
-                        return List.of();
-                    })
-                    .execute();
+                    "getProviderSerieName: [$serieName]")
+                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
+                    LOGGER.info("API $providerName - Could not find serie name [$serieName]");
+                    return List.of();
+                })
+                .execute();
         }
         return serieIds.stream()
-                .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
-                        .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
-                .toList();
+            .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
+                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
+            .toList();
     }
 
     @Override

@@ -22,7 +22,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
+public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
     private final @NonNull FileListAction filelistAction;
 
@@ -54,9 +54,9 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class FileGuiSearchActionBuilder
-            implements FileGuiSearchActionBuilderBuild, FileGuiSearchActionBuilderReleaseFactory,
-            FileGuiSearchActionBuilderSearchPanel, FileGuiSearchActionBuilderGUI,
-            FileGuiSearchActionBuilderSubtitleProviderStore {
+        implements FileGuiSearchActionBuilderBuild, FileGuiSearchActionBuilderReleaseFactory,
+        FileGuiSearchActionBuilderSearchPanel, FileGuiSearchActionBuilderGUI,
+        FileGuiSearchActionBuilderSubtitleProviderStore {
         private final Settings settings;
         private SubtitleProviderStore subtitleProviderStore;
         private GUI mainWindow;
@@ -70,7 +70,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     }
 
     private FileGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
-            SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
+        SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
         super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
         this.filelistAction = new FileListAction(settings);
     }
@@ -88,7 +88,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
         VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
         List<Subtitle> filteredSubtitles = filtering != null ?
-                subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
+            subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
         filteredSubtitles.forEach(release::addMatchingSub);
 
         model.addRow(release);
@@ -146,7 +146,7 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
     }
 
     private List<Path> getFiles(String filePath, Language language, boolean recursive,
-            boolean overwriteExistingSubtitles) {
+        boolean overwriteExistingSubtitles) {
         /* Get a list of selected directories */
         List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : this.settings.defaultFolders;
 
@@ -156,8 +156,8 @@ public class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
 
         /* Start the getFileListing Action */
         return dirs.stream()
-                .flatMap(dir -> this.filelistAction.getFileListing(dir, recursive, language, overwriteExistingSubtitles)
-                        .stream())
-                .toList();
+            .flatMap(dir -> this.filelistAction.getFileListing(dir, recursive, language, overwriteExistingSubtitles)
+                .stream())
+            .toList();
     }
 }

@@ -7,7 +7,7 @@ import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.model.Release;
 
-public class CLISearchProgress extends CLIProgress implements SearchProgressListener {
+public final class CLISearchProgress extends CLIProgress implements SearchProgressListener {
 
     private final TextTable table;
     private final SearchProgressTableModel tableModel;

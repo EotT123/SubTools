@@ -16,7 +16,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-public class PathLibraryBuilder extends LibraryBuilder {
+public final class PathLibraryBuilder extends LibraryBuilder {
 
     private final String structure;
     private final boolean replaceSpace;

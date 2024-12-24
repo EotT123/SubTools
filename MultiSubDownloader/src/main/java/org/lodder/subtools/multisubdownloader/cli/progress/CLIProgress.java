@@ -5,7 +5,7 @@ import static manifold.ext.props.rt.api.PropOption.*;
 import manifold.ext.props.rt.api.var;
 import manifold.ext.rt.api.Self;
 
-abstract class CLIProgress {
+abstract sealed class CLIProgress permits CLIFileIndexerProgress, CLISearchProgress {
 
     @var(Protected) int progress;
     @var(Protected) boolean enabled;
