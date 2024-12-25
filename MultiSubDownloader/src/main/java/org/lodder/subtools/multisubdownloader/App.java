@@ -63,8 +63,9 @@ public class App {
         }
 
         Preferences preferences = Preferences.userRoot();
-        preferences.putBoolean("speedy", line.hasCliOption(CliOption.SPEEDY));
-        preferences.putBoolean("confirmProviderMapping", line.hasCliOption(CliOption.CONFIRM_PROVIDER_MAPPING));
+        preferences.putBoolean(CliOption.SPEEDY.value, line.hasCliOption(CliOption.SPEEDY));
+        preferences.putBoolean(CliOption.CONFIRM_PROVIDER_MAPPING.value,
+            line.hasCliOption(CliOption.CONFIRM_PROVIDER_MAPPING));
 
         final Container app = new Container();
         final Manager manager = createManager(!line.hasCliOption(CliOption.NO_GUI));

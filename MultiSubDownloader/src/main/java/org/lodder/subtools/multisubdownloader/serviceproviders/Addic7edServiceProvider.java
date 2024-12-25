@@ -4,6 +4,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
+import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -55,7 +56,7 @@ public class Addic7edServiceProvider implements ServiceProvider {
             return new JAddic7edViaProxyAdapter(manager, userInteractionHandler);
         } else {
             return new JAddic7edAdapter(loginEnabled, username, password,
-                app.makePreferences().getBoolean("speedy", false),
+                app.makePreferences().getBoolean(CliOption.SPEEDY.value, false),
                 manager, userInteractionHandler);
         }
     }
