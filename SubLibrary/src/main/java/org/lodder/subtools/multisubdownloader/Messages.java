@@ -9,10 +9,8 @@ import manifold.ext.props.rt.api.var;
 import org.lodder.subtools.sublibrary.Language;
 
 public class Messages {
-    private static final String BUNDLE_NAME = "resourcebundle.message";
-    private static final Language DEFAULT_LANGUAGE = Language.ENGLISH;
-    private static ResourceBundle resourceBundle =
-        ResourceBundle.getBundle(BUNDLE_NAME, Locale.forLanguageTag(DEFAULT_LANGUAGE.langCode));
+    private static final String BUNDLE_NAME = "resourcebundle.Message";
+    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.ROOT);
     static @var Language language;
 
     private Messages() {
@@ -29,10 +27,11 @@ public class Messages {
 
     public static void setLanguage(Language language) {
         Messages.language = language;
-        resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.forLanguageTag(language.langCode));
+        Locale locale = language == Language.ENGLISH ? Locale.ROOT : Locale.forLanguageTag(language.langCode);
+        resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
     }
 
     public static List<Language> getAvailableLanguages() {
-        return List.of(Language.fromId("nl"), DEFAULT_LANGUAGE);
+        return List.of(Language.DUTCH, Language.ENGLISH);
     }
 }
