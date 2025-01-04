@@ -9,7 +9,7 @@ import manifold.ext.props.rt.api.var;
 import org.lodder.subtools.sublibrary.Language;
 
 public class Messages {
-    private static final String BUNDLE_NAME = "messages";
+    private static final String BUNDLE_NAME = "resourcebundle.message";
     private static final Language DEFAULT_LANGUAGE = Language.ENGLISH;
     private static ResourceBundle resourceBundle =
         ResourceBundle.getBundle(BUNDLE_NAME, Locale.forLanguageTag(DEFAULT_LANGUAGE.langCode));
