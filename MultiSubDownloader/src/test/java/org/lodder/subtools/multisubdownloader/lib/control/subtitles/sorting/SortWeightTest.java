@@ -8,13 +8,14 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.TvRelease;
 
 class SortWeightTest {
 
     @Test
     void test_it_generates_weights_for_release() throws Exception {
         // Arrested.Development.S01E01.DVDRip.XviD-MEDiEVAL
-        Release release = mock(Release.class);
+        Release release = mock(TvRelease.class);
         when(release.quality).thenReturn("DVDRip XviD");
         when(release.releaseGroup).thenReturn("MEDiEVAL");
 

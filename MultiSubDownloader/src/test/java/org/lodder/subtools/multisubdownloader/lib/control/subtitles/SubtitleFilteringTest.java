@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
+import org.lodder.subtools.sublibrary.model.TvRelease;
 
 class SubtitleFilteringTest {
 
@@ -114,7 +115,7 @@ class SubtitleFilteringTest {
     }
 
     private Release createRelease(String filename, String releasegroup) {
-        Release release = mock(Release.class);
+        Release release = mock(TvRelease.class);
 
         when(release.fileName).thenReturn(filename);
         when(release.extension).thenReturn("mkv");

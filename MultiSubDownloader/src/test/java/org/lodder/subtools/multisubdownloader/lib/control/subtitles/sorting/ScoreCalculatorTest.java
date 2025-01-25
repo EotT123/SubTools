@@ -8,6 +8,7 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
+import org.lodder.subtools.sublibrary.model.TvRelease;
 
 class ScoreCalculatorTest {
 
@@ -52,7 +53,7 @@ class ScoreCalculatorTest {
 
     private SortWeight createWeights(String quality, String group) {
         // Arrested.Development.S01E01.DVDRip.XviD-MEDiEVAL
-        Release release = mock(Release.class);
+        Release release = mock(TvRelease.class);
         when(release.quality).thenReturn(quality);
         when(release.releaseGroup).thenReturn(group);
 

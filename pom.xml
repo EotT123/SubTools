@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.lodder.subtools</groupId>
     <artifactId>subtools</artifactId>
@@ -8,7 +9,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <manifold.version>2024.1.47</manifold.version>
+        <manifold.version>2024.1.53</manifold.version>
         <lombok.version>1.18.36</lombok.version>
         <maven.compiler.target>23</maven.compiler.target>
         <maven.compiler.source>23</maven.compiler.source>
@@ -309,13 +310,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.12.0</version>
+                <version>5.15.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.26.0</version>
+                <version>3.27.3</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

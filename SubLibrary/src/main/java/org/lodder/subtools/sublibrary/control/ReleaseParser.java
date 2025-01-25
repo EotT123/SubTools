@@ -5,17 +5,19 @@ import static org.lodder.subtools.sublibrary.control.Tags.*;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
@@ -110,9 +112,8 @@ public class ReleaseParser {
 
                 // If the year is found, or the source is likely a movie release and not a TV show release, create a
                 // MovieRelease object
-                if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE)
-                    .map(source -> source.likelyMovieRelease || !source.likelyTvRelease)
-                    .orElse(true)) {
+                if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE).stream()
+                    .anyMatch(source -> source.likelyMovieRelease || !source.likelyTvRelease)) {
                     if (StringUtils.equals(parserResults.parts.first, fileParseName)) {
                         throw new ReleaseParseException("Could not parse " + fileParseName);
                     }
@@ -166,7 +167,7 @@ public class ReleaseParser {
         if (StringUtils.equals(name, fileParseName)) {
             throw new ReleaseParseException("Could not parse " + fileParseName);
         }
-        if (season == null || episodes.isEmpty()) {
+        if (season == null) {
             throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
         }
 
@@ -315,31 +316,32 @@ public class ReleaseParser {
         }
 
         private boolean parse(boolean removeMatchedParts, RegexBuilderBuild... regexBuilders) {
+            boolean result = false;
+            Multimap<String, String> matches = MultimapBuilder.hashKeys().arrayListValues().build();
             for (RegexBuilderBuild regexBuilder : regexBuilders) {
-                boolean hasMatch = regexBuilder.createWithDelimiter()
-                    .stream()
-                    .map(v -> parsePrivate(v, removeMatchedParts))
-                    .reduce(false, Boolean::logicalOr);
-                if (hasMatch) {
-                    return true;
-                }
+                result &=
+                    regexBuilder.createWithDelimiter().stream().map(v -> parsePrivate(matches, v, removeMatchedParts))
+                        .toList().contains(true);
             }
-            return false;
+            matches.asMap().forEach(namedMatches::put);
+            return result;
         }
 
         private boolean parse(boolean removeMatchedParts, String... regexes) {
-            return regexes.stream()
-                .map(regex -> parsePrivate(regex, removeMatchedParts))
-                .reduce(false, Boolean::logicalOr);
+            Multimap<String, String> matches = MultimapBuilder.hashKeys().arrayListValues().build();
+            boolean result =
+                regexes.stream().map(regex -> parsePrivate(matches, regex, removeMatchedParts)).toList().contains(true);
+            matches.asMap().forEach(namedMatches::put);
+            return result;
         }
 
-        public boolean parsePrivate(String regex, boolean removeMatchedParts) {
+        public boolean parsePrivate(Multimap<String, String> matches, String regex, boolean removeMatchedParts) {
             Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
             for (String part : parts) {
                 Matcher matcher = pattern.matcher(part);
                 if (matcher.find()) {
                     Map<String, Integer> namedGroupMap = matcher.namedGroups();
-                    namedGroupMap.entrySet().forEach(entry -> namedMatches.put(entry.key, matcher.group(entry.value)));
+                    namedGroupMap.entrySet().forEach(entry -> matches.put(entry.key, matcher.group(entry.value)));
                     String match = matcher.group();
                     if (removeMatchedParts) {
                         List<String> remainingParts = parts.stream()
@@ -359,7 +361,8 @@ public class ReleaseParser {
         }
 
         public boolean contains(Tag<?> tag) {
-            return getNamedMatch(tag).isPresent();
+            List<?> namedMatch = getNamedMatch(tag);
+            return namedMatch != null && !namedMatch.isEmpty();
         }
 
         public boolean containsNone(Tag<?>... tags) {
@@ -369,21 +372,21 @@ public class ReleaseParser {
         @SafeVarargs
         public final <T> T getNamedMatchValue(Tag<T>... tags) {
             for (Tag<T> tag : tags) {
-                Optional<T> namedMatch = getNamedMatch(tag, tag.mapper);
-                if (namedMatch.isPresent()) {
-                    return namedMatch.get();
+                List<T> namedMatch = getNamedMatch(tag, tag.mapper);
+                if (!namedMatch.isEmpty()) {
+                    return namedMatch.first;
                 }
             }
             return null;
         }
 
-        public <T> Optional<T> getNamedMatch(Tag<T> tag) {
+        public <T> List<T> getNamedMatch(Tag<T> tag) {
             return getNamedMatch(tag, tag.mapper);
         }
 
-        public <T> Optional<T> getNamedMatch(Tag<T> tag, Function<String, T> mapper) {
-            String value = namedMatches.get(tag);
-            return value == null ? Optional.empty() : Optional.of(mapper.apply(value));
+        public <T> List<T> getNamedMatch(Tag<T> tag, Function<String, T> mapper) {
+            List<String> values = namedMatches.get(tag);
+            return values == null ? List.of() : values.stream().map(mapper).distinct().toList();
         }
     }
 
@@ -432,12 +435,12 @@ public class ReleaseParser {
     }
 
     private static List<String> getQualityKeyWordsAlreadyParsed(ParserResults parserResults) {
-        return Stream.of(parserResults.getNamedMatch(QUALITY), parserResults.getNamedMatch(SOURCE),
-                parserResults.getNamedMatch(AUDIO_ENCODING), parserResults.getNamedMatch(VIDEO_ENCODING))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(RegexPattern::getValue)
-            .toList();
+        return Stream.of(
+                parserResults.getNamedMatch(QUALITY),
+                parserResults.getNamedMatch(SOURCE),
+                parserResults.getNamedMatch(AUDIO_ENCODING),
+                parserResults.getNamedMatch(VIDEO_ENCODING))
+            .flatMap(List::stream).map(RegexPattern::getValue).toList();
     }
 
     public static String extractReleaseGroup(final String fileName, boolean hasExtension) {
@@ -466,13 +469,13 @@ public class ReleaseParser {
      * Helper class for storing and retrieving named regular expression matches.
      */
     private static class NamedMatches {
-        private final Map<String, String> map = new HashMap<>();
+        private final Map<String, List<String>> map = new HashMap<>();
 
-        public void put(String key, String value) {
-            map.put(key, value);
+        public void put(String key, Collection<String> values) {
+            map.put(key, values.stream().distinct().toList());
         }
 
-        public String get(Tag<?> tag) {
+        public List<String> get(Tag<?> tag) {
             return map.get(tag.value);
         }
     }
