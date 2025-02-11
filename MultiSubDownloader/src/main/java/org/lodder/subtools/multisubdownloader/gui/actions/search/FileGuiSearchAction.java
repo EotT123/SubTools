@@ -78,7 +78,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
     @Override
     protected void validate() throws SearchSetupException {
         String path = getInputPanel().getIncomingPath();
-        if ("".equals(path) && !this.settings.hasDefaultFolders()) {
+        if (path.isEmpty() && !this.settings.hasDefaultFolders()) {
             throw new SearchSetupException(Messages.getText("App.NoFolderSelected"));
         }
     }

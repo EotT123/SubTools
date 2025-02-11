@@ -108,7 +108,7 @@ public class FileListAction {
         String extension = file.getExtension();
         Optional<String> subtitleNameOptional = VideoPatterns.EXTENSIONS.stream()
             .filter(extension::equals)
-            .map(x -> file.changeExtension(SUBTITLE_EXTENSION))
+            .map(_ -> file.changeExtension(SUBTITLE_EXTENSION))
             .findAny();
 
         if (subtitleNameOptional.isEmpty()) {
