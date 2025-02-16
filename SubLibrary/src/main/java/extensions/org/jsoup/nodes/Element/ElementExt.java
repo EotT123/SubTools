@@ -5,13 +5,13 @@ import extensions.org.jsoup.select.Elements.UnmodifiableElements;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Jailbreak;
 import manifold.ext.rt.api.This;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Collector;
 import org.jsoup.select.Elements;
 import org.jsoup.select.Evaluator;
 import org.jsoup.select.QueryParser;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.exception.WebpageException;
 
 @Extension
@@ -21,24 +21,24 @@ public class ElementExt extends NodeExt {
     // Get all Element \\
     // --------------- \\
 
-    public static Elements selectAllByClass(@Nullable @This Element element, String className) {
+    public static Elements selectAllByClass(@This @Nullable Element element, String className) {
         return element == null ? UnmodifiableElements.EMPTY : element.getElementsByClass(requireNotEmpty(className));
     }
 
-    public static Elements selectAllByTag(@Nullable @This Element element, String tagName) {
+    public static Elements selectAllByTag(@This @Nullable Element element, String tagName) {
         return element == null ? UnmodifiableElements.EMPTY : element.getElementsByTag(requireNotEmpty(tagName));
     }
 
-    public static Elements selectAllByAttribute(@Nullable @This Element element, String attribute) {
+    public static Elements selectAllByAttribute(@This @Nullable Element element, String attribute) {
         return element == null ? UnmodifiableElements.EMPTY :
                 element.getElementsByAttribute(requireNotEmpty(attribute));
     }
 
-    public static Elements selectAllByCss(@Nullable @This Element element, String cssQuery) {
+    public static Elements selectAllByCss(@This @Nullable Element element, String cssQuery) {
         return element == null ? UnmodifiableElements.EMPTY : element.getElements(requireNotEmpty(cssQuery));
     }
 
-    public static Elements selectAll(@Nullable @This Element element, Evaluator evaluator) {
+    public static Elements selectAll(@This @Nullable Element element, Evaluator evaluator) {
         return element == null ? UnmodifiableElements.EMPTY : Collector.collect(evaluator, element);
     }
 
@@ -46,27 +46,27 @@ public class ElementExt extends NodeExt {
     // Get First Element \\
     // ----------------- \\
 
-    public static @Nullable Element selectFirstByClass(@Nullable @This Element element, String className) {
+    public static @Nullable Element selectFirstByClass(@This @Nullable Element element, String className) {
         return element == null ? null : element.selectFirst(new Evaluator.Class(requireNotEmpty(className)));
     }
 
-    public static @Nullable Element selectFirstByTag(@Nullable @This Element element, String tagName) {
+    public static @Nullable Element selectFirstByTag(@This @Nullable Element element, String tagName) {
         return element == null ? null : element.selectFirst(new Evaluator.Tag(requireNotEmpty(tagName)));
     }
 
-    public static @Nullable Element selectFirstByAttribute(@Nullable @This Element element, String attribute) {
+    public static @Nullable Element selectFirstByAttribute(@This @Nullable Element element, String attribute) {
         return element == null ? null : element.selectFirst(new Evaluator.Attribute(requireNotEmpty(attribute)));
     }
 
-    public static @Nullable Element selectFirstByCss(@Nullable @This Element element, String cssQuery) {
+    public static @Nullable Element selectFirstByCss(@This @Nullable Element element, String cssQuery) {
         return element == null ? null : element.selectFirst(QueryParser.parse(requireNotEmpty(cssQuery)));
     }
 
-    public static @Nullable Element selectFirstById(@Nullable @This Element element, String id) {
+    public static @Nullable Element selectFirstById(@This @Nullable Element element, String id) {
         return element == null ? null : element.selectFirst(new Evaluator.Id(requireNotEmpty(id)));
     }
 
-    public static @Nullable Element selectFirstBy(@Nullable @This Element element, Evaluator evaluator) {
+    public static @Nullable Element selectFirstBy(@This @Nullable Element element, Evaluator evaluator) {
         return element == null ? null : Collector.findFirst(evaluator, element);
     }
 
@@ -74,25 +74,25 @@ public class ElementExt extends NodeExt {
     // Get n-th Element \\
     // ---------------- \\
 
-    public static @Nullable Element selectNthByClass(@Nullable @This Element element, String className, int index) {
+    public static @Nullable Element selectNthByClass(@This @Nullable Element element, String className, int index) {
         return element == null ? null : selectNth(element, new Evaluator.Class(requireNotEmpty(className)), index);
     }
 
-    public static @Nullable Element selectNthByTag(@Nullable @This Element element, String tagName, int index) {
+    public static @Nullable Element selectNthByTag(@This @Nullable Element element, String tagName, int index) {
         return element == null ? null : selectNth(element, new Evaluator.Tag(requireNotEmpty(tagName)), index);
     }
 
-    public static @Nullable Element selectNthByAttribute(@Nullable @This Element element, String attribute,
+    public static @Nullable Element selectNthByAttribute(@This @Nullable Element element, String attribute,
             int index) {
         return element == null ? null :
                 selectNth(element, new Evaluator.Attribute(requireNotEmpty(attribute)), index);
     }
 
-    public static @Nullable Element selectNthByCss(@Nullable @This Element element, String cssQuery, int index) {
+    public static @Nullable Element selectNthByCss(@This @Nullable Element element, String cssQuery, int index) {
         return element == null ? null : selectNth(element, QueryParser.parse(requireNotEmpty(cssQuery)), index);
     }
 
-    public static @Nullable Element selectNth(@Nullable @This Element element, @Jailbreak Evaluator eval, int idx) {
+    public static @Nullable Element selectNth(@This @Nullable Element element, @Jailbreak Evaluator eval, int idx) {
         eval.reset();
         return new NthElementFinder(eval).find(element, element, idx);
     }
@@ -101,7 +101,7 @@ public class ElementExt extends NodeExt {
     // Get First Element or Throw \\
     // -------------------------- \\
 
-    public static Element selectFirstByClassOrThrow(@Nullable @This Element element, String className)
+    public static Element selectFirstByClassOrThrow(@This @Nullable Element element, String className)
             throws WebpageException {
         Element n = selectFirstByClass(element, className);
         if (n == null) {
@@ -110,7 +110,7 @@ public class ElementExt extends NodeExt {
         return n;
     }
 
-    public static Element selectFirstByTagOrThrow(@Nullable @This Element element, String tagName)
+    public static Element selectFirstByTagOrThrow(@This @Nullable Element element, String tagName)
             throws WebpageException {
         Element n = selectFirstByTag(element, tagName);
         if (n == null) {
@@ -119,7 +119,7 @@ public class ElementExt extends NodeExt {
         return n;
     }
 
-    public static Element selectFirstByAttributeOrThrow(@Nullable @This Element element, String attribute)
+    public static Element selectFirstByAttributeOrThrow(@This @Nullable Element element, String attribute)
             throws WebpageException {
         Element n = selectFirstByAttribute(element, attribute);
         if (n == null) {
@@ -128,7 +128,7 @@ public class ElementExt extends NodeExt {
         return n;
     }
 
-    public static Element selectFirstByCssOrThrow(@Nullable @This Element element, String cssQuery)
+    public static Element selectFirstByCssOrThrow(@This @Nullable Element element, String cssQuery)
             throws WebpageException {
         Element n = selectFirstByCss(element, cssQuery);
         if (n == null) {
@@ -137,7 +137,7 @@ public class ElementExt extends NodeExt {
         return n;
     }
 
-    public static Element selectFirstByIdOrThrow(@Nullable @This Element element, String id)
+    public static Element selectFirstByIdOrThrow(@This @Nullable Element element, String id)
             throws WebpageException {
         Element n = selectFirstById(element, id);
         if (n == null) {
@@ -146,7 +146,7 @@ public class ElementExt extends NodeExt {
         return n;
     }
 
-    public static Element selectOrThrow(@Nullable @This Element element, Evaluator evaluator)
+    public static Element selectOrThrow(@This @Nullable Element element, Evaluator evaluator)
             throws WebpageException {
         Element n = selectFirstBy(element, evaluator);
         if (n == null) {
@@ -159,7 +159,7 @@ public class ElementExt extends NodeExt {
     // Get n-th Element or Throw \\
     // ------------------------- \\
 
-    public static Element selectNthByClassOrThrow(@Nullable @This Element element, String className, int index)
+    public static Element selectNthByClassOrThrow(@This @Nullable Element element, String className, int index)
             throws WebpageException {
         Element elem = selectNthByClass(element, className, index);
         if (elem == null) {
@@ -168,7 +168,7 @@ public class ElementExt extends NodeExt {
         return elem;
     }
 
-    public static Element selectNthByTagOrThrow(@Nullable @This Element element, String tagName, int index)
+    public static Element selectNthByTagOrThrow(@This @Nullable Element element, String tagName, int index)
             throws WebpageException {
         Element elem = selectNthByTag(element, tagName, index);
         if (elem == null) {
@@ -177,7 +177,7 @@ public class ElementExt extends NodeExt {
         return elem;
     }
 
-    public static Element selectNthByAttributeOrThrow(@Nullable @This Element element, String attribute, int index)
+    public static Element selectNthByAttributeOrThrow(@This @Nullable Element element, String attribute, int index)
             throws WebpageException {
         Element elem = selectNthByAttribute(element, attribute, index);
         if (elem == null) {
@@ -186,7 +186,7 @@ public class ElementExt extends NodeExt {
         return elem;
     }
 
-    public static Element selectNthByCssOrThrow(@Nullable @This Element element, String cssQuery, int index)
+    public static Element selectNthByCssOrThrow(@This @Nullable Element element, String cssQuery, int index)
             throws WebpageException {
         Element elem = selectNthByCss(element, cssQuery, index);
         if (elem == null) {
@@ -195,7 +195,7 @@ public class ElementExt extends NodeExt {
         return elem;
     }
 
-    public static Element selectNthOrThrow(@Nullable @This Element element, Evaluator eval, int index)
+    public static Element selectNthOrThrow(@This @Nullable Element element, Evaluator eval, int index)
             throws WebpageException {
         Element elem = selectNth(element, eval, index);
         if (elem == null) {
@@ -209,7 +209,7 @@ public class ElementExt extends NodeExt {
     // Get Elements \\
     // ------------ \\
 
-    public static Elements getElements(@Nullable @This Element element, String cssQuery) {
+    public static Elements getElements(@This @Nullable Element element, String cssQuery) {
         return element == null ? new Elements() : element.select(cssQuery);
     }
 
@@ -218,11 +218,11 @@ public class ElementExt extends NodeExt {
     // --------------- \\
 
 
-    public static String getText(@Nullable @This Element element) {
+    public static String getText(@This @Nullable Element element) {
         return element == null ? "" : element.text();
     }
 
-    public static @Nullable Element getParent(@Nullable @This Element element) {
+    public static @Nullable Element getParent(@This @Nullable Element element) {
         return element == null ? null : element.parent();
     }
 

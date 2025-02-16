@@ -3,12 +3,12 @@ package extensions.org.jsoup.nodes.Element;
 import static org.jsoup.select.NodeFilter.FilterResult.*;
 
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Evaluator;
 import org.jsoup.select.NodeFilter;
 import org.jsoup.select.NodeTraversor;
+import org.jspecify.annotations.Nullable;
 
 @RequiredArgsConstructor
 class NthElementFinder implements NodeFilter {
@@ -18,8 +18,7 @@ class NthElementFinder implements NodeFilter {
     private int index;
     private int currentIdx;
 
-    @Nullable
-    Element find(Element root, Element start, int index) {
+    @Nullable Element find(Element root, Element start, int index) {
         this.index = index;
         this.evalRoot = root;
         this.match = null;
