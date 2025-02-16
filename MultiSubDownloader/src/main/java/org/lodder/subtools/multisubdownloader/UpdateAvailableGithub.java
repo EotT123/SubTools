@@ -79,7 +79,7 @@ public class UpdateAvailableGithub {
                         .getAsJsoupDocument()
                         .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
                     Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
-                    String versionText = element.getParent().selectFirstByCss("a").getText();
+                    String versionText = element.parent().selectFirstByTag("a").text();
                     Matcher matcher = versionPattern.matcher(versionText);
                     matcher.find();
                     String version = matcher.group();
@@ -92,7 +92,7 @@ public class UpdateAvailableGithub {
                         .cacheType(CacheType.NONE)
                         .getAsJsoupDocument()
                         .selectFirstByCss(".Box-row a[href$='.jar']");
-                    String url = DOMAIN + artifactElement.getAttr("href");
+                    String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
                     return Optional.of(url);
                 } catch (Exception e) {
@@ -121,18 +121,18 @@ public class UpdateAvailableGithub {
                             .getAsJsoupDocument()
                             .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
-                        rowElement.selectFirstByCss(".d-inline relative-time").getAttr("datetime"));
+                        rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
                     if (nightlyBuildTista.isBefore(buildTista)) {
                         return Optional.empty();
                     }
                     String url =
-                        "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").getAttr("href");
+                        "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
                     String downloadUrl = manager.getPageContentBuilder()
                         .url(url)
                         .cacheType(CacheType.MEMORY)
                         .getAsJsoupDocument()
                         .selectFirstByCss("table td a")
-                        .getAttr("href");
+                        .attr("href");
                     updateLastUpdateCheck();
                     return Optional.of(downloadUrl);
                 } catch (Exception e) {

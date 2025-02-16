@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.Intercept;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.jsoup.nodes.Node;
@@ -19,12 +20,14 @@ public class NodeExt {
     // Node methods \\
     // ------------ \\
 
-    public static @Nullable Node getParent(@This @Nullable Node node) {
+    @Intercept
+    public static @Nullable Node parent(@This @Nullable Node node) {
         return node == null ? null : node.parent();
     }
 
-    public static String getAttr(@This @Nullable Node node, String attr) {
-        return node == null ? "" : node.attr(attr);
+    @Intercept
+    public static String attr(@This @Nullable Node node, String attr) {
+        return node == null ? null : node.attr(attr);
     }
 
     public static <T> T useAttrOrElse(@This @Nullable Node node, String attr, Function<String, T> mapper,
@@ -32,20 +35,8 @@ public class NodeExt {
         return node != null && node.hasAttr(attr) ? mapper.apply(node.attr(attr)) : supplier.get();
     }
 
-    public static @Nullable String getAttrNull(@This @Nullable Node node, String attr) {
-        return node == null ? null : node.attr(attr);
-    }
-
     public static Optional<String> getAttrOptional(@This @Nullable Node node, String attr) {
-        return node == null ? Optional.empty() : Optional.of(node.attr(attr));
-    }
-
-    public static <X extends Exception> String getAttrOrThrow(@This @Nullable Node node, String attr,
-            Supplier<X> exceptionSupplier) throws X {
-        if (node == null) {
-            throw exceptionSupplier.get();
-        }
-        return node.attr(attr);
+        return Optional.ofNullable(node.attr(attr));
     }
 
     // ------------- \\

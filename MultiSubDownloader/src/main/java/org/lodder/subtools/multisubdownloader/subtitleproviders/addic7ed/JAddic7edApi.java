@@ -140,7 +140,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                             break;
                         } else {
                             version = m.group(1).trim();
-                            uploader = block.selectFirst("a[href*=user/]").getText();
+                            uploader = block.selectFirst("a[href*=user/]").text();
                             hearingImpaired = !block.select("img[title~=Hearing]").isEmpty();
                         }
                     }

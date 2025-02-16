@@ -85,10 +85,10 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                             String title = null;
                             String author = null;
                             Elements subtitlePageTableDoc = subtitlePageDoc.selectAllByClass("subtitle1");
-                            if (subtitlePageTableDoc.getSize() != 1) {
+                            if (subtitlePageTableDoc.size() != 1) {
                                 continue;
                             }
-                            for (Element item : subtitlePageTableDoc.getFirstElement().selectAllByTag("tr")) {
+                            for (Element item : subtitlePageTableDoc.getFirst().selectAllByTag("tr")) {
                                 Elements row = item.getElementsByTag("td");
                                 if (row.size() != 3) {
                                     continue;
@@ -146,7 +146,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                                         .map(element -> formattedSeasonEpisode.equals(element.text()))
                                         .orElse(false))
                                 .map(element -> DOMAIN + "/" +
-                                        element.selectNthByTag("td", 2).selectFirstByTag("a").getAttr("href"))
+                                    element.selectNthByTag("td", 2).selectFirstByTag("a").attr("href"))
                                 .findAny();
                     } catch (Exception e) {
                         throw new TvSubtitlesException(e);

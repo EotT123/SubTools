@@ -38,8 +38,8 @@ record ImdbSearchIdApi(Manager manager) {
                                 .getAsJsoupDocument()
                                 .selectAllByCss("#main .findList .findResult .result_text");
                         return getImdbIdCommon(searchResults,
-                                e -> e.selectFirstByTag("a").getText() + " " + e.getText(),
-                                e -> e.selectFirst("a").getAttr("href"));
+                            e -> e.selectFirstByTag("a").text() + " " + e.text(),
+                            e -> e.selectFirst("a").attr("href"));
                     } catch (Exception e) {
                         throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
                     }
@@ -99,8 +99,8 @@ record ImdbSearchIdApi(Manager manager) {
                                 .getAsJsoupDocument()
                                 .selectAllByCss("a[href*='https://www.imdb.com/title/tt']");
                         Function<Element, String> toStringMapper =
-                                e -> e.selectFirstByTag("span").getText().replace(" - IMDb", "");
-                        Function<Element, String> toHrefMapper = e -> e.getAttr("href");
+                            e -> e.selectFirstByTag("span").text().replace(" - IMDb", "");
+                        Function<Element, String> toHrefMapper = e -> e.attr("href");
                         return getImdbIdCommon(searchResults, toStringMapper, toHrefMapper);
                     } catch (Exception e) {
                         throw new ImdbSearchIdException("Error getImdbIdOnGoogle", url, e);

@@ -100,16 +100,17 @@ public class SubsceneApi extends Html implements SubtitleApi {
                     return getJsoupDocument(DOMAIN + providerSerieId.providerId)
                         .selectAllByCss("td.a1")
                         .stream()
-                        .map(Element::parent)
+//                        .map(Element::parent)
+                        .map(el -> (Element) el.parent())
                         .map(row -> new SubsceneSubtitleDescriptor().setLanguage(
-                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").getText().trim())
+                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
                                     .orElse(null))
                             .setUrlSupplier(() -> getDownloadUrl(
-                                DOMAIN + row.selectAllByCss(".a1 > a").getAttr("href").trim()))
-                            .setName(row.selectAllByCss(".a1 span:not(.l)").getText().trim())
+                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim()))
+                            .setName(row.selectAllByCss(".a1 span:not(.l)").text().trim())
                             .setHearingImpaired(row.selectFirstByCss(".a41") != null)
-                            .setUploader(row.selectFirstByCss(".a5 > a").getText().trim())
-                            .setComment(row.selectFirstByCss(".a6 > div").getText().trim()))
+                            .setUploader(row.selectFirstByCss(".a5 > a").text().trim())
+                            .setComment(row.selectFirstByCss(".a6 > div").text().trim()))
                         .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
                             subDescriptor.getSeasonEpisode().episodes.stream()
                                 .anyMatch(ep -> ep == episode))
@@ -123,7 +124,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
         try {
-            String href = getJsoupDocument(seriePageUrl).selectFirstById("downloadButton").getAttr("href");
+            String href = getJsoupDocument(seriePageUrl).selectFirstById("downloadButton").attr("href");
             if (StringUtils.isBlank(href)) {
                 throw new SubsceneException("href for $seriePageUrl is blank");
             }

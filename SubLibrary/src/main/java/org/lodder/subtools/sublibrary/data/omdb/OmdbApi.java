@@ -24,7 +24,7 @@ class OmdbApi {
                         return manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsDocument()
-                                .selectAllByTag("movie").stream()
+                            .getElementsByTagName("movie").stream()
                                 .map(this::parseOMDBDetails).findFirst();
                     } catch (Exception e) {
                         throw new OmdbException("Error OMDB API", url, e);

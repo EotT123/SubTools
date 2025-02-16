@@ -24,9 +24,9 @@ public class ImdbApi {
                                 .url(url)
                                 .getAsJsoupDocument()
                                 .selectFirstByCss(".article .subpage_title_block .subpage_title_block__right-column");
-                        String imdbName = element.selectFirstByCss("a[itemprop='url']").getText();
+                        String imdbName = element.selectFirstByCss("a[itemprop='url']").text();
                         int year = Integer.parseInt(
-                                element.selectFirstByCss("span.nobr").getText().replaceAll("[^0-9]", ""));
+                            element.selectFirstByCss("span.nobr").text().replaceAll("[^0-9]", ""));
                         return Optional.of(new ImdbDetails(imdbName, year));
                     } catch (Exception e) {
                         throw new ImdbException("Error IMDB API", url, e);

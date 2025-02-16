@@ -117,12 +117,12 @@ public class JPodnapisiApi implements SubtitleApi {
             .hearingImpaired(elem.select("new_flags flags")
                 .stream()
                 .anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))
-            .language(languageIdToLanguage(elem.selectFirst("languageId").getText()))
-            .releaseString(elem.selectFirst("release").getText().length() > 10 ? elem.selectFirst("release").getText() :
-                elem.selectFirst("title").getText().replace(":", "") + " " + elem.selectFirst("release").getText())
-            .uploaderName(elem.selectFirst("uploaderName").getText())
-            .url(elem.selectFirst("url").getText() + "/download?")
-            .subtitleId(elem.selectFirst("id").getText())
+            .language(languageIdToLanguage(elem.selectFirst("languageId").text()))
+            .releaseString(elem.selectFirst("release").text().length() > 10 ? elem.selectFirst("release").text() :
+                elem.selectFirst("title").text().replace(":", "") + " " + elem.selectFirst("release").text())
+            .uploaderName(elem.selectFirst("uploaderName").text())
+            .url(elem.selectFirst("url").text() + "/download?")
+            .subtitleId(elem.selectFirst("id").text())
             .year(getText.apply(elem.selectFirst("year")))
             .imdb(getText.apply(elem.selectFirst("imdb")))
             .omdb(getText.apply(elem.selectFirst("omdb")))

@@ -26,17 +26,16 @@ class SortWeightTest {
         definedWeights.put("%GROUP%", 5);
 
         SortWeight sortWeight = new SortWeight(release, definedWeights);
-        Map<String, Integer> weights = sortWeight.getWeights();
+        Map<String, Integer> weights = sortWeight.weights;
 
         /* check if we have the 3 weights */
-        assertThat(weights).hasSize(3).containsKeys("dvdrip", "xvid", "medieval");
-
-        /* check if the weights are correct */
-        assertThat(weights.get("dvdrip")).isEqualTo(2);
-        assertThat(weights.get("xvid")).isEqualTo(1);
-        assertThat(weights.get("medieval")).isEqualTo(5);
+        assertThat(weights)
+            .hasSize(3)
+            .containsEntry("dvdrip", 2)
+            .containsEntry("xvid", 1)
+            .containsEntry("medieval", 5);
 
         /* check if the maxScore is correct */
-        assertThat(sortWeight.getMaxScore()).isEqualTo(8);
+        assertThat(sortWeight.maxScore).isEqualTo(8);
     }
 }

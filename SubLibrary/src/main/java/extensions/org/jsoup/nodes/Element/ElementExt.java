@@ -1,8 +1,8 @@
 package extensions.org.jsoup.nodes.Element;
 
-import extensions.org.jsoup.nodes.Node.NodeExt;
 import extensions.org.jsoup.select.Elements.UnmodifiableElements;
 import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.Intercept;
 import manifold.ext.rt.api.Jailbreak;
 import manifold.ext.rt.api.This;
 import org.jsoup.helper.Validate;
@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.exception.WebpageException;
 
 @Extension
-public class ElementExt extends NodeExt {
+public class ElementExt {
 
     // --------------- \\
     // Get all Element \\
@@ -218,18 +218,15 @@ public class ElementExt extends NodeExt {
     // --------------- \\
 
 
-    public static String getText(@This @Nullable Element element) {
+    @Intercept
+    public static String text(@This @Nullable Element element) {
         return element == null ? "" : element.text();
     }
 
-    public static @Nullable Element getParent(@This @Nullable Element element) {
+    @Intercept
+    public static @Nullable Element parent(@This @Nullable Element element) {
         return element == null ? null : element.parent();
     }
-
-    //    public static <T> T map(@This @Nullable Element element, Function<Element, T> function) {
-    //        return element == null ? null : function.apply(element);
-    //    }
-
 
     // --------------- \\
     // Utility methods \\

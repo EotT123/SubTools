@@ -38,7 +38,7 @@ public class TheTvdbMirrors {
             manager.getPageContentBuilder()
                     .url("http://www.thetvdb.com/api/" + apikey + "/mirrors.xml")
                     .getAsDocument()
-                    .selectAllByTag("Mirror").stream()
+                .getElementsByTagName("Mirror").stream()
                     .filter(nMirror -> nMirror.getNodeType() == Node.ELEMENT_NODE)
                     .map(Element.class::cast)
                     .forEach(eMirror -> {
