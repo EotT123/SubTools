@@ -1,6 +1,5 @@
 package extensions.javax.swing.JComboBox;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.util.Collection;
@@ -13,6 +12,7 @@ import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import manifold.ext.rt.api.ThisClass;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.ToStringListCellRenderer;
 
 @UtilityClass
