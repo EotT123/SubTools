@@ -17,23 +17,20 @@ public final class InMemoryCache<K, V> extends Cache<K, V> {
         super(maxItems);
         if (maxItems != null && maxItems < 1) {
             throw new IllegalStateException("maxItems should be a positive number");
-        }
-        if (timerIntervalSeconds != null && timerIntervalSeconds < 1) {
+        } else if (timerIntervalSeconds != null && timerIntervalSeconds < 1) {
             throw new IllegalStateException("timerInterval should be a positive number");
-        }
-        if (timeToLiveSeconds != null && timeToLiveSeconds < 1) {
+        } else if (timeToLiveSeconds != null && timeToLiveSeconds < 1) {
             throw new IllegalStateException("timeToLive should be a positive number");
-        }
-        if (timeToLiveSeconds == null && timerIntervalSeconds != null) {
+        } else if (timeToLiveSeconds == null && timerIntervalSeconds != null) {
             throw new IllegalStateException("timeToLive should be specified when timerInterval is used");
-        }
-        if (timeToLiveSeconds != null && timerIntervalSeconds != null && timeToLiveSeconds < timerIntervalSeconds) {
+        } else if (timeToLiveSeconds != null && timerIntervalSeconds != null &&
+            timeToLiveSeconds < timerIntervalSeconds) {
             throw new IllegalStateException("timerInterval should be greater than timeToLive");
         }
         if (timerIntervalSeconds != null) {
-            createCleanUpThread(timerIntervalSeconds * 1000);
+            createCleanUpThread(timerIntervalSeconds * 1000L);
         }
-        this.timeToLive = timeToLiveSeconds * 1000;
+        this.timeToLive = timeToLiveSeconds * 1000L;
     }
 
     public static InMemoryCacheBuilderKeyTypeIntf builder() {
