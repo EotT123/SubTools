@@ -89,6 +89,10 @@
             <artifactId>throwing-function</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
@@ -232,6 +236,7 @@
                                 <!--<sourceFolder>src/gen/java</sourceFolder>-->
                                 <!--<java8>true</java8>-->
                                 <dateLibrary>java8-localdatetime</dateLibrary>
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
 
                             <typeMappings>
@@ -268,6 +273,7 @@
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
                                 <!--<sourceFolder>src/gen/java</sourceFolder>-->
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
                         </configuration>
                     </execution>

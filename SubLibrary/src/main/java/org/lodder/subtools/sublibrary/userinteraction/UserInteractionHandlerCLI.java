@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.codehaus.plexus.components.interactivity.DefaultInputHandler;
+import org.codehaus.plexus.components.interactivity.DefaultOutputHandler;
 import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
@@ -16,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class UserInteractionHandlerCLI implements UserInteractionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInteractionHandlerCLI.class);
-    @val Prompter prompter = new DefaultPrompter();
+    @val Prompter prompter = new DefaultPrompter(new DefaultOutputHandler(), new DefaultInputHandler());
     @val @override UserInteractionSettingsIntf settings;
 
     public UserInteractionHandlerCLI(UserInteractionSettingsIntf settings) {

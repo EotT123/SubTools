@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.util.http;
 
-import javax.ws.rs.core.HttpHeaders;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
@@ -23,6 +22,7 @@ import java.util.zip.GZIPInputStream;
 
 import extensions.java.io.InputStream.InputStreamExt;
 import extensions.java.nio.file.Path.PathExt;
+import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.HttpConnection;
