@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.io.Serial;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.LogTextAppender;
 
@@ -15,9 +16,7 @@ public class LoggingPanel extends JPanel {
     private static final long serialVersionUID = 1578326761175927376L;
 
     private final JTextArea txtLogging;
-    private final ch.qos.logback.classic.Logger ROOT =
-        (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(
-            ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+    private final Logger ROOT = (Logger) org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
     public LoggingPanel() {
         this.setLayout(new MigLayout("", "[698px,grow][]", "[][70px,grow]"));
