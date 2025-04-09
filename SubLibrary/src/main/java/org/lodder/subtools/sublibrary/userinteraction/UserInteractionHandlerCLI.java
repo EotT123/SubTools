@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
+import org.codehaus.plexus.components.interactivity.DefaultInputHandler;
+import org.codehaus.plexus.components.interactivity.DefaultOutputHandler;
 import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
@@ -12,15 +16,14 @@ import org.lodder.subtools.sublibrary.util.prompter.PrompterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public class UserInteractionHandlerCLI implements UserInteractionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInteractionHandlerCLI.class);
-    private final Prompter prompter = new DefaultPrompter();
-    private final UserInteractionSettingsIntf settings;
+    @val Prompter prompter = new DefaultPrompter(new DefaultOutputHandler(), new DefaultInputHandler());
+    @val @override UserInteractionSettingsIntf settings;
+
+    public UserInteractionHandlerCLI(UserInteractionSettingsIntf settings) {
+        this.settings = settings;
+    }
 
     @Override
     public Optional<String> selectFromList(Collection<String> options, String message, String title) {
@@ -28,8 +31,13 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> selectFromList(Collection<T> options, String message, String title, Function<T, String> toStringMapper) {
-        return PrompterUtil.getElementFromList(options).toStringMapper(toStringMapper).message(message).includeNull().prompt(prompter);
+    public <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
+            Function<T, String> toStringMapper) {
+        return PrompterUtil.getElementFromList(options)
+                .toStringMapper(toStringMapper)
+                .message(message)
+                .includeNull()
+                .prompt(prompter);
     }
 
     @Override
@@ -38,7 +46,8 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> choice(Collection<T> options, String message, String title, Function<T, String> toStringMapper) {
+    public <T> Optional<T> choice(Collection<T> options, String message, String title,
+            Function<T, String> toStringMapper) {
         return selectFromList(options, message, title, toStringMapper);
     }
 
@@ -49,7 +58,11 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
 
     @Override
     public Optional<String> enter(String title, String message, String errorMessage, Predicate<String> validator) {
-        return PrompterUtil.getString().message(message).errorMessage(errorMessage).objectValidator(validator).prompt(prompter);
+        return PrompterUtil.getString()
+                .message(message)
+                .errorMessage(errorMessage)
+                .objectValidator(validator)
+                .prompt(prompter);
     }
 
     @Override

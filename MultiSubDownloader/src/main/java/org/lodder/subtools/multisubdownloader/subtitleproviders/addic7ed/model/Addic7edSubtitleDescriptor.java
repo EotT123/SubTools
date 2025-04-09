@@ -1,11 +1,10 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model;
 
-import org.lodder.subtools.sublibrary.Language;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.lodder.subtools.sublibrary.Language;
 
 @EqualsAndHashCode
 @Accessors(chain = true)

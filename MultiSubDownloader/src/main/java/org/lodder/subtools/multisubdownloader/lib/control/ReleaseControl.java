@@ -1,22 +1,25 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.get;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.Release;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter(value = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public abstract class ReleaseControl {
+public abstract sealed class ReleaseControl permits MovieReleaseControl, TvReleaseControl {
 
-    private final Settings settings;
-    private final Manager manager;
+    @get(Protected) Settings settings;
+    @get(Protected) Manager manager;
+    @get abstract Release videoFile;
+
+    ReleaseControl(Settings settings, Manager manager) {
+        this.settings = settings;
+        this.manager = manager;
+    }
 
     public abstract void process() throws ReleaseControlException;
-
-    public abstract Release getVideoFile();
 }

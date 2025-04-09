@@ -20,7 +20,7 @@ public class PrompterUtil {
 
     public static Prompter showMessage(Prompter prompter, String message, Object... replacements) {
         try {
-            prompter.showMessage(String.format(message, replacements));
+            prompter.showMessage(message.formatted(replacements));
             return prompter;
         } catch (PrompterException e) {
             throw new IllegalStateException(e);

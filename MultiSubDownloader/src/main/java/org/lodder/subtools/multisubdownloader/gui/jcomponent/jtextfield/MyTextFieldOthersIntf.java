@@ -14,9 +14,9 @@ public interface MyTextFieldOthersIntf<T, R extends MyTextFieldCommon<T, R>> {
 
     MyTextFieldOthersIntf<T, R> requireValue(boolean requireValue);
 
-    MyTextFieldOthersIntf<T, R> withValueChangedCallback(Consumer<T> valueChangedCalbackListener);
+    MyTextFieldOthersIntf<T, R> withValueChangedCallback(Consumer<T> valueChangedCallbackListener);
 
-    MyTextFieldOthersIntf<T, R> withValidityChangedCallback(BooleanConsumer... validityChangedCalbackListeners);
+    MyTextFieldOthersIntf<T, R> withValidityChangedCallback(BooleanConsumer... validityChangedCallbackListeners);
 
     R build();
 }

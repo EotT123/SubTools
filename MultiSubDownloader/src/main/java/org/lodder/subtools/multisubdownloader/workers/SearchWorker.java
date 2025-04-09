@@ -12,13 +12,14 @@ import org.slf4j.LoggerFactory;
 
 public class SearchWorker extends Thread {
 
-    protected final SubtitleProvider provider;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
+
     private final SearchManager scheduler;
+    protected final SubtitleProvider provider;
     private boolean busy = false;
     private boolean isInterrupted = false;
     private Release release;
     private Set<Subtitle> subtitles;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
 
     public SearchWorker(SubtitleProvider provider, SearchManager scheduler) {
         this.provider = provider;
@@ -27,7 +28,7 @@ public class SearchWorker extends Thread {
 
     @Override
     public void run() {
-        Language language = this.scheduler.getLanguage();
+        Language language = this.scheduler.language;
         this.busy = false;
         try {
             while (!this.isInterrupted()) {
@@ -47,14 +48,15 @@ public class SearchWorker extends Thread {
                 this.subtitles = Set.copyOf(subtitles);
 
                 this.busy = false;
-                LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.getName(), subtitles.size(), release);
+                LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.getName(), subtitles.size(),
+                        release);
 
                 if (!this.isInterrupted()) {
                     this.scheduler.onCompleted(this);
                 }
             }
         } catch (SubtitlesProviderInitException e) {
-            LOGGER.error("API %s INIT (%s)".formatted(e.getProviderName(), e.getMessage()), e);
+            LOGGER.error("API %s INIT (%s)".formatted(e.providerName, e.getMessage()), e);
         }
     }
 

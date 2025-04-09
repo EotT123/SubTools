@@ -10,13 +10,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.common.base.Objects;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.experimental.ExtensionMethod;
-import org.lodder.subtools.multisubdownloader.gui.jcomponent.jcomponent.JComponentExtension;
+import manifold.ext.props.rt.api.val;
 
-@ExtensionMethod({ JComponentExtension.class })
 public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     @Serial
@@ -61,7 +58,8 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     public void addItem(Image image, T value) {
         if (!distinctValues || !contains(value)) {
-            ((DefaultListModel<LabelPanel<T>>) getModel()).addElement(new LabelPanel<>(image, value, toStringMapper, SwingConstants.LEFT));
+            ((DefaultListModel<LabelPanel<T>>) getModel()).addElement(
+                new LabelPanel<>(image, value, toStringMapper, SwingConstants.LEFT));
         }
     }
 
@@ -93,11 +91,10 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         return Optional.ofNullable(getModel().getElementAt(index));
     }
 
-    @Getter
     public static class LabelPanel<T> extends JPanel {
 
-        private static final long serialVersionUID = 1L;
-        private final Label<T> label;
+        @Serial private static final long serialVersionUID = 1L;
+        @val Label<T> label;
 
         LabelPanel(Image image, T object, Function<T, String> toStringMapper, int horizontalAlignment) {
             this.label = new Label<>(image, object, toStringMapper, horizontalAlignment);
@@ -106,19 +103,18 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         }
 
         public T getObject() {
-            return label.getObject();
+            return label.object;
         }
 
         public Image getImage() {
-            return label.getImage();
+            return label.image;
         }
     }
 
-    @Getter
     private static class Label<T> extends JLabel {
-        private static final long serialVersionUID = 1L;
-        private final T object;
-        private final Image image;
+        @Serial private static final long serialVersionUID = 1L;
+        @val T object;
+        @val Image image;
 
         Label(Image image, T object, Function<T, String> toStringMapper, int horizontalAlignment) {
             super(toStringMapper.apply(object), getImageIcon(image), horizontalAlignment);
@@ -131,7 +127,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         }
 
         private static ImageIcon resizeIcon(ImageIcon icon, int width, int height) {
-            return new ImageIcon( icon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH));
+            return new ImageIcon(icon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH));
         }
     }
 }

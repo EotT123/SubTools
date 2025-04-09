@@ -2,24 +2,24 @@ package org.lodder.subtools.sublibrary.cache;
 
 import java.util.function.Function;
 
-import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
-
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.jodah.typetools.TypeResolver;
 
-public class TypedDiskCache<K, V> extends DiskCache<K, V> {
+public final class TypedDiskCache<K, V> extends DiskCache<K, V> {
 
     private final Function<K, String> toStringMapperKey;
     private final Function<String, K> toObjectMapperKey;
     private final Function<V, String> toStringMapperValue;
     private final Function<String, V> toObjectMapperValue;
-    @SuppressWarnings("unchecked")
-    private final LazySupplier<Class<K>> keyType =
-            new LazySupplier<>(() -> (Class<K>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[0]);
-    @SuppressWarnings("unchecked")
-    private final LazySupplier<Class<V>> valueType =
-            new LazySupplier<>(() -> (Class<V>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[1]);
+
+    @Getter(lazy = true) @SuppressWarnings("unchecked")
+    private final Class<K> dbKeyType =
+            (Class<K>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[0];
+    @Getter(lazy = true) @SuppressWarnings("unchecked")
+    private final Class<V> dbValueType =
+            (Class<V>) TypeResolver.resolveRawArguments(TypedDiskCache.class, this.getClass())[1];
 
     @SuppressWarnings("rawtypes")
     public static DiskCacheBuilderToStringMapperKeyIntf cacheBuilder() {
@@ -60,8 +60,10 @@ public class TypedDiskCache<K, V> extends DiskCache<K, V> {
 
     @Setter
     @Accessors(chain = true, fluent = true)
-    public static class DiskCacheBuilder<K, V> implements DiskCacheBuilderPasswordIntf<K, V>, DiskCacheBuilderOtherIntf<K, V>,
-            DiskCacheBuilderToObjectMapperValueIntf<K, V>, DiskCacheBuilderToStringMapperValueIntf<K>, DiskCacheBuilderToObjectMapperKeyIntf<K>,
+    public static class DiskCacheBuilder<K, V>
+            implements DiskCacheBuilderPasswordIntf<K, V>, DiskCacheBuilderOtherIntf<K, V>,
+            DiskCacheBuilderToObjectMapperValueIntf<K, V>, DiskCacheBuilderToStringMapperValueIntf<K>,
+            DiskCacheBuilderToObjectMapperKeyIntf<K>,
             DiskCacheBuilderToStringMapperKeyIntf {
         private Long timeToLive;
         private Integer maxItems;
@@ -89,13 +91,16 @@ public class TypedDiskCache<K, V> extends DiskCache<K, V> {
 
         @Override
         public TypedDiskCache<K, V> build() {
-            return new TypedDiskCache<>(timeToLive, maxItems, username, password, toStringMapperKey, toObjectMapperKey, toStringMapperValue,
+            return new TypedDiskCache<>(timeToLive, maxItems, username, password, toStringMapperKey, toObjectMapperKey,
+                    toStringMapperValue,
                     toObjectMapperValue, cacheName);
         }
     }
 
-    private TypedDiskCache(Long timeToLive, Integer maxItems, String username, String password, Function<K, String> toStringMapperKey,
-            Function<String, K> toObjectMapperKey, Function<V, String> toStringMapperValue, Function<String, V> toObjectMapperValue,
+    private TypedDiskCache(Long timeToLive, Integer maxItems, String username, String password,
+            Function<K, String> toStringMapperKey,
+            Function<String, K> toObjectMapperKey, Function<V, String> toStringMapperValue,
+            Function<String, V> toObjectMapperValue,
             String cacheName) {
         super(timeToLive, maxItems, username, password, cacheName);
         this.toStringMapperKey = toStringMapperKey;
@@ -124,15 +129,4 @@ public class TypedDiskCache<K, V> extends DiskCache<K, V> {
     protected Object cacheObjectToDiskObject(CacheObject<V> value) {
         return value.toString(toStringMapperValue);
     }
-
-    @Override
-    protected Class<K> getDbKeyType() {
-        return keyType.get();
-    }
-
-    @Override
-    protected Class<V> getDbValueType() {
-        return valueType.get();
-    }
-
 }

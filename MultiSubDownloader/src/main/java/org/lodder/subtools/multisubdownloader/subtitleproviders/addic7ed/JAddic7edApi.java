@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,19 +28,17 @@ import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.OptionalExtension;
 
-import lombok.experimental.ExtensionMethod;
-
-@ExtensionMethod({ OptionalExtension.class })
 public class JAddic7edApi extends Html implements SubtitleApi {
 
     private static final long RATEDURATION = 1; // seconds
+
     private static final String DOMAIN = "https://www.addic7ed.com";
-    private final static Pattern TITLE_PATTERN = Pattern.compile(".*? - [0-9]+x[0-9]+ - (.*)");
-    private final static Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: ([0-9]+).([0-9])+");
+    private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: (\\d+).(\\d)+");
     private final boolean speedy;
     private LocalDateTime lastRequest = LocalDateTime.now();
+    @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
 
     public JAddic7edApi(boolean speedy, Manager manager) {
         super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
@@ -55,12 +53,12 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
     public void login(String username, String password) throws Addic7edException {
         try {
-            getManager().postBuilder()
-                    .url(DOMAIN + "/dologin.php")
-                    .addData("username", username)
-                    .addData("password", password)
-                    .addData("remember", "false")
-                    .post();
+            manager.postBuilder()
+                .url(DOMAIN + "/dologin.php")
+                .addData("username", username)
+                .addData("password", password)
+                .addData("remember", "false")
+                .post();
         } catch (ManagerException e) {
             throw new Addic7edException(e);
         }
@@ -71,16 +69,17 @@ public class JAddic7edApi extends Html implements SubtitleApi {
             return List.of();
         }
         try {
-            List<ProviderSerieId> providerSerieIds = getContent(DOMAIN + "/allshows/" + serieName.split(" ")[0])
-                    .map(doc -> doc.select("table.tabel90 td a").stream()
-                            .map(element -> new ProviderSerieId(element.text(), element.attr("href").split("/")[2])).toList())
-                    .orElseGet(List::of);
+            List<ProviderSerieId> providerSerieIds =
+                getContent("$DOMAIN/allshows/" + serieName.split(" ")[0]).selectAllByCss("table.tabel90 td a")
+                    .stream()
+                    .map(elem -> new ProviderSerieId(elem.text(), elem.attr("href").split("/")[2]))
+                    .toList();
 
             String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
             List<ProviderSerieId> providerSerieIdsFormatted = providerSerieIds.stream().filter(providerId -> {
-                String formattedSerieName = providerId.getName().replaceAll("[^A-Za-z]", "");
+                String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
                 return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
-                        StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
+                    StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
             }).toList();
             return !providerSerieIdsFormatted.isEmpty() ? providerSerieIdsFormatted : providerSerieIds;
         } catch (Exception e) {
@@ -99,120 +98,106 @@ public class JAddic7edApi extends Html implements SubtitleApi {
     // .toList())
     // .orElseGet(List::of));
 
-    public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode, Language language)
-            throws Addic7edException {
-        return getManager().valueBuilder()
-                .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(getSubtitleSource().name(), addic7edSerieMapping.getProviderId(), season, episode,
-                        language))
-                .collectionSupplier(Addic7edSubtitleDescriptor.class, () -> {
-                    List<LanguageId> languageIds = LanguageId.forLanguage(language);
-                    String url = "%s/serie/%s/%s/%s/%s".formatted(
-                            DOMAIN,
-                            URLEncoder.encode(addic7edSerieMapping.getProviderName().replace(" ", "_"), UTF_8),
-                            season,
-                            episode,
-                            languageIds.size() == 1 ? languageIds.get(0).getId() : LanguageId.ALL.getId());
+    public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode,
+        Language language) throws Addic7edException {
+        return manager.valueBuilder()
+            .memoryCache()
+            .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), addic7edSerieMapping.providerId,
+                season, episode, language))
+            .collectionSupplier(Addic7edSubtitleDescriptor.class, () -> {
+                List<LanguageId> languageIds = LanguageId.forLanguage(language);
+                String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
+                    URLEncoder.encode(addic7edSerieMapping.providerName.replace(" ", "_"), UTF_8), season,
+                    episode, languageIds.size() == 1 ? languageIds.first.id : LanguageId.ALL.id);
 
-                    Optional<Document> doc = getContent(url);
-                    if (doc.isEmpty()) {
-                        return List.of();
+                Document doc = getContent(url);
+                String title = null;
+
+                Elements elTitle = doc.getElementsByClass("titulo");
+                if (elTitle.size() == 1) {
+                    Matcher matcher = TITLE_PATTERN.matcher(elTitle.first.html());
+                    if (matcher.matches()) {
+                        title = matcher.group(1);
                     }
+                }
 
-                    String title = null;
 
-                    Elements elTitel = doc.get().getElementsByClass("titulo");
-                    if (elTitel.size() == 1) {
-                        Matcher matcher = TITLE_PATTERN.matcher(elTitel.get(0).html());
-                        if (matcher.matches()) {
-                            title = matcher.group(1);
+                Elements blocks = doc.select(".tabel95[width='100%']");
+
+                List<Addic7edSubtitleDescriptor> lSubtitles = new ArrayList<>();
+                for (Element block : blocks) {
+                    String uploader = "";
+                    String version = null;
+                    String lang = null;
+                    String download = null;
+                    boolean hearingImpaired = false;
+
+                    Elements classesNewsTitle = block.getElementsByClass("NewsTitle");
+                    Elements classesNewsDate = block.getElementsByClass("newsDate").select("td[colspan=3]");
+                    if (classesNewsTitle.size() == 1 && classesNewsDate.size() == 1) {
+                        Matcher m = VERSION_PATTERN.matcher(classesNewsTitle.first.text().trim());
+                        if (!m.matches()) {
+                            break;
+                        } else {
+                            version = m.group(1).trim();
+                            uploader = block.selectFirst("a[href*=user/]").text();
+                            hearingImpaired = !block.select("img[title~=Hearing]").isEmpty();
                         }
                     }
 
-                    String uploader, version, lang, download;
-                    boolean hearingImpaired;
-                    Elements blocks = doc.get().select(".tabel95[width='100%']");
-
-                    List<Addic7edSubtitleDescriptor> lSubtitles = new ArrayList<>();
-                    for (Element block : blocks) {
-                        uploader = "";
-                        version = null;
-                        lang = null;
-                        download = null;
-                        hearingImpaired = false;
-
-                        Elements classesNewsTitle = block.getElementsByClass("NewsTitle");
-                        Elements classesNewsDate = block.getElementsByClass("newsDate").select("td[colspan=3]");
-                        if (classesNewsTitle.size() == 1 && classesNewsDate.size() == 1) {
-                            Matcher m = VERSION_PATTERN.matcher(classesNewsTitle.get(0).text().trim());
-                            if (!m.matches()) {
-                                break;
-                            } else {
-                                version = m.group(1).trim();
-                                uploader = block.selectFirst("a[href*=user/]").text();
-                                hearingImpaired = !block.select("img[title~=Hearing]").isEmpty();
+                    if (version != null) {
+                        Elements tds = block.select("tr:contains(Completed)");
+                        Elements reqTds = tds.select("td").not("td[rowspan=2]");
+                        for (Element td : reqTds) {
+                            if (td.hasClass("language")) {
+                                lang = td.html().substring(0, td.html().indexOf("<"));
                             }
-                        }
 
-                        if (version != null) {
-                            Elements tds = block.select("tr:contains(Completed)");
-                            Elements reqTds = tds.select("td").not("td[rowspan=2]");
-                            for (Element td : reqTds) {
-                                if (td.hasClass("language")) {
-                                    lang = td.html().substring(0, td.html().indexOf("<"));
-                                }
+                            // incomplete not wanted
+                            if ((lang != null && td.toString().toLowerCase().contains("completed")) &&
+                                td.html().toLowerCase().contains("% completed")) {
+                                lang = null;
+                            }
 
-                                // incomplete not wanted
-                                if ((lang != null && td.toString().toLowerCase().contains("completed"))
-                                        && td.html().toLowerCase().contains("% completed")) {
-                                    lang = null;
+                            Elements downloadElements = td.getElementsByClass("buttonDownload");
+                            if (lang != null && !downloadElements.isEmpty()) {
+                                if (downloadElements.size() == 1) {
+                                    download = DOMAIN + downloadElements.first.attr("href");
+                                } else if (downloadElements.size() == 2) {
+                                    download = DOMAIN + downloadElements.get(1).attr("href");
                                 }
-
-                                Elements downloadElements = td.getElementsByClass("buttonDownload");
-                                if (lang != null && downloadElements.size() > 0) {
-                                    if (downloadElements.size() == 1) {
-                                        download = DOMAIN + downloadElements.get(0).attr("href");
-                                    }
-                                    if (downloadElements.size() == 2) {
-                                        download = DOMAIN + downloadElements.get(1).attr("href");
-                                    }
+                            }
+                            if (lang != null && download != null && title != null) {
+                                Addic7edSubtitleDescriptor sub =
+                                    new Addic7edSubtitleDescriptor().setUploader(uploader)
+                                        .setTitle(title.trim())
+                                        .setVersion(version.trim())
+                                        .setUrl(download)
+                                        .setLanguage(Language.fromValueOptional(lang.trim()).orElse(null))
+                                        .setHearingImpaired(hearingImpaired);
+                                if (!isDuplicate(lSubtitles, sub)) {
+                                    lSubtitles.add(sub);
                                 }
-                                if (lang != null && download != null && title != null) {
-                                    Addic7edSubtitleDescriptor sub =
-                                            new Addic7edSubtitleDescriptor()
-                                                    .setUploader(uploader)
-                                                    .setTitle(title.trim())
-                                                    .setVersion(version.trim())
-                                                    .setUrl(download)
-                                                    .setLanguage(Language.fromValueOptional(lang.trim()).orElse(null))
-                                                    .setHearingImpaired(hearingImpaired);
-                                    if (!isDuplicate(lSubtitles, sub)) {
-                                        lSubtitles.add(sub);
-                                    }
-                                    lang = null;
-                                    download = null;
-                                }
+                                lang = null;
+                                download = null;
                             }
                         }
                     }
-                    return lSubtitles;
-                }).getCollection();
+                }
+                return lSubtitles;
+            })
+            .getCollection();
     }
 
     public boolean isDuplicate(List<Addic7edSubtitleDescriptor> lSubtitles, Addic7edSubtitleDescriptor sub) {
         return lSubtitles.stream()
-                .anyMatch(s -> s.getLanguage() == sub.getLanguage()
-                        && StringUtils.equals(s.getUrl(), sub.getUrl())
-                        && StringUtils.equals(s.getVersion(), sub.getVersion()));
+            .anyMatch(s -> s.getLanguage() == sub.getLanguage() && StringUtils.equals(s.getUrl(), sub.getUrl()) &&
+                StringUtils.equals(s.getVersion(), sub.getVersion()));
     }
 
-    private Optional<Document> getContent(String url) throws Addic7edException {
-        return getContent(url, null);
-    }
-
-    private Optional<Document> getContent(String url, Predicate<String> emptyResultPredicate) throws Addic7edException {
+    private Document getContent(String url) throws Addic7edException {
         try {
-            if (!speedy && !getManager().valueBuilder().cacheType(CacheType.MEMORY).key(url).isPresent()) {
+            if (!speedy && !manager.valueBuilder().cacheType(CacheType.MEMORY).key(url).isPresent()) {
                 // if (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION) {
                 // LOGGER.info("RateLimit is reached for ADDIC7ed, please wait {} seconds", RATEDURATION);
                 // }
@@ -227,14 +212,9 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                 }
                 lastRequest = LocalDateTime.now();
             }
-            return this.getHtml(url).cacheType(CacheType.NONE).getAsJsoupDocument(emptyResultPredicate);
+            return this.getHtml(url).cacheType(CacheType.NONE).getAsJsoupDocument();
         } catch (Exception e) {
             throw new Addic7edException(e);
         }
-    }
-
-    @Override
-    public SubtitleSource getSubtitleSource() {
-        return SubtitleSource.ADDIC7ED;
     }
 }

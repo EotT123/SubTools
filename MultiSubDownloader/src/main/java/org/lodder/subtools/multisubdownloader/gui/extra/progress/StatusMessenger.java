@@ -3,10 +3,18 @@ package org.lodder.subtools.multisubdownloader.gui.extra.progress;
 import java.util.LinkedList;
 import java.util.List;
 
-public enum StatusMessenger implements Messenger {
-    instance;
+public class StatusMessenger implements Messenger {
+    private static final StatusMessenger instance = new StatusMessenger();
 
     private final List<Messenger> statusMessengers = new LinkedList<>();
+
+    private StatusMessenger() {
+        // private constructor to prevent instantiation
+    }
+
+    public static StatusMessenger getInstance() {
+        return instance;
+    }
 
     public void addListener(Messenger sm) {
         synchronized (statusMessengers) {
@@ -23,7 +31,7 @@ public enum StatusMessenger implements Messenger {
     @Override
     public void message(String message) {
         synchronized (statusMessengers) {
-            statusMessengers.forEach(sm ->  sm.message(message));
+            statusMessengers.forEach(sm -> sm.message(message));
         }
     }
 }

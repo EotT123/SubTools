@@ -9,12 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 public class PrompterBuilderValuesFromList {
 
@@ -80,7 +79,7 @@ public class PrompterBuilderValuesFromList {
 
         @Override
         public ValuesFromListBuilder<T> message(String message, Object... replacements) {
-            this.message = String.format(message, replacements);
+            this.message = message.formatted(replacements);
             return this;
         }
 
@@ -105,9 +104,11 @@ public class PrompterBuilderValuesFromList {
                     value = prompter.prompt(message);
                 } else {
                     String choicesMessage = IntStream.range(0, elements.size())
-                            .mapToObj(number -> "  - " + (number + 1) + ": " + toStringMapper.apply(elements.get(number)))
+                            .mapToObj(
+                                    number -> "  - " + (number + 1) + ": " + toStringMapper.apply(elements.get(number)))
                             .collect(Collectors.joining(System.lineSeparator())) + System.lineSeparator();
-                    value = prompter.prompt(StringUtils.isBlank(message) ? choicesMessage : message + System.lineSeparator() + choicesMessage);
+                    value = prompter.prompt(StringUtils.isBlank(message) ? choicesMessage :
+                            message + System.lineSeparator() + choicesMessage);
                 }
                 if (StringUtils.isBlank(value) && includeNull) {
                     return new ArrayList<>();
@@ -115,19 +116,21 @@ public class PrompterBuilderValuesFromList {
                 if (StringUtils.isBlank(value)) {
                     return prompt(PrompterUtil.showMessage(prompter, "Enter a valid value, try again."));
                 }
-                List<Integer> choices = Arrays.stream(value.split(",")).map(Integer::parseInt).map(i -> i - 1).toList();
+                List<Integer> choices = value.split(",").stream().map(Integer::parseInt).map(i -> i - 1).toList();
                 if (choices.stream().distinct().count() != choices.size()) {
                     return prompt(PrompterUtil.showMessage(prompter, "Choose all distinct options, try again."));
                 }
                 if (choices.stream().anyMatch(number -> number < 0 || number > elements.size() - 1)) {
-                    PrompterUtil.showMessage(prompter, "The entered number(s) aren't in the range [1, %s], try again.", elements.size());
+                    PrompterUtil.showMessage(prompter, "The entered number(s) aren't in the range [1, %s], try again.",
+                            elements.size());
                     return prompt(prompter);
                 }
                 return choices.stream().map(elements::get).collect(Collectors.toList());
             } catch (PrompterException e) {
                 throw new IllegalStateException(e);
             } catch (NumberFormatException e) {
-                PrompterUtil.showMessage(prompter, "Invalid number(s) encountered. Enter a comma separated list of the choices.");
+                PrompterUtil.showMessage(prompter,
+                        "Invalid number(s) encountered. Enter a comma separated list of the choices.");
                 return prompt(prompter);
             }
         }

@@ -3,26 +3,21 @@ package org.lodder.subtools.sublibrary.data.omdb.model;
 import java.io.Serial;
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.data.ReleaseDBIntf;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class OmdbDetails implements ReleaseDBIntf, Serializable {
     @Serial
     private static final long serialVersionUID = 7701770682134890544L;
-    private final String title;
-    private final int year;
+
+    @val String title;
+    @val @override int year;
 
     @Override
     public String getName() {
         return title;
-    }
-
-    @Override
-    public int year() {
-        return year;
     }
 }

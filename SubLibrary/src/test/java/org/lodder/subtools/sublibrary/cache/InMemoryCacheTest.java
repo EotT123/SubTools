@@ -9,11 +9,11 @@ class InMemoryCacheTest {
     @Test
     void testAddRemoveObjects() {
         InMemoryCache<String, String> cache =
-                InMemoryCache.builder().keyType(String.class).valueType(String.class)
-                        .timeToLive(200L)
-                        .timerInterval(100L)
-                        .maxItems(6)
-                        .build();
+            InMemoryCache.builder().keyType(String.class).valueType(String.class)
+                .timeToLive(200L)
+                .timerInterval(100L)
+                .maxItems(6)
+                .build();
 
         cache.put("eBay", "eBay");
         cache.put("Paypal", "Paypal");
@@ -36,11 +36,11 @@ class InMemoryCacheTest {
     void testExpiredCacheObjects() throws InterruptedException {
 
         InMemoryCache<String, String> cache =
-                InMemoryCache.builder().keyType(String.class).valueType(String.class)
-                        .timeToLive(1L)
-                        .timerInterval(1L)
-                        .maxItems(10)
-                        .build();
+            InMemoryCache.builder().keyType(String.class).valueType(String.class)
+                .timeToLive(1L)
+                .timerInterval(1L)
+                .maxItems(10)
+                .build();
 
         cache.put("eBay", "eBay");
         cache.put("Paypal", "Paypal");
@@ -56,11 +56,11 @@ class InMemoryCacheTest {
         int size = 500000;
 
         InMemoryCache<String, String> cache =
-                InMemoryCache.builder().keyType(String.class).valueType(String.class)
-                        .timeToLive(100L)
-                        .timerInterval(100L)
-                        .maxItems(500000)
-                        .build();
+            InMemoryCache.builder().keyType(String.class).valueType(String.class)
+                .timeToLive(100L)
+                .timerInterval(100L)
+                .maxItems(500000)
+                .build();
 
         for (int i = 0; i < size; i++) {
             String value = Integer.toString(i);
@@ -73,7 +73,7 @@ class InMemoryCacheTest {
         cache.cleanup();
         double finish = (System.currentTimeMillis() - start) / 1000.0;
 
-        System.out.println("Cleanup times for " + size + " objects are " + finish + " s");
+        System.out.println("Cleanup times for $size objects are $finish s");
     }
 
 }

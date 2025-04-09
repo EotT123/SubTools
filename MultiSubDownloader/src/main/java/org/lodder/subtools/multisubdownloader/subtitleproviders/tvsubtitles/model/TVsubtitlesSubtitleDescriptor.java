@@ -4,17 +4,16 @@ import java.io.Serial;
 import java.io.Serializable;
 
 import lombok.Builder;
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 
-@Getter
 @Builder
 public class TVsubtitlesSubtitleDescriptor implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6423513286301479905L;
-    private final String filename;
-    private final String url;
-    private final String rip;
-    private final String author;
+    @val String filename;
+    @val String url;
+    @val String rip;
+    @val String author;
 
 }

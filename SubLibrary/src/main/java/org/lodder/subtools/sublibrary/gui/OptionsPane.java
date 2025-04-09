@@ -1,14 +1,11 @@
 package org.lodder.subtools.sublibrary.gui;
 
-import java.util.Arrays;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import javax.swing.JOptionPane;
-
-import java.awt.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -81,7 +78,8 @@ public class OptionsPane {
     @Setter
     @Accessors(fluent = true)
     @RequiredArgsConstructor
-    private static class OptionsPaneBuilder<T> implements OptionsPaneBuilderPromptIntf<T>, OptionsPaneBuilderMessageTypeIntf<T>,
+    private static class OptionsPaneBuilder<T>
+            implements OptionsPaneBuilderPromptIntf<T>, OptionsPaneBuilderMessageTypeIntf<T>,
             OptionsPaneBuilderMessageIntf<T>, OptionsPaneBuilderTitleIntf<T>, OptionsPaneBuilderToStringMapperIntf<T> {
         private final T[] optionsArray;
         private final Collection<T> optionsList;
@@ -110,13 +108,17 @@ public class OptionsPane {
                     } else {
                         options = optionsArray;
                     }
-                    return Optional.ofNullable((T) JOptionPane.showInputDialog(parent, message, title, messageType, null, options, "0"));
+                    return Optional.ofNullable(
+                            (T) JOptionPane.showInputDialog(parent, message, title, messageType, null, options, "0"));
                 } else {
-                    Stream<T> optionsStream = optionsList != null ? optionsList.stream() : Arrays.stream(optionsArray);
+                    Stream<T> optionsStream = optionsList != null ? optionsList.stream() : optionsArray.stream();
                     ElementWrapper<T>[] options =
-                            optionsStream.map(option -> new ElementWrapper<>(option, toStringMapper)).toArray(ElementWrapper[]::new);
+                            optionsStream.map(option -> new ElementWrapper<>(option, toStringMapper))
+                                    .toArray(ElementWrapper[]::new);
                     return Optional
-                            .ofNullable((ElementWrapper<T>) JOptionPane.showInputDialog(parent, message, title, messageType, null, options, "0"))
+                            .ofNullable(
+                                    (ElementWrapper<T>) JOptionPane.showInputDialog(parent, message, title, messageType,
+                                            null, options, "0"))
                             .map(ElementWrapper::element);
                 }
             }

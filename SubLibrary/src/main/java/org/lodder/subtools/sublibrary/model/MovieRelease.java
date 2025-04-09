@@ -3,18 +3,14 @@ package org.lodder.subtools.sublibrary.model;
 import java.nio.file.Path;
 import java.util.OptionalInt;
 
-import org.apache.commons.lang3.StringUtils;
-
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.var;
 
-@Getter
-@Setter
-public class MovieRelease extends Release {
+public final class MovieRelease extends Release {
 
-    private String name;
-    private Integer year;
+    @var String name;
+    @var Integer year;
     private int imdbId;
     private int tvdbId;
 
@@ -27,11 +23,11 @@ public class MovieRelease extends Release {
 
         MovieReleaseBuilderOther quality(String quality);
 
-        MovieReleaseBuilderOther description(String description);
-
         MovieReleaseBuilderOther releaseGroup(String releaseGroup);
 
         MovieReleaseBuilderOther year(Integer year);
+        
+        MovieReleaseBuilderOther extension(String extension);
 
         MovieRelease build();
     }
@@ -48,40 +44,48 @@ public class MovieRelease extends Release {
 
         private String quality;
         private Path file;
-        private String description;
         private String releaseGroup;
+        private String extension;
 
         @Override
         public MovieRelease build() {
-            return new MovieRelease(file, description, releaseGroup, quality, name, year == null ? 0 : year);
+            return new MovieRelease(file, releaseGroup, quality, extension, name, year == null ? 0 : year);
         }
     }
 
-    private MovieRelease(Path file, String description, String releaseGroup, String quality, String name, int year) {
-        super(VideoType.MOVIE, file, description, releaseGroup, quality);
+    private MovieRelease(Path file, String releaseGroup, String quality, String extension, String name, int year) {
+        super(VideoType.MOVIE, file, releaseGroup, quality, extension);
         this.name = name;
         this.year = year;
     }
 
     public String getImdbIdAsString() {
-        return "tt" + StringUtils.leftPad(String.valueOf(imdbId), 7, "0");
+        return "tt%07d".formatted(imdbId);
     }
 
     public OptionalInt getTvdbId() {
         return tvdbId == 0 ? OptionalInt.empty() : OptionalInt.of(tvdbId);
     }
 
+    public void setTvdbId(int tvdbId) {
+        this.tvdbId = tvdbId;
+    }
+
     public OptionalInt getImdbId() {
         return imdbId == 0 ? OptionalInt.empty() : OptionalInt.of(imdbId);
     }
 
+    public void setImdbId(int imdbId) {
+        this.imdbId = imdbId;
+    }
+
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + this.getName() + " " + this.getQuality() + " " + this.getReleaseGroup();
+        return "${getClass().getSimpleName()}: $name ${quality} ${releaseGroup}";
     }
 
     @Override
     public String getReleaseDescription() {
-        return getName();
+        return name;
     }
 }

@@ -1,10 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-
-import java.awt.Frame;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 import java.io.Serial;
 
 public class MultiSubDialog extends JDialog {
@@ -26,8 +23,8 @@ public class MultiSubDialog extends JDialog {
 
     protected void setDialogLocation(Frame f) {
         Rectangle r = f.getBounds();
-        int x = r.x + (r.width - getSize().width) / 2;
-        int y = r.y + (r.height - getSize().height) / 2;
+        int x = r.x + (r.width - size.width) / 2;
+        int y = r.y + (r.height - size.height) / 2;
         setLocation(x, y);
     }
 

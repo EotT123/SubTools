@@ -2,40 +2,38 @@ package org.lodder.subtools.sublibrary.data.omdb;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
-import org.w3c.dom.Element;
-
-import lombok.RequiredArgsConstructor;
+import org.w3c.dom.Node;
 
 @RequiredArgsConstructor
 class OmdbApi {
 
+    private static final String DOMAIN = "http://www.omdbapi.com";
     private final Manager manager;
 
     public Optional<OmdbDetails> getMovieDetails(int imdbId) throws OmdbException {
         return manager.valueBuilder()
                 .memoryCache()
-                .key("%s-moviedetails-%s".formatted("OMDB", imdbId))
+                .key("OMDB-moviedetails-$imdbId")
                 .optionalSupplier(() -> {
-                    final String url = "http://www.omdbapi.com/?i=tt" + StringUtils.leftPad(String.valueOf(imdbId), 7, "0") + "&plot=short&r=xml";
+                    final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
                     try {
                         return manager.getPageContentBuilder()
                                 .url(url)
                                 .getAsDocument()
-                                .map(doc -> doc.getElementsByTagName("movie"))
-                                .filter(nodeList -> nodeList.getLength() > 0)
-                                .map(nodeList -> parseOMDBDetails((Element) nodeList.item(0)));
+                            .getElementsByTagName("movie").stream()
+                                .map(this::parseOMDBDetails).findFirst();
                     } catch (Exception e) {
-                        throw new OmdbException("Error OMDBAPI", url, e);
+                        throw new OmdbException("Error OMDB API", url, e);
                     }
                 }).getOptional();
     }
 
-    private OmdbDetails parseOMDBDetails(Element item) {
-        return new OmdbDetails(item.getAttribute("title"), Integer.parseInt(item.getAttribute("year")));
+    private OmdbDetails parseOMDBDetails(Node node) {
+        return new OmdbDetails(node.getAttribute("title"), Integer.parseInt(node.getAttribute("year")));
     }
 
 }

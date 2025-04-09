@@ -3,10 +3,9 @@ package org.lodder.subtools.sublibrary.util.prompter;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
-import org.codehaus.plexus.components.interactivity.Prompter;
-
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.codehaus.plexus.components.interactivity.Prompter;
 
 public class PrompterBuilderBoolean {
 
@@ -73,13 +72,13 @@ public class PrompterBuilderBoolean {
 
         @Override
         public ValueBuilder message(String message, Object... replacements) {
-            this.message = String.format(message, replacements);
+            this.message = message.formatted(replacements);
             return this;
         }
 
         @Override
         public ValueBuilder errorMessage(String errorMessage, Object... replacements) {
-            this.errorMessage = String.format(errorMessage, replacements);
+            this.errorMessage = errorMessage.formatted(replacements);
             return this;
         }
 

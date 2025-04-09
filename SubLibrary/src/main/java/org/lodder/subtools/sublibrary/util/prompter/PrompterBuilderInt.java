@@ -5,10 +5,9 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-import org.codehaus.plexus.components.interactivity.Prompter;
-
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.codehaus.plexus.components.interactivity.Prompter;
 
 public class PrompterBuilderInt {
 
@@ -89,13 +88,13 @@ public class PrompterBuilderInt {
 
         @Override
         public ValueBuilder message(String message, Object... replacements) {
-            this.message = String.format(message, replacements);
+            this.message = message.formatted(replacements);
             return this;
         }
 
         @Override
         public ValueBuilder errorMessage(String errorMessage, Object... replacements) {
-            this.errorMessage = String.format(errorMessage, replacements);
+            this.errorMessage = errorMessage.formatted(replacements);
             return this;
         }
 
