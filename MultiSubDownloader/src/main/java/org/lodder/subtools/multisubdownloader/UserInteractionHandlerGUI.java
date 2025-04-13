@@ -3,13 +3,11 @@ package org.lodder.subtools.multisubdownloader;
 import javax.swing.*;
 import java.util.List;
 
-import lombok.Getter;
 import org.lodder.subtools.multisubdownloader.gui.dialog.SelectDialog;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-@Getter
 public class UserInteractionHandlerGUI extends org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandlerGUI
     implements UserInteractionHandler {
 
