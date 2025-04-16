@@ -152,6 +152,11 @@
                 <version>${manifold.version}</version>
             </dependency>
             <dependency>
+                <groupId>systems.manifold</groupId>
+                <artifactId>manifold-params-rt</artifactId>
+                <version>${manifold.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>

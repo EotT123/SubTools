@@ -4,8 +4,10 @@ import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.multisubdownloader.gui.extra.table.SearchColumnName.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseListener;
@@ -249,12 +251,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(_ -> downloadText());
 
-        TextGuiSearchAction searchAction = TextGuiSearchAction.createWithSettings(settings)
-            .subtitleProviderStore(app.makeSubtitleProviderStore())
-            .mainWindow(this)
-            .searchPanel(pnlSearchText)
-            .releaseFactory(new ReleaseFactory(settings, app.makeManager()))
-            .build();
+        TextGuiSearchAction searchAction = new TextGuiSearchAction(settings, app.makeSubtitleProviderStore(),
+            this, pnlSearchText, new ReleaseFactory(settings, app.makeManager()));
         pnlSearchTextInput.addSearchAction(searchAction);
     }
 
@@ -279,12 +277,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         resultPanel.setTable(createVideoTable());
 
-        FileGuiSearchAction searchAction = FileGuiSearchAction.createWithSettings(settings)
-            .subtitleProviderStore(app.makeSubtitleProviderStore())
-            .mainWindow(this)
-            .searchPanel(pnlSearchFile)
-            .releaseFactory(new ReleaseFactory(settings, app.makeManager()))
-            .build();
+        FileGuiSearchAction searchAction = new FileGuiSearchAction(settings, app.makeSubtitleProviderStore(), this,
+            pnlSearchFile, new ReleaseFactory(settings, app.makeManager()));
 
         pnlSearchFileInput.addSelectFolderAction(_ -> selectIncomingFolder());
         pnlSearchFileInput.addSearchAction(searchAction);

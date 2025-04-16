@@ -81,15 +81,12 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
     }
 
     private Function<String, PathLibraryBuilder> getLibraryStructureBuilder() {
-        return structure -> PathLibraryBuilder.builder()
-            .structure(structure)
-            .replaceSpace(chkReplaceSpace.isSelected())
-            .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
-            .useTvdbName(false)
-            .tvdbAdapter(null)
-            .libraryFolder(txtLibraryFolder.getObject())
-            .move(true)
-            .build();
+        return structure -> new PathLibraryBuilder(
+            structure:structure,
+            replaceSpace:chkReplaceSpace.isSelected(),
+            replacingSpaceChar:cbxReplaceSpaceChar.getSelectedValue(),
+            libraryFolder:txtLibraryFolder.getObject(),
+            move:true);
     }
 
     @Override

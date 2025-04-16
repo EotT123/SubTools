@@ -3,7 +3,9 @@ package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.Serial;
 import java.util.LinkedHashMap;
@@ -150,16 +152,13 @@ public class StructureFilePanel extends JPanel {
     }
 
     private Function<String, FilenameLibraryBuilder> getLibraryStructureBuilder() {
-        return structure -> FilenameLibraryBuilder.builder()
-            .structure(structure)
-            .replaceSpace(chkReplaceSpace.isSelected())
-            .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
-            .includeLanguageCode(chkIncludeLanguageCode.isSelected())
-            .languageTags(languageMapping.toSettingsMap())
-            .useTvdbName(false)
-            .tvdbAdapter(null)
-            .rename(true)
-            .build();
+        return structure -> new FilenameLibraryBuilder(
+            structure:structure,
+            replaceSpace:chkReplaceSpace.isSelected(),
+            replacingSpaceChar:cbxReplaceSpaceChar.getSelectedValue(),
+            includeLanguageCode:chkIncludeLanguageCode.isSelected(),
+            languageTags:languageMapping.toSettingsMap(),
+            rename:true);
     }
 
     @Override

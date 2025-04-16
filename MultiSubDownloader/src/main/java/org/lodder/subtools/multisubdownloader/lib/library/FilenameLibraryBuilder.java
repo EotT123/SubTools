@@ -3,8 +3,6 @@ package org.lodder.subtools.multisubdownloader.lib.library;
 import java.nio.file.Path;
 import java.util.Map;
 
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
@@ -27,10 +25,10 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     private final Map<Language, String> languageTags;
     private final boolean rename;
 
-    private FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        boolean includeLanguageCode, Map<Language, String> languageTags, boolean useTvdb,
-        TheTvdbAdapter tvdbAdapter, boolean rename) {
-        super(useTvdb, tvdbAdapter);
+    public FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
+        boolean includeLanguageCode, Map<Language, String> languageTags, TheTvdbAdapter tvdbAdapter=null,
+        boolean rename) {
+        super(tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
         this.replacingSpaceChar = replacingSpaceChar;
@@ -39,85 +37,16 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         this.rename = rename;
     }
 
-    public static FilenameLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
+    public static FilenameLibraryBuilder fromSettings(LibrarySettings libSettings, Manager manager,
         UserInteractionHandler userInteractionHandler) {
-        return FilenameLibraryBuilder.builder()
-            .structure(librarySettings.folderStructure)
-            .replaceSpace(librarySettings.folderReplaceSpace)
-            .replacingSpaceChar(librarySettings.folderReplacingSpaceChar)
-            .includeLanguageCode(librarySettings.includeLanguageCode)
-            .languageTags(librarySettings.langCodeMap)
-            .useTvdbName(librarySettings.useTVDBNaming)
-            .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
-            .rename(librarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME))
-            .build();
-    }
-
-    public static FilenameLibraryBuilderStructureIntf builder() {
-        return new FilenameLibraryBuilderBuilder();
-    }
-
-    public interface FilenameLibraryBuilderStructureIntf {
-        FilenameLibraryBuilderReplaceSpaceIntf structure(String structure);
-    }
-
-    public interface FilenameLibraryBuilderReplaceSpaceIntf {
-        FilenameLibraryBuilderReplaceSpaceCharIntf replaceSpace(boolean replaceSpace);
-    }
-
-    public interface FilenameLibraryBuilderReplaceSpaceCharIntf {
-        FilenameLibraryBuilderIncludeLanguageCodeIntf replacingSpaceChar(char replacingSpaceChar);
-    }
-
-    public interface FilenameLibraryBuilderIncludeLanguageCodeIntf {
-        FilenameLibraryBuilderLanguageTagIntf includeLanguageCode(boolean includeLanguageCode);
-    }
-
-    public interface FilenameLibraryBuilderLanguageTagIntf {
-        FilenameLibraryBuilderUseTvdbNameIntf languageTags(Map<Language, String> languageTags);
-    }
-
-    public interface FilenameLibraryBuilderUseTvdbNameIntf extends FilenameLibraryBuilderBuildIntf {
-        FilenameLibraryBuilderTvdbAdapterIntf useTvdbName(boolean useTvdbName);
-    }
-
-    public interface FilenameLibraryBuilderTvdbAdapterIntf {
-        FilenameLibraryBuilderRenameIntf tvdbAdapter(TheTvdbAdapter tvdbAdapter);
-    }
-
-    public interface FilenameLibraryBuilderRenameIntf {
-        FilenameLibraryBuilderBuildIntf rename(boolean rename);
-    }
-
-    public interface FilenameLibraryBuilderBuildIntf {
-        FilenameLibraryBuilder build();
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class FilenameLibraryBuilderBuilder
-        implements FilenameLibraryBuilderStructureIntf, FilenameLibraryBuilderReplaceSpaceIntf,
-        FilenameLibraryBuilderReplaceSpaceCharIntf, FilenameLibraryBuilderIncludeLanguageCodeIntf,
-        FilenameLibraryBuilderLanguageTagIntf, FilenameLibraryBuilderUseTvdbNameIntf,
-        FilenameLibraryBuilderTvdbAdapterIntf, FilenameLibraryBuilderRenameIntf, FilenameLibraryBuilderBuildIntf {
-        private String structure;
-
-        private boolean replaceSpace;
-        private char replacingSpaceChar;
-
-        private boolean includeLanguageCode;
-        private Map<Language, String> languageTags;
-
-        private boolean useTvdbName;
-        private TheTvdbAdapter tvdbAdapter;
-
-        private boolean rename;
-
-        @Override
-        public FilenameLibraryBuilder build() {
-            return new FilenameLibraryBuilder(structure, replaceSpace, replacingSpaceChar, includeLanguageCode,
-                languageTags, useTvdbName, tvdbAdapter, rename);
-        }
+        return new FilenameLibraryBuilder(
+            structure:libSettings.folderStructure,
+            replaceSpace:libSettings.folderReplaceSpace,
+            replacingSpaceChar:libSettings.folderReplacingSpaceChar,
+            includeLanguageCode:libSettings.includeLanguageCode,
+            languageTags:libSettings.langCodeMap,
+            tvdbAdapter:libSettings.useTVDBNaming ? TheTvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME));
     }
 
     @Override

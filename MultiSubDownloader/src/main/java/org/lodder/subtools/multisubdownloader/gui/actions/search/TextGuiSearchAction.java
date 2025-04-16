@@ -4,9 +4,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -25,50 +22,7 @@ import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
 
-    public interface TextGuiSearchActionBuilderSubtitleProviderStore {
-        TextGuiSearchActionBuilderGUI subtitleProviderStore(SubtitleProviderStore subtitleProviderStore);
-    }
-
-    public interface TextGuiSearchActionBuilderGUI {
-        TextGuiSearchActionBuilderSearchPanel mainWindow(GUI mainWindow);
-    }
-
-    public interface TextGuiSearchActionBuilderSearchPanel {
-        TextGuiSearchActionBuilderReleaseFactory searchPanel(SearchPanel<SearchTextInputPanel> searchPanel);
-    }
-
-    public interface TextGuiSearchActionBuilderReleaseFactory {
-        TextGuiSearchActionBuilderBuild releaseFactory(ReleaseFactory releaseFactory);
-    }
-
-    public interface TextGuiSearchActionBuilderBuild {
-        TextGuiSearchAction build();
-    }
-
-    public static TextGuiSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
-        return new TextGuiSearchActionBuilder(settings);
-    }
-
-    @RequiredArgsConstructor
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class TextGuiSearchActionBuilder
-        implements TextGuiSearchActionBuilderBuild, TextGuiSearchActionBuilderReleaseFactory,
-        TextGuiSearchActionBuilderSearchPanel, TextGuiSearchActionBuilderGUI,
-        TextGuiSearchActionBuilderSubtitleProviderStore {
-        private final Settings settings;
-        private SubtitleProviderStore subtitleProviderStore;
-        private GUI mainWindow;
-        private SearchPanel<SearchTextInputPanel> searchPanel;
-        private ReleaseFactory releaseFactory;
-
-        @Override
-        public TextGuiSearchAction build() {
-            return new TextGuiSearchAction(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
-        }
-    }
-
-    private TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
+    public TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
         SearchPanel<SearchTextInputPanel> searchPanel, ReleaseFactory releaseFactory) {
         super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
     }

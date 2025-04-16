@@ -89,8 +89,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             // LOCAL
             this.chkSourceLocal = new JCheckBox(getText("PreferenceDialog.Local"));
             JScrollPane scrLocalSources =
-                    new JScrollPane().viewportView(this.localSourcesFoldersList =
-                            JListWithImages.createForType(Path.class).distinctValues().build());
+                new JScrollPane().viewportView(this.localSourcesFoldersList = new JListWithImages<>());
             JButton btnBrowseLocalSources = new JButton(getText("PreferenceDialog.AddFolder"))
                     .actionListener(() -> MemoryFolderChooser.getInstance()
                             .selectDirectory(this, getText("PreferenceDialog.SelectFolder"))

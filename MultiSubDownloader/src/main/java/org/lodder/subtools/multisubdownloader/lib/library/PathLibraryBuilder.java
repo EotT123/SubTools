@@ -3,8 +3,6 @@ package org.lodder.subtools.multisubdownloader.lib.library;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
@@ -24,9 +22,9 @@ public final class PathLibraryBuilder extends LibraryBuilder {
     private final Path libraryFolder;
     private final boolean move;
 
-    private PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar, boolean useTvdb,
-        TheTvdbAdapter tvdbAdapter, Path libraryFolder, boolean move) {
-        super(useTvdb, tvdbAdapter);
+    public PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
+        TheTvdbAdapter tvdbAdapter=null, Path libraryFolder, boolean move) {
+        super(tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
         this.replacingSpaceChar = replacingSpaceChar;
@@ -34,79 +32,15 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         this.move = move;
     }
 
-    public static PathLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
+    public static PathLibraryBuilder fromSettings(LibrarySettings libSettings, Manager manager,
         UserInteractionHandler userInteractionHandler) {
-        return PathLibraryBuilder.builder()
-            .structure(librarySettings.folderStructure)
-            .replaceSpace(librarySettings.folderReplaceSpace)
-            .replacingSpaceChar(librarySettings.folderReplacingSpaceChar)
-            .useTvdbName(librarySettings.useTVDBNaming)
-            .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
-            .libraryFolder(librarySettings.folder)
-            .move(librarySettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVEANDRENAME))
-            .build();
-    }
-
-    public static PathLibraryBuilderStructureIntf builder() {
-        return new PathLibraryBuilderBuilder();
-    }
-
-    public interface PathLibraryBuilderStructureIntf {
-        PathLibraryBuilderReplaceSpaceIntf structure(String structure);
-    }
-
-    public interface PathLibraryBuilderReplaceSpaceIntf {
-        PathLibraryBuilderReplaceSpaceCharIntf replaceSpace(boolean replaceSpace);
-    }
-
-    public interface PathLibraryBuilderReplaceSpaceCharIntf {
-        PathLibraryBuilderUseTvdbNameIntf replacingSpaceChar(char replacingSpaceChar);
-    }
-
-    public interface PathLibraryBuilderUseTvdbNameIntf extends PathLibraryBuilderBuildIntf {
-        PathLibraryBuilderTvdbAdapterIntf useTvdbName(boolean useTvdbName);
-    }
-
-    public interface PathLibraryBuilderTvdbAdapterIntf {
-        PathLibraryBuilderLibraryFolderIntf tvdbAdapter(TheTvdbAdapter tvdbAdapter);
-    }
-
-    public interface PathLibraryBuilderLibraryFolderIntf {
-        PathLibraryBuilderMoveIntf libraryFolder(Path libraryFolder);
-    }
-
-    public interface PathLibraryBuilderMoveIntf {
-        PathLibraryBuilderBuildIntf move(boolean move);
-    }
-
-    public interface PathLibraryBuilderBuildIntf {
-        PathLibraryBuilder build();
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class PathLibraryBuilderBuilder
-        implements PathLibraryBuilderStructureIntf, PathLibraryBuilderReplaceSpaceIntf,
-        PathLibraryBuilderReplaceSpaceCharIntf, PathLibraryBuilderUseTvdbNameIntf,
-        PathLibraryBuilderTvdbAdapterIntf, PathLibraryBuilderLibraryFolderIntf, PathLibraryBuilderMoveIntf,
-        PathLibraryBuilderBuildIntf {
-        private String structure;
-
-        private boolean replaceSpace;
-        private char replacingSpaceChar;
-
-        private boolean useTvdbName;
-        private TheTvdbAdapter tvdbAdapter;
-
-        private Path libraryFolder;
-
-        private boolean move;
-
-        @Override
-        public PathLibraryBuilder build() {
-            return new PathLibraryBuilder(structure, replaceSpace, replacingSpaceChar, useTvdbName, tvdbAdapter,
-                libraryFolder, move);
-        }
+        return new PathLibraryBuilder(
+            structure:libSettings.folderStructure,
+            replaceSpace:libSettings.folderReplaceSpace,
+            replacingSpaceChar:libSettings.folderReplacingSpaceChar,
+            tvdbAdapter:libSettings.useTVDBNaming ? TheTvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            libraryFolder:libSettings.folder,
+            move:libSettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVEANDRENAME));
     }
 
     @Override
