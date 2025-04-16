@@ -12,11 +12,12 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldInteger;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -46,8 +47,11 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         this.gui = gui;
         this.settingsCtrl = settingsCtrl;
 
-        JPanel settingsPanel = TitlePanel.title(getText("PreferenceDialog.Settings"))
-            .padding(0).paddingLeft(20).useGrid().fillContents(false)
+        JPanel settingsPanel = new TitlePanelBuilder(
+            title:getText("PreferenceDialog.Settings"),
+            padding:new BoxModelProperties(0, 20, 0, 0),
+            useGrid:true,
+            fillContents:false)
             .addTo(this, "span, grow, wrap");
         {
 

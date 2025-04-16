@@ -9,8 +9,9 @@ import java.nio.file.Files;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PartialDisableComboBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
@@ -39,8 +40,11 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
 
         this.pnlBackup = renameMode ? null : new SubtitleBackupPanel(librarySettings).addTo(this, "wrap, span, growx");
 
-        JPanel performActionPanel = TitlePanel.title(getText("PreferenceDialog.PerformActions"))
-            .margin(0).padding(0).paddingLeft(20).addTo(this, "span, growx");
+        JPanel performActionPanel = new TitlePanelBuilder(
+            title:getText("PreferenceDialog.PerformActions"),
+            margin:new BoxModelProperties(0),
+            padding:new BoxModelProperties(0, 20, 0, 0))
+            .addTo(this, "span, growx");
         {
 
             this.chkUseTVDBNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(

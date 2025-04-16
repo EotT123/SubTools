@@ -21,8 +21,9 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
@@ -49,11 +50,10 @@ public class StructureFilePanel extends JPanel {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.RenameFiles"))
-            .margin(0)
-            .padding(0)
-            .marginLeft(20)
-            .paddingLeft(20)
+        JPanel titlePanel = new TitlePanelBuilder(
+            title:getText("PreferenceDialog.RenameFiles"),
+            margin:new BoxModelProperties(0, 20, 0, 0),
+            padding:new BoxModelProperties(0, 20, 0, 0))
             .addTo(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");

@@ -6,8 +6,9 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 
@@ -33,10 +34,10 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.settingsCtrl = settingsCtrl;
 
-        TitlePanel.title(getText("PreferenceDialog.DownloadOptions"))
-                .marginBottom(0)
-                .padding(0)
-                .paddingLeft(20)
+        new TitlePanelBuilder(
+            title:getText("PreferenceDialog.DownloadOptions"),
+            margin:new BoxModelProperties(null, null, 0, null),
+            padding:new BoxModelProperties(0, 20, 0, 0))
                 .addTo(this, "span, grow, wrap")
                 .addComponent(this.chkAlwaysConfirm =
                         new JCheckBox(getText("PreferenceDialog.CheckBeforeDownloading")), "wrap")
@@ -52,10 +53,10 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                                 .build()
                                 .addComponent(this.pnlDefaultSelection = new DefaultSelectionPanel(settingsCtrl)));
 
-        TitlePanel.title(getText("PreferenceDialog.SearchFilter"))
-                .marginBottom(0)
-                .padding(0)
-                .paddingLeft(20)
+        new TitlePanelBuilder(
+            title:getText("PreferenceDialog.SearchFilter"),
+            margin:new BoxModelProperties(null, null, 0, null),
+            padding:new BoxModelProperties(0, 20, 0, 0))
                 .addTo(this, "span, grow, wrap")
                 .addComponent(
                         this.chkSubtitleExactMethod = new JCheckBox(getText("PreferenceDialog.SearchFilterExact")),

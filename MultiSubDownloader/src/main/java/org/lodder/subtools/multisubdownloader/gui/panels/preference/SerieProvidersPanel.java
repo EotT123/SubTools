@@ -12,7 +12,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyPasswordField;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -44,7 +44,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.settingsCtrl = settingsCtrl;
 
-        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.SelectPreferredSources"))
+        JPanel titlePanel = new TitlePanelBuilder(title:getText("PreferenceDialog.SelectPreferredSources"))
                 .addTo(this, "span, grow");
 
         {

@@ -7,7 +7,9 @@ import java.io.Serial;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
+import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
@@ -36,9 +38,13 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.MoveToLibrary"))
-            .margin(0).padding(0).marginLeft(20).paddingLeft(20).useGrid()
-            .panelColumnConstraints("[shrink][grow][shrink]").addTo(this, "span, grow");
+        JPanel titlePanel = new TitlePanel.TitlePanelBuilder(
+            title:Messages.getText("PreferenceDialog.MoveToLibrary"),
+            margin:new BoxModelProperties(0, 20, 0, 0),
+            padding:new BoxModelProperties(0, 20, 0, 0),
+            useGrid:true,
+            panelColumnConstraints:"[shrink][grow][shrink]")
+            .addTo(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
         this.txtLibraryFolder =

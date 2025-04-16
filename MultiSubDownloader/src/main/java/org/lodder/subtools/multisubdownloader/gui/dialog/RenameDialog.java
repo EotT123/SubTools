@@ -19,8 +19,9 @@ import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldPath;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
@@ -52,10 +53,10 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         setBounds(100, 100, 650, 680);
         contentPane.setLayout(new MigLayout("fill, nogrid", "[]", "[][]20:push[]"));
 
-        TitlePanel.title(Messages.getText("PreferenceDialog.Settings"))
-            .padding(0)
-            .paddingLeft(20)
-            .fillContents(true)
+        new TitlePanelBuilder(
+            title:getText("PreferenceDialog.Settings"),
+            padding:new BoxModelProperties(0, 20, 0, 0),
+            fillContents:true)
             .addTo(contentPane, "span, grow, wrap")
             .addComponent("shrink", new JLabel(Messages.getText("PreferenceDialog.Location")))
             .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().columns(20))
