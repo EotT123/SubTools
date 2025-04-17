@@ -168,13 +168,9 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                                 }
                             }
                             if (lang != null && download != null && title != null) {
-                                Addic7edSubtitleDescriptor sub =
-                                    new Addic7edSubtitleDescriptor().setUploader(uploader)
-                                        .setTitle(title.trim())
-                                        .setVersion(version.trim())
-                                        .setUrl(download)
-                                        .setLanguage(Language.fromValueOptional(lang.trim()).orElse(null))
-                                        .setHearingImpaired(hearingImpaired);
+                                Addic7edSubtitleDescriptor sub = new Addic7edSubtitleDescriptor(version.trim(),
+                                    Language.fromValueOptional(lang.trim()).orElse(null), download, title.trim(),
+                                    uploader, hearingImpaired);
                                 if (!isDuplicate(lSubtitles, sub)) {
                                     lSubtitles.add(sub);
                                 }
@@ -190,9 +186,8 @@ public class JAddic7edApi extends Html implements SubtitleApi {
     }
 
     public boolean isDuplicate(List<Addic7edSubtitleDescriptor> lSubtitles, Addic7edSubtitleDescriptor sub) {
-        return lSubtitles.stream()
-            .anyMatch(s -> s.getLanguage() == sub.getLanguage() && StringUtils.equals(s.getUrl(), sub.getUrl()) &&
-                StringUtils.equals(s.getVersion(), sub.getVersion()));
+        return lSubtitles.stream().anyMatch(s -> s.language == sub.language && StringUtils.equals(s.url, sub.url) &&
+            StringUtils.equals(s.version, sub.version));
     }
 
     private Document getContent(String url) throws Addic7edException {
