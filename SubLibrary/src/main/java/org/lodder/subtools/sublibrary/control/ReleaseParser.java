@@ -117,14 +117,13 @@ public class ReleaseParser {
                     if (StringUtils.equals(parserResults.parts.first, fileParseName)) {
                         throw new ReleaseParseException("Could not parse " + fileParseName);
                     }
-                    return MovieRelease.builder()
-                        .name(cleanUnwantedChars(parserResults.parts.first))
-                        .file(file)
-                        .year(parserResults.getNamedMatchValue(YEAR))
-                        .releaseGroup(releaseGroup)
-                        .quality(StringUtils.toRootLowerCase(quality))
-                        .extension(extension)
-                        .build();
+                    return new MovieRelease(
+                        name:cleanUnwantedChars(parserResults.parts.first),
+                        file:file,
+                        year:parserResults.getNamedMatchValue(YEAR),
+                        releaseGroup:releaseGroup,
+                        quality:StringUtils.toRootLowerCase(quality),
+                        extension:extension);
                 }
             }
         }

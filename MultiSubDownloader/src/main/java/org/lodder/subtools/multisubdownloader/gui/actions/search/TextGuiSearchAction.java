@@ -50,7 +50,7 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
                 .episode(inputPanel.episode)
                 .quality(inputPanel.quality)
                 .build();
-            case MOVIE -> MovieRelease.builder().name(name).quality(inputPanel.quality).build();
+            case MOVIE -> new MovieRelease(name:name, quality:inputPanel.quality);
             default -> releaseFactory.createRelease(Path.of(
                     name + (Arrays.stream(VideoExtensions.values()).anyMatch(ext -> name.endsWith("." + ext)) ? "" :
                         ".")),
