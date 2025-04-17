@@ -2,13 +2,13 @@ package org.lodder.subtools.sublibrary.util.prompter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.google.common.collect.Lists;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
@@ -25,12 +25,12 @@ public class PrompterBuilderValuesFromList {
     // Interface \\
     // --------- \\
 
-    public static ValuesFromListPromptBuilderIntf<String> getStringsFromList(Collection<String> elements) {
+    public static ValuesFromListPromptBuilderIntf<String> getStringsFromList(Iterable<String> elements) {
         return getElementsFromList(elements).toStringMapper(Function.identity());
     }
 
-    public static <T> ValuesFromListToStringMapperBuilderIntf<T> getElementsFromList(Collection<T> elements) {
-        return new ValuesFromListBuilder<>(new ArrayList<>(elements));
+    public static <T> ValuesFromListToStringMapperBuilderIntf<T> getElementsFromList(Iterable<T> elements) {
+        return new ValuesFromListBuilder<>(elements);
     }
 
     public static <T> ValuesFromListToStringMapperBuilderIntf<T> getElementsFromList(T[] elements) {
@@ -67,8 +67,8 @@ public class PrompterBuilderValuesFromList {
         private boolean includeNull;
         private TableDisplayer<T> tableDisplayer;
 
-        ValuesFromListBuilder(List<T> elements) {
-            this.elements = new ArrayList<>(elements);
+        ValuesFromListBuilder(Iterable<T> elements) {
+            this.elements = Lists.newArrayList(elements);
         }
 
         @Override

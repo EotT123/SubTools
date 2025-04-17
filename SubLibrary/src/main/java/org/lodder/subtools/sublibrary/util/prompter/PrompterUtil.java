@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.util.prompter;
 
-import java.util.Collection;
 import java.util.function.Function;
 
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -81,11 +80,11 @@ public class PrompterUtil {
     // ## Get Value From List ## \\
     // ######################### \\
 
-    public static ValueFromListPromptBuilderIntf<String> getStringFromList(Collection<String> elements) {
+    public static ValueFromListPromptBuilderIntf<String> getStringFromList(Iterable<String> elements) {
         return PrompterBuilderValueFromList.getElementFromList(elements).toStringMapper(Function.identity());
     }
 
-    public static <T> ValueFromListToStringMapperBuilderIntf<T> getElementFromList(Collection<T> elements) {
+    public static <T> ValueFromListToStringMapperBuilderIntf<T> getElementFromList(Iterable<T> elements) {
         return PrompterBuilderValueFromList.getElementFromList(elements);
     }
 
@@ -97,11 +96,11 @@ public class PrompterUtil {
     // ## Get Values From List ## \\
     // ########################## \\
 
-    public static ValuesFromListPromptBuilderIntf<String> getStringsFromList(Collection<String> elements) {
+    public static ValuesFromListPromptBuilderIntf<String> getStringsFromList(Iterable<String> elements) {
         return PrompterBuilderValuesFromList.getStringsFromList(elements);
     }
 
-    public static <T> ValuesFromListToStringMapperBuilderIntf<T> getElementsFromList(Collection<T> elements) {
+    public static <T> ValuesFromListToStringMapperBuilderIntf<T> getElementsFromList(Iterable<T> elements) {
         return PrompterBuilderValuesFromList.getElementsFromList(elements);
     }
 
