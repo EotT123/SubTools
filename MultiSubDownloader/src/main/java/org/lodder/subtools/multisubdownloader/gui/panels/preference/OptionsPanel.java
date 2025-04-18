@@ -8,7 +8,7 @@ import java.io.Serial;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 
@@ -34,7 +34,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.settingsCtrl = settingsCtrl;
 
-        new TitlePanelBuilder(
+        new TitlePanel(
             title:getText("PreferenceDialog.DownloadOptions"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
@@ -53,7 +53,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                                 .build()
                                 .addComponent(this.pnlDefaultSelection = new DefaultSelectionPanel(settingsCtrl)));
 
-        new TitlePanelBuilder(
+        new TitlePanel(
             title:getText("PreferenceDialog.SearchFilter"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
@@ -66,24 +66,24 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                 .addComponent(this.chkExcludeHearingImpaired =
                         new JCheckBox(getText("PreferenceDialog.ExcludeHearingImpaired")));
 
-        TitlePanel.title(getText("PreferenceDialog.TableOptions"))
-                .marginBottom(0)
-                .padding(0)
-                .paddingLeft(20)
+        new TitlePanel(
+            title:getText("PreferenceDialog.TableOptions"),
+            margin:new BoxModelProperties(null, null, 0, null),
+            padding:new BoxModelProperties(0, 20, 0, 0))
                 .addTo(this, "span, grow, wrap")
                 .addComponent(this.chkOnlyFound = new JCheckBox(getText("PreferenceDialog.ShowOnlyFound")));
 
-        TitlePanel.title(getText("PreferenceDialog.ErrorHandlingOption"))
-                .marginBottom(0)
-                .padding(0)
-                .paddingLeft(20)
+        new TitlePanel(
+            title:getText("PreferenceDialog.ErrorHandlingOption"),
+            margin:new BoxModelProperties(null, null, 0, null),
+            padding:new BoxModelProperties(0, 20, 0, 0))
                 .addTo(this, "span, grow, wrap")
                 .addComponent(this.chkStopOnSearchError = new JCheckBox(getText("PreferenceDialog.StopAfterError")));
 
-        TitlePanel.title(getText("PreferenceDialog.SerieDatabaseSource"))
-                .marginBottom(0)
-                .padding(0)
-                .paddingLeft(20)
+        new TitlePanel(
+            title:getText("PreferenceDialog.SerieDatabaseSource"),
+            margin:new BoxModelProperties(null, null, 0, null),
+            padding:new BoxModelProperties(0, 20, 0, 0))
                 .addTo(this, "span, grow")
                 .addComponent(this.cbxEpisodeProcessSource = new JComboBox<>(SettingsProcessEpisodeSource.values()),
                         "wrap")

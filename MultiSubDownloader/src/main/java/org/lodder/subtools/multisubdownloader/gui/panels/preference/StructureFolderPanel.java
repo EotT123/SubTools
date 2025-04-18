@@ -38,7 +38,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = new TitlePanel.TitlePanelBuilder(
+        JPanel titlePanel = new TitlePanel(
             title:Messages.getText("PreferenceDialog.MoveToLibrary"),
             margin:new BoxModelProperties(0, 20, 0, 0),
             padding:new BoxModelProperties(0, 20, 0, 0),

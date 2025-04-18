@@ -11,7 +11,7 @@ import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PartialDisableComboBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
@@ -40,7 +40,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
 
         this.pnlBackup = renameMode ? null : new SubtitleBackupPanel(librarySettings).addTo(this, "wrap, span, growx");
 
-        JPanel performActionPanel = new TitlePanelBuilder(
+        JPanel performActionPanel = new TitlePanel(
             title:getText("PreferenceDialog.PerformActions"),
             margin:new BoxModelProperties(0),
             padding:new BoxModelProperties(0, 20, 0, 0))

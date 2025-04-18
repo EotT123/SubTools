@@ -17,7 +17,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldInteger;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -47,7 +47,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         this.gui = gui;
         this.settingsCtrl = settingsCtrl;
 
-        JPanel settingsPanel = new TitlePanelBuilder(
+        JPanel settingsPanel = new TitlePanel(
             title:getText("PreferenceDialog.Settings"),
             padding:new BoxModelProperties(0, 20, 0, 0),
             useGrid:true,
@@ -122,11 +122,11 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
         {
 
-            JPanel updatePanel = TitlePanel.title(getText("PreferenceDialog.Update"))
-                .padding(0)
-                .paddingLeft(20)
-                .useGrid()
-                .fillContents(false)
+            JPanel updatePanel = new TitlePanel(
+                title:getText("PreferenceDialog.Update"),
+                padding:new BoxModelProperties(0, 20, 0, 0),
+                useGrid:true,
+                fillContents:false)
                 .addTo(this, "span, grow, wrap");
 
             new JLabel(getText("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
@@ -141,10 +141,10 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
         {
 
-            JPanel proxyPanel = TitlePanel.title(getText("PreferenceDialog.ConfigureProxy"))
-                .padding(0)
-                .paddingLeft(20)
-                .fillContents(false)
+            JPanel proxyPanel = new TitlePanel(
+                title:getText("PreferenceDialog.ConfigureProxy"),
+                padding:new BoxModelProperties(0, 20, 0, 0),
+                fillContents:false)
                 .addTo(this, "span, grow");
 
             PanelCheckBox.checkbox(

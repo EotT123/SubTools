@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -21,7 +23,7 @@ import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
-import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel.TitlePanelBuilder;
+import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldPath;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
@@ -53,7 +55,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         setBounds(100, 100, 650, 680);
         contentPane.setLayout(new MigLayout("fill, nogrid", "[]", "[][]20:push[]"));
 
-        new TitlePanelBuilder(
+        new TitlePanel(
             title:getText("PreferenceDialog.Settings"),
             padding:new BoxModelProperties(0, 20, 0, 0),
             fillContents:true)
