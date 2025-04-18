@@ -105,15 +105,15 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<Addic7edSubtitleDescriptor> subtitles,
         Language language) {
         return subtitles.stream()
-            .filter(sub -> language == sub.getLanguage())
-            .map(sub -> Subtitle.downloadSource(sub.getUrl())
+            .filter(sub -> language == sub.language)
+            .map(sub -> Subtitle.downloadSource(sub.url)
                 .subtitleSource(subtitleSource)
-                .fileName(StringExt.removeIllegalFilenameChars(sub.getTitle() + " " + sub.getVersion()))
-                .language(sub.getLanguage())
-                .quality(ReleaseParser.getQualityKeyword(sub.getTitle() + " " + sub.getVersion()))
+                .fileName(StringExt.removeIllegalFilenameChars(sub.title + " " + sub.version))
+                .language(sub.language)
+                .quality(ReleaseParser.getQualityKeyword(sub.title + " " + sub.version))
                 .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleaseGroup(sub.getTitle(), sub.getTitle().endsWith(".srt")))
-                .uploader(sub.getUploader())
+                .releaseGroup(ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".srt")))
+                .uploader(sub.uploader)
                 .hearingImpaired(false))
             .collect(Collectors.toSet());
     }
