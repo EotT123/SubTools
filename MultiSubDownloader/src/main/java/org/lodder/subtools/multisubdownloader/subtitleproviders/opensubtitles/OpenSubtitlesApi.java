@@ -81,7 +81,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .retryPredicate(exc -> exc instanceof HttpClientException e && e.responseCode == 429)
                 .retryWait(5)
                 .getAsJsonArray()
-                .stream()
+                .streamJsonObjects()
                 .filter(show -> "tv".equals(show.getString("kind")))
                 .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
                     show.getString("year")))
