@@ -1,7 +1,6 @@
 package org.lodder.subtools.sublibrary.userinteraction;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -21,32 +20,27 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     @val JFrame frame;
 
     @Override
-    public Optional<String> selectFromList(Collection<String> options, String message, String title) {
+    public Optional<String> selectFromList(Iterable<String> options, String message, String title) {
         return selectFromList(options, message, title, null);
     }
 
     @Override
-    public <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
-            Function<T, String> toStringMapper) {
-        if (options.isEmpty()) {
+    public <T> Optional<T> selectFromList(Iterable<T> options, String message, String title,
+        Function<T, String> toStringMapper) {
+        if (!options.iterator().hasNext()) {
             return Optional.empty();
         }
-        return OptionsPane.options(options)
-                .toStringMapper(toStringMapper)
-                .title(title)
-                .message(message)
-                .defaultOption()
-                .parent(frame)
-                .prompt();
+        return new OptionsPane.OptionPaneBuilder<>(options, toStringMapper, title, message, OptionsPane.Option.DEFAULT,
+            frame).prompt();
     }
 
     @Override
-    public <T> Optional<T> choice(Collection<T> options, String message, String title) {
+    public <T> Optional<T> choice(Iterable<T> options, String message, String title) {
         return choice(options, message, title, null);
     }
 
     @Override
-    public <T> Optional<T> choice(Collection<T> options, String message, String title,
+    public <T> Optional<T> choice(Iterable<T> options, String message, String title,
             Function<T, String> toStringMapper) {
         String[] optionsAsStrings = options.stream()
                 .map(Objects.requireNonNullElseGet(toStringMapper, () -> String::valueOf))

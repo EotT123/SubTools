@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.userinteraction;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
@@ -16,14 +15,14 @@ public interface UserInteractionHandler {
 
     boolean confirm(String message, String title);
 
-    Optional<String> selectFromList(Collection<String> options, String message, String title);
+    Optional<String> selectFromList(Iterable<String> options, String message, String title);
 
-    <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
+    <T> Optional<T> selectFromList(Iterable<T> options, String message, String title,
         Function<T, String> toStringMapper);
 
-    <T> Optional<T> choice(Collection<T> options, String message, String title);
+    <T> Optional<T> choice(Iterable<T> options, String message, String title);
 
-    <T> Optional<T> choice(Collection<T> options, String message, String title, Function<T, String> toStringMapper);
+    <T> Optional<T> choice(Iterable<T> options, String message, String title, Function<T, String> toStringMapper);
 
     default Optional<String> enter(String title, String message) {
         return enter(title, message, null, null);

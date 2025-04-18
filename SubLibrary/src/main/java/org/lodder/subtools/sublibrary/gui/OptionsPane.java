@@ -2,124 +2,58 @@ package org.lodder.subtools.sublibrary.gui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.UtilityClass;
+import lombok.AllArgsConstructor;
+import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-@UtilityClass
 public class OptionsPane {
 
     public static final Object LOCK = new Object();
 
-    public static <T> OptionsPaneBuilderToStringMapperIntf<T> options(Collection<T> options) {
-        return OptionsPaneBuilder.options(options);
-    }
+    public static class OptionPaneBuilder<T> {
 
-    public static <T> OptionsPaneBuilderToStringMapperIntf<T> options(T[] options) {
-        return OptionsPaneBuilder.options(options);
-    }
+        private final T[] options;
+        private final @Nullable String title;
+        private final @Nullable String message;
+        private final Option messageType;
+        private final @Nullable Function<T, String> toStringMapper;
+        private final @Nullable Component parent;
 
-    public static OptionsPaneBuilderTitleIntf<String> stringOptions(Collection<String> options) {
-        return OptionsPaneBuilder.options(options);
-    }
-
-    public static OptionsPaneBuilderTitleIntf<String> stringOptions(String[] options) {
-        return OptionsPaneBuilder.options(options);
-    }
-
-    // interface
-
-    public interface OptionsPaneBuilderToStringMapperIntf<T> {
-        OptionsPaneBuilderTitleIntf<T> toStringMapper(Function<T, String> toStringMapper);
-    }
-
-    public interface OptionsPaneBuilderTitleIntf<T> {
-        OptionsPaneBuilderMessageIntf<T> title(String title);
-    }
-
-    public interface OptionsPaneBuilderMessageIntf<T> {
-        OptionsPaneBuilderMessageTypeIntf<T> message(String message);
-    }
-
-    public interface OptionsPaneBuilderMessageTypeIntf<T> {
-        OptionsPaneBuilderPromptIntf<T> messageType(int messageType);
-
-        default OptionsPaneBuilderPromptIntf<T> defaultOption() {
-            return messageType(JOptionPane.DEFAULT_OPTION);
+        public OptionPaneBuilder(T[] options, @Nullable Function<T, String> toStringMapper, @Nullable String title,
+            @Nullable String message,
+            Option messageType, @Nullable Component parent) {
+            this.options = options;
+            this.toStringMapper = toStringMapper;
+            this.title = title;
+            this.message = message;
+            this.messageType = messageType;
+            this.parent = parent;
         }
 
-        default OptionsPaneBuilderPromptIntf<T> yesNoOption() {
-            return messageType(JOptionPane.YES_NO_OPTION);
+        public OptionPaneBuilder(Iterable<T> options, @Nullable Function<T, String> toStringMapper,
+            @Nullable String title, @Nullable String message, Option messageType, @Nullable Component parent) {
+            this((T[]) StreamSupport.stream(options.spliterator(), false).toArray(), toStringMapper, title, message,
+                messageType, parent);
         }
 
-        default OptionsPaneBuilderPromptIntf<T> yesNoCancelOption() {
-            return messageType(JOptionPane.YES_NO_CANCEL_OPTION);
-        }
-
-        default OptionsPaneBuilderPromptIntf<T> okCancelOption() {
-            return messageType(JOptionPane.OK_CANCEL_OPTION);
-        }
-    }
-
-    public interface OptionsPaneBuilderPromptIntf<T> {
-        OptionsPaneBuilderPromptIntf<T> parent(Component parent);
-
-        Optional<T> prompt();
-    }
-
-    // builder
-
-    @Setter
-    @Accessors(fluent = true)
-    @RequiredArgsConstructor
-    private static class OptionsPaneBuilder<T>
-            implements OptionsPaneBuilderPromptIntf<T>, OptionsPaneBuilderMessageTypeIntf<T>,
-            OptionsPaneBuilderMessageIntf<T>, OptionsPaneBuilderTitleIntf<T>, OptionsPaneBuilderToStringMapperIntf<T> {
-        private final T[] optionsArray;
-        private final Collection<T> optionsList;
-        private String title;
-        private String message;
-        private int messageType;
-        private Function<T, String> toStringMapper;
-        private Component parent;
-
-        public static <S> OptionsPaneBuilder<S> options(Collection<S> options) {
-            return new OptionsPaneBuilder<>(null, options);
-        }
-
-        public static <S> OptionsPaneBuilder<S> options(S[] options) {
-            return new OptionsPaneBuilder<>(options, null);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
         public Optional<T> prompt() {
             synchronized (LOCK) {
                 if (toStringMapper == null) {
-                    T[] options;
-                    if (optionsList != null) {
-                        options = (T[]) optionsList.toArray();
-                    } else {
-                        options = optionsArray;
-                    }
                     return Optional.ofNullable(
-                            (T) JOptionPane.showInputDialog(parent, message, title, messageType, null, options, "0"));
+                        (T) JOptionPane.showInputDialog(parent, message, title, messageType.value, null, options, "0"));
                 } else {
-                    Stream<T> optionsStream = optionsList != null ? optionsList.stream() : optionsArray.stream();
-                    ElementWrapper<T>[] options =
-                            optionsStream.map(option -> new ElementWrapper<>(option, toStringMapper))
-                                    .toArray(ElementWrapper[]::new);
-                    return Optional
-                            .ofNullable(
-                                    (ElementWrapper<T>) JOptionPane.showInputDialog(parent, message, title, messageType,
-                                            null, options, "0"))
-                            .map(ElementWrapper::element);
+                    ElementWrapper<T>[] optionsWrapper =
+                        options.stream().map(option -> new ElementWrapper<>(option, toStringMapper))
+                            .toArray(ElementWrapper[]::new);
+                    return Optional.ofNullable(
+                            (ElementWrapper<T>) JOptionPane.showInputDialog(parent, message, title, messageType.value, null,
+                                optionsWrapper, "0"))
+                        .map(ElementWrapper::element);
                 }
             }
         }
@@ -127,8 +61,18 @@ public class OptionsPane {
 
     private record ElementWrapper<T>(T element, Function<T, String> toStringMapper) {
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return toStringMapper.apply(element);
         }
+    }
+
+    @AllArgsConstructor
+    public enum Option {
+        DEFAULT(JOptionPane.DEFAULT_OPTION),
+        YES_NO(JOptionPane.YES_NO_OPTION),
+        YES_NO_CANCEL(JOptionPane.YES_NO_CANCEL_OPTION),
+        OK_CANCEL(JOptionPane.OK_CANCEL_OPTION);
+
+        @val int value;
     }
 }

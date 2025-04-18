@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.userinteraction;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -26,12 +25,12 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public Optional<String> selectFromList(Collection<String> options, String message, String title) {
+    public Optional<String> selectFromList(Iterable<String> options, String message, String title) {
         return selectFromList(options, message, title, null);
     }
 
     @Override
-    public <T> Optional<T> selectFromList(Collection<T> options, String message, String title,
+    public <T> Optional<T> selectFromList(Iterable<T> options, String message, String title,
             Function<T, String> toStringMapper) {
         return PrompterUtil.getElementFromList(options)
                 .toStringMapper(toStringMapper)
@@ -41,12 +40,12 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> choice(Collection<T> options, String message, String title) {
+    public <T> Optional<T> choice(Iterable<T> options, String message, String title) {
         return choice(options, message, title, null);
     }
 
     @Override
-    public <T> Optional<T> choice(Collection<T> options, String message, String title,
+    public <T> Optional<T> choice(Iterable<T> options, String message, String title,
             Function<T, String> toStringMapper) {
         return selectFromList(options, message, title, toStringMapper);
     }
