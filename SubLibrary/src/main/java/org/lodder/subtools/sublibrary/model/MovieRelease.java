@@ -8,12 +8,12 @@ import manifold.ext.props.rt.api.var;
 public final class MovieRelease extends Release {
 
     @var String name;
-    @var int year;
+    @var Integer year;
     private int imdbId;
     private int tvdbId;
 
     public MovieRelease(String name, Path file=null, String releaseGroup=null, String quality=null,
-        String extension=null, int year=0) {
+        String extension=null, Integer year=null) {
         super(VideoType.MOVIE, file, releaseGroup, quality, extension);
         this.name = name;
         this.year = year;
