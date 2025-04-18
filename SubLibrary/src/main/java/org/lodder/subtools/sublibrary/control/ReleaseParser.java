@@ -99,7 +99,7 @@ public class ReleaseParser {
 
         if (parserResults.containsNone(SEASON, EPISODES_TEXT)) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
-                // If the season and episode numbers are not found, and neither are the Arabic or Roman numbers, try to
+                // If the season and episode numbers are not found, and neither are the Arabic nor Roman numbers, try to
                 // parse the season + episode numbers (using less 'safe' formats 'see' and 's_ee'), and the title
                 parserResults.parse(name_season_episode_title_Regex(SeasonEpisodeType.X_XX),
                     name_season_episode_title_Regex(SeasonEpisodeType.XXX),
