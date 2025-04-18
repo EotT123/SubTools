@@ -30,8 +30,7 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
         if (!options.iterator().hasNext()) {
             return Optional.empty();
         }
-        return new OptionsPane.OptionPaneBuilder<>(options, toStringMapper, title, message, OptionsPane.Option.DEFAULT,
-            frame).prompt();
+        return new OptionsPane<>(options, toStringMapper, title, message, OptionsPane.Option.DEFAULT, frame).prompt();
     }
 
     @Override
