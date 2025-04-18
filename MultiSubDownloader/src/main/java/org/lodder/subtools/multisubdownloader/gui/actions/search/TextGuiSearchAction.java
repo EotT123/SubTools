@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 import org.lodder.subtools.multisubdownloader.GUI;
@@ -52,8 +51,7 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
                 .build();
             case MOVIE -> new MovieRelease(name:name, quality:inputPanel.quality);
             default -> releaseFactory.createRelease(Path.of(
-                    name + (Arrays.stream(VideoExtensions.values()).anyMatch(ext -> name.endsWith("." + ext)) ? "" :
-                        ".")),
+                    name + (VideoExtensions.values().stream().anyMatch(ext -> name.endsWith("." + ext)) ? "" : ".")),
                 userInteractionHandler);
         };
         return release != null ? List.of(release) : List.of();
