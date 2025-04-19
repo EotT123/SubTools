@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.util;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -21,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.StandardException;
 import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.val;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -59,8 +60,8 @@ public class ExportImport {
     public void importSettings(SettingsType listType) {
         chooseFile(listType.fileType).ifPresent(path -> {
             if (Files.notExists(path)) {
-                userInteractionHandler.showMessage(Messages.getText("ImportExport.FileDoesNotExist"),
-                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
+                userInteractionHandler.showMessage(getText("ImportExport.FileDoesNotExist"),
+                    getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
                 return;
             }
             try {
@@ -72,11 +73,11 @@ public class ExportImport {
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                 }
             } catch (CorruptSettingsFileException e) {
-                userInteractionHandler.showMessage(Messages.getText("ImportExport.ImportCorruptFile"),
-                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                userInteractionHandler.showMessage(getText("ImportExport.ImportCorruptFile"),
+                    getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             } catch (Exception e) {
-                userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileImporting"),
-                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                userInteractionHandler.showMessage(getText("ImportExport.ErrorWhileImporting"),
+                    getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             }
         });
     }
@@ -92,8 +93,8 @@ public class ExportImport {
                         default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                     }
                 } catch (Exception e) {
-                    userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileExporting"),
-                        Messages.getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
+                    userInteractionHandler.showMessage(getText("ImportExport.ErrorWhileExporting"),
+                        getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
                 }
             });
     }
@@ -150,7 +151,7 @@ public class ExportImport {
                         .flatMap(Arrays::stream)
                         .forEach(selectionForKeyPrefix -> manager.clearExpiredCacheBuilder()
                             .cacheType(CacheType.DISK)
-                            .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
+                            .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix))
                             .clear());
                 }
                 serieMappings.forEach(serieMapping -> manager.valueBuilder()
@@ -163,11 +164,11 @@ public class ExportImport {
 
         private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
             return userInteractionHandler.choice(Arrays.asList(ImportStyle.values()),
-                Messages.getText("ImportExport.OverwriteOrAdd"),
-                Messages.getText("ImportExport.OverwriteOrAddTitle"),
+                getText("ImportExport.OverwriteOrAdd"),
+                getText("ImportExport.OverwriteOrAddTitle"),
                 option -> switch (option) {
-                    case OVERWRITE -> Messages.getText("ImportExport.Overwrite");
-                    case APPEND -> Messages.getText("ImportExport.Add");
+                    case OVERWRITE -> getText("ImportExport.Overwrite");
+                    case APPEND -> getText("ImportExport.Add");
                 });
         }
 

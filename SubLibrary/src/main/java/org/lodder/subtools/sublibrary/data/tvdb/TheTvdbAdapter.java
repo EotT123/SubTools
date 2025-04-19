@@ -80,9 +80,11 @@ public class TheTvdbAdapter {
                     Comparator.reverseOrder())
                 .thenComparing(TheTvdbSerie::getFirstAired, Comparator.reverseOrder());
             try {
-                tvdbSerie = userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
+                tvdbSerie = userInteractionHandler.selectFromList(
+                    serieIds.stream().sorted(comparator).toList(),
                     getText("Prompter.SelectTvdbMatchForSerie", serieName),
-                    PROVIDER_NAME, s -> "${s.serieName} (${s.firstAired})");
+                    PROVIDER_NAME,
+                    s -> "${s.serieName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
                     tvdbSerie = askUserToEnterTvdbId(serieName)
                         .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));

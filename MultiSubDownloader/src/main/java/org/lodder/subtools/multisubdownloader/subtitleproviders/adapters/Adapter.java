@@ -203,10 +203,13 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 uriForSerie = Optional.empty();
             } else {
                 // let the user select the correct provider serie id
-                uriForSerie = getUserInteractionHandler().selectFromList(providerSerieIds, useSeasonForSerieId() ?
+                uriForSerie = getUserInteractionHandler().selectFromList(
+                    providerSerieIds,
+                    useSeasonForSerieId() ?
                         getText("SelectDialog.SelectSerieNameForNameWithSeason", displayName, seasonToUse) :
                         getText("SelectDialog.SelectSerieNameForName", displayName),
-                    providerName, this::providerSerieIdToDisplayString);
+                    providerName,
+                    this::providerSerieIdToDisplayString);
             }
             if (uriForSerie.isEmpty()) {
                 if (serieNameToSearchFor.equals(serieName)) {
