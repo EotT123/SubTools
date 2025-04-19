@@ -1,10 +1,11 @@
 package org.lodder.subtools.sublibrary.userinteraction;
 
 import javax.swing.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.override;
@@ -13,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.gui.InputPane;
 import org.lodder.subtools.sublibrary.gui.OptionsPane;
+import org.lodder.subtools.sublibrary.util.Validator;
 
 @AllArgsConstructor
 public class UserInteractionHandlerGUI implements UserInteractionHandler {
@@ -21,7 +23,7 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     @val JFrame frame;
 
     @Override
-    public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message,
+    public <T> Optional<T> selectFromList(Iterable<T> options, String message,
         @Nullable String title, @Nullable Function<T, String> toStringMapper) {
         if (!options.iterator().hasNext()) {
             return Optional.empty();
@@ -49,13 +51,25 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     }
 
     @Override
-    public Optional<String> enter(String title, String message, String errorMessage, Predicate<String> validator) {
-        return InputPane.create()
-                .title(title)
-                .message(message)
-                .errorMessage(errorMessage)
-                .validator(validator)
-                .prompt();
+    public Optional<String> enter(String title, String message, @Nullable List<Validator<String>> inputValidators) {
+        return new InputPane<>(
+            title:title,
+            message:message,
+            inputValidators:inputValidators,
+            toObjectMapper:Function.identity())
+            .prompt();
+    }
+
+    @Override
+    public OptionalInt enterNumber(String title, String message,
+        @Nullable List<Validator<Integer>> objectValidators) {
+
+        return new InputPane<>(
+            title:title,
+            message:message,
+            toObjectMapper:Integer::parseInt,
+            objectValidators:objectValidators)
+            .prompt().mapToInt(v -> v);
     }
 
     public void message(String message, String title) {

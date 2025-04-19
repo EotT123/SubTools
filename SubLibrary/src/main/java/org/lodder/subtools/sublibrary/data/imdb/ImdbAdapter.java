@@ -122,8 +122,7 @@ public class ImdbAdapter {
     }
 
     private OptionalInt promptUserToEnterImdbId(String title, int year) {
-        return userInteractionHandler.enterNumber(PROVIDER_NAME,
-            getText("Prompter.EnterImdbMatchForSerie", title), getText("Prompter.ValueIsNotValid"));
+        return userInteractionHandler.enterNumber(PROVIDER_NAME, getText("Prompter.EnterImdbMatchForSerie", title));
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {

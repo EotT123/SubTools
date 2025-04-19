@@ -4,15 +4,16 @@ import static com.pivovarit.gatherers.MoreGatherers.*;
 import static java.lang.System.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BooleanSupplier;
+import java.util.OptionalInt;
 import java.util.function.Function;
-import java.util.function.IntPredicate;
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import dnl.utils.text.table.TextTable;
@@ -21,13 +22,25 @@ import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.TriFunction;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.util.Validator;
 
 @Extension
 @UtilityClass
 public class PrompterExt {
+
+    public static Validator<String> NON_BLANK_VALIDATOR =
+        new Validator<>(StringUtils::isNotBlank, getText("Prompter.ValueNonBlank"));
+    public static Validator<String> INT_VALIDATOR =
+        new Validator<>(v -> v.parseAsNumber(Integer::parseInt).isPresent());
+    public static Validator<String> BOOLEAN_VALIDATOR =
+        new Validator<>(v -> getText("Prompter.YesAbbreviation").equalsIgnoreCase(v) ||
+            getText("Prompter.Yes").equalsIgnoreCase(v) ||
+            getText("Prompter.NoAbbreviation").equalsIgnoreCase(v) ||
+            getText("Prompter.No").equalsIgnoreCase(v));
 
     public static void show(@This Prompter prompter, String message, Object... replacements) {
         try {
@@ -38,170 +51,251 @@ public class PrompterExt {
     }
 
     public static void pressAnyKeyToContinue(@This Prompter prompter) {
-        prompter.promptString(message:"Press any key to continue", defaultValue:"");
-//        new PrompterString(message:"Press any key to continue", defaultValue:"").prompt(prompter);
+        prompt(prompter:prompter, message:"Press any key to continue", toObjectMapper:Function.identity());
     }
 
-    public static Optional<String> promptString(@This Prompter prompter,
-        @Nullable Predicate<String> validator=StringUtils::isNotBlank,
-        @Nullable String defaultValue=null,
-        @Nullable Supplier<String> defaultValueSupplier=null,
+    public static Optional<String> promptString(@This Prompter prompter, String message,
+        List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR),
+        List<Validator<String>> objectValidators=new ArrayList<Validator<String>>()) {
+
+        return prompt(prompter, message, inputValidators, Function.identity(), objectValidators);
+    }
+
+    public static OptionalInt promptInt(@This Prompter prompter, String message,
+        List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR, INT_VALIDATOR),
+        Function<String, Integer> toObjectMapper=Integer::parseInt,
+        List<Validator<Integer>> objectValidators=new ArrayList<Validator<Integer>>()) {
+
+        return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators).mapToInt(v -> v);
+    }
+
+    public static Optional<Boolean> promptBoolean(@This Prompter prompter, String message,
+        List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR, BOOLEAN_VALIDATOR)) {
+
+        return prompt(prompter, message, inputValidators, Boolean::parseBoolean, List.of());
+    }
+
+//    public static <T> Optional<T> promptValueFromList(@This Prompter prompter,
+//        String message,
+//        Iterable<T> elements,
+//        Function<T, String> toStringMapper=String::valueOf,
+//        boolean includeNull,
+//        @Nullable TableDisplayer<T> tableDisplayer=null,
+//        @Nullable Comparator<T> sorter=null) {
+//
+//        List<T> sortedElements =
+//            sorter == null ? elements.stream().toList() : elements.stream().sorted(sorter).toList();
+//        String choicesMessage;
+//        if (tableDisplayer != null) {
+//            choicesMessage = tableDisplayer.getAsString(sortedElements);
+//        } else {
+//            choicesMessage = message + lineSeparator() +
+//                sortedElements.stream()
+//                    .gather(zipWithIndex())
+//                    .map(entry -> "  - " + (entry.getValue() + 1) + ": " + toStringMapper.apply(entry.getKey()))
+//                    .collect(Collectors.joining(lineSeparator())) +
+//                lineSeparator();
+//        }
+//
+//        int numberOfElements = sortedElements.size();
+//        List<Validator<String>> inputValidators = new ArrayList<>();
+//        if (!includeNull) {
+//            inputValidators.add(NON_BLANK_VALIDATOR);
+//        }
+//        inputValidators.add(new Validator<>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt).isPresent()));
+//
+//        Function<String, Integer> toObjectMapper = v -> v == null ? null : Integer.parseUnsignedInt(v);
+//
+//        List<Validator<Integer>> objectValidators =
+//            List.of(new Validator<>(number -> number == null || (number > 0 && number <= numberOfElements),
+//                getText("Prompter.ValueNotInRange", numberOfElements)));
+//
+//        return prompter.promptInt(choicesMessage, inputValidators, toObjectMapper, objectValidators)
+//            .mapToObj(idx -> sortedElements.get(idx - 1));
+//    }
+//
+//
+//    public static <T> List<T> promptValuesFromList(@This Prompter prompter,
+//        String message,
+//        Iterable<T> elements,
+//        Function<T, String> toStringMapper=String::valueOf,
+//        boolean includeNull,
+//        @Nullable TableDisplayer<T> tableDisplayer=null,
+//        @Nullable Comparator<T> sorter=null) {
+//
+//        List<T> sortedElements =
+//            sorter == null ? elements.stream().toList() : elements.stream().sorted(sorter).toList();
+//        String choicesMessage;
+//        if (tableDisplayer != null) {
+//            choicesMessage = tableDisplayer.getAsString(sortedElements);
+//        } else {
+//            choicesMessage = message + lineSeparator() +
+//                sortedElements.stream()
+//                    .gather(zipWithIndex())
+//                    .map(entry -> "  - " + (entry.getValue() + 1) + ": " + toStringMapper.apply(entry.getKey()))
+//                    .collect(Collectors.joining(lineSeparator())) +
+//                lineSeparator();
+//        }
+//
+//        int numberOfElements = sortedElements.size();
+//        List<Validator<String>> inputValidators = new ArrayList<>();
+//        if (!includeNull) {
+//            inputValidators.add(NON_BLANK_VALIDATOR);
+//        }
+//        inputValidators.add(
+//            new Validator<>(v -> v == null ||
+//                v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt).isPresent())));
+//
+//        Function<String, int[]> toObjectsMapper =
+//            v -> v.split(",").stream().mapToInt(Integer::parseUnsignedInt).toArray();
+//
+//        List<Validator<int[]>> objectValidators = List.of(
+//            new Validator<>(numbers -> numbers.stream().distinct().count() == numbers.stream().count(),
+//                getText("Prompter.DistinctValues")),
+//            new Validator<>(numbers -> numbers.stream().allMatch(number -> number > 0 && number <= numberOfElements),
+//                getText("Prompter.ValueNotInRange", numberOfElements)));
+//
+//        return prompter.promptValues(choicesMessage, inputValidators, toObjectsMapper, objectValidators).stream()
+//            .map(idx -> sortedElements.get(idx - 1)).toList();
+//    }
+
+    public static <T> Optional<T> promptValueFromList(@This Prompter prompter,
         String message,
-        @Nullable String errorMessage=null) {
-
-        return prompt(prompter, Function.identity(), validator, null, defaultValue, defaultValueSupplier, message,
-            errorMessage);
-    }
-
-    public static Optional<Integer> promptInt(@This Prompter prompter,
-        @Nullable IntPredicate validator=_ -> true,
-        @Nullable Integer defaultValue=null,
-        @Nullable IntSupplier defaultValueSupplier=null,
-        String message,
-        @Nullable String errorMessage=null) {
-
-        Predicate<String> isIntValidator = v -> {
-            try {
-                Integer.parseInt(v);
-                return true;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        };
-        return prompt(prompter, Integer::parseInt, isIntValidator, validator == null ? null : validator::test,
-            defaultValue, defaultValueSupplier == null ? null : defaultValueSupplier::getAsInt, message, errorMessage);
-    }
-
-    public static Optional<Boolean> promptBoolean(@This Prompter prompter,
-        Predicate<String> toObjectMapper="y"::equalsIgnoreCase,
-        @Nullable Predicate<String> validator=v -> "y".equalsIgnoreCase(v) || "n".equalsIgnoreCase(v),
-        @Nullable Boolean defaultValue=null,
-        @Nullable BooleanSupplier defaultValueSupplier=null,
-        String message,
-        @Nullable String errorMessage=null) {
-
-        return prompt(prompter, toObjectMapper::test, validator, null,
-            defaultValue, defaultValueSupplier == null ? null : defaultValueSupplier::getAsBoolean, message,
-            errorMessage);
-    }
-
-    public static <T> Optional<T> promptValue(@This Prompter prompter,
         Iterable<T> elements,
         Function<T, String> toStringMapper=String::valueOf,
-        String message,
         boolean includeNull,
-        T emptyValue=null,
         @Nullable TableDisplayer<T> tableDisplayer=null,
         @Nullable Comparator<T> sorter=null) {
-        List<T> sortedElements =
-            sorter == null ? elements.stream().toList() : elements.stream().sorted(sorter).toList();
-        try {
-            String value = promptFromListIndices(prompter, sortedElements, tableDisplayer, toStringMapper, message);
-            if (StringUtils.isBlank(value) && includeNull) {
-                return Optional.ofNullable(emptyValue);
-            }
-            int number = Integer.parseInt(value);
-            if (number < 1 || number > sortedElements.size()) {
-                prompter.show("The entered value isn't in the range [1, %s], try again.", sortedElements.size());
-                return prompter.promptValue(elements, toStringMapper, message, includeNull, emptyValue,
-                    tableDisplayer, sorter);
-            }
-            return Optional.ofNullable(sortedElements.get(number - 1));
-        } catch (NumberFormatException e) {
-            prompter.show("Enter a valid number, try again.");
-            return prompter.promptValue(elements, toStringMapper, message, includeNull, emptyValue,
-                tableDisplayer, sorter);
-        }
 
+        Validator<String> inputValidator =
+            new Validator<>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt).isPresent());
+        Function<String, Integer> toObjectMapper = v -> v == null ? null : Integer.parseUnsignedInt(v);
+        int numberOfElements = elements.size();
+        List<Validator<Integer>> objectValidators =
+            List.of(new Validator<>(number -> number == null || (number > 0 && number <= numberOfElements),
+                getText("Prompter.ValueNotInRange", numberOfElements)));
+
+        TriFunction<String, List<Validator<String>>, List<T>, Optional<T>> promptFunction = (choicesMessage,
+            inputValidators, sortedElements) ->
+            // TODO use extension method
+            PrompterExt.promptInt(prompter, choicesMessage, inputValidators, toObjectMapper, objectValidators)
+                .mapToObj(idx -> sortedElements.get(idx - 1));
+
+        return promptFromList(message, elements, toStringMapper, includeNull, tableDisplayer, sorter,
+            List.of(inputValidator), promptFunction);
     }
 
-    public static <T> List<T> promptValues(@This Prompter prompter,
+    public static <T> List<T> promptValuesFromList(@This Prompter prompter,
+        String message,
         Iterable<T> elements,
         Function<T, String> toStringMapper=String::valueOf,
-        String message,
         boolean includeNull,
         @Nullable TableDisplayer<T> tableDisplayer=null,
         @Nullable Comparator<T> sorter=null) {
 
-        List<T> sortedElements =
-            sorter == null ? elements.stream().toList() : elements.stream().sorted(sorter).toList();
-        try {
-            String value = promptFromListIndices(prompter, sortedElements, tableDisplayer, toStringMapper, message);
+        Validator<String> inputValidator = new Validator<>(v -> v == null ||
+            v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt).isPresent()));
+        Function<String, int[]> toObjectsMapper =
+            v -> v.split(",").stream().mapToInt(Integer::parseUnsignedInt).toArray();
+        int numberOfElements = elements.size();
+        List<Validator<int[]>> objectValidators = List.of(
+            new Validator<>(numbers -> numbers.stream().distinct().count() == numbers.stream().count(),
+                getText("Prompter.DistinctValues")),
+            new Validator<>(numbers -> numbers.stream().allMatch(number -> number > 0 && number <= numberOfElements),
+                getText("Prompter.ValueNotInRange", numberOfElements)));
 
-            if (StringUtils.isBlank(value) && includeNull) {
-                return List.of();
-            }
-            if (StringUtils.isBlank(value)) {
-                prompter.show("Enter a valid value, try again.");
-                return prompter.promptValues(elements, toStringMapper, message, includeNull, tableDisplayer, sorter);
-            }
-            int[] choices = value.split(",").stream().mapToInt(Integer::parseInt).map(i -> i - 1).toArray();
-            if (choices.stream().distinct().count() != choices.length) {
-                prompter.show("Choose all distinct options, try again.");
-                return prompter.promptValues(elements, toStringMapper, message, includeNull, tableDisplayer, sorter);
-            }
-            if (choices.stream().anyMatch(number -> number < 0 || number > sortedElements.size() - 1)) {
-                prompter.show("The entered number(s) aren't in the range [1, %s], try again.", sortedElements.size());
-                return prompter.promptValues(elements, toStringMapper, message, includeNull, tableDisplayer, sorter);
-            }
-            return choices.stream().map(sortedElements::get).collect(Collectors.toList());
-        } catch (NumberFormatException e) {
-            prompter.show("Invalid number(s) encountered. Enter a comma separated list of the choices.");
-            return prompter.promptValues(elements, toStringMapper, message, includeNull, tableDisplayer, sorter);
-        }
+        TriFunction<String, List<Validator<String>>, List<T>, List<T>> promptFunction = (choicesMessage,
+            inputValidators, sortedElements) ->
+            // TODO use extension method
+            PrompterExt.promptValues(prompter, choicesMessage, inputValidators, toObjectsMapper, objectValidators)
+                .stream()
+                .map(idx -> sortedElements.get(idx - 1)).toList();
+
+        return promptFromList(message, elements, toStringMapper, includeNull, tableDisplayer, sorter,
+            List.of(inputValidator), promptFunction);
     }
 
-    private static <T> String promptFromListIndices(Prompter prompter, Iterable<T> elements,
-        @Nullable TableDisplayer<T> tableDisplayer, Function<T, String> toStringMapper,
-        String message) {
-        try {
-            if (tableDisplayer != null) {
-                tableDisplayer.display(elements);
-                return prompter.prompt(message);
-            } else {
-                String choicesMessage = elements.stream()
+    private static <T, R> R promptFromList(
+        String message,
+        Iterable<T> elements,
+        Function<T, String> toStringMapper=String::valueOf,
+        boolean includeNull,
+        @Nullable TableDisplayer<T> tableDisplayer=null,
+        @Nullable Comparator<T> sorter=null,
+        List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
+        TriFunction<String, List<Validator<String>>, List<T>, R> promptFunction) {
+
+        List<T> sortedElements =
+            sorter == null ? elements.stream().toList() : elements.stream().sorted(sorter).toList();
+        String choicesMessage;
+        if (tableDisplayer != null) {
+            choicesMessage = tableDisplayer.getAsString(sortedElements);
+        } else {
+            choicesMessage = message + lineSeparator() +
+                sortedElements.stream()
                     .gather(zipWithIndex())
                     .map(entry -> "  - " + (entry.getValue() + 1) + ": " + toStringMapper.apply(entry.getKey()))
-                    .collect(Collectors.joining(lineSeparator())) + lineSeparator();
-                return prompter.prompt(
-                    StringUtils.isBlank(message) ? choicesMessage : message + lineSeparator() + choicesMessage);
+                    .collect(Collectors.joining(lineSeparator())) +
+                lineSeparator();
+        }
+        List<Validator<String>> allInputValidators = new ArrayList<>();
+        if (!includeNull) {
+            allInputValidators.add(NON_BLANK_VALIDATOR);
+        }
+        allInputValidators.addAll(inputValidators);
+
+        return promptFunction.apply(choicesMessage, allInputValidators, sortedElements);
+    }
+
+    private static <T> Optional<T> prompt(Prompter prompter, String message,
+        List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
+        Function<String, T> toObjectMapper,
+        List<Validator<T>> objectValidators=new ArrayList<Validator<T>>()) {
+        try {
+            String value = prompter.prompt(message + System.lineSeparator());
+            for (Validator<String> inputValidator : inputValidators) {
+                if (inputValidator.isInvalid(value)) {
+                    prompter.showMessage(inputValidator.errorMessage);
+                    return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators);
+                }
             }
+            T object = toObjectMapper.apply(value);
+            for (Validator<T> objectValidator : objectValidators) {
+                if (objectValidator.isInvalid(object)) {
+                    prompter.showMessage(objectValidator.errorMessage);
+                    return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators);
+                }
+            }
+            return Optional.ofNullable(object);
         } catch (PrompterException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private static <T> Optional<T> prompt(Prompter prompter, Function<String, T> toObjectMapper,
-        @Nullable Predicate<String> validator=null, @Nullable Predicate<T> objValidator=null,
-        @Nullable T defaultValue=null, @Nullable Supplier<T> defaultValueSupplier=null, String message,
-        @Nullable String errorMessage=null) {
+    public static <T> T promptValues(@This Prompter prompter, String message,
+        List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
+        Function<String, T> toObjectsMapper,
+        List<Validator<T>> objectValidators=new ArrayList<Validator<T>>()) {
         try {
             String value = prompter.prompt(message + System.lineSeparator());
-            if (StringUtils.isEmpty(value)) {
-                if (defaultValue != null) {
-                    return Optional.of(defaultValue);
-                } else if (defaultValueSupplier != null) {
-                    return Optional.ofNullable(defaultValueSupplier.get());
-                } else {
-                    return prompt(prompter, toObjectMapper, validator, objValidator, defaultValue, defaultValueSupplier,
-                        message, errorMessage);
+            for (Validator<String> inputValidator : inputValidators) {
+                if (inputValidator.isInvalid(value)) {
+                    prompter.showMessage(inputValidator.errorMessage);
+                    // TODO use extension method
+                    return PrompterExt.promptValues(prompter, message, inputValidators, toObjectsMapper,
+                        objectValidators);
                 }
-            } else {
-                if (validator != null && !validator.test(value)) {
-                    prompter.showMessage(
-                        StringUtils.isNotBlank(errorMessage) ? errorMessage : getText("Prompter.ValueIsNotValid"));
-                    return prompt(prompter, toObjectMapper, validator, objValidator, defaultValue, defaultValueSupplier,
-                        message, errorMessage);
-                }
-                T object = toObjectMapper.apply(value);
-                if (objValidator != null && !objValidator.test(object)) {
-                    prompter.showMessage(
-                        StringUtils.isNotBlank(errorMessage) ? errorMessage : getText("Prompter.ValueIsNotValid"));
-                    return prompt(prompter, toObjectMapper, validator, objValidator, defaultValue, defaultValueSupplier,
-                        message, errorMessage);
-                }
-                return Optional.ofNullable(object);
             }
+            T objects = toObjectsMapper.apply(value);
+            for (Validator<T> objectValidator : objectValidators) {
+                if (objectValidator.isInvalid(objects)) {
+                    prompter.showMessage(objectValidator.errorMessage);
+                    // TODO use extension method
+                    return PrompterExt.promptValues(prompter, message, inputValidators, toObjectsMapper,
+                        objectValidators);
+                }
+            }
+            return objects;
         } catch (PrompterException e) {
             throw new IllegalStateException(e);
         }
@@ -228,6 +322,17 @@ public class PrompterExt {
         }
 
         public void display(Iterable<T> tableElements) {
+            writeToPrintStream(tableElements, System.out);
+        }
+
+        public String getAsString(Iterable<T> tableElements) {
+            LineReadingOutputStream lineReadingOutputStream = new LineReadingOutputStream();
+            PrintStream printStream = new PrintStream(lineReadingOutputStream);
+            writeToPrintStream(tableElements, printStream);
+            return lineReadingOutputStream.toString();
+        }
+
+        private void writeToPrintStream(Iterable<T> tableElements, PrintStream printStream) {
             String[] columnNames = columnDisplayers.stream().map(ColumnDisplayer::columnName).toArray(String[]::new);
             Object[][] dataTable = tableElements.stream()
                 .map(tableElement -> columnDisplayers.stream()
@@ -238,10 +343,32 @@ public class PrompterExt {
             TextTable tt = new TextTable(columnNames, dataTable);
             // this adds the numbering on the left
             tt.setAddRowNumbering(true);
-            tt.printTable();
+            tt.printTable(printStream, 0);
         }
+
+
     }
 
-    public record ColumnDisplayer<T>(String columnName, Function<T, String> toStringMapper) {
+    private static class LineReadingOutputStream extends OutputStream {
+        private final ByteArrayOutputStream byteArrayOutputStream;
+
+        // Constructor
+        public LineReadingOutputStream() {
+            this.byteArrayOutputStream = new ByteArrayOutputStream();
+        }
+
+        // Write method, called when you write data to the stream
+        @Override
+        public void write(int b) throws IOException {
+            byteArrayOutputStream.write(b);
+        }
+
+        public String toString() {
+            return byteArrayOutputStream.toString();
+        }
+
+    }
+
+    public record ColumnDisplayer<T>(String columnName, Function<? super T, String> toStringMapper) {
     }
 }

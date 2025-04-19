@@ -1,9 +1,13 @@
 package org.lodder.subtools.sublibrary.userinteraction;
 
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import static org.lodder.subtools.multisubdownloader.Messages.*;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.function.Function;
+
+import extensions.org.codehaus.plexus.components.interactivity.Prompter.PrompterExt;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.codehaus.plexus.components.interactivity.DefaultInputHandler;
@@ -12,6 +16,7 @@ import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
+import org.lodder.subtools.sublibrary.util.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,44 +32,51 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     @Override
     public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message, @Nullable String title,
         @Nullable Function<T, String> toStringMapper) {
-        return prompter.promptValue(
-            elements:options,
-            toStringMapper:toStringMapper,
-            message:message,
-            includeNull:true);
-//        return new PrompterValueFromList<>(
+//        return prompter.promptValueFromList(
+//            message:message,
 //            elements:options,
 //            toStringMapper:toStringMapper,
-//            message:message,
-//            includeNull:true)
-//            .prompt(prompter);
+//            includeNull:true);
+        // TODO remove optional parameters
+        // TODO use extension method
+        return PrompterExt.promptValueFromList(prompter,
+            message,
+            options,
+            toStringMapper,
+            true);
     }
 
     @Override
-    public <T> Optional<T> choice(Iterable<T> options, @Nullable String message, @Nullable String title,
+    public <T> Optional<T> choice(Iterable<T> options, String message, @Nullable String title,
         @Nullable Function<T, String> toStringMapper) {
         return selectFromList(options, message, title, toStringMapper);
     }
 
     @Override
     public boolean confirm(String message, String title) {
-        return prompter.promptBoolean(message:message + " (Y/N)");
-//        return new PrompterBoolean(message:message + " (Y/N)").prompt(prompter);
+//        return prompter.promptBoolean(message + " (%s/%s)"
+//            .formatted(getText("Prompter.YesAbbreviation"), getText("Prompter.NoAbbreviation")))
+//            .orElse(false);
+        // TODO remove optional parameters
+        return prompter.promptBoolean(
+            message.formatted(getText("Prompter.YesAbbreviation"), getText("Prompter.NoAbbreviation")),
+            null).orElse(false);
     }
 
     @Override
-    public Optional<String> enter(String title, String message, @Nullable String errorMessage,
-        @Nullable Predicate<String> validator) {
-        return prompter.promptString(
-            message:message,
-            errorMessage:errorMessage,
-            validator:validator);
+    public Optional<String> enter(String title, String message,
+        @Nullable List<Validator<String>> inputValidators) {
+//        return prompter.promptString(message, inputValidators:inputValidators);
+        // TODO use extension method
+        return PrompterExt.promptString(prompter, message, inputValidators:inputValidators);
+    }
 
-//        return new PrompterString(
-//            message:message,
-//            errorMessage:errorMessage,
-//            validator:validator)
-//                .prompt(prompter);
+    @Override
+    public OptionalInt enterNumber(String title, String message,
+        @Nullable List<Validator<Integer>> objectValidators) {
+//        return prompter.promptInt(message, objectValidators:objectValidators);
+        // TODO use extension method
+        return PrompterExt.promptInt(prompter, message, objectValidators:objectValidators);
     }
 
     @Override

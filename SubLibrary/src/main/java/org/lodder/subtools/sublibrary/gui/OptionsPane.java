@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.StreamSupport;
 
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
@@ -17,15 +16,15 @@ public class OptionsPane<T> {
 
     private final T[] options;
     private final @Nullable String title;
-    private final @Nullable String message;
+    private final String message;
     private final Option messageType;
     private final @Nullable Function<T, String> toStringMapper;
     private final @Nullable Component parent;
 
     public OptionsPane(Iterable<T> options, @Nullable Function<T, String> toStringMapper=null,
         @Nullable String title=null,
-        @Nullable String message=null, Option messageType, @Nullable Component parent=null) {
-        this.options = (T[]) StreamSupport.stream(options.spliterator(), false).toArray();
+        String message, Option messageType, @Nullable Component parent=null) {
+        this.options = (T[]) options.stream().toArray();
         this.toStringMapper = toStringMapper;
         this.title = title;
         this.message = message;

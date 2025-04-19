@@ -316,6 +316,11 @@
                 <artifactId>joor</artifactId>
                 <version>0.9.15</version>
             </dependency>
+            <dependency>
+                <groupId>com.pivovarit</groupId>
+                <artifactId>more-gatherers</artifactId>
+                <version>0.0.2</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
