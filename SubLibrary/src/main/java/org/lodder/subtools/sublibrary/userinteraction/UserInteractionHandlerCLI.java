@@ -37,7 +37,6 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
 //            elements:options,
 //            toStringMapper:toStringMapper,
 //            includeNull:true);
-        // TODO remove optional parameters
         // TODO use extension method
         return PrompterExt.promptValueFromList(prompter,
             message,
@@ -53,8 +52,9 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
 //            .orElse(false);
         // TODO remove optional parameters
         return prompter.promptBoolean(
-            message.formatted(getText("Prompter.YesAbbreviation"), getText("Prompter.NoAbbreviation")),
-            null).orElse(false);
+                message + " (%s/%s)".formatted(getText("Prompter.YesAbbreviation"),
+                    getText("Prompter.NoAbbreviation")), null)
+            .orElse(false);
     }
 
     @Override
