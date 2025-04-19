@@ -12,9 +12,6 @@ import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
-import org.lodder.subtools.sublibrary.util.prompter.PrompterBoolean;
-import org.lodder.subtools.sublibrary.util.prompter.PrompterString;
-import org.lodder.subtools.sublibrary.util.prompter.PrompterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +27,17 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     @Override
     public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message, @Nullable String title,
         @Nullable Function<T, String> toStringMapper) {
-        return PrompterUtil.getElementFromList(options)
-                .toStringMapper(toStringMapper)
-                .message(message)
-                .includeNull()
-                .prompt(prompter);
+        return prompter.promptValue(
+            elements:options,
+            toStringMapper:toStringMapper,
+            message:message,
+            includeNull:true);
+//        return new PrompterValueFromList<>(
+//            elements:options,
+//            toStringMapper:toStringMapper,
+//            message:message,
+//            includeNull:true)
+//            .prompt(prompter);
     }
 
     @Override
@@ -45,17 +48,23 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
 
     @Override
     public boolean confirm(String message, String title) {
-        return new PrompterBoolean(message:message + " (Y/N)").prompt(prompter);
+        return prompter.promptBoolean(message:message + " (Y/N)");
+//        return new PrompterBoolean(message:message + " (Y/N)").prompt(prompter);
     }
 
     @Override
     public Optional<String> enter(String title, String message, @Nullable String errorMessage,
         @Nullable Predicate<String> validator) {
-        return new PrompterString(
+        return prompter.promptString(
             message:message,
             errorMessage:errorMessage,
-            validator:validator)
-                .prompt(prompter);
+            validator:validator);
+
+//        return new PrompterString(
+//            message:message,
+//            errorMessage:errorMessage,
+//            validator:validator)
+//                .prompt(prompter);
     }
 
     @Override

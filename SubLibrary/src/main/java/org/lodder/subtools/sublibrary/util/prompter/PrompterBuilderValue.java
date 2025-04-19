@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.jspecify.annotations.Nullable;
 
+@Deprecated
 public class PrompterBuilderValue {
 
     private PrompterBuilderValue() {

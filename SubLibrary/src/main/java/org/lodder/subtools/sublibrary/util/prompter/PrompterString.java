@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.jspecify.annotations.Nullable;
 
+@Deprecated
 public class PrompterString {
 
     public final Predicate<String> validator;

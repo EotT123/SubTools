@@ -11,6 +11,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 
+@Deprecated
 class PrompterBuilderCommon {
 
     private PrompterBuilderCommon() {

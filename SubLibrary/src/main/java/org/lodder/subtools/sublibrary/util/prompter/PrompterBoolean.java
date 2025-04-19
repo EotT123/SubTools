@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.jspecify.annotations.Nullable;
 
+@Deprecated
 public class PrompterBoolean {
 
     public final Function<String, Boolean> toObjectMapper;

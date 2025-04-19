@@ -5,6 +5,7 @@ import java.util.List;
 import dnl.utils.text.table.TextTable;
 import lombok.RequiredArgsConstructor;
 
+@Deprecated
 @RequiredArgsConstructor
 public class TableDisplayer<T> {
 
@@ -25,8 +26,7 @@ public class TableDisplayer<T> {
         tt.printTable();
     }
 
-    public void display(List<T> tableElements) {
-
+    public void display(Iterable<T> tableElements) {
         String[] columnNames = columnDisplayers.stream().map(ColumnDisplayer::columnName).toArray(String[]::new);
         Object[][] dataTable = tableElements.stream()
                 .map(tableElement -> columnDisplayers.stream()
