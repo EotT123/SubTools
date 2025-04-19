@@ -13,7 +13,6 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.gui.InputPane;
-import org.lodder.subtools.sublibrary.gui.OptionsPane;
 import org.lodder.subtools.sublibrary.util.Validator;
 
 @AllArgsConstructor
@@ -25,15 +24,6 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     @Override
     public <T> Optional<T> selectFromList(Iterable<T> options, String message,
         @Nullable String title, @Nullable Function<T, String> toStringMapper) {
-        if (!options.iterator().hasNext()) {
-            return Optional.empty();
-        }
-        return new OptionsPane<>(options, toStringMapper, title, message, OptionsPane.Option.DEFAULT, frame).prompt();
-    }
-
-    @Override
-    public <T> Optional<T> choice(Iterable<T> options, @Nullable String message, @Nullable String title,
-        @Nullable Function<T, String> toStringMapper) {
         String[] optionsAsStrings = options.stream()
                 .map(Objects.requireNonNullElseGet(toStringMapper, () -> String::valueOf))
                 .toArray(String[]::new);

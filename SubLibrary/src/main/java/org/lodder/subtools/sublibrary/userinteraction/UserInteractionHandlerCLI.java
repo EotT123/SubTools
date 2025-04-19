@@ -47,12 +47,6 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> choice(Iterable<T> options, String message, @Nullable String title,
-        @Nullable Function<T, String> toStringMapper) {
-        return selectFromList(options, message, title, toStringMapper);
-    }
-
-    @Override
     public boolean confirm(String message, String title) {
 //        return prompter.promptBoolean(message + " (%s/%s)"
 //            .formatted(getText("Prompter.YesAbbreviation"), getText("Prompter.NoAbbreviation")))

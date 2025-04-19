@@ -163,7 +163,7 @@ public class ExportImport {
         }
 
         private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
-            return userInteractionHandler.choice(Arrays.asList(ImportStyle.values()),
+            return userInteractionHandler.selectFromList(Arrays.asList(ImportStyle.values()),
                 getText("ImportExport.OverwriteOrAdd"),
                 getText("ImportExport.OverwriteOrAddTitle"),
                 option -> switch (option) {
