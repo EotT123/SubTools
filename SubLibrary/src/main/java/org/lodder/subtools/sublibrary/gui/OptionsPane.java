@@ -22,9 +22,10 @@ public class OptionsPane<T> {
     private final @Nullable Function<T, String> toStringMapper;
     private final @Nullable Component parent;
 
-    public OptionsPane(T[] options, @Nullable Function<T, String> toStringMapper=null, @Nullable String title=null,
+    public OptionsPane(Iterable<T> options, @Nullable Function<T, String> toStringMapper=null,
+        @Nullable String title=null,
         @Nullable String message=null, Option messageType, @Nullable Component parent=null) {
-        this.options = options;
+        this.options = (T[]) StreamSupport.stream(options.spliterator(), false).toArray();
         this.toStringMapper = toStringMapper;
         this.title = title;
         this.message = message;
@@ -32,12 +33,6 @@ public class OptionsPane<T> {
         this.parent = parent;
     }
 
-    public OptionsPane(Iterable<T> options, @Nullable Function<T, String> toStringMapper=null,
-        @Nullable String title=null, @Nullable String message=null, Option messageType,
-        @Nullable Component parent=null) {
-        this((T[]) StreamSupport.stream(options.spliterator(), false).toArray(), toStringMapper, title, message,
-            messageType, parent);
-    }
 
     public Optional<T> prompt() {
         synchronized (LOCK) {
