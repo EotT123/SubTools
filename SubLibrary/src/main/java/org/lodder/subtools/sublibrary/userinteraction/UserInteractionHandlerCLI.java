@@ -32,11 +32,6 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     @Override
     public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message, @Nullable String title,
         @Nullable Function<T, String> toStringMapper) {
-//        return prompter.promptValueFromList(
-//            message:message,
-//            elements:options,
-//            toStringMapper:toStringMapper,
-//            includeNull:true);
         // TODO use extension method
         return PrompterExt.promptValueFromList(prompter,
             message,
@@ -47,20 +42,16 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
 
     @Override
     public boolean confirm(String message, String title) {
-//        return prompter.promptBoolean(message + " (%s/%s)"
-//            .formatted(getText("Prompter.YesAbbreviation"), getText("Prompter.NoAbbreviation")))
-//            .orElse(false);
-        // TODO remove optional parameters
-        return prompter.promptBoolean(
+        // TODO Use extension method
+        return PrompterExt.promptBoolean(prompter,
                 message + " (%s/%s)".formatted(getText("Prompter.YesAbbreviation"),
-                    getText("Prompter.NoAbbreviation")), null)
+                    getText("Prompter.NoAbbreviation")))
             .orElse(false);
     }
 
     @Override
     public Optional<String> enter(String title, String message,
         @Nullable List<Validator<String>> inputValidators) {
-//        return prompter.promptString(message, inputValidators:inputValidators);
         // TODO use extension method
         return PrompterExt.promptString(prompter, message, inputValidators:inputValidators);
     }
@@ -68,7 +59,6 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     @Override
     public OptionalInt enterNumber(String title, String message,
         @Nullable List<Validator<Integer>> objectValidators) {
-//        return prompter.promptInt(message, objectValidators:objectValidators);
         // TODO use extension method
         return PrompterExt.promptInt(prompter, message, objectValidators:objectValidators);
     }
