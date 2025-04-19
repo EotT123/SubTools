@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.gui.InputPane;
 import org.lodder.subtools.sublibrary.gui.OptionsPane;
@@ -20,13 +21,8 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     @val JFrame frame;
 
     @Override
-    public Optional<String> selectFromList(Iterable<String> options, String message, String title) {
-        return selectFromList(options, message, title, null);
-    }
-
-    @Override
-    public <T> Optional<T> selectFromList(Iterable<T> options, String message, String title,
-        Function<T, String> toStringMapper) {
+    public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message,
+        @Nullable String title, @Nullable Function<T, String> toStringMapper) {
         if (!options.iterator().hasNext()) {
             return Optional.empty();
         }
@@ -34,13 +30,8 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> choice(Iterable<T> options, String message, String title) {
-        return choice(options, message, title, null);
-    }
-
-    @Override
-    public <T> Optional<T> choice(Iterable<T> options, String message, String title,
-            Function<T, String> toStringMapper) {
+    public <T> Optional<T> choice(Iterable<T> options, @Nullable String message, @Nullable String title,
+        @Nullable Function<T, String> toStringMapper) {
         String[] optionsAsStrings = options.stream()
                 .map(Objects.requireNonNullElseGet(toStringMapper, () -> String::valueOf))
                 .toArray(String[]::new);

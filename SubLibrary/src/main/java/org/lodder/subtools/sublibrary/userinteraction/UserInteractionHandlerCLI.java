@@ -10,7 +10,10 @@ import org.codehaus.plexus.components.interactivity.DefaultInputHandler;
 import org.codehaus.plexus.components.interactivity.DefaultOutputHandler;
 import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
+import org.lodder.subtools.sublibrary.util.prompter.PrompterBoolean;
+import org.lodder.subtools.sublibrary.util.prompter.PrompterString;
 import org.lodder.subtools.sublibrary.util.prompter.PrompterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +28,8 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public Optional<String> selectFromList(Iterable<String> options, String message, String title) {
-        return selectFromList(options, message, title, null);
-    }
-
-    @Override
-    public <T> Optional<T> selectFromList(Iterable<T> options, String message, String title,
-            Function<T, String> toStringMapper) {
+    public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message, @Nullable String title,
+        @Nullable Function<T, String> toStringMapper) {
         return PrompterUtil.getElementFromList(options)
                 .toStringMapper(toStringMapper)
                 .message(message)
@@ -40,27 +38,23 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> choice(Iterable<T> options, String message, String title) {
-        return choice(options, message, title, null);
-    }
-
-    @Override
-    public <T> Optional<T> choice(Iterable<T> options, String message, String title,
-            Function<T, String> toStringMapper) {
+    public <T> Optional<T> choice(Iterable<T> options, @Nullable String message, @Nullable String title,
+        @Nullable Function<T, String> toStringMapper) {
         return selectFromList(options, message, title, toStringMapper);
     }
 
     @Override
     public boolean confirm(String message, String title) {
-        return PrompterUtil.getBooleanValue().message(message + " (Y/N)").prompt(prompter).get();
+        return new PrompterBoolean(message:message + " (Y/N)").prompt(prompter);
     }
 
     @Override
-    public Optional<String> enter(String title, String message, String errorMessage, Predicate<String> validator) {
-        return PrompterUtil.getString()
-                .message(message)
-                .errorMessage(errorMessage)
-                .objectValidator(validator)
+    public Optional<String> enter(String title, String message, @Nullable String errorMessage,
+        @Nullable Predicate<String> validator) {
+        return new PrompterString(
+            message:message,
+            errorMessage:errorMessage,
+            validator:validator)
                 .prompt(prompter);
     }
 

@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.jspecify.annotations.Nullable;
 
 public class PrompterBuilderValueFromList {
 
@@ -64,11 +65,11 @@ public class PrompterBuilderValueFromList {
     public static class ValueFromListBuilder<T>
             implements ValueFromListToStringMapperBuilderIntf<T>, ValueFromListPromptBuilderIntf<T> {
         private final List<T> elements;
-        private Function<T, String> toStringMapper;
-        private String message;
+        private Function<T, String> toStringMapper = String::valueOf;
+        private @Nullable String message;
         private boolean includeNull;
         private T emptyValue;
-        private TableDisplayer<T> tableDisplayer;
+        private @Nullable TableDisplayer<T> tableDisplayer;
 
         ValueFromListBuilder(Iterable<T> elements) {
             this.elements = Lists.newArrayList(elements);

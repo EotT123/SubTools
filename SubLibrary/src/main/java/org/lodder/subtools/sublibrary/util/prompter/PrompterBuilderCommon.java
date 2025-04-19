@@ -8,17 +8,19 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 
-public class PrompterBuilderCommon {
+class PrompterBuilderCommon {
 
     private PrompterBuilderCommon() {
         // hide constructor
     }
 
     protected static <T> Optional<T> prompt(Prompter prompter, Function<String, T> toObjectMapper,
-            Predicate<String> validator, Predicate<T> objValidator, T defaultValue, Supplier<T> defaultValueSupplier,
-            String message, String errorMessage) {
+        @Nullable Predicate<String> validator=null, @Nullable Predicate<T> objValidator=null,
+        @Nullable T defaultValue=null, @Nullable Supplier<T> defaultValueSupplier=null, String message,
+        @Nullable String errorMessage=null) {
         try {
             String value = prompter.prompt(message + System.lineSeparator());
             if (StringUtils.isEmpty(value)) {

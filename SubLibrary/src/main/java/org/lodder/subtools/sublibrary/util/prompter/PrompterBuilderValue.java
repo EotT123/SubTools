@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.codehaus.plexus.components.interactivity.Prompter;
+import org.jspecify.annotations.Nullable;
 
 public class PrompterBuilderValue {
 
@@ -88,8 +89,8 @@ public class PrompterBuilderValue {
         }
 
         @Override
-        public ValueBuilder<T> errorMessage(String errorMessage, Object... replacements) {
-            this.errorMessage = errorMessage.formatted(replacements);
+        public ValueBuilder<T> errorMessage(@Nullable String errorMessage, Object... replacements) {
+            this.errorMessage = errorMessage == null ? null : errorMessage.formatted(replacements);
             return this;
         }
 
