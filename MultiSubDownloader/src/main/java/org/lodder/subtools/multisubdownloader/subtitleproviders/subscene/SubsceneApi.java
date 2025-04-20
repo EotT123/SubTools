@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import com.pivovarit.function.ThrowingSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
@@ -100,20 +101,21 @@ public class SubsceneApi extends Html implements SubtitleApi {
                     return getJsoupDocument(DOMAIN + providerSerieId.providerId)
                         .selectAllByCss("td.a1")
                         .stream()
-//                        .map(Element::parent)
                         .map(el -> (Element) el.parent())
-                        .map(row -> new SubsceneSubtitleDescriptor().setLanguage(
-                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
-                                    .orElse(null))
-                            .setUrlSupplier(() -> getDownloadUrl(
-                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim()))
-                            .setName(row.selectAllByCss(".a1 span:not(.l)").text().trim())
-                            .setHearingImpaired(row.selectFirstByCss(".a41") != null)
-                            .setUploader(row.selectFirstByCss(".a5 > a").text().trim())
-                            .setComment(row.selectFirstByCss(".a6 > div").text().trim()))
-                        .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
-                            subDescriptor.getSeasonEpisode().episodes.stream()
-                                .anyMatch(ep -> ep == episode))
+                        .map(row -> {
+                            Language lang = Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
+                                .orElse(null);
+                            String name = row.selectAllByCss(".a1 span:not(.l)").text().trim();
+                            boolean hearingImpaired = row.selectFirstByCss(".a41") != null;
+                            String uploader = row.selectFirstByCss(".a5 > a").text().trim();
+                            String comment = row.selectFirstByCss(".a6 > div").text().trim();
+                            ThrowingSupplier<String, SubsceneException> urlSupplier = () -> getDownloadUrl(
+                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim());
+                            return new SubsceneSubtitleDescriptor(lang, name, hearingImpaired, uploader, comment,
+                                urlSupplier);
+                        })
+                        .filter(subDescriptor -> subDescriptor.seasonEpisode != null &&
+                            subDescriptor.seasonEpisode.episodes.stream().anyMatch(ep -> ep == episode))
                         .toList();
                 } catch (Exception e) {
                     throw new SubsceneException(e);
