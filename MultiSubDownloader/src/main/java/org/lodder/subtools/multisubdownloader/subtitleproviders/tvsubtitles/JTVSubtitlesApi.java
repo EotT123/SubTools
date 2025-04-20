@@ -38,8 +38,7 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     public List<ProviderSerieId> getUrisForSerieName(String serieName) throws TvSubtitlesException {
         try {
-            return manager.postBuilder()
-                    .url(DOMAIN + "/search.php")
+            return manager.postBuilder("$DOMAIN/search.php")
                     .addData("qs", serieName)
                     .postAsJsoupDocument()
                     .select(".left_articles > ul > li a")

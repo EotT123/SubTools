@@ -67,45 +67,23 @@ public class Manager {
     // POST \\
     // ==== \\
 
-    public PostBuilderUrlIntf postBuilder() {
-        return new PostBuilder(httpClient);
+    public PostBuilder postBuilder(String url, String userAgent=null) {
+        return new PostBuilder(httpClient, url, userAgent);
     }
 
-    public interface PostBuilderUrlIntf {
-        PostBuilderUserAgentIntf url(String url);
-    }
-
-    public interface PostBuilderUserAgentIntf extends PostBuilderDataMapIntf {
-        PostBuilderDataMapIntf userAgent(String userAgent);
-    }
-
-    public interface PostBuilderDataMapIntf extends PostBuilderDataIntf {
-        PostBuilderPostIntf data(Map<String, String> data);
-    }
-
-    public interface PostBuilderDataIntf extends PostBuilderPostIntf {
-        PostBuilderDataIntf addData(String key, String value);
-    }
-
-    public interface PostBuilderPostIntf {
-        String post() throws ManagerException;
-
-        org.jsoup.nodes.Document postAsJsoupDocument() throws ManagerException;
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    @RequiredArgsConstructor
-    public static class PostBuilder
-        implements PostBuilderUrlIntf, PostBuilderUserAgentIntf, PostBuilderDataMapIntf, PostBuilderDataIntf,
-        PostBuilderPostIntf {
-        private final HttpClient httpClient;
-        private String url;
-        private String userAgent;
+    public static class PostBuilder {
+        @val HttpClient httpClient;
+        @val String url;
+        @val String userAgent;
         private Map<String, String> data;
 
-        @Override
-        public PostBuilderDataIntf addData(String key, String value) {
+        public PostBuilder(HttpClient httpClient, String url, String userAgent=null) {
+            this.httpClient = httpClient;
+            this.url = url;
+            this.userAgent = userAgent;
+        }
+
+        public PostBuilder addData(String key, String value) {
             if (data == null) {
                 data = new HashMap<>();
             }
@@ -113,7 +91,6 @@ public class Manager {
             return this;
         }
 
-        @Override
         public String post() throws ManagerException {
             try {
                 return httpClient.doPost(new URI(url).toURL(), userAgent, data == null ? new HashMap<>() : data);
@@ -124,7 +101,6 @@ public class Manager {
             }
         }
 
-        @Override
         public org.jsoup.nodes.Document postAsJsoupDocument() throws ManagerException {
             return Jsoup.parse(post());
         }

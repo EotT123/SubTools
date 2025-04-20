@@ -10,9 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
@@ -29,38 +26,6 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public class SearchManager implements Cancelable {
 
-    public interface SearchManagerLanguage {
-        SearchManagerProgressListener language(@NonNull Language language);
-    }
-
-    public interface SearchManagerProgressListener {
-        SearchManagerUserInteractionHandler progressListener(@NonNull SearchProgressListener progressListener);
-    }
-
-    public interface SearchManagerUserInteractionHandler {
-        SearchManagerOnFound userInteractionHandler(@NonNull UserInteractionHandler userInteractionHandler);
-    }
-
-    public interface SearchManagerOnFound {
-        SearchManager onFound(@NonNull SearchHandler onFound);
-    }
-
-    @Setter
-    @Accessors(fluent = true)
-    public static class SearchManagerBuilder
-        implements SearchManagerOnFound, SearchManagerUserInteractionHandler, SearchManagerProgressListener,
-        SearchManagerLanguage {
-        private Settings settings;
-        private Language language;
-        private SearchProgressListener progressListener;
-        private UserInteractionHandler userInteractionHandler;
-
-        @Override
-        public SearchManager onFound(SearchHandler onFound) {
-            return new SearchManager(settings, onFound, language, progressListener, userInteractionHandler);
-        }
-    }
-
     private final Map<SubtitleProvider, Queue<Release>> queue = new HashMap<>();
     private final Map<SubtitleProvider, SearchWorker> workers = new HashMap<>();
     private final Map<Release, ScoreCalculator> scoreCalculators = new HashMap<>();
@@ -73,17 +38,13 @@ public class SearchManager implements Cancelable {
     private final SearchProgressListener progressListener;
     @val UserInteractionHandler userInteractionHandler;
 
-    public SearchManager(Settings settings, SearchHandler onFound, Language language,
-        SearchProgressListener progressListener, UserInteractionHandler userInteractionHandler) {
+    public SearchManager(Settings settings, Language language, SearchProgressListener progressListener,
+        UserInteractionHandler userInteractionHandler, SearchHandler onFound) {
         this.settings = settings;
-        this.onFound = onFound;
         this.language = language;
         this.progressListener = progressListener;
         this.userInteractionHandler = userInteractionHandler;
-    }
-
-    public static SearchManagerLanguage createWithSettings(Settings settings) {
-        return new SearchManagerBuilder().settings(settings);
+        this.onFound = onFound;
     }
 
     public void addProvider(SubtitleProvider provider) {

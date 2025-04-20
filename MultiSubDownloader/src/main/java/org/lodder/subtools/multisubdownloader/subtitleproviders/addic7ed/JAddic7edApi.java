@@ -53,8 +53,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
 
     public void login(String username, String password) throws Addic7edException {
         try {
-            manager.postBuilder()
-                .url(DOMAIN + "/dologin.php")
+            manager.postBuilder("$DOMAIN/dologin.php")
                 .addData("username", username)
                 .addData("password", password)
                 .addData("remember", "false")
