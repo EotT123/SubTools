@@ -31,7 +31,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
             title:Messages.getText("PreferenceDialog.SubtitlesBackup"),
             margin:new BoxModelProperties(0),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, growx");
+            .addTo(this, "span, growx").panel;
         
         {
             this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().columns(20);

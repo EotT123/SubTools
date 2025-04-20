@@ -44,8 +44,8 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.settingsCtrl = settingsCtrl;
 
-        JPanel titlePanel = new TitlePanel(title:getText("PreferenceDialog.SelectPreferredSources"))
-                .addTo(this, "span, grow");
+        JPanel titlePanel = new TitlePanel(getText("PreferenceDialog.SelectPreferredSources"))
+            .addTo(this, "span, grow").panel;
 
         {
             // ADDIC7ED

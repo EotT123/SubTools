@@ -44,7 +44,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             padding:new BoxModelProperties(0, 20, 0, 0),
             useGrid:true,
             panelColumnConstraints:"[shrink][grow][shrink]")
-            .addTo(this, "span, grow");
+            .addTo(this, "span, grow").panel;
 
         new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
         this.txtLibraryFolder =

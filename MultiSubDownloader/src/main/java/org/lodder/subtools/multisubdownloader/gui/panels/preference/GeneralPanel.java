@@ -52,7 +52,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             padding:new BoxModelProperties(0, 20, 0, 0),
             useGrid:true,
             fillContents:false)
-            .addTo(this, "span, grow, wrap");
+            .addTo(this, "span, grow, wrap").panel;
         {
 
             // Language \\

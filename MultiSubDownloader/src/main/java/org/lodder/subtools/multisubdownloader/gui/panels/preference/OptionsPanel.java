@@ -38,7 +38,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
             title:getText("PreferenceDialog.DownloadOptions"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
-                .addTo(this, "span, grow, wrap")
+            .addTo(this, "span, grow, wrap").panel
                 .addComponent(this.chkAlwaysConfirm =
                         new JCheckBox(getText("PreferenceDialog.CheckBeforeDownloading")), "wrap")
                 .addComponent("wrap, grow", PanelCheckBox.checkbox(this.chkMinScoreSelection =

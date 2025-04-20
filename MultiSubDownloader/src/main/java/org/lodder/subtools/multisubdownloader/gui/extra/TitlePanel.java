@@ -4,18 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
-import manifold.ext.props.rt.api.var;
+import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 
 public class TitlePanel extends JPanel {
     @Serial
     private static final long serialVersionUID = 1L;
-    @var JPanel panel;
+    @val JPanel panel;
 
-    public TitlePanel(String title, boolean useGrid=false, boolean fillContents=true,
+    public TitlePanel(String title,
+        boolean useGrid=false,
+        boolean fillContents=true,
         BoxModelProperties margin=new BoxModelProperties(),
-        BoxModelProperties padding=new BoxModelProperties(), LayoutManager panelLayout=null,
+        BoxModelProperties padding=new BoxModelProperties(),
+        LayoutManager panelLayout=null,
         String panelColumnConstraints="") {
+
         super(new MigLayout("fillx, nogrid, " + margin.getInsets()));
         super.add(new JLabel(title));
         super.add(new JSeparator(), "growx, gapy 6, wrap");
