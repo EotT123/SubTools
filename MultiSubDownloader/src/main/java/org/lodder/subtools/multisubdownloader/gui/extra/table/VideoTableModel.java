@@ -2,7 +2,7 @@ package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
 import static org.lodder.subtools.multisubdownloader.gui.extra.table.SearchColumnName.*;
 
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -104,7 +104,7 @@ public class VideoTableModel extends DefaultTableModel {
                 case SELECT -> false;
                 case OBJECT -> release;
                 case SEASON -> release instanceof TvRelease tvRelease ? tvRelease.season : null;
-                case EPISODE -> release instanceof TvRelease tvRelease ? tvRelease.firstEpisodeNumber : null;
+                case EPISODE -> release instanceof TvRelease tvRelease ? tvRelease.firstEpisode : null;
                 case TYPE -> release.videoType;
                 case TITLE -> release instanceof TvRelease tvRelease ? tvRelease.title : null;
                 default -> throw new IllegalArgumentException("Unexpected value: " + searchColumn);

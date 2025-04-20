@@ -36,7 +36,7 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
                 separator = "";
             }
             String formattedEpisodeNumber = episodeNumbers.stream()
-                .map(episode -> formattedNumber(episode, leadingZero))
+                .map(episode -> formatNumber(episode, leadingZero))
                 .collect(Collectors.joining(separator));
             return structure.replace(tag.label, formattedEpisodeNumber);
         }
@@ -44,7 +44,7 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
 
     }
 
-    protected String formattedNumber(int number, boolean leadingZero) {
+    protected String formatNumber(int number, boolean leadingZero) {
         return number < 10 && leadingZero ? "0" + number : Integer.toString(number);
     }
 }

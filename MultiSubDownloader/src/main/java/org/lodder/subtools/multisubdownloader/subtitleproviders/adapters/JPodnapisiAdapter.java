@@ -80,7 +80,7 @@ public final class JPodnapisiAdapter
     public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws PodnapisiException {
         return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return api.getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                 } catch (PodnapisiException e) {

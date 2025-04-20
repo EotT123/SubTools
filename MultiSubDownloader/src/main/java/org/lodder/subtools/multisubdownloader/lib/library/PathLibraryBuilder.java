@@ -62,13 +62,12 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         folder = folder.replace(SerieStructureTag.SHOW_NAME.label, getShowName(tvRelease.name))
             .removeIllegalWindowsChars();
         // order is important!
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers, true);
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers,
-            false);
-        folder = replace(folder, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
-        folder = replace(folder, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
-        folder = replace(folder, SerieStructureTag.EPISODE_LONG, formattedNumber(tvRelease.firstEpisodeNumber, true));
-        folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formattedNumber(tvRelease.firstEpisodeNumber, false));
+        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
+        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes, false);
+        folder = replace(folder, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
+        folder = replace(folder, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
+        folder = replace(folder, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
+        folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
         folder = replace(folder, SerieStructureTag.TITLE, tvRelease.title);
         folder = replace(folder, SerieStructureTag.QUALITY, tvRelease.quality);
         folder = replace(folder, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);

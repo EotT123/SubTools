@@ -89,7 +89,7 @@ public final class JSubsceneAdapter
     public Set<SubsceneSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws SubsceneException {
         return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                 } catch (SubsceneException e) {
@@ -133,7 +133,7 @@ public final class JSubsceneAdapter
         return subtitles.stream()
             .filter(sub -> language == sub.getLanguage())
             .filter(sub -> sub.getName()
-                .contains(getSeasonEpisodeString(tvRelease.season, tvRelease.firstEpisodeNumber)))
+                .contains(getSeasonEpisodeString(tvRelease.season, tvRelease.firstEpisode)))
             .map(sub -> Subtitle.downloadSource(sub.getUrlSupplier())
                 .subtitleSource(subtitleSource)
                 .fileName(sub.getName().removeIllegalFilenameChars())

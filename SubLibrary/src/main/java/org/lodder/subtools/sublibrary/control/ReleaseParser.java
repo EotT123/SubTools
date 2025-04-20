@@ -170,17 +170,16 @@ public class ReleaseParser {
             throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
         }
 
-        return TvRelease.builder()
-            .name(cleanUnwantedChars(name))
-            .season(season)
-            .episodes(episodes)
-            .file(file)
-            .title(cleanUnwantedChars(parserResults.getNamedMatchValue(TITLE)))
-            .releaseGroup(releaseGroup)
-            .special(isSpecialEpisode(season, episodes))
-            .quality(StringUtils.toRootLowerCase(quality))
-            .extension(extension)
-            .build();
+        return new TvRelease(
+            name:cleanUnwantedChars(name),
+            season:season,
+            episodes:episodes,
+            file:file,
+            title:cleanUnwantedChars(parserResults.getNamedMatchValue(TITLE)),
+            releaseGroup:releaseGroup,
+            special:isSpecialEpisode(season, episodes),
+            quality:StringUtils.toRootLowerCase(quality),
+            extension:extension);
     }
 
     @AllArgsConstructor

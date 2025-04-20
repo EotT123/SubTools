@@ -20,7 +20,7 @@ public class TvReleaseAssert extends ReleaseAssert<TvRelease> {
 
     public @Self TvReleaseAssert hasEpisodes(Integer... episodeNumbers) {
         isNotNull();
-        assertThat(actual.episodeNumbers).containsExactly(episodeNumbers);
+        assertThat(actual.episodes).containsExactly(episodeNumbers);
         return this;
     }
 

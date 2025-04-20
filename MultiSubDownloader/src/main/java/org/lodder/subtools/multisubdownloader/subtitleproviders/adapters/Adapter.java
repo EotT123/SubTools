@@ -98,9 +98,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
-                    TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisodeNumber),
-                    e.getMessage()),
-                e);
+                TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisode), e.getMessage()), e);
             return Set.of();
         }
     }

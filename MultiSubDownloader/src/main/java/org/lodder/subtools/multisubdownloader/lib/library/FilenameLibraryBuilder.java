@@ -58,17 +58,14 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     // order is important!
                     fName = replace(fName, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
                     fName =
-                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers,
-                            true);
+                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
+                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes,
+                        false);
+                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
+                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
+                    fName = replace(fName, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
                     fName =
-                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers,
-                            false);
-                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
-                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
-                    fName = replace(fName, SerieStructureTag.EPISODE_LONG,
-                        formattedNumber(tvRelease.firstEpisodeNumber, true));
-                    fName = replace(fName, SerieStructureTag.EPISODE_SHORT,
-                        formattedNumber(tvRelease.firstEpisodeNumber, false));
+                        replace(fName, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
                     fName = replace(fName, SerieStructureTag.TITLE, tvRelease.title);
                     fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, SerieStructureTag.RELEASE_GROUP, release.releaseGroup);
@@ -80,7 +77,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     String fName = structure;
                     // order is important!
                     fName = replace(fName, MovieStructureTag.MOVIE_TITLE, getShowName(movieRelease.name));
-                    fName = replace(fName, MovieStructureTag.YEAR, formattedNumber(movieRelease.year, false));
+                    fName = replace(fName, MovieStructureTag.YEAR, formatNumber(movieRelease.year, false));
                     fName = replace(fName, MovieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, MovieStructureTag.RELEASE_GROUP, release.releaseGroup);
 

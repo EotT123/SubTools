@@ -43,12 +43,8 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
 
         // TODO: Redefine what a "release" is.
         Release release = switch (type) {
-            case EPISODE -> TvRelease.builder()
-                .name(name)
-                .season(inputPanel.season)
-                .episode(inputPanel.episode)
-                .quality(inputPanel.quality)
-                .build();
+            case EPISODE ->
+                new TvRelease(name:name, season:inputPanel.season, episode:inputPanel.episode, quality:inputPanel.quality);
             case MOVIE -> new MovieRelease(name:name, quality:inputPanel.quality);
             default -> releaseFactory.createRelease(Path.of(
                     name + (VideoExtensions.values().stream().anyMatch(ext -> name.endsWith("." + ext)) ? "" : ".")),

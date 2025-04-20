@@ -96,7 +96,7 @@ public final class JOpenSubAdapter
     public Set<org.opensubtitles.model.Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws OpenSubtitlesException {
         return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return getApi().searchSubtitles()
                         .query(providerSerieId.name)

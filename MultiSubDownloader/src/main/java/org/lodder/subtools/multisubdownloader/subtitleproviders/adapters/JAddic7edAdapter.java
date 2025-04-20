@@ -89,7 +89,7 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
     public Set<Addic7edSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws Addic7edException {
         return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                 } catch (Addic7edException e) {

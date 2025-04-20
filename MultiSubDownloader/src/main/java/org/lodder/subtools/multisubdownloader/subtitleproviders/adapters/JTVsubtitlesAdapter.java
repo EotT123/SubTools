@@ -86,7 +86,7 @@ public final class JTVsubtitlesAdapter
     public Set<TVsubtitlesSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws TvSubtitlesException {
         return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                 } catch (TvSubtitlesException e) {

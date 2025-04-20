@@ -3,9 +3,10 @@ package org.lodder.subtools.multisubdownloader.gui.dialog;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.RowSorter.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Arrays;
@@ -102,13 +103,12 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                 currentName);
                             selectedSubtitleProvider.ifPresent(provider ->
                                 userInteractionHandler.enter(message, message).ifPresent(newName -> {
-                                    TvRelease tvRelease = TvRelease.builder()
-                                        .name(currentName)
-                                        .season(row.serieMapping.season)
-                                        .episode(1)
-                                        .originalName(currentName)
-                                        .customName(newName)
-                                        .build();
+                                    TvRelease tvRelease = new TvRelease(
+                                        name:currentName,
+                                        season:row.serieMapping.season,
+                                        episode:1,
+                                        originalName:currentName,
+                                        customName:newName);
                                     try {
                                         provider.getProviderSerieId(tvRelease).ifPresentOrElse(serieId -> {
                                             row.serieMapping =
