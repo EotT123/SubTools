@@ -29,4 +29,9 @@ public class TitlePanel extends JPanel {
             panelColumnConstraints);
         super.add(this.panel = new JPanel(panelLayoutNew), "growx, span");
     }
+
+    public JPanel addToPanel(Container parent, Object constraints=null) {
+        parent.addComponent(this, constraints);
+        return this.panel;
+    }
 }

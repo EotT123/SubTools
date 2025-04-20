@@ -46,7 +46,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         this.settingsCtrl = settingsCtrl;
 
         JPanel titlePanel = new TitlePanel(getText("PreferenceDialog.SelectPreferredSources"))
-            .addTo(this, "span, grow").panel;
+            .addToPanel(this, "span, grow");
 
         {
             // ADDIC7ED
@@ -55,7 +55,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
             this.chkSourceAddic7edProxy = new JCheckBox(getText("PreferenceDialog.Proxy"));
 
             new PanelCheckBox(checkbox:chkSourceAddic7ed, panelOnNewLine:true)
-                .addTo(titlePanel, "wrap").panel
+                .addToPanel(titlePanel, "wrap")
                 .addComponent("wrap", chkSourceAddic7edProxy)
                 .addComponent(new PanelCheckBox(
                     checkbox:chkUserAddic7edLogin,

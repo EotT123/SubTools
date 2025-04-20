@@ -38,7 +38,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
             title:getText("PreferenceDialog.DownloadOptions"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, grow, wrap").panel
+            .addToPanel(this, "span, grow, wrap")
             .addComponent(this.chkAlwaysConfirm =
                 new JCheckBox(getText("PreferenceDialog.CheckBeforeDownloading")), "wrap")
             .addComponent("wrap, grow",
@@ -60,7 +60,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
             title:getText("PreferenceDialog.SearchFilter"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, grow, wrap")
+            .addToPanel(this, "span, grow, wrap")
             .addComponent(
                 this.chkSubtitleExactMethod = new JCheckBox(getText("PreferenceDialog.SearchFilterExact")),
                 "wrap")
@@ -73,21 +73,21 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
             title:getText("PreferenceDialog.TableOptions"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, grow, wrap")
+            .addToPanel(this, "span, grow, wrap")
             .addComponent(this.chkOnlyFound = new JCheckBox(getText("PreferenceDialog.ShowOnlyFound")));
 
         new TitlePanel(
             title:getText("PreferenceDialog.ErrorHandlingOption"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, grow, wrap")
+            .addToPanel(this, "span, grow, wrap")
             .addComponent(this.chkStopOnSearchError = new JCheckBox(getText("PreferenceDialog.StopAfterError")));
 
         new TitlePanel(
             title:getText("PreferenceDialog.SerieDatabaseSource"),
             margin:new BoxModelProperties(null, null, 0, null),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, grow")
+            .addToPanel(this, "span, grow")
             .addComponent(this.cbxEpisodeProcessSource = new JComboBox<>(SettingsProcessEpisodeSource.values()),
                 "wrap")
             .addComponent(this.chkConfirmProviderMapping =

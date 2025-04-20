@@ -52,7 +52,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
             padding:new BoxModelProperties(0, 20, 0, 0),
             useGrid:true,
             fillContents:false)
-            .addTo(this, "span, grow, wrap").panel;
+            .addToPanel(this, "span, grow, wrap");
         {
 
             // Language \\
@@ -127,7 +127,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 padding:new BoxModelProperties(0, 20, 0, 0),
                 useGrid:true,
                 fillContents:false)
-                .addTo(this, "span, grow, wrap");
+                .addToPanel(this, "span, grow, wrap");
 
             new JLabel(getText("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
             this.cbxUpdateCheckPeriod = new JComboBox<>(UpdateCheckPeriod.values())
@@ -145,14 +145,14 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 title:getText("PreferenceDialog.ConfigureProxy"),
                 padding:new BoxModelProperties(0, 20, 0, 0),
                 fillContents:false)
-                .addTo(this, "span, grow");
+                .addToPanel(this, "span, grow");
 
             new PanelCheckBox(
                 checkbox:this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")),
                 panelOnNewLine:false,
                 panelLayout:new MigLayout("insets 0, fill")
                 )
-                .addTo(proxyPanel).panel
+                .addToPanel(proxyPanel)
                 .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
                 .addComponent("wrap",
                     this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))

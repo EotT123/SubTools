@@ -31,7 +31,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
             title:Messages.getText("PreferenceDialog.SubtitlesBackup"),
             margin:new BoxModelProperties(0),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, growx").panel;
+            .addToPanel(this, "span, growx");
         
         {
             this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().columns(20);
@@ -40,7 +40,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
                 checkbox:this.chkBackupSubtitle = new JCheckBox(getText("PreferenceDialog.BackupSubtitles")),
                 panelOnNewLine:true
                 )
-                .addTo(titlePanel, "span, wrap, growx").panel
+                .addToPanel(titlePanel, "span, wrap, growx")
                 .addComponent("split 3, shrink", new JLabel(getText("PreferenceDialog.Location")))
                 .addComponent("growx", txtBackupSubtitlePath)
                 .addComponent("shrink",

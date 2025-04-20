@@ -44,7 +44,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             padding:new BoxModelProperties(0, 20, 0, 0),
             useGrid:true,
             panelColumnConstraints:"[shrink][grow][shrink]")
-            .addTo(this, "span, grow").panel;
+            .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
         this.txtLibraryFolder =
@@ -79,7 +79,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             checkbox:this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith")),
             panelOnNewLine:false
             )
-            .addTo(titlePanel, "span").panel
+            .addToPanel(titlePanel, "span")
             .addComponent(this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         // behaviour

@@ -44,7 +44,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             title:getText("PreferenceDialog.PerformActions"),
             margin:new BoxModelProperties(0),
             padding:new BoxModelProperties(0, 20, 0, 0))
-            .addTo(this, "span, growx").panel;
+            .addToPanel(this, "span, growx");
         {
 
             this.chkUseTVDBNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
