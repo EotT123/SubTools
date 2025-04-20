@@ -426,12 +426,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
                         }
 
                         try {
-                            if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
-                                subtitle.file.copyToDir(path);
-                            } else {
-                                String url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url :
-                                    subtitle.urlSupplier.get();
-                                app.makeManager().store(url, path.resolve(filename));
+                            switch (subtitle.downloadSource.sourceLocation) {
+                                case FILE -> subtitle.downloadSource.file.copyToDir(path);
+                                case URL, URL_SUPPLIER -> app.makeManager()
+                                    .store(subtitle.downloadSource.getValue(), path.resolve(filename));
                             }
                         } catch (IOException | ManagerException e) {
                             LOGGER.error("downloadText", e);

@@ -64,22 +64,24 @@ public class DownloadAction {
         String subFileName = filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, version);
         Path subFile = path.resolve(subFileName);
 
-        boolean success;
-        if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
-            subtitle.file.copyToDir(path);
-            success = true;
-        } else {
-            try {
-                String url =
-                    subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url : subtitle.urlSupplier.get();
-                success = manager.store(url, subFile);
-                LOGGER.debug("doDownload file was [{}] ", success);
-            } catch (SubtitlesProviderException e) {
-                LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
-                    "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
-                throw new RuntimeException(e);
+        boolean success = switch (subtitle.downloadSource.sourceLocation) {
+            case FILE -> {
+                subtitle.downloadSource.file.copyToDir(path);
+                yield true;
             }
-        }
+            case URL, URL_SUPPLIER -> {
+                try {
+                    String url = subtitle.downloadSource.getValue();
+                    boolean result = manager.store(url, subFile);
+                    LOGGER.debug("doDownload file was [{}] ", result);
+                    yield result;
+                } catch (SubtitlesProviderException e) {
+                    LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
+                        "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
+                    throw new RuntimeException(e);
+                }
+            }
+        };
 
         if (success) {
             if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {

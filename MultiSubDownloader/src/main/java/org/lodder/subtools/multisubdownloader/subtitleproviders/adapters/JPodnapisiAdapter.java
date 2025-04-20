@@ -101,16 +101,17 @@ public final class JPodnapisiAdapter
     private Set<Subtitle> buildListSubtitles(Language language, Collection<PodnapisiSubtitleDescriptor> lSubtitles) {
         return lSubtitles.stream()
             .filter(ossd -> StringUtils.isNotBlank(ossd.releaseString))
-            .map(ossd -> Subtitle.downloadSource(ossd.url)
-                .subtitleSource(subtitleSource)
-                .fileName(ossd.releaseString)
-                .language(language)
-                .quality(ReleaseParser.getQualityKeyword(ossd.releaseString))
-                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleaseGroup(ossd.releaseString,
-                    StringUtils.endsWith(ossd.releaseString, ".srt")))
-                .uploader(ossd.uploaderName)
-                .hearingImpaired(ossd.hearingImpaired))
+            .map(ossd -> new Subtitle(
+                downloadSource:Subtitle.DownloadSource.of(ossd.url),
+                subtitleSource:subtitleSource,
+                fileName:ossd.releaseString,
+                language:language,
+                quality:ReleaseParser.getQualityKeyword(ossd.releaseString),
+                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                releaseGroup:ReleaseParser.extractReleaseGroup(ossd.releaseString,
+                    StringUtils.endsWith(ossd.releaseString, ".srt")),
+                uploader:ossd.uploaderName,
+                hearingImpaired:ossd.hearingImpaired))
             .collect(Collectors.toSet());
     }
 

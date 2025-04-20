@@ -42,4 +42,8 @@ public class SeasonEpisode {
         }
         return Optional.empty();
     }
+
+    public boolean containsEpisode(int episode) {
+        return episodes.contains(episode);
+    }
 }

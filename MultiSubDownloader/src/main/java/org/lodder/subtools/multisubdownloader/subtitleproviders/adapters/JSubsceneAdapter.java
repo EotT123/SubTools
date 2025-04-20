@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
+import static org.lodder.subtools.sublibrary.model.Subtitle.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -131,18 +133,19 @@ public final class JSubsceneAdapter
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<SubsceneSubtitleDescriptor> subtitles,
         Language language) {
         return subtitles.stream()
-            .filter(sub -> language == sub.getLanguage())
-            .filter(sub -> sub.getName()
+            .filter(sub -> language == sub.language)
+            .filter(sub -> sub.name
                 .contains(getSeasonEpisodeString(tvRelease.season, tvRelease.firstEpisode)))
-            .map(sub -> Subtitle.downloadSource(sub.getUrlSupplier())
-                .subtitleSource(subtitleSource)
-                .fileName(sub.getName().removeIllegalFilenameChars())
-                .language(sub.getLanguage())
-                .quality(ReleaseParser.getQualityKeyword(sub.getName()))
-                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleaseGroup(sub.getName(), false))
-                .uploader(sub.getUploader())
-                .hearingImpaired(sub.isHearingImpaired()))
+            .map(sub -> new Subtitle(
+                downloadSource:DownloadSource.of(sub.urlSupplier),
+                subtitleSource:subtitleSource,
+                fileName:sub.name.removeIllegalFilenameChars(),
+                language:sub.language,
+                quality:ReleaseParser.getQualityKeyword(sub.name),
+                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                releaseGroup:ReleaseParser.extractReleaseGroup(sub.name, false),
+                uploader:sub.uploader,
+                hearingImpaired:sub.hearingImpaired))
             .collect(Collectors.toSet());
     }
 

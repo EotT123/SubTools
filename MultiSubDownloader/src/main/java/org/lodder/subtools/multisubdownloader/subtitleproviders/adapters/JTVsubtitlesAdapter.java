@@ -102,16 +102,17 @@ public final class JTVsubtitlesAdapter
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<TVsubtitlesSubtitleDescriptor> subtitles,
         Language language) {
         return subtitles.stream()
-            .map(sub -> Subtitle.downloadSource(sub.url)
-                .subtitleSource(subtitleSource)
-                .fileName(sub.filename)
-                .language(language)
-                .quality(ReleaseParser.getQualityKeyword(sub.filename + " " + sub.rip))
-                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleaseGroup(sub.filename,
-                    StringUtils.endsWith(sub.filename, ".srt")))
-                .uploader(sub.author)
-                .hearingImpaired(false))
+            .map(sub -> new Subtitle(
+                downloadSource:Subtitle.DownloadSource.of(sub.url),
+                subtitleSource:subtitleSource,
+                fileName:sub.filename,
+                language:language,
+                quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.rip),
+                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                releaseGroup:ReleaseParser.extractReleaseGroup(sub.filename,
+                    StringUtils.endsWith(sub.filename, ".srt")),
+                uploader:sub.author,
+                hearingImpaired:false))
             .collect(Collectors.toSet());
     }
 

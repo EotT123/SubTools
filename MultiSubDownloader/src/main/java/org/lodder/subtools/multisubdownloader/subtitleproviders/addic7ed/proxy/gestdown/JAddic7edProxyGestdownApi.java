@@ -64,23 +64,23 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
                     response.getMatchingSubtitles()
                             .stream()
                             .filter(SubtitleDto::isCompleted)
-                            .map(sub -> mapToSubtitle(sub, response.getEpisode(), language))
+                        .map(sub -> mapToSubtitle(sub, response.episode, language))
                             .forEach(results::add);
                     return results;
                 }).getCollection();
     }
 
     private Subtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {
-        return Subtitle.downloadSource(getDownloadUrl(sub.getDownloadUri()))
-                .subtitleSource(subtitleSource)
-                .fileName(StringExt.removeIllegalFilenameChars(
-                        "${episodedto.show} - ${episodedto.title} - ${sub.version}"))
-                .language(language)
-                .quality(ReleaseParser.getQualityKeyword(episodedto.getTitle() + " " + sub.getVersion()))
-                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(sub.getVersion())
-                .uploader("")
-                .hearingImpaired(false);
+        return new Subtitle(
+            downloadSource:Subtitle.DownloadSource.of(getDownloadUrl(sub.getDownloadUri())),
+            subtitleSource:subtitleSource,
+            fileName:StringExt.removeIllegalFilenameChars("${episodedto.show} - ${episodedto.title} - ${sub.version}"),
+            language:language,
+            quality:ReleaseParser.getQualityKeyword(episodedto.getTitle() + " " + sub.getVersion()),
+            subtitleMatchType:SubtitleMatchType.EVERYTHING,
+            releaseGroup:sub.getVersion(),
+            uploader:"",
+            hearingImpaired:false);
     }
 
     public String getDownloadUrl(String subtitleId) {

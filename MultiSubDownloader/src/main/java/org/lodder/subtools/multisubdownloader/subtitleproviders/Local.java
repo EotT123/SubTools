@@ -77,16 +77,16 @@ public class Local implements SubtitleProvider {
                         Language detectedLang = DetectLanguage.execute(fileSub);
                         if (detectedLang == language) {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
-                            listFoundSubtitles.add(
-                                Subtitle.downloadSource(fileSub)
-                                    .subtitleSource(subtitleSource)
-                                    .fileName(fileSub.fileNameAsString)
-                                    .language(language)
-                                    .quality(ReleaseParser.getQualityKeyword(fileSub.fileNameAsString))
-                                    .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                    .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))
-                                    .uploader(fileSub.toAbsolutePath().toString())
-                                    .hearingImpaired(false));
+                            listFoundSubtitles.add(new Subtitle(
+                                downloadSource:Subtitle.DownloadSource.of(fileSub),
+                                subtitleSource:subtitleSource,
+                                fileName:fileSub.fileNameAsString,
+                                language:language,
+                                quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
+                                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                                releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true),
+                                uploader:fileSub.toAbsolutePath().toString(),
+                                hearingImpaired:false));
                         }
                     }
                 }
@@ -119,15 +119,16 @@ public class Local implements SubtitleProvider {
                         if (release.getImdbId().equals(movieRelease.getImdbId())
                             && DetectLanguage.execute(fileSub) == language) {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
-                            listFoundSubtitles.add(Subtitle.downloadSource(fileSub)
-                                .subtitleSource(subtitleSource)
-                                .fileName(fileSub.fileNameAsString)
-                                .language(language) // TODO previously: language(""). This was not correct?
-                                .quality(ReleaseParser.getQualityKeyword(fileSub.fileNameAsString))
-                                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                                .releaseGroup(ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))
-                                .uploader(fileSub.toAbsolutePath().toString())
-                                .hearingImpaired(false));
+                            listFoundSubtitles.add(new Subtitle(
+                                downloadSource:Subtitle.DownloadSource.of(fileSub),
+                                subtitleSource:subtitleSource,
+                                fileName:fileSub.fileNameAsString,
+                                language:language,// TODO previously: language(""). This was not correct?
+                                quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
+                                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                                releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true),
+                                uploader:fileSub.toAbsolutePath().toString(),
+                                hearingImpaired:false));
                         }
                     }
                     default -> {
