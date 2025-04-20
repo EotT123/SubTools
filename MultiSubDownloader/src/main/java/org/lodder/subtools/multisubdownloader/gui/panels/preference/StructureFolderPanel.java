@@ -75,9 +75,11 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         this.chkRemoveEmptyFolder = new JCheckBox(getText("PreferenceDialog.RemoveEmptyFolders"))
             .addTo(titlePanel, "span, wrap");
 
-        PanelCheckBox.checkbox(this.chkReplaceSpace =
-                new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith")))
-            .panelOnSameLine().addTo(titlePanel, "span")
+        new PanelCheckBox(
+            checkbox:this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith")),
+            panelOnNewLine:false
+            )
+            .addTo(titlePanel, "span").panel
             .addComponent(this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         // behaviour

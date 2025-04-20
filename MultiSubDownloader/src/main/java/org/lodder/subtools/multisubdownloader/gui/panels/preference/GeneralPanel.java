@@ -147,12 +147,12 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 fillContents:false)
                 .addTo(this, "span, grow");
 
-            PanelCheckBox.checkbox(
-                    this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")))
-                .panelOnSameLine()
-                .panelLayout(new MigLayout("insets 0, fill"))
-                .leftGap(0)
-                .addTo(proxyPanel)
+            new PanelCheckBox(
+                checkbox:this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")),
+                panelOnNewLine:false,
+                panelLayout:new MigLayout("insets 0, fill")
+                )
+                .addTo(proxyPanel).panel
                 .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
                 .addComponent("wrap",
                     this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))

@@ -74,9 +74,8 @@ public class StructureFilePanel extends JPanel {
 
         this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith"));
 
-        PanelCheckBox.checkbox(chkReplaceSpace)
-            .panelOnSameLine()
-            .addTo(titlePanel, "wrap")
+        new PanelCheckBox(checkbox:chkReplaceSpace, panelOnNewLine:false)
+            .addTo(titlePanel, "wrap").panel
             .addComponent("width pref+10px, wrap",
                 this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
@@ -84,10 +83,11 @@ public class StructureFilePanel extends JPanel {
             new JCheckBox(getText("PreferenceDialog.IncludeLanguageInFileName"))
                 .selectedListener(languageMapping::refreshState).addTo(titlePanel, "wrap");
 
-        JPanel languagePanelRoot = PanelCheckBox.checkbox(chkIncludeLanguageCode)
-            .panelOnNewLine()
-            .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
-            .addTo(titlePanel, "span, growx");
+        JPanel languagePanelRoot = new PanelCheckBox(
+            checkbox:chkIncludeLanguageCode,
+            panelOnNewLine:true,
+            panelLayout:new MigLayout("insets 0, novisualpadding", "[][][]"))
+            .addTo(titlePanel, "span, growx").panel;
         {
             JPanel languagePanel = new JPanel(new MigLayout("insets 0, novisualpadding", "[][][][20px]"));
             JScrollPane languageScrollPane =
