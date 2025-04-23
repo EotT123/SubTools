@@ -382,7 +382,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             text += " ($buildTimestamp)";
         }
         JOptionPane.showConfirmDialog(this, text, ConfigProperties.getProperty(Property.NAME),
-            JOptionPane.CLOSED_OPTION);
+            JOptionPane.DEFAULT_OPTION);
     }
 
     protected void rename() {
@@ -449,7 +449,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     public void showErrorMessage(String message) {
         JOptionPane.showConfirmDialog(this, message, ConfigProperties.getProperty(Property.NAME),
-            JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     private void selectIncomingFolder() {

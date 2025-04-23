@@ -229,7 +229,7 @@ public class PrompterExt {
                 .map(tableElement -> columnDisplayers.stream()
                     .map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
                     .toArray())
-                .toArray(Object[][]::new);
+                .toTypedArray(Object[][]::new);
 
             TextTable tt = new TextTable(columnNames, dataTable);
             // this adds the numbering on the left
