@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.data.omdb;
 
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
+
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -16,20 +18,18 @@ class OmdbApi {
 
     public Optional<OmdbDetails> getMovieDetails(int imdbId) throws OmdbException {
         return manager.valueBuilder()
-                .memoryCache()
-                .key("OMDB-moviedetails-$imdbId")
-                .optionalSupplier(() -> {
-                    final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
-                    try {
-                        return manager.getPageContentBuilder()
-                                .url(url)
-                                .getAsDocument()
-                            .getElementsByTagName("movie").stream()
-                                .map(this::parseOMDBDetails).findFirst();
-                    } catch (Exception e) {
-                        throw new OmdbException("Error OMDB API", url, e);
-                    }
-                }).getOptional();
+            .memoryCache()
+            .key("OMDB-moviedetails-$imdbId")
+            .optionalSupplier(() -> {
+                final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
+                try {
+                    return manager.getAsDocument(url(url))
+                        .getElementsByTagName("movie").stream()
+                        .map(this::parseOMDBDetails).findFirst();
+                } catch (Exception e) {
+                    throw new OmdbException("Error OMDB API", url, e);
+                }
+            }).getOptional();
     }
 
     private OmdbDetails parseOMDBDetails(Node node) {

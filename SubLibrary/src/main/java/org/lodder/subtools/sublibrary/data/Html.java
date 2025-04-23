@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.Manager.PageContentBuilderCacheTypeIntf;
 
 @AllArgsConstructor
 public class Html {
@@ -20,10 +19,6 @@ public class Html {
 
     public void storeCookies(String domain, Map<String, String> cookieMap) {
         manager.storeCookies(domain, cookieMap);
-    }
-
-    public PageContentBuilderCacheTypeIntf getHtml(String url) {
-        return manager.getPageContentBuilder().url(url).userAgent(userAgent);
     }
 
     public void sleepSeconds(long seconds) {

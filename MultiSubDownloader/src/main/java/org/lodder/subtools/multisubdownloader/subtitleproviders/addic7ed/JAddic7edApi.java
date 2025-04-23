@@ -23,6 +23,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.A
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
@@ -206,7 +207,7 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                 }
                 lastRequest = LocalDateTime.now();
             }
-            return this.getHtml(url).cacheType(CacheType.NONE).getAsJsoupDocument();
+            return manager.getAsJsoupDocument(PageContentParams.params(url:url, userAgent:""));
         } catch (Exception e) {
             throw new Addic7edException(e);
         }

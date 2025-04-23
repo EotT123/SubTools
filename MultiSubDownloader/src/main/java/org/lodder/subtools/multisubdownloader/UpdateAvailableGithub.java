@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader;
 
 import static java.time.temporal.ChronoUnit.*;
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.ValueBuilderIsPresentIntf;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,10 +75,11 @@ public class UpdateAvailableGithub {
             .optionalSupplier(() -> {
                 try {
                     String currentVersion = getVersion();
-                    Element element = manager.getPageContentBuilder().url(REPO_URL + "/releases")
-                        .userAgent(null)
-                        .cacheType(CacheType.NONE)
-                        .getAsJsoupDocument()
+                    Element element =
+                        manager.getAsJsoupDocument(PageContentParams.params(
+                                url:"$REPO_URL/releases",
+                                cacheType:CacheType.NONE,
+                                userAgent:null))
                         .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
                     Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
                     String versionText = element.parent().selectFirstByTag("a").text();
@@ -87,10 +90,8 @@ public class UpdateAvailableGithub {
                         return Optional.empty();
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
-                    Element artifactElement = manager.getPageContentBuilder().url(versionBlockUrl)
-                        .userAgent(null)
-                        .cacheType(CacheType.NONE)
-                        .getAsJsoupDocument()
+                    Element artifactElement = manager.getAsJsoupDocument(
+                            PageContentParams.params(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
@@ -115,10 +116,10 @@ public class UpdateAvailableGithub {
                     LocalDateTime buildTista = getBuildTista();
 
                     Element rowElement =
-                        manager.getPageContentBuilder().url(REPO_URL + "/actions?query=branch%3Amaster")
-                            .userAgent(null)
-                            .cacheType(CacheType.MEMORY)
-                            .getAsJsoupDocument()
+                        manager.getAsJsoupDocument(PageContentParams.params(
+                                url:"$REPO_URL/actions?query=branch%3Amaster",
+                                cacheType:CacheType.MEMORY,
+                                userAgent:null))
                             .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
                         rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
@@ -127,10 +128,7 @@ public class UpdateAvailableGithub {
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getPageContentBuilder()
-                        .url(url)
-                        .cacheType(CacheType.MEMORY)
-                        .getAsJsoupDocument()
+                    String downloadUrl = manager.getAsJsoupDocument(params(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();

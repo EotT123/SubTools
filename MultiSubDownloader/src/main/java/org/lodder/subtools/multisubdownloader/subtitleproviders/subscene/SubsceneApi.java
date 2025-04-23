@@ -27,8 +27,9 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.S
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleDescriptor;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.Manager.PageContentBuilderCacheTypeIntf;
+import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -140,18 +141,13 @@ public class SubsceneApi extends Html implements SubtitleApi {
         while (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATE_DURATION_SHORT) {
             sleepSeconds(1);
         }
-        Document document = super.getHtml(url)
-            .retries(1)
-            .retryPredicate(RETRY_PREDICATE)
-            .retryWait(RATE_DURATION_LONG)
-            .getAsJsoupDocument();
+        Document document =
+            manager.getAsJsoupDocument(PageContentParams.params(
+                url:url,
+                userAgent:"",
+                retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));
         lastRequest = LocalDateTime.now();
         return document;
-    }
-
-    @Override
-    public PageContentBuilderCacheTypeIntf getHtml(String url) {
-        throw new IllegalStateException("Should not be used, use getJsoupDocument");
     }
 
     private void setLanguageWithCookie(Language language) {

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
+
 import java.io.Serial;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +25,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.except
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleDescriptor;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -97,15 +100,12 @@ public class JPodnapisiApi implements SubtitleApi {
 
     protected @Nullable Document getXml(String url) throws PodnapisiException {
         try {
-            return manager.getPageContentBuilder()
-                .url(url)
-                .userAgent(userAgent)
-                .cacheType(CacheType.MEMORY)
-                .retries(1)
-                .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
-                    httpClientException.responseCode >= 500 && httpClientException.responseCode < 600)
-                .retryWait(5)
-                .getAsJsoupDocument();
+            return manager.getAsJsoupDocument(params(url, CacheType.MEMORY, userAgent,
+                new Retry(
+                    1,
+                    ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&
+                        e.responseCode < 600,
+                    5)));
         } catch (Exception e) {
             throw new PodnapisiException(e);
         }

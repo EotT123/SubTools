@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
@@ -111,163 +112,107 @@ public class Manager {
     // GET PAGE CONTENT \\
     // ================ \\
 
-    public PageContentBuilderUrlIntf getPageContentBuilder() {
-        return new PageContentBuilder(httpClient, inMemoryCache);
+    public String get(PageContentParams params) throws ManagerException {
+        ThrowingSupplier<String, ManagerException> supplier = () -> getContentWithoutCache(params);
+        return switch (params.cacheType) {
+            case NONE -> getContentWithoutCache(params);
+            case MEMORY -> inMemoryCache.getOrPut(params.url, supplier);
+            case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
+        };
     }
 
-    public interface PageContentBuilderUrlIntf {
-        PageContentBuilderUserAgentIntf url(String url);
+    public InputStream getAsInputStream(PageContentParams params) throws ManagerException {
+        return get(params).toInputStream(StandardCharsets.UTF_8);
     }
 
-    public interface PageContentBuilderUserAgentIntf extends PageContentBuilderCacheTypeIntf {
-        PageContentBuilderCacheTypeIntf userAgent(String userAgent);
+    public @Nullable Document getAsDocument(PageContentParams params, Predicate<String> emptyResultPredicate=null)
+        throws ParserConfigurationException, ManagerException, IOException {
+        Optional<String> asStringDocument = getAsStringDocument(params, emptyResultPredicate);
+        return asStringDocument.isPresent() ? XMLHelper.getDocument(asStringDocument.get()) : null;
     }
 
-    public interface PageContentBuilderCacheTypeIntf extends PageContentBuilderRetryIntf {
-        PageContentBuilderRetryIntf cacheType(CacheType cacheType);
+    public org.jsoup.nodes.Document getAsJsoupDocument(PageContentParams params,
+        Predicate<String> emptyResultPredicate=null) throws ManagerException {
+        return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
     }
 
-    public interface PageContentBuilderRetryIntf extends PageContentBuilderGetIntf {
-        PageContentBuilderRetryConditionIntf retries(int retries);
+    private Optional<String> getAsStringDocument(PageContentParams params,
+        Predicate<String> emptyResultPredicate) throws ManagerException {
+        if (emptyResultPredicate == null) {
+            return Optional.of(get(params));
+        }
+        String html = get(params);
+        return StringUtils.isBlank(html) || emptyResultPredicate.test(html) ? Optional.empty() : Optional.of(html);
     }
 
-    public interface PageContentBuilderRetryConditionIntf {
-        PageContentBuilderRetryWaitIntf retryPredicate(Predicate<Exception> retryPredicate);
+    public JSONObject getAsJsonObject(PageContentParams params) throws ManagerException {
+        return new JSONObject(getAsJsonString(params));
     }
 
-    public interface PageContentBuilderRetryWaitIntf {
-        PageContentBuilderGetIntf retryWait(int retryWait);
+    public JSONArray getAsJsonArray(PageContentParams params) throws ManagerException {
+        return new JSONArray(getAsJsonString(params));
     }
 
-    public interface PageContentBuilderGetIntf {
-        String get() throws ManagerException;
-
-        InputStream getAsInputStream() throws ManagerException;
-
-        Document getAsDocument() throws ParserConfigurationException, ManagerException, IOException;
-
-        Document getAsDocument(Predicate<String> emptyResultPredicate)
-            throws ParserConfigurationException, ManagerException, IOException;
-
-        org.jsoup.nodes.Document getAsJsoupDocument() throws ManagerException;
-
-        org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate) throws ManagerException;
-
-        JSONObject getAsJsonObject() throws ManagerException;
-
-        JSONArray getAsJsonArray() throws ManagerException;
+    private String getAsJsonString(PageContentParams params) throws ManagerException {
+        try {
+            return new String(getAsInputStream(params).readAllBytes(), StandardCharsets.UTF_8);
+        } catch (JSONException | IOException | ManagerException e) {
+            throw new ManagerException(e);
+        }
     }
 
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    @RequiredArgsConstructor
-    public static class PageContentBuilder
-        implements PageContentBuilderGetIntf, PageContentBuilderCacheTypeIntf, PageContentBuilderUserAgentIntf,
-        PageContentBuilderUrlIntf, PageContentBuilderRetryIntf, PageContentBuilderRetryConditionIntf,
-        PageContentBuilderRetryWaitIntf {
-        private final HttpClient httpClient;
-        private final InMemoryCache<String, String> inMemoryCache;
-        private String url;
-        private String userAgent = "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)";
-        private CacheType cacheType;
-        private int retries;
-        private Predicate<Exception> retryPredicate;
-        private int retryWait;
+    private String getContentWithoutCache(PageContentParams params) throws ManagerException {
+        String url = params.url;
+        String userAgent = params.userAgent;
+        Retry retry = params.retry;
+        try {
+            return httpClient.doGet(new URI(url).toURL(), userAgent);
+        } catch (HttpClientException e) {
+            if (retry.canRetry() && retry.predicate.test(e)) {
+                retry.decreaseRetries().sleep();
+                return getContentWithoutCache(params);
+            }
+            throw new ManagerException(
+                "Error occurred with httpclient response: %s %s".formatted(e.responseCode, e.responseMessage), e);
+        } catch (IOException e) {
+            if (retry.canRetry() && retry.predicate.test(e)) {
+                retry.decreaseRetries();
+                return getContentWithoutCache(params);
+            }
+            throw new ManagerException(e);
+        } catch (URISyntaxException e) {
+            throw new ManagerException("Invalid url [%s]".formatted(url), e);
+        }
+    }
 
-        @Override
-        public PageContentBuilder retries(int retries) {
+    public record Retry(int retries, Predicate<Exception> predicate, int waitSeconds) {
+
+        public static final Retry DEFAULT = new Retry(0, null, 0);
+
+        public Retry {
             if (retries < 0) {
                 throw new IllegalStateException("Number of retries cannot be less than 0");
             }
-            this.retries = retries;
+        }
+
+        public Retry decreaseRetries() {
+            return new Retry(retries - 1, predicate, waitSeconds);
+        }
+
+        public boolean canRetry() {
+            return retries > 0;
+        }
+
+        public Retry sleep() {
+            try {
+                Thread.sleep(waitSeconds * 1000L);
+            } catch (InterruptedException e1) {
+                // continue
+            }
             return this;
         }
-
-        @Override
-        public String get() throws ManagerException {
-            if (cacheType == null) {
-                cacheType = CacheType.NONE;
-            }
-            return switch (cacheType) {
-                case NONE -> getContentWithoutCache(url, userAgent);
-                case MEMORY -> inMemoryCache.getOrPut(url, () -> getContentWithoutCache(url, userAgent));
-                case DISK -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
-            };
-        }
-
-        @Override
-        public InputStream getAsInputStream() throws ManagerException {
-            return get().toInputStream(StandardCharsets.UTF_8);
-        }
-
-        @Override
-        public Document getAsDocument() throws ParserConfigurationException, ManagerException, IOException {
-            return XMLHelper.getDocument(get());
-        }
-
-        @Override
-        public Document getAsDocument(Predicate<String> emptyResultPredicate)
-            throws ParserConfigurationException, ManagerException, IOException {
-            String html = get();
-            return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
-                null : XMLHelper.getDocument(html);
-        }
-
-        @Override
-        public org.jsoup.nodes.Document getAsJsoupDocument() throws ManagerException {
-            return Jsoup.parse(get());
-        }
-
-        @Override
-        public org.jsoup.nodes.Document getAsJsoupDocument(Predicate<String> emptyResultPredicate)
-            throws ManagerException {
-            String html = get();
-            return StringUtils.isBlank(html) || (emptyResultPredicate != null && emptyResultPredicate.test(html)) ?
-                null : Jsoup.parse(html);
-        }
-
-        @Override
-        public JSONObject getAsJsonObject() throws ManagerException {
-            try {
-                return new JSONObject(new String(getAsInputStream().readAllBytes(), StandardCharsets.UTF_8));
-            } catch (JSONException | IOException | ManagerException e) {
-                throw new ManagerException(e);
-            }
-        }
-
-        @Override
-        public JSONArray getAsJsonArray() throws ManagerException {
-            try {
-                return new JSONArray(new String(getAsInputStream().readAllBytes(), StandardCharsets.UTF_8));
-            } catch (JSONException | IOException | ManagerException e) {
-                throw new ManagerException(e);
-            }
-        }
-
-        private String getContentWithoutCache(String urlString, String userAgent) throws ManagerException {
-            try {
-                return httpClient.doGet(new URI(urlString).toURL(), userAgent);
-            } catch (HttpClientException e) {
-                if (retries-- > 0 && retryPredicate.test(e)) {
-                    try {
-                        Thread.sleep(retryWait * 1000L);
-                    } catch (InterruptedException e1) {
-                        // continue
-                    }
-                    return getContentWithoutCache(urlString, userAgent);
-                }
-                throw new ManagerException(
-                    "Error occurred with httpclient response: %s %s".formatted(e.responseCode, e.responseMessage), e);
-            } catch (IOException e) {
-                if (retries-- > 0 && retryPredicate.test(e)) {
-                    return getContentWithoutCache(urlString, userAgent);
-                }
-                throw new ManagerException(e);
-            } catch (URISyntaxException e) {
-                throw new ManagerException("Invalid url [%s]".formatted(urlString), e);
-            }
-        }
     }
+
 
     // =========== \\
     // CLEAR CACHE \\
@@ -284,10 +229,10 @@ public class Manager {
 
     public interface ClearExpiredCacheBuilderKeyFilterIntf extends ClearExpiredCacheBuilderClearIntf {
 
-        <K> ClearExpiredCacheBuilderClearIntf<K> keyFilter(Predicate<K> keyFilter);
+        <K> ClearExpiredCacheBuilderClearIntf keyFilter(Predicate<K> keyFilter);
     }
 
-    public interface ClearExpiredCacheBuilderClearIntf<K> {
+    public interface ClearExpiredCacheBuilderClearIntf {
 
         void clear();
     }
@@ -295,7 +240,7 @@ public class Manager {
     @Setter
     @Accessors(chain = true, fluent = true)
     @RequiredArgsConstructor
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static class ClearExpiredCacheBuilder<K>
         implements ClearExpiredCacheBuilderCacheTypeIntf, ClearExpiredCacheBuilderKeyFilterIntf,
         ClearExpiredCacheBuilderClearIntf {
@@ -474,7 +419,7 @@ public class Manager {
     @Setter
     @Accessors(chain = true, fluent = true)
     @RequiredArgsConstructor
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static class ValueBuilder<C extends Collection<T>, T, X extends Exception>
         implements ValueBuilderGetOptionalIntf<T, X>, ValueBuilderCacheTypeIntf, ValueBuilderValueSupplierIntf<T>,
         ValueBuilderKeyIntf<T>, ValueBuilderGetCollectionIntf<C, T, X>, ValueBuilderGetOptionalIntIntf<X>,

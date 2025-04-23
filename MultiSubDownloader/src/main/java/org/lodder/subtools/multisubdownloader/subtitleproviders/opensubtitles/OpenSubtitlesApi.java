@@ -10,6 +10,8 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Retry;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
@@ -72,15 +74,16 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public List<OpensubtitleSerieId> getProviderSerieIds(String serieName) throws OpenSubtitlesException {
         try {
-            return manager.getPageContentBuilder()
-                .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                    + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
-                .userAgent("")
-                .cacheType(CacheType.MEMORY)
-                .retries(1)
-                .retryPredicate(exc -> exc instanceof HttpClientException e && e.responseCode == 429)
-                .retryWait(5)
-                .getAsJsonArray()
+            return manager.getAsJsonArray(PageContentParams.params(
+                    url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
+                        + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
+                    cacheType:CacheType.MEMORY,
+                    userAgent:"",
+                    retry:new Retry(
+                        1,
+                        exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                        5)
+                    ))
                 .streamJsonObjects()
                 .filter(show -> "tv".equals(show.getString("kind")))
                 .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
