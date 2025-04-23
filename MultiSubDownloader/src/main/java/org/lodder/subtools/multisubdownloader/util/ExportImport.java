@@ -149,10 +149,9 @@ public class ExportImport {
                     MappingType.values().stream()
                         .map(MappingType::getSelectionForKeyPrefixList)
                         .flatMap(Arrays::stream)
-                        .forEach(selectionForKeyPrefix -> manager.clearExpiredCacheBuilder()
-                            .cacheType(CacheType.DISK)
-                            .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix))
-                            .clear());
+                        .forEach(selectionForKeyPrefix ->
+                            manager.clearExpiredCache(CacheType.DISK,
+                                k -> k.startsWith(selectionForKeyPrefix.keyPrefix)));
                 }
                 serieMappings.forEach(serieMapping -> manager.valueBuilder()
                     .cacheType(CacheType.DISK)

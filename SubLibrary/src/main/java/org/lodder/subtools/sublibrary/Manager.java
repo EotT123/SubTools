@@ -218,50 +218,11 @@ public class Manager {
     // CLEAR CACHE \\
     // =========== \\
 
-    public ClearExpiredCacheBuilderCacheTypeIntf clearExpiredCacheBuilder() {
-        return new ClearExpiredCacheBuilder<>(inMemoryCache, diskCache);
-    }
-
-    public interface ClearExpiredCacheBuilderCacheTypeIntf {
-
-        ClearExpiredCacheBuilderKeyFilterIntf cacheType(CacheType cacheType);
-    }
-
-    public interface ClearExpiredCacheBuilderKeyFilterIntf extends ClearExpiredCacheBuilderClearIntf {
-
-        <K> ClearExpiredCacheBuilderClearIntf keyFilter(Predicate<K> keyFilter);
-    }
-
-    public interface ClearExpiredCacheBuilderClearIntf {
-
-        void clear();
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    @RequiredArgsConstructor
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static class ClearExpiredCacheBuilder<K>
-        implements ClearExpiredCacheBuilderCacheTypeIntf, ClearExpiredCacheBuilderKeyFilterIntf,
-        ClearExpiredCacheBuilderClearIntf {
-        private final InMemoryCache inMemoryCache;
-        private final DiskCache diskCache;
-        private CacheType cacheType;
-        private Predicate<K> keyFilter;
-
-        @Override
-        public <T> ClearExpiredCacheBuilder<T> keyFilter(Predicate<T> keyFilter) {
-            this.keyFilter = (Predicate<K>) keyFilter;
-            return (ClearExpiredCacheBuilder<T>) this;
-        }
-
-        @Override
-        public void clear() {
-            switch (cacheType) {
-                case MEMORY -> inMemoryCache.cleanup(keyFilter);
-                case DISK -> diskCache.cleanup(keyFilter);
-                default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
-            }
+    public void clearExpiredCache(CacheType cacheType, Predicate<String> keyFilter=null) {
+        switch (cacheType) {
+            case MEMORY -> inMemoryCache.cleanup(keyFilter);
+            case DISK -> diskCache.cleanup(keyFilter);
+            default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
         }
     }
 

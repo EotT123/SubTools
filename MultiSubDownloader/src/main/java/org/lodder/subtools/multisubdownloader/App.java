@@ -118,10 +118,7 @@ public class App {
                 app.makeSubtitleProviderStore().getAllProviders().stream().map(SubtitleProvider::getProviderName)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
-            manager.clearExpiredCacheBuilder()
-                .cacheType(CacheType.DISK)
-                .keyFilter((String key) -> providerNames.stream().noneMatch(key::startsWith))
-                .clear();
+            manager.clearExpiredCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key::startsWith));
         }).start();
 
     }
