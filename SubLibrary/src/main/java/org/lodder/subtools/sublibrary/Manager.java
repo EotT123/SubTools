@@ -48,8 +48,8 @@ import org.w3c.dom.Document;
 public class Manager {
 
     @val HttpClient httpClient;
-    @val InMemoryCache inMemoryCache;
-    @val DiskCache diskCache;
+    @val InMemoryCache<String, String> inMemoryCache;
+    @val DiskCache<String, Serializable> diskCache;
 
     public boolean store(String downloadLink, Path file) throws ManagerException {
         try {

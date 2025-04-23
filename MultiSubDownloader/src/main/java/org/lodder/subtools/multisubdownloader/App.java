@@ -163,8 +163,8 @@ public class App {
                 .maxItems(2500)
                 .build();
 
-        InMemoryCache<String, Serializable> inMemoryCache =
-            InMemoryCache.builder().keyType(String.class).valueType(Serializable.class)
+        InMemoryCache<String, String> inMemoryCache =
+            InMemoryCache.builder().keyType(String.class).valueType(String.class)
                 .timeToLive(SECONDS.convert(10, MINUTES))
                 .timerInterval(100L)
                 .maxItems(500)
