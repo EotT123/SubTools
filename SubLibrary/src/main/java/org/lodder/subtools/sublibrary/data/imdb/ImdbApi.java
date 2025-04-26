@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 
@@ -16,10 +17,8 @@ public class ImdbApi {
     private final Manager manager;
 
     public Optional<ImdbDetails> getMovieDetails(int imdbId) throws ImdbException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("IMDB-moviedetails-$imdbId")
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, "IMDB-moviedetails-$imdbId")
+            .getOptional(() -> {
                 final String url = "$DOMAIN/title/tt${%07d/releaseinfo".formatted(imdbId);
                 try {
                     org.jsoup.nodes.Element element = manager.getAsJsoupDocument(url(url))
@@ -31,6 +30,6 @@ public class ImdbApi {
                 } catch (Exception e) {
                     throw new ImdbException("Error IMDB API", url, e);
                 }
-            }).getOptional();
+            });
     }
 }

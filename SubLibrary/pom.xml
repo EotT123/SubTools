@@ -96,6 +96,10 @@
             <artifactId>manifold-params-rt</artifactId>
         </dependency>
         <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-science</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>

@@ -65,7 +65,7 @@ import org.lodder.subtools.sublibrary.OsCheck.OSType;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.VideoType;
-import org.lodder.subtools.sublibrary.util.TriConsumer;
+import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

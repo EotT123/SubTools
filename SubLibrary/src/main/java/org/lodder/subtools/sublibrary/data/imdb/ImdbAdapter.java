@@ -50,10 +50,8 @@ public class ImdbAdapter {
     }
 
     public Optional<ImdbDetails> getMovieDetails(int imdbId) {
-        return manager.valueBuilder()
-            .cacheType(CacheType.DISK)
-            .key("%s-MovieDetails:%s".formatted(PROVIDER_NAME, imdbId))
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.DISK, "%s-MovieDetails:%s".formatted(PROVIDER_NAME, imdbId))
+            .getOptional(() -> {
                 try {
                     return imdbApi.get().getMovieDetails(imdbId);
                 } catch (ImdbException e) {
@@ -61,19 +59,18 @@ public class ImdbAdapter {
                         e.getMessage()), e);
                     return Optional.empty();
                 }
-            }).getOptional();
+            });
     }
 
     public OptionalInt getImdbId(String title, Integer year) {
         try {
-            return manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .key("%s-id-%s-%s".formatted(PROVIDER_NAME, title, year))
-                .optionalIntSupplier(() -> getImdbIdOnImdb(title, year)
-                    .orElseMap(() -> getImdbIdOnGoogle(title, year))
-                    .orElseMap(() -> getImdbIdOnYahoo(title, year))
-                    .orElseMap(() -> promptUserToEnterImdbId(title, year)))
-                .storeTempNullValue().getOptionalInt();
+            return manager.getCache(CacheType.DISK, "%s-id-%s-%s".formatted(PROVIDER_NAME, title, year))
+                .getOptionalInt(
+                    () -> getImdbIdOnImdb(title, year)
+                        .orElseMap(() -> getImdbIdOnGoogle(title, year))
+                        .orElseMap(() -> getImdbIdOnYahoo(title, year))
+                        .orElseMap(() -> promptUserToEnterImdbId(title, year)),
+                    storeTempNullValue:true);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(PROVIDER_NAME, title, e.getMessage()), e);
             return OptionalInt.empty();

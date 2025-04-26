@@ -17,6 +17,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
+import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
@@ -42,17 +43,12 @@ public final class JOpenSubAdapter
     @val @override SubtitleSource subtitleSource = SubtitleSource.OPENSUBTITLES;
     @val @override String providerName = subtitleSource.name();
 
-    public JOpenSubAdapter(boolean isLoginEnabled, String username, String password, Manager manager,
-        UserInteractionHandler userInteractionHandler) {
+    public JOpenSubAdapter(Manager manager, Credentials credentials, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         if (osApi == null) {
             osApi = new LazySupplier<>(() -> {
                 try {
-                    if (isLoginEnabled) {
-                        return new OpenSubtitlesApi(manager, username, password);
-                    } else {
-                        return new OpenSubtitlesApi(manager);
-                    }
+                    return new OpenSubtitlesApi(manager, credentials);
                 } catch (OpenSubtitlesException e) {
                     throw new SubtitlesProviderInitException(providerName, e);
                 }

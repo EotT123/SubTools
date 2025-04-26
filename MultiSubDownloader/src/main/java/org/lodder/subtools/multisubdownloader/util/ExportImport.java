@@ -27,6 +27,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler.MessageSeverity;
@@ -123,11 +124,8 @@ public class ExportImport {
             List<SeriemappingWithKey> serieMappingsWithKey = MappingType.values().stream()
                 .map(MappingType::getSelectionForKeyPrefixList)
                 .flatMap(Arrays::stream)
-                .flatMap(selectionForKeyPrefix -> manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
-                    .returnType(SerieMapping.class)
-                    .getEntries()
+                .flatMap(selectionForKeyPrefix -> manager.getCache(CacheType.DISK,
+                        k -> k.startsWith(selectionForKeyPrefix.keyPrefix())).getEntries(SerieMapping.class)
                     .stream()
                     .map(pair -> new SeriemappingWithKey(pair.getKey(), pair.getValue())))
                 .toList();
@@ -150,14 +148,11 @@ public class ExportImport {
                         .map(MappingType::getSelectionForKeyPrefixList)
                         .flatMap(Arrays::stream)
                         .forEach(selectionForKeyPrefix ->
-                            manager.clearExpiredCache(CacheType.DISK,
-                                k -> k.startsWith(selectionForKeyPrefix.keyPrefix)));
+                            manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
+                                .clearExpiredCache());
                 }
-                serieMappings.forEach(serieMapping -> manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .key(serieMapping.key)
-                    .value(serieMapping.serieMapping)
-                    .store());
+                serieMappings.forEach(serieMapping ->
+                    manager.getCache(CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
             });
         }
 

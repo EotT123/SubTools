@@ -1,24 +1,24 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import com.pivovarit.function.ThrowingBiFunction;
 import lombok.RequiredArgsConstructor;
+import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingQuadFunction;
 
 @RequiredArgsConstructor
-public class LazyThrowingBiFunction<T, U, R, X extends Exception> {
+public class LazyThrowingQuadFunction<T, U, V, W, R, X extends Exception> {
 
     private final Object lock = new Object();
 
-    private final ThrowingBiFunction<T, U, R, X> function;
+    private final ThrowingQuadFunction<T, U, V, W, R, X> function;
 
     private R object;
 
     private volatile boolean initialized = false;
 
-    public R apply(T arg1, U arg2) throws X {
+    public R apply(T arg1, U arg2, V arg3, W arg4) throws X {
         if (!initialized) {
             synchronized (lock) {
                 if (!initialized) {
-                    object = function.apply(arg1, arg2);
+                    object = function.apply(arg1, arg2, arg3, arg4);
                     initialized = true;
                 }
             }

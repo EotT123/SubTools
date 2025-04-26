@@ -16,6 +16,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.JAddic7edApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitleDescriptor;
+import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
@@ -40,14 +41,13 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
     @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
     @val @override String providerName = subtitleSource.name();
 
-    public JAddic7edAdapter(boolean isLoginEnabled, String username, String password, boolean speedy, Manager manager,
+    public JAddic7edAdapter(Manager manager, boolean speedy, Credentials credentials=null,
         UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         if (jaapi == null) {
             jaapi = new LazySupplier<>(() -> {
                 try {
-                    return isLoginEnabled ? new JAddic7edApi(username, password, speedy, manager) :
-                        new JAddic7edApi(speedy, manager);
+                    return new JAddic7edApi(manager, speedy, credentials);
                 } catch (Exception e) {
                     throw new SubtitlesProviderInitException(providerName, e);
                 }

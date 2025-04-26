@@ -17,8 +17,8 @@ import org.gestdown.model.SubtitleSearchResponse;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
@@ -26,16 +26,17 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 // see https://www.gestdown.info/Api
-public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
+public class JAddic7edProxyGestdownApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://api.gestdown.info";
 
+    private final Manager manager;
     private final TvShowsApi tvShowsApi;
     private final SubtitlesApi subtitlesApi;
     @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
 
     public JAddic7edProxyGestdownApi(Manager manager) {
-        super(manager);
+        this.manager = manager;
         tvShowsApi = new TvShowsApi();
         subtitlesApi = new SubtitlesApi();
     }
@@ -52,11 +53,9 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
 
     public Set<Subtitle> getSubtitles(SerieMapping providerSerieId, int season, int episode, Language language)
             throws ApiException {
-        return manager.valueBuilder()
-                .memoryCache()
-                .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId,
-                        season, episode, language))
-                .collectionSupplier(Subtitle.class, () -> {
+        return manager.getCache(CacheType.MEMORY, "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(),
+                providerSerieId.providerId, season, episode, language))
+            .getCollection(() -> {
                     Set<Subtitle> results = new HashSet<>();
                     SubtitleSearchResponse response =
                             subtitlesApi.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.getName(),
@@ -67,7 +66,7 @@ public class JAddic7edProxyGestdownApi extends Html implements SubtitleApi {
                         .map(sub -> mapToSubtitle(sub, response.episode, language))
                             .forEach(results::add);
                     return results;
-                }).getCollection();
+            });
     }
 
     private Subtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {

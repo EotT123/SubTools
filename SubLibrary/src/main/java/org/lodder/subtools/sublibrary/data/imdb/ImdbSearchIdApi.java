@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import util.Utils;
@@ -24,10 +25,8 @@ record ImdbSearchIdApi(Manager manager) {
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
     public Set<ProviderSerieId> getImdbIdOnImdb(String title, Integer year) throws ImdbSearchIdException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("IMDB-imdbid-imdb-$title-$year")
-            .collectionSupplier(ProviderSerieId.class, () -> {
+        return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-imdb-$title-$year")
+            .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("https://www.imdb.com/find?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {
@@ -43,15 +42,12 @@ record ImdbSearchIdApi(Manager manager) {
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
                 }
-            })
-            .getCollection();
+            });
     }
 
     public Set<ProviderSerieId> getImdbIdOnYahoo(String title, Integer year) throws ImdbSearchIdException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("IMDB-imdbid-yahoo-$title-$year")
-            .collectionSupplier(ProviderSerieId.class, () -> {
+        return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-yahoo-$title-$year")
+            .getCollection(() -> {
                 StringBuilder sb =
                     new StringBuilder("http://search.yahoo.com/search;_ylt=A1f4cfvx9C1I1qQAACVjAQx.?p=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
@@ -74,16 +70,12 @@ record ImdbSearchIdApi(Manager manager) {
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnYahoo", url, e);
                 }
-            })
-            .getCollection();
-
+            });
     }
 
     public Set<ProviderSerieId> getImdbIdOnGoogle(String title, Integer year) throws ImdbSearchIdException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("IMDB-imdbid-google-$title-$year")
-            .collectionSupplier(ProviderSerieId.class, () -> {
+        return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-google-$title-$year")
+            .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("http://www.google.com/search?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {
@@ -101,8 +93,7 @@ record ImdbSearchIdApi(Manager manager) {
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnGoogle", url, e);
                 }
-            })
-            .getCollection();
+            });
     }
 
     private Set<ProviderSerieId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,

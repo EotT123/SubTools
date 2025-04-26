@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -112,7 +113,7 @@ public class PrompterExt {
         Validator<String> inputValidator = new Validator<>(v -> v == null ||
             v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt).isPresent()));
         Function<String, int[]> toObjectsMapper =
-            v -> v.split(",").stream().mapToInt(Integer::parseUnsignedInt).toArray();
+            v -> Arrays.stream(v.split(",")).mapToInt(Integer::parseUnsignedInt).toArray();
         int numberOfElements = elements.size();
         List<Validator<int[]>> objectValidators = List.of(
             new Validator<>(numbers -> numbers.stream().distinct().count() == numbers.stream().count(),

@@ -34,15 +34,12 @@ public class OmdbAdapter {
     private OmdbApi getApi() {
         return omdpApi.get();
     }
-
     public Optional<OmdbDetails> getMovieDetails(int imdbId) {
         try {
-            return manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .key("$providerName-movieDetails-$imdbId")
-                    .optionalSupplier(() -> getApi().getMovieDetails(imdbId))
-                    .storeTempNullValue()
-                    .getOptional();
+            return manager.getCache(CacheType.DISK, "$providerName-movieDetails-$imdbId")
+                .getOptional(
+                    supplier:() -> getApi().getMovieDetails(imdbId),
+                    storeTempNullValue:true);
         } catch (Exception e) {
             LOGGER.error("API $providerName getMovieDetails for id [$imdbId] (${e.getMessage()})", e);
             return Optional.empty();

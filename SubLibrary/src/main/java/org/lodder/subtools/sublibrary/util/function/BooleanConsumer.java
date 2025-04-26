@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util;
+package org.lodder.subtools.sublibrary.util.function;
 
 import java.util.Objects;
 import java.util.function.Consumer;

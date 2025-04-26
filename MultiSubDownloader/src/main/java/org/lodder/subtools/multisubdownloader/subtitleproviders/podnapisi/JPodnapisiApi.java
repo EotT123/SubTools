@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
+import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.io.Serial;
@@ -61,12 +62,10 @@ public class JPodnapisiApi implements SubtitleApi {
 
     private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, Integer year, int season,
         int episode, Language language) throws PodnapisiException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key(
+        return manager.getCache(CacheType.MEMORY,
                 "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId, season, episode,
                     language))
-            .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
+            .getCollection(() -> {
                 try {
                     StringBuilder url = new StringBuilder("$DOMAIN/sl/ppodnapisi/search?sK=").append(
                         URLEncoder.encode(providerSerieId.providerId.trim().toLowerCase(), StandardCharsets.UTF_8));
@@ -93,8 +92,7 @@ public class JPodnapisiApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw new PodnapisiException(e);
                 }
-            })
-            .getCollection();
+            });
     }
 
 
@@ -105,7 +103,7 @@ public class JPodnapisiApi implements SubtitleApi {
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&
                         e.responseCode < 600,
-                    5)));
+                    5 Second)));
         } catch (Exception e) {
             throw new PodnapisiException(e);
         }

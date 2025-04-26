@@ -79,14 +79,12 @@ public final class SearchSubtitles extends OpenSubtitlesExecuter {
     private String userAgent = "SubTools"; // should be set
 
     public Subtitles200Response searchSubtitles() throws OpenSubtitlesException {
-        return manager.valueBuilder()
-            .cacheType(CacheType.MEMORY)
-            .key(
+        return manager.getCache(CacheType.MEMORY,
                 "OpenSubtitles-subtitles-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s".formatted(
                     id, imdbId, tmdbId, type, query, language, movieHash, userId, hearingImpaired, foreignPartsOnly,
                     trustedSources, machineTranslated, aiTranslated, orderBy, orderDirection, parentFeatureId,
                     parentImdbId, parentTmdbId, season, episode, year, movieHashMatch, page))
-            .valueSupplier(() -> {
+            .get(() -> {
                 try {
                     return execute(
                         () -> new SubtitlesApi(apiClient).subtitles(id, imdbId, tmdbId, getValue(type), query,
@@ -99,8 +97,7 @@ public final class SearchSubtitles extends OpenSubtitlesExecuter {
                 } catch (Exception e) {
                     throw new OpenSubtitlesException(e);
                 }
-            })
-            .get();
+            });
     }
 
     private String getValue(ParamIntf param) {

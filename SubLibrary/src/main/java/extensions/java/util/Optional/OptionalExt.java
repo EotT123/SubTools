@@ -9,6 +9,7 @@ import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import name.falgout.jeffrey.throwing.ThrowingToIntFunction;
 
 @UtilityClass
@@ -44,4 +45,10 @@ public class OptionalExt {
         }
         return optional;
     }
+
+    public static <T, X extends Throwable> T orElseGetThrowing(@This Optional<T> optional,
+        ThrowingSupplier<T, X> supplier) throws X {
+        return optional.isPresent() ? optional.get() : supplier.get();
+    }
+
 }

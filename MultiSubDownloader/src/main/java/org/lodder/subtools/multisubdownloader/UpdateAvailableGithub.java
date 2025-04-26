@@ -21,7 +21,8 @@ import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomProperty;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.Manager.ValueBuilderIsPresentIntf;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
+import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.slf4j.Logger;
@@ -69,10 +70,8 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewStableGithubRelease() {
-        return manager.valueBuilder()
-            .cacheType(CacheType.MEMORY)
-            .key("GitHub-update")
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, "GitHub-update")
+            .getOptional(() -> {
                 try {
                     String currentVersion = getVersion();
                     Element element =
@@ -104,14 +103,12 @@ public class UpdateAvailableGithub {
                     }
                     return Optional.empty();
                 }
-            }).getOptional();
+            });
     }
 
     private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return manager.valueBuilder()
-            .cacheType(CacheType.MEMORY)
-            .key("GitHub-update-nightly")
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, "GitHub-update-nightly")
+            .getOptional(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
 
@@ -141,7 +138,7 @@ public class UpdateAvailableGithub {
                     }
                     return Optional.empty();
                 }
-            }).getOptional();
+            });
     }
 
     private LocalDateTime getBuildTista() {
@@ -157,17 +154,16 @@ public class UpdateAvailableGithub {
         return !version.contains("-SNAPSHOT");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static ValueBuilderIsPresentIntf<LocalDate> getUpdateLastUpdateCheckBuilder(Manager manager) {
-        return (ValueBuilderIsPresentIntf) manager.valueBuilder().cacheType(CacheType.DISK).key("LastUpdateCheck");
+    private CacheKey getUpdateLastUpdateCheckCache() {
+        return manager.getCache(CacheType.DISK, "LastUpdateCheck");
     }
 
     private void updateLastUpdateCheck() {
-        getUpdateLastUpdateCheckBuilder(manager).value(LocalDate.now()).store();
+        getUpdateLastUpdateCheckCache().store(Value.of(LocalDate.now()));
     }
 
     private LocalDate getLastUpdateCheck() {
-        return getUpdateLastUpdateCheckBuilder(manager).valueSupplier(() -> LocalDate.MIN).get();
+        return getUpdateLastUpdateCheckCache().get(() -> LocalDate.MIN);
     }
 
     private LocalDateTime zonedDateTimeStringToLocalDateTime(String dateString) {

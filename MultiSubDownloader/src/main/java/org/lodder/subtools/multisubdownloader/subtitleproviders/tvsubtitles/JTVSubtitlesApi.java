@@ -21,19 +21,20 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.mode
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.PageContentParams;
-import org.lodder.subtools.sublibrary.data.Html;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
-public class JTVSubtitlesApi extends Html implements SubtitleApi {
+public class JTVSubtitlesApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
     private static final String SERIE_URL_PREFIX = DOMAIN + "/";
+    private final Manager manager;
     @val @override SubtitleSource subtitleSource = SubtitleSource.TVSUBTITLES;
 
     public JTVSubtitlesApi(Manager manager) {
-        super(manager);
+        this.manager = manager;
     }
 
     public List<ProviderSerieId> getUrisForSerieName(String serieName) throws TvSubtitlesException {
@@ -59,10 +60,8 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
 
     private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language)
         throws TvSubtitlesException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("%s-subtitles-%s-%s".formatted(subtitleSource.name(), episodeUrl, language))
-            .collectionSupplier(TVsubtitlesSubtitleDescriptor.class, () -> {
+        return manager.getCache(CacheType.MEMORY, subtitleSource.name() + "subtitles-$episodeUrl-$language")
+            .getCollection(() -> {
                 Set<TVsubtitlesSubtitleDescriptor> lSubtitles = new HashSet<>();
                 try {
                     Elements searchEpisodes =
@@ -123,15 +122,12 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                 } catch (Exception e) {
                     throw new TvSubtitlesException(e);
                 }
-            })
-            .getCollection();
+            });
     }
 
     private Optional<String> getEpisodeUrl(String showUrl, int season, int episode) throws TvSubtitlesException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("%s-episodeUrl-%s-%s-%s".formatted(subtitleSource.name(), showUrl, season, episode))
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, subtitleSource.name() + "-episodeUrl-$showUrl-$season-$episode")
+            .getOptional(() -> {
                 try {
                     String formattedSeasonEpisode =
                         season + "x" + (episode < 10 ? "0" + episode : String.valueOf(episode));
@@ -152,7 +148,6 @@ public class JTVSubtitlesApi extends Html implements SubtitleApi {
                 } catch (Exception e) {
                     throw new TvSubtitlesException(e);
                 }
-            })
-            .getOptional();
+            });
     }
 }

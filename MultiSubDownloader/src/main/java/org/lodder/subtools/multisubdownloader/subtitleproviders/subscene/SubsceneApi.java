@@ -1,8 +1,10 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
+import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.util.Sleep.*;
+
 import java.io.Serial;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -18,6 +20,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,17 +33,17 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
-import org.lodder.subtools.sublibrary.data.Html;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import util.Utils;
 
-public class SubsceneApi extends Html implements SubtitleApi {
+public class SubsceneApi implements SubtitleApi {
 
-    private static final int RATE_DURATION_SHORT = 1; // seconds
-    private static final int RATE_DURATION_LONG = 5; // seconds
+    private static final Time RATE_DURATION_SHORT = 1 Second;
+    private static final Time RATE_DURATION_LONG = 5 Second;
     private static final String DOMAIN = "https://subscene.com";
     private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
 
@@ -51,6 +54,7 @@ public class SubsceneApi extends Html implements SubtitleApi {
         default -> false;
     };
 
+    private final Manager manager;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 
@@ -58,7 +62,8 @@ public class SubsceneApi extends Html implements SubtitleApi {
     @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
 
     public SubsceneApi(Manager manager) {
-        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
+//        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
+        this.manager = manager;
         addCookie("ForeignOnly", "False");
     }
 
@@ -92,11 +97,9 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     public List<SubsceneSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
         Language language) throws SubsceneException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name, providerSerieId.providerId, season,
-                episode, language))
-            .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
+        return manager.getCache(CacheType.MEMORY, "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name,
+                providerSerieId.providerId, season, episode, language))
+            .getCollection(() -> {
                 setLanguageWithCookie(language);
                 try {
                     return getJsoupDocument(DOMAIN + providerSerieId.providerId)
@@ -138,9 +141,11 @@ public class SubsceneApi extends Html implements SubtitleApi {
     }
 
     private Document getJsoupDocument(String url) throws ManagerException {
-        while (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATE_DURATION_SHORT) {
-            sleepSeconds(1);
+        Time timeToSleep = RATE_DURATION_SHORT - Time.now() + lastRequest;
+        if (timeToSleep.isPositive) {
+            sleep(timeToSleep);
         }
+
         Document document =
             manager.getAsJsoupDocument(PageContentParams.params(
                 url:url,

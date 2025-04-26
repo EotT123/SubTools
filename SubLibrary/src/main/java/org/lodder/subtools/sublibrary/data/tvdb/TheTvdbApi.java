@@ -14,6 +14,7 @@ import com.uwetrottmann.thetvdb.entities.SeriesResponse;
 import com.uwetrottmann.thetvdb.entities.SeriesResultsResponse;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TheTvdbException;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
@@ -30,36 +31,34 @@ public class TheTvdbApi {
     }
 
     public List<TheTvdbSerie> getSeries(String serieName, Language language) throws TheTvdbException {
-        return manager.valueBuilder()
-                .memoryCache()
-                .key("TVDB-series-$serieName-$language")
-                .collectionSupplier(TheTvdbSerie.class, () -> {
-                    String encodedSerieName =
-                            URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
-                    try {
-                        Response<SeriesResultsResponse> response =
-                                theTvdb.search()
-                                        .series(encodedSerieName, null, null, null,
-                                                language == null ? null : language.langCode)
-                                        .execute();
-                        if (response.isSuccessful()) {
-                            return response.body().data.stream()
-                                    .map(series -> seriesToTVDBSerie(series, language))
-                                    .toList();
-                        }
-                        return List.of();
-                    } catch (IOException e) {
-                        throw new TheTvdbException(e);
+        return manager.getCache(CacheType.MEMORY, "TVDB-series-$serieName-$language")
+            .getCollection(() -> {
+                String encodedSerieName =
+                    URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
+                try {
+                    Response<SeriesResultsResponse> response =
+                        theTvdb.search()
+                            .series(encodedSerieName, null, null, null,
+                                language == null ? null : language.langCode)
+                            .execute();
+                    if (response.isSuccessful()) {
+                        return response.body().data.stream()
+                            .map(series -> seriesToTVDBSerie(series, language))
+                            .toList();
                     }
-                }).getCollection();
+                    return List.of();
+                } catch (IOException e) {
+                    throw new TheTvdbException(e);
+                }
+            });
     }
 
     public Optional<TheTvdbSerie> getSerie(int tvdbId, Language language) throws TheTvdbException {
         try {
             Response<SeriesResponse> response =
-                    theTvdb.series()
-                            .series(tvdbId, language == null ? null : language.langCode)
-                            .execute();
+                theTvdb.series()
+                    .series(tvdbId, language == null ? null : language.langCode)
+                    .execute();
             if (response.isSuccessful()) {
                 return Optional.of(seriesToTVDBSerie(response.body().data, language));
             }
@@ -70,30 +69,28 @@ public class TheTvdbApi {
     }
 
     public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode, Language language)
-            throws TheTvdbException {
-        return manager.valueBuilder()
-                .memoryCache()
-                .key("TVDB-episode-$tvdbId-$season-$episode-$language")
-                .optionalSupplier(() -> {
-                    try {
-                        Response<EpisodesResponse> response =
-                                theTvdb.series()
-                                        .episodesQuery(tvdbId, null, season, episode, null, null, null, null, null,
-                                                language == null ? null : language.langCode)
-                                        .execute();
-                        if (response.isSuccessful()) {
-                            if (response.body().data == null) {
-                                return Optional.empty();
-                            }
-                            return response.body().data.stream()
-                                    .map(serie -> episodeToTVDBEpisode(serie, language))
-                                    .findFirst();
+        throws TheTvdbException {
+        return manager.getCache(CacheType.MEMORY, "TVDB-episode-$tvdbId-$season-$episode-$language")
+            .getOptional(() -> {
+                try {
+                    Response<EpisodesResponse> response =
+                        theTvdb.series()
+                            .episodesQuery(tvdbId, null, season, episode, null, null, null, null, null,
+                                language == null ? null : language.langCode)
+                            .execute();
+                    if (response.isSuccessful()) {
+                        if (response.body().data == null) {
+                            return Optional.empty();
                         }
-                        throw new TheTvdbException(response.errorBody().string());
-                    } catch (IOException e) {
-                        throw new TheTvdbException(e);
+                        return response.body().data.stream()
+                            .map(serie -> episodeToTVDBEpisode(serie, language))
+                            .findFirst();
                     }
-                }).getOptional();
+                    throw new TheTvdbException(response.errorBody().string());
+                } catch (IOException e) {
+                    throw new TheTvdbException(e);
+                }
+            });
     }
 
     private TheTvdbSerie seriesToTVDBSerie(Series serie, Language lang) {

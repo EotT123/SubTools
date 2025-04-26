@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary;
 
-import static java.util.concurrent.TimeUnit.*;
+import static manifold.science.measures.TimeUnit.*;
+import static manifold.science.util.UnitConstants.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -17,18 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.OptionalLong;
-import java.util.function.LongUnaryOperator;
 import java.util.function.Predicate;
 
-import com.pivovarit.function.ThrowingSupplier;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import name.falgout.jeffrey.throwing.Nothing;
+import manifold.science.measures.Time;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
@@ -40,6 +36,8 @@ import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
 import org.lodder.subtools.sublibrary.cache.InMemoryCache;
+import org.lodder.subtools.sublibrary.util.Nothing;
+import org.lodder.subtools.sublibrary.util.Sleep;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.xml.XMLHelper;
@@ -113,10 +111,9 @@ public class Manager {
     // ================ \\
 
     public String get(PageContentParams params) throws ManagerException {
-        ThrowingSupplier<String, ManagerException> supplier = () -> getContentWithoutCache(params);
         return switch (params.cacheType) {
             case NONE -> getContentWithoutCache(params);
-            case MEMORY -> inMemoryCache.getOrPut(params.url, supplier);
+            case MEMORY -> inMemoryCache.getOrPut(params.url, () -> getContentWithoutCache(params));
             case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
         };
     }
@@ -162,22 +159,21 @@ public class Manager {
     }
 
     private String getContentWithoutCache(PageContentParams params) throws ManagerException {
-        String url = params.url;
-        String userAgent = params.userAgent;
-        Retry retry = params.retry;
+        return getContentWithoutCache(params.url, params.userAgent, params.retry);
+    }
+
+    private String getContentWithoutCache(String url, String userAgent, Retry retry) throws ManagerException {
         try {
             return httpClient.doGet(new URI(url).toURL(), userAgent);
         } catch (HttpClientException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                retry.decreaseRetries().sleep();
-                return getContentWithoutCache(params);
+                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep());
             }
             throw new ManagerException(
                 "Error occurred with httpclient response: %s %s".formatted(e.responseCode, e.responseMessage), e);
         } catch (IOException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                retry.decreaseRetries();
-                return getContentWithoutCache(params);
+                return getContentWithoutCache(url, userAgent, retry.decreaseRetries());
             }
             throw new ManagerException(e);
         } catch (URISyntaxException e) {
@@ -185,9 +181,9 @@ public class Manager {
         }
     }
 
-    public record Retry(int retries, Predicate<Exception> predicate, int waitSeconds) {
+    public record Retry(int retries, Predicate<Exception> predicate, Time waitTime) {
 
-        public static final Retry DEFAULT = new Retry(0, null, 0);
+        public static final Retry NONE = new Retry(0, null, 0 Second);
 
         public Retry {
             if (retries < 0) {
@@ -196,7 +192,7 @@ public class Manager {
         }
 
         public Retry decreaseRetries() {
-            return new Retry(retries - 1, predicate, waitSeconds);
+            return new Retry(retries - 1, predicate, waitTime);
         }
 
         public boolean canRetry() {
@@ -204,616 +200,271 @@ public class Manager {
         }
 
         public Retry sleep() {
-            try {
-                Thread.sleep(waitSeconds * 1000L);
-            } catch (InterruptedException e1) {
-                // continue
-            }
+            Sleep.sleep(waitTime);
             return this;
-        }
-    }
-
-
-    // =========== \\
-    // CLEAR CACHE \\
-    // =========== \\
-
-    public void clearExpiredCache(CacheType cacheType, Predicate<String> keyFilter=null) {
-        switch (cacheType) {
-            case MEMORY -> inMemoryCache.cleanup(keyFilter);
-            case DISK -> diskCache.cleanup(keyFilter);
-            default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
         }
     }
 
     // ============= \\
-    // VALUE BUILDER \\
+    // CACHE METHODS \\
     // ============= \\
 
-    public ValueBuilderCacheTypeIntf valueBuilder() {
-        return new ValueBuilder<>(inMemoryCache, diskCache);
-    }
-
-    public interface ValueBuilderCacheTypeIntf {
-
-        <T extends Serializable> ValueBuilderKeyIntf<T> cacheType(CacheType cacheType);
-
-        <T> ValueBuilderKeyIntf<T> memoryCache();
-
-        <T extends Serializable> ValueBuilderKeyIntf<T> diskCache();
-    }
-
-    public interface ValueBuilderKeyIntf<T> {
-        ValueBuilderIsPresentIntf<T> key(String key);
-
-        ValuesBuilderCacheTypeIntf<T> keyFilter(Predicate<String> keyFilter);
-    }
-
-    public interface ValueBuilderIsPresentIntf<T> extends ValuesBuilderCacheTypeIntf<T> {
-        boolean isPresent();
-
-        boolean isExpiredTemporary();
-
-        boolean isTemporaryObject();
-
-        OptionalLong getTemporaryTimeToLive();
-    }
-
-    public interface ValuesBuilderCacheTypeIntf<T> extends ValueBuilderRetryIntf<T> {
-        <S extends T> ValueBuilderGetOptionalIntf<S, Nothing> returnType(Class<S> returnType);
-
-        <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> returnType(
-            Class<C> collectionReturnType, Class<S> returnType);
-
-        void remove();
-    }
-
-    public interface ValueBuilderRetryIntf<T> extends ValueBuilderValueSupplierIntf<T> {
-        ValueBuilderRetryConditionIntf<T> retries(int retries);
-
-        <S extends T> ValueBuilderGetValueStoreTempValueIntf<S, Nothing> value(S value);
-
-        <S extends T> ValueBuilderGetOptionalStoreTempValueIntf<S, Nothing> optionalValue(Optional<S> optionalValue);
-
-        ValueBuilderGetOptionalIntStoreTempValueIntf<Nothing> optionalIntValue(OptionalInt optionalIntValue);
-
-        <C extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<C, S, Nothing> collectionValue(
-            C collectionValue);
-    }
-
-    public interface ValueBuilderRetryConditionIntf<T> {
-        ValueBuilderRetryWaitIntf<T> retryPredicate(Predicate<Exception> retryPredicate);
-    }
-
-    public interface ValueBuilderRetryWaitIntf<T> {
-        ValueBuilderValueSupplierIntf<T> retryWait(int retryWait);
-    }
-
-    public interface ValueBuilderValueSupplierIntf<T> {
-
-        <S extends T, X extends Exception> ValueBuilderGetValueStoreTempValueIntf<S, X> valueSupplier(
-            ThrowingSupplier<S, X> valueSupplier);
-
-        <C extends Collection<S>, S extends T, X extends Exception> ValueBuilderGetCollectionIntf<C, S, X> collectionSupplier(
-            Class<S> collectionValueType, ThrowingSupplier<C, X> valueSupplier);
-
-        <S extends T, X extends Exception> ValueBuilderGetOptionalStoreTempValueIntf<S, X> optionalSupplier(
-            ThrowingSupplier<Optional<S>, X> valueSupplier);
-
-        <X extends Exception> ValueBuilderGetOptionalIntStoreTempValueIntf<X> optionalIntSupplier(
-            ThrowingSupplier<OptionalInt, X> optionalIntSupplier);
-    }
-
-    public interface ValueBuilderGetValueStoreTempValueIntf<T, X extends Exception>
-        extends ValueBuilderGetValueIntf<T, X> {
-        ValueBuilderGetValueStoreTempValueTtlIntf<T, X> storeTempNullValue();
-    }
-
-    public interface ValueBuilderGetValueStoreTempValueTtlIntf<T, X extends Exception>
-        extends ValueBuilderGetValueIntf<T, X> {
-        ValueBuilderGetValueIntf<T, X> timeToLive(long seconds);
-
-        ValueBuilderGetValueIntf<T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
-    }
-
-    public interface ValueBuilderGetValueIntf<T, X extends Exception> extends ValueBuilderStoreIntf<X> {
-        T get() throws X;
-    }
-
-    public interface ValueBuilderGetOptionalStoreTempValueIntf<T, X extends Exception>
-        extends ValueBuilderGetOptionalIntf<T, X> {
-        ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X> storeTempNullValue();
-    }
-
-    public interface ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X extends Exception>
-        extends ValueBuilderGetOptionalIntf<T, X> {
-        ValueBuilderGetOptionalIntf<T, X> timeToLive(long seconds);
-
-        ValueBuilderGetOptionalIntf<T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
-    }
-
-    public interface ValueBuilderGetOptionalIntf<T, X extends Exception> extends ValueBuilderStoreIntf<X> {
-        List<Pair<String, T>> getEntries();
-
-        Optional<T> getOptional() throws X;
-    }
-
-    public interface ValueBuilderGetOptionalIntStoreTempValueIntf<X extends Exception>
-        extends ValueBuilderGetOptionalIntIntf<X> {
-        ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X> storeTempNullValue();
-    }
-
-    public interface ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X extends Exception>
-        extends ValueBuilderGetOptionalIntIntf<X> {
-        ValueBuilderGetOptionalIntIntf<X> timeToLive(long seconds);
-
-        ValueBuilderGetOptionalIntIntf<X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
-    }
-
-    public interface ValueBuilderGetOptionalIntIntf<X extends Exception> extends ValueBuilderStoreIntf<X> {
-        OptionalInt getOptionalInt() throws X;
-    }
-
-    // public interface ValueBuilderGetCollectionStoreTempValueIntf<C extends Collection<T>, T, X extends Exception>
-    // extends ValueBuilderGetCollectionIntf<C, T, X> {
-    // ValueBuilderGetCollectionStoreTempValueTtlIntf<C, T, X> storeTempValue();
-    // }
-    //
-    // public interface ValueBuilderGetCollectionStoreTempValueTtlIntf<C extends Collection<T>, T, X extends Exception>
-    // extends ValueBuilderGetCollectionIntf<C, T, X> {
-    // ValueBuilderGetCollectionIntf<C, T, X> timeToLive(long seconds);
-    //
-    // ValueBuilderGetCollectionIntf<C, T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction);
-    // }
-
-    public interface ValueBuilderGetCollectionIntf<C extends Collection<T>, T, X extends Exception>
-        extends ValueBuilderStoreIntf<X> {
-        C getCollection() throws X;
-    }
-
-    public interface ValueBuilderStoreIntf<X extends Exception> {
-        void store() throws X;
-
-        void storeAsTempValue() throws X;
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    @RequiredArgsConstructor
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static class ValueBuilder<C extends Collection<T>, T, X extends Exception>
-        implements ValueBuilderGetOptionalIntf<T, X>, ValueBuilderCacheTypeIntf, ValueBuilderValueSupplierIntf<T>,
-        ValueBuilderKeyIntf<T>, ValueBuilderGetCollectionIntf<C, T, X>, ValueBuilderGetOptionalIntIntf<X>,
-        ValueBuilderRetryIntf<T>, ValueBuilderRetryConditionIntf<T>, ValueBuilderRetryWaitIntf<T>,
-        ValueBuilderIsPresentIntf<T>, ValuesBuilderCacheTypeIntf<T>, ValueBuilderStoreIntf<X>,
-        ValueBuilderGetOptionalIntStoreTempValueIntf<X>, ValueBuilderGetOptionalStoreTempValueIntf<T, X>,
-        ValueBuilderGetOptionalIntStoreTempValueTtlIntf<X>, ValueBuilderGetOptionalStoreTempValueTtlIntf<T, X>,
-        ValueBuilderGetValueStoreTempValueIntf<T, X>, ValueBuilderGetValueStoreTempValueTtlIntf<T, X>,
-        ValueBuilderGetValueIntf<T, X> {
-        private final InMemoryCache inMemoryCache;
-        private final DiskCache diskCache;
-        private String key;
-        private ThrowingSupplier<T, X> valueSupplier;
-        private ThrowingSupplier<C, X> collectionSupplier;
-        private ThrowingSupplier<Optional<T>, X> optionalSupplier;
-        private ThrowingSupplier<OptionalInt, X> optionalIntSupplier;
-        private T value;
-        private Optional<T> optionalValue;
-        private OptionalInt optionalIntValue;
-        private C collectionValue;
-
-        private CacheType cacheType;
-        private Class<T> returnType;
-        private int retries;
-        private Predicate<Exception> retryPredicate;
-        private int retryWait;
-        private Predicate<String> keyFilter;
-        @Setter(value = AccessLevel.NONE) private Long timeToLive;
-        @Setter(value = AccessLevel.NONE) private boolean storeTempNullValue;
-        private LongUnaryOperator timeToLiveFunction;
-
-        //
-        // @Override
-        // public ValueBuilder<C, T, X> timeToLiveFunction(LongUnaryOperator timeToLiveFunction) {
-        // this.timeToLiveFunction = timeToLiveFunction;
-        // return this;
-        // }
-        @Override
-        public ValueBuilder<C, T, Nothing> optionalIntValue(OptionalInt optionalIntValue) {
-            this.optionalIntValue = optionalIntValue;
-            return (ValueBuilder<C, T, Nothing>) this;
+    public record CacheKey(Manager manager, CacheType cacheType, String key) {
+        public boolean isPresent() {
+            return manager.getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
         }
 
-        @Override
-        public ValueBuilder<C, T, X> retries(int retries) {
-            if (retries < 0) {
-                throw new IllegalStateException("Number of retries cannot be less than 0");
-            }
-            this.retries = retries;
-            return this;
+        public boolean isExpiredTemporary() {
+            return manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryExpired(key)).orElse(false);
         }
 
-        @Override
-        public ValueBuilder<?, ?, ?> memoryCache() {
-            this.cacheType = CacheType.MEMORY;
-            return this;
+        public boolean isTemporaryObject() {
+            return manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryObject(key)).orElse(false);
         }
 
-        @Override
-        public <S extends Serializable> ValueBuilder<?, S, ?> diskCache() {
-            this.cacheType = CacheType.DISK;
-            return (ValueBuilder<?, S, ?>) this;
+        public Optional<Time> getTemporaryTimeToLive() {
+            return manager.getOptionalCache(cacheType).map(cache -> cache.getTemporaryTimeToLive(key))
+                .orElseGet(() -> Optional.of(0 Second));
         }
 
-        @Override
-        public <S extends T> ValueBuilder<?, S, Nothing> returnType(Class<S> returnType) {
-            this.returnType = (Class<T>) returnType;
-            return (ValueBuilder<?, S, Nothing>) this;
+        public void remove() {
+            manager.getCache(cacheType).remove(key);
         }
 
-        @Override
-        public <L extends Collection<S>, S extends T> ValueBuilderGetCollectionIntf<L, S, Nothing> returnType(
-            Class<L> collectionReturnType, Class<S> returnType) {
-            this.returnType = (Class<T>) returnType;
-            return (ValueBuilder<L, S, Nothing>) this;
-        }
-
-        @Override
-        public <S extends T, E extends Exception> ValueBuilder<?, S, E> valueSupplier(
-            ThrowingSupplier<S, E> valueSupplier) {
-            this.valueSupplier = (ThrowingSupplier<T, X>) valueSupplier;
-            return (ValueBuilder<?, S, E>) this;
-        }
-
-        @Override
-        public <S extends T, E extends Exception> ValueBuilder<?, S, E> optionalSupplier(
-            ThrowingSupplier<Optional<S>, E> valueSupplier) {
-            this.optionalSupplier = (ThrowingSupplier) valueSupplier;
-            return (ValueBuilder<?, S, E>) this;
-        }
-
-        @Override
-        public <E extends Exception> ValueBuilder<?, Integer, E> optionalIntSupplier(
-            ThrowingSupplier<OptionalInt, E> optionalIntSupplier) {
-            this.optionalIntSupplier = (ThrowingSupplier) optionalIntSupplier;
-            return (ValueBuilder<?, Integer, E>) this;
-        }
-
-        @Override
-        public <L extends Collection<S>, S extends T, E extends Exception> ValueBuilder<L, S, E> collectionSupplier(
-            Class<S> collectionValueType, ThrowingSupplier<L, E> collectionSupplier) {
-            this.collectionSupplier = (ThrowingSupplier<C, X>) collectionSupplier;
-            return (ValueBuilder<L, S, E>) this;
-        }
-
-        @Override
-        public <S extends T> ValueBuilder<?, S, Nothing> value(S value) {
-            this.value = value;
-            return (ValueBuilder<?, S, Nothing>) this;
-        }
-
-        @Override
-        public <S extends T> ValueBuilder<?, S, Nothing> optionalValue(Optional<S> optionalValue) {
-            this.optionalValue = (Optional<T>) optionalValue;
-            return (ValueBuilder<?, S, Nothing>) this;
-        }
-
-        @Override
-        public <L extends Collection<S>, S extends T> ValueBuilder<L, S, Nothing> collectionValue(L collectionValue) {
-            this.collectionValue = (C) collectionValue;
-            return (ValueBuilder<L, S, Nothing>) this;
-        }
-
-        @Override
-        public ValueBuilder<C, T, X> storeTempNullValue() {
-            this.storeTempNullValue = true;
-            return this;
-        }
-
-        @Override
-        public ValueBuilder<C, T, X> timeToLive(long seconds) {
-            this.timeToLive = seconds * 1000;
-            return this;
-        }
-
-        // ######### \\
-        // GET VALUE \\
-        // ######### \\
-
-        @Override
-        public T get() throws X {
-            return switch (cacheType) {
-                case NONE -> valueSupplier.get();
-                case MEMORY -> getOrPutValue(inMemoryCache);
-                case DISK -> getOrPutValue(diskCache);
-            };
-        }
-
-        private T getOrPutValue(Cache cache) throws X {
+        public <V extends Serializable, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
+            Retry retry=Retry.NONE) throws X {
+            Cache<String, V> cache = manager.getCache(cacheType);
             if (cache.contains(key)) {
-                try {
-                    return (T) cache.get(key).get();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                return cache.get(key).orElseThrow();
             }
-            T value = executeSupplier(valueSupplier);
+            V value = executeSupplier(supplier, retry);
             if (value != null) {
                 cache.put(key, value);
             } else {
                 switch (cache) {
-                    case DiskCache dCache -> dCache.putWithoutPersist(key, null);
-                    case InMemoryCache mCache -> mCache.put(key, null);
+                    case DiskCache<String, ?> dCache -> dCache.putWithoutPersist(key, null);
+                    case InMemoryCache<String, ?> mCache -> mCache.put(key, null);
                 }
             }
             return value;
         }
 
-        // ############## \\
-        // GET COLLECTION \\
-        // ############## \\
-
-        @Override
-        public C getCollection() throws X {
-            return switch (cacheType) {
-                case NONE -> collectionSupplier.get();
-                case MEMORY -> getOrPutCollection(inMemoryCache);
-                case DISK -> getOrPutCollection(diskCache);
-            };
-        }
-
-        private C getOrPutCollection(Cache cache) throws X {
-            if (cache.contains(key)) {
-                try {
-                    return (C) cache.get(key).get();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+        public <C extends Iterable<? extends V>, V extends Serializable, X extends Exception> C getCollection(
+            ThrowingSupplier<C, X> supplier, Retry retry=Retry.NONE) throws X {
+            Optional<Cache<String, C>> optionalCache = manager.getOptionalCache(cacheType);
+            return optionalCache.mapThrowing(cache -> {
+                if (cache.contains(key)) {
+                    return cache.get(key).orElseThrow();
                 }
-            }
-            C value = executeSupplier(collectionSupplier);
-            cache.put(key, value);
-            return value;
-        }
-
-        // ############ \\
-        // GET OPTIONAL \\
-        // ############ \\
-
-        @Override
-        public Optional<T> getOptional() throws X {
-            if (returnType != null) {
-                return switch (cacheType) {
-                    case NONE -> Optional.empty();
-                    case MEMORY -> inMemoryCache.get(key);
-                    case DISK -> diskCache.get(key);
-                };
-            }
-            return switch (cacheType) {
-                case NONE -> optionalSupplier.get();
-                case MEMORY -> getOrPutOptional(inMemoryCache);
-                case DISK -> getOrPutOptional(diskCache);
-            };
-        }
-
-        private Optional<T> getOrPutOptional(Cache cache) throws X {
-            boolean containsKey = cache.contains(key);
-            if (!containsKey && storeTempNullValue) {
-                timeToLive(calculateTtl()).store();
-                return cache.get(key);
-            } else if (containsKey && !isExpiredTemporary()) {
-                return cache.get(key);
-            } else {
-                Optional<T> value = executeSupplier(optionalSupplier);
-                value.ifPresentOrElse(v -> cache.put(key, v), () -> {
-                    switch (cache) {
-                        case DiskCache dCache -> dCache.putWithoutPersist(key, null);
-                        case InMemoryCache mCache -> mCache.put(key, null);
-                    }
-                });
+                C value = executeSupplier(supplier, retry);
+                cache.put(key, value);
                 return value;
-            }
+            }).orElseGetThrowing(supplier);
         }
 
-        // ################ \\
-        // GET OPTIONAL INT \\
-        // ################ \\
-
-        @Override
-        public OptionalInt getOptionalInt() throws X {
-            try {
-                return switch (cacheType) {
-                    case NONE -> optionalIntSupplier.get();
-                    case MEMORY -> getOrPutOptionalInt(inMemoryCache);
-                    case DISK -> getOrPutOptionalInt(diskCache);
-                };
-            } catch (Exception e) {
-                // TODO why is this needed?
-                try {
-                    throw (X) e;
-                } catch (ClassCastException e2) {
-                    throw new RuntimeException(e);
-                }
-            }
+        public <V> Optional<V> getOptional() {
+            Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
+            return optionalCache.flatMap(cache -> cache.get(key));
         }
 
-        private OptionalInt getOrPutOptionalInt(Cache<String, Integer> cache) throws X {
-            boolean containsKey = cache.contains(key);
-            if (!containsKey && storeTempNullValue) {
-                timeToLive(calculateTtl()).store();
-                return cache.get(key).mapToInt(t -> t);
-            } else if (containsKey && !isExpiredTemporary()) {
-                return cache.get(key).mapToInt(t -> t);
-            } else {
-                OptionalInt value = executeSupplier(optionalIntSupplier);
-                value.ifPresentOrElse(v -> cache.put(key, v), () -> {
-                    switch (cache) {
-                        case DiskCache dCache -> dCache.putWithoutPersist(key, null);
-                        case InMemoryCache mCache -> mCache.put(key, null);
-                    }
-                });
-                return value;
-            }
-        }
+        public <V extends Serializable, X extends Exception> Optional<V> getOptional(
+            ThrowingSupplier<Optional<V>, X> supplier, Retry retry=Retry.NONE, Time timeToLive=null,
+            boolean storeTempNullValue=false, boolean storeAsTempValue=false) throws X {
+            Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
 
-        // ########### \\
-        // GET ENTRIES \\
-        // ########### \\
-
-        @Override
-        public List<Pair<String, T>> getEntries() {
-            return switch (cacheType) {
-                case NONE -> List.of();
-                case MEMORY -> inMemoryCache.getEntries(keyFilter);
-                case DISK -> diskCache.getEntries(keyFilter);
-            };
-        }
-
-        // ########## \\
-        // IS PRESENT \\
-        // ########## \\
-
-        @Override
-        public boolean isPresent() {
-            return switch (cacheType) {
-                case NONE -> false;
-                case MEMORY -> inMemoryCache.contains(key);
-                case DISK -> diskCache.contains(key);
-            };
-        }
-
-        // ###################### \\
-        // TEMPORARY CACHE OBJECT \\
-        // ###################### \\
-
-        @Override
-        public boolean isExpiredTemporary() {
-            return switch (cacheType) {
-                case NONE -> false;
-                case MEMORY -> inMemoryCache.isTemporaryExpired(key);
-                case DISK -> diskCache.isTemporaryExpired(key);
-            };
-        }
-
-        @Override
-        public boolean isTemporaryObject() {
-            return switch (cacheType) {
-                case NONE -> false;
-                case MEMORY -> inMemoryCache.isTemporaryObject(key);
-                case DISK -> diskCache.isTemporaryObject(key);
-            };
-        }
-
-        @Override
-        public OptionalLong getTemporaryTimeToLive() {
-            return switch (cacheType) {
-                case NONE -> OptionalLong.of(0);
-                case MEMORY -> getTemporaryTimeToLive(inMemoryCache);
-                case DISK -> getTemporaryTimeToLive(diskCache);
-            };
-        }
-
-        private OptionalLong getTemporaryTimeToLive(Cache cache) {
-            return cache.getTemporaryTimeToLive(key).map(v -> SECONDS.convert(v, MILLISECONDS));
-        }
-
-        // ##### \\
-        // STORE \\
-        // ##### \\
-
-        @Override
-        public void storeAsTempValue() throws X {
-            store(true);
-        }
-
-        @Override
-        public void store() throws X {
-            store(false);
-        }
-
-        private void store(boolean storeAsTempValue) throws X {
-            Object value;
-            if (valueSupplier != null) {
-                value = executeSupplier(valueSupplier);
-            } else if (optionalSupplier != null) {
-                value = executeSupplier(optionalSupplier).orElse(null);
-            } else if (optionalIntSupplier != null) {
-                value = executeSupplier(optionalIntSupplier).orElseNull();
-            } else if (collectionSupplier != null) {
-                value = executeSupplier(collectionSupplier);
-            } else if (optionalValue != null) {
-                value = optionalValue.orElse(null);
-            } else if (optionalIntValue != null) {
-                value = optionalIntValue.orElseNull();
-            } else if (collectionValue != null) {
-                value = collectionValue;
-            } else {
-                value = this.value;
-            }
-            if (storeAsTempValue || (storeTempNullValue && value == null)) {
-                long ttl = timeToLive != null ? timeToLive : SECONDS.convert(1, DAYS);
-                switch (cacheType) {
-                    case MEMORY -> inMemoryCache.put(key, value, ttl);
-                    case DISK -> diskCache.put(key, value, ttl);
-                    default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
+            if (optionalCache.isPresent()) {
+                Cache<String, V> cache = optionalCache.get();
+                boolean containsKey = cache.contains(key);
+                if (!containsKey && storeTempNullValue) {
+                    store(OptionalValue.of(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
+                    return cache.get(key);
+                } else if (containsKey && !isExpiredTemporary()) {
+                    return cache.get(key);
+                } else {
+                    Optional<V> object = executeSupplier(supplier, retry);
+                    object.ifPresentOrElse(v -> cache.put(key, v), () -> {
+                        switch (cache) {
+                            case DiskCache<String, ?> dCache -> dCache.putWithoutPersist(key, null);
+                            case InMemoryCache<String, ?> mCache -> mCache.put(key, null);
+                        }
+                    });
+                    return object;
                 }
             } else {
-                switch (cacheType) {
-                    case MEMORY -> inMemoryCache.put(key, value);
-                    case DISK -> diskCache.put(key, value);
-                    default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
-                }
-            }
-        }
-
-        // ###### \\
-        // REMOVE \\
-        // ###### \\
-
-        @Override
-        public void remove() {
-            if (keyFilter != null) {
-                switch (cacheType) {
-                    case MEMORY -> inMemoryCache.deleteEntries(keyFilter);
-                    case DISK -> diskCache.deleteEntries(keyFilter);
-                    default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
-                }
-            } else {
-                switch (cacheType) {
-                    case MEMORY -> inMemoryCache.remove(key);
-                    case DISK -> diskCache.remove(key);
-                    default -> throw new IllegalArgumentException("Unexpected value: " + cacheType);
-                }
-            }
-        }
-
-        // ############## \\
-        // HELPER METHODS \\
-        // ############## \\
-
-        private <V> V executeSupplier(ThrowingSupplier<V, X> supplier) throws X {
-            try {
                 return supplier.get();
-            } catch (Exception e) {
-                if (retries-- > 0 && retryPredicate.test(e)) {
-                    try {
-                        Thread.sleep(retryWait * 1000L);
-                    } catch (InterruptedException e1) {
-                        throw new RuntimeException(e1);
-                    }
-                    return executeSupplier(supplier);
-                }
-                try {
-                    throw (X) e;
-                } catch (ClassCastException e2) {
-                    throw new RuntimeException("Exception while getting value (%s)".formatted(e.getMessage()), e);
-                }
             }
         }
 
-        private long calculateTtl() {
-            return getTemporaryTimeToLive().mapToObj(
-                    v -> timeToLiveFunction != null ? timeToLiveFunction.applyAsLong(v) : v * 2)
-                .orElseGet(() -> timeToLive != null ? timeToLive : MILLISECONDS.convert(1, DAYS));
+        public <X extends Exception> OptionalInt getOptionalInt(
+            ThrowingSupplier<OptionalInt, X> supplier, Retry retry=Retry.NONE, Time timeToLive=null,
+            boolean storeTempNullValue=false, boolean storeAsTempValue=false) throws X {
+
+            return manager.getOptionalCache(cacheType).mapThrowing(cache -> {
+                boolean containsKey = cache.contains(key);
+                if (!containsKey && storeTempNullValue) {
+                    store(OptionalIntValue.of(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
+                    return cache.get(key).mapToInt(t -> (int) t);
+                } else if (containsKey && !isExpiredTemporary()) {
+                    return cache.get(key).mapToInt(t -> (int) t);
+                } else {
+                    OptionalInt object = executeSupplier(supplier, retry);
+                    object.ifPresentOrElse(v -> cache.put(key, v), () -> {
+                        switch (cache) {
+                            case DiskCache dCache -> dCache.putWithoutPersist(key, null);
+                            case InMemoryCache<String, ?> mCache -> mCache.put(key, null);
+                        }
+                    });
+                    return object;
+                }
+            }).orElseGetThrowing(supplier);
+        }
+
+        public <V, X extends Exception> void store(ValueIntf<V, X> value,
+            Retry retry=Retry.NONE, boolean storeAsTempValue=false, boolean storeTempNullValue=false,
+            Time timeToLive=null) throws X {
+
+            V object = value.supplier != null ? executeSupplier(value.supplier, retry) : value.value;
+            Time ttl = null;
+            if (storeAsTempValue || (storeTempNullValue && object == null)) {
+                ttl = getTemporaryTimeToLive().map(time -> time * 2)
+                    .orElseGet(() -> timeToLive != null ? timeToLive : 1 day);
+            }
+            manager.getCache(cacheType).put(key, object, ttl);
+        }
+    }
+
+    public record CacheKeyFilter(Manager manager, CacheType cacheType, Predicate<String> keyFilter) {
+        public void clearExpiredCache() {
+            manager.getCache(cacheType).cleanup(keyFilter);
+        }
+
+        public void remove() {
+            manager.getCache(cacheType).deleteEntries(keyFilter);
+        }
+
+        public <V extends Serializable> List<Pair<String, V>> getEntries(Class<V> valueType=null) {
+            Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
+            return optionalCache.map(cache -> cache.getEntries(keyFilter)).orElseGet(List::of);
+        }
+    }
+
+    private <V> Cache<String, V> getCache(CacheType cacheType) {
+        Optional<Cache<String, V>> optionalCache = getOptionalCache(cacheType);
+        return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
+    }
+
+    private <V> Optional<Cache<String, V>> getOptionalCache(CacheType cacheType) {
+        return switch (cacheType) {
+            case NONE -> Optional.empty();
+            case MEMORY -> (Optional) Optional.of(inMemoryCache);
+            case DISK -> (Optional) Optional.of(diskCache);
+        };
+    }
+
+    public CacheKey getCache(CacheType cacheType, String key) {
+        return new CacheKey(this, cacheType, key);
+    }
+
+    public CacheKeyFilter getCache(CacheType cacheType, Predicate<String> keyFilter) {
+        return new CacheKeyFilter(this, cacheType, keyFilter);
+    }
+
+    public interface ValueIntf<V, X extends Exception> {
+        @val V value;
+        @val ThrowingSupplier<V, X> supplier;
+    }
+
+    public static class Value<V extends Serializable, X extends Exception> implements ValueIntf<V, X> {
+        @override @val V value;
+        @override @val ThrowingSupplier<V, X> supplier;
+
+        public static <V extends Serializable> Value<V, Nothing> of(V value) {
+            return new Value<>(value, null);
+        }
+
+        public static <V extends Serializable, X extends Exception> Value<V, X> of(ThrowingSupplier<V, X> supplier) {
+            return new Value<>(null, supplier);
+        }
+
+        private Value(V value, ThrowingSupplier<V, X> supplier) {
+            this.value = value;
+            this.supplier = supplier;
+        }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static class OptionalValue<V extends Serializable, X extends Exception> implements
+        ValueIntf<Optional<V>, X> {
+        @override @val Optional<V> value;
+        @override @val ThrowingSupplier<Optional<V>, X> supplier;
+
+        public static <V extends Serializable> OptionalValue<V, Nothing> of(Optional<V> value) {
+            return new OptionalValue<>(value, null);
+        }
+
+        public static <V extends Serializable, X extends Exception> OptionalValue<V, X> of(
+            ThrowingSupplier<Optional<V>, X> supplier) {
+            return new OptionalValue<>(null, supplier);
+        }
+
+
+        private OptionalValue(Optional<V> value, ThrowingSupplier<Optional<V>, X> supplier) {
+            this.value = value;
+            this.supplier = supplier;
+        }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static class OptionalIntValue<X extends Exception> implements ValueIntf<OptionalInt, X> {
+        @override @val OptionalInt value;
+        @override @val ThrowingSupplier<OptionalInt, X> supplier;
+
+        public static OptionalIntValue<Nothing> of(OptionalInt value) {
+            return new OptionalIntValue<>(value, null);
+        }
+
+        public static <X extends Exception> OptionalIntValue<X> of(ThrowingSupplier<OptionalInt, X> supplier) {
+            return new OptionalIntValue<>(null, supplier);
+        }
+
+        private OptionalIntValue(OptionalInt value, ThrowingSupplier<OptionalInt, X> supplier) {
+            this.value = value;
+            this.supplier = supplier;
+        }
+    }
+
+
+    public static class CollectionValue<C extends Collection<V>, V, X extends Exception> implements ValueIntf<C, X> {
+        @override @val C value;
+        @override @val ThrowingSupplier<C, X> supplier;
+
+        public static <C extends Collection<V>, V extends Serializable> CollectionValue<C, V, Nothing> of(C value) {
+            return new CollectionValue<>(value, null);
+        }
+
+        public static <C extends Collection<V>, V extends Serializable, X extends Exception> CollectionValue<C, V, X> of(
+            ThrowingSupplier<C, X> supplier) {
+            return new CollectionValue<>(null, supplier);
+        }
+
+        private CollectionValue(C value, ThrowingSupplier<C, X> supplier) {
+            this.value = value;
+            this.supplier = supplier;
+        }
+    }
+
+    // ############## \\
+    // HELPER METHODS \\
+    // ############## \\
+
+    private static <V, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier, Retry retry) throws X {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            if (retry.canRetry() && retry.predicate.test(e)) {
+                return executeSupplier(supplier, retry.decreaseRetries().sleep());
+            }
+            throw (X) e;
         }
     }
 }

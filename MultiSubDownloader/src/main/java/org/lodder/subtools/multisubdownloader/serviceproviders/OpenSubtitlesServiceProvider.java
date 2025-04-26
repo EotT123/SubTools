@@ -10,6 +10,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JOpenSubAdapter;
+import org.lodder.subtools.sublibrary.Credentials;
 
 public class OpenSubtitlesServiceProvider implements ServiceProvider {
 
@@ -38,16 +39,16 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
     private SubtitleProvider createProvider(UserInteractionHandler userInteractionHandler) {
         Settings settings = app.makeSettings();
 
-        boolean loginEnabled = false;
-        String username = "";
-        String password = "";
+        Credentials credentials = null;
         if (settings.loginOpenSubtitlesEnabled) {
-            username = StringUtils.trim(settings.loginOpenSubtitlesUsername);
-            password = StringUtils.trim(settings.loginOpenSubtitlesPassword);
+            String username = StringUtils.trim(settings.loginOpenSubtitlesUsername);
+            String password = StringUtils.trim(settings.loginOpenSubtitlesPassword);
             /* Protect against empty login */
-            loginEnabled = !username.isEmpty() && !password.isEmpty();
+            if (!username.isEmpty() && !password.isEmpty()) {
+                credentials = new Credentials(username, password);
+            }
         }
-        return new JOpenSubAdapter(loginEnabled, username, password, app.makeManager(), userInteractionHandler);
+        return new JOpenSubAdapter(app.makeManager(), credentials, userInteractionHandler);
     }
 
     private void registerListener(SubtitleProviderStore subtitleProviderStore,

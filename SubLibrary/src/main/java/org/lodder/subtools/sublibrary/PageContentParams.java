@@ -10,7 +10,7 @@ public record PageContentParams(String url,
     public static PageContentParams params(String url,
         CacheType cacheType=CacheType.NONE,
         String userAgent="Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)",
-        Manager.Retry retry=Manager.Retry.DEFAULT) {
+        Manager.Retry retry=Manager.Retry.NONE) {
         return new PageContentParams(url, cacheType, userAgent, retry);
     }
 

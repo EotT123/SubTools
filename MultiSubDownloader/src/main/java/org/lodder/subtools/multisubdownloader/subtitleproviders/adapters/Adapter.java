@@ -1,9 +1,9 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
+import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -12,9 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +20,9 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesHasher;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager.ValueBuilderIsPresentIntf;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
+import org.lodder.subtools.sublibrary.Manager.CollectionValue;
+import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @param <S> type of the ProviderSerieId
  * @param <X> type of the exception thrown by the api
  */
-@ExtensionMethod({ Files.class })
+@ExtensionMethod({Files.class})
 public interface Adapter<T, S extends ProviderSerieId, X extends Exception> extends SubtitleProvider {
     Logger LOGGER = LoggerFactory.getLogger(Adapter.class);
 
@@ -137,48 +137,46 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
         int season, OptionalInt tvdbIdOptional) throws X {
-        Supplier<ValueBuilderIsPresentIntf<Serializable>> tvdbIdValueBuilder = () -> tvdbIdOptional.mapToObj(
-            tvdbId -> manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .key("%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId,
-                    useSeasonForSerieId() ? season : -1))).orElseThrow();
-        if (tvdbIdOptional.isPresent() && tvdbIdValueBuilder.get().isPresent()) {
-            // if value using the tvdbId is present, return it
-            return tvdbIdValueBuilder.get().returnType(SerieMapping.class).getOptional();
+
+        Function<Integer, CacheKey> tvdbIdCacheFunction = tvdbId -> manager.getCache(CacheType.DISK,
+            "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId() ? season : -1));
+        if (tvdbIdOptional.isPresent()) {
+            CacheKey tvdbIdCache = tvdbIdCacheFunction.apply(tvdbIdOptional.orElseThrow());
+            if (tvdbIdCache.isPresent()) {
+                // if value using the tvdbId is present, return it
+                return tvdbIdCache.getOptional();
+            }
         }
         if (StringUtils.isBlank(serieNameToSearchFor)) {
             return Optional.empty();
         }
-        int seasonToUse = useSeasonForSerieId() ? season : 0;
-        ValueBuilderIsPresentIntf<Serializable> serieNameValueBuilder = manager.valueBuilder()
-            .cacheType(CacheType.DISK)
-            .key("%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
 
-        if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameValueBuilder.isPresent()) {
-            if (serieNameValueBuilder.isTemporaryObject()) {
-                if (!serieNameValueBuilder.isExpiredTemporary()) {
+        int seasonToUse = useSeasonForSerieId() ? season : 0;
+        CacheKey serieNameCache = manager.getCache(CacheType.DISK,
+            "%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
+        if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameCache.isPresent()) {
+            if (serieNameCache.isTemporaryObject()) {
+                if (!serieNameCache.isExpiredTemporary()) {
                     return Optional.empty();
                 }
             } else {
-                Optional<SerieMapping> serieMapping =
-                    serieNameValueBuilder.returnType(SerieMapping.class).getOptional();
+                Optional<SerieMapping> serieMapping = serieNameCache.getOptional();
                 serieMapping.ifPresent(providerSerieName -> tvdbIdOptional.ifPresent(
-                    tvdbId -> tvdbIdValueBuilder.get().value(providerSerieName).store()));
+                    tvdbId -> tvdbIdCacheFunction.apply(tvdbId).store(Value.of(providerSerieName))));
                 return serieMapping;
             }
         }
 
         List<S> providerSerieIds = getSortedProviderSerieIds(tvdbIdOptional, serieNameToSearchFor, seasonToUse);
         if (providerSerieIds.isEmpty()) {
-            // if no provider serie id's could be found, store a temporary null value with expiration time of 1 day
-            // (so the provider isn't contacted every time this method is being called)
-            // If a temporary expired value was already found, persist the null value with a doubled expiration time
-            serieNameValueBuilder.value(new SerieMapping(serieName, null, null, seasonToUse))
-                .storeTempNullValue()
-                .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
-                    .map(v -> v * 2)
-                    .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
-                .storeAsTempValue();
+            // If no provider serie id's could be found, store a temporary null value with expiration time of 1 day
+            // (so the provider isn't contacted every time this method is being called).
+            // If a temporary expired value was already found, persist the null value with a doubled expiration time.
+            serieNameCache.store(
+                value:Value.of(new SerieMapping(serieName, null, null, seasonToUse)),
+                timeToLive:serieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
+                storeAsTempValue:true,
+                storeTempNullValue:true);
             return Optional.empty();
         }
 
@@ -187,17 +185,13 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             serieMapping =
                 new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
         } else {
-            ValueBuilderIsPresentIntf<Serializable> previousResultsValueBuilder = manager.valueBuilder()
-                .cacheType(CacheType.MEMORY)
-                .key("%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(),
-                    seasonToUse));
+            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY,
+                "%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(), seasonToUse));
 
-            boolean previousResultsPresent = previousResultsValueBuilder.isPresent();
+            boolean previousResultsPresent = previousResultsCache.isPresent();
             Optional<S> uriForSerie;
             // Check if the previous results were the same for the service. If so, don't ask the user to select again
-            if (previousResultsPresent && previousResultsValueBuilder.returnType((Class<List<S>>) null, null)
-                .getCollection()
-                .equals(providerSerieIds)) {
+            if (previousResultsPresent && providerSerieIds.equals(previousResultsCache.getCollection(null))) {
                 uriForSerie = Optional.empty();
             } else {
                 // let the user select the correct provider serie id
@@ -213,24 +207,21 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 if (serieNameToSearchFor.equals(serieName)) {
                     // if no provider serie id was selected, store a temporary null value with expiration time of 1 day,
                     // or the doubled previously temporary value (if present)
-                    serieNameValueBuilder.value(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse))
-                        .storeTempNullValue()
-                        .timeToLive(serieNameValueBuilder.getTemporaryTimeToLive()
-                            .map(v -> v * 2)
-                            .orElseGet(() -> TimeUnit.SECONDS.convert(1, TimeUnit.DAYS)))
-                        .storeAsTempValue();
-                    previousResultsValueBuilder.collectionValue(providerSerieIds).store();
+                    serieNameCache.store(
+                        value:Value.of(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse)),
+                        timeToLive:serieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
+                        storeAsTempValue:true,
+                        storeTempNullValue:true);
+                    previousResultsCache.store(CollectionValue.of(providerSerieIds));
                 }
                 return Optional.empty();
             }
             // create a serieMapping for the selected value
             serieMapping = new SerieMapping(serieName, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
         }
-        if (tvdbIdOptional.isPresent()) {
-            tvdbIdValueBuilder.get().value(serieMapping).store();
-        } else {
-            serieNameValueBuilder.value(serieMapping).store();
-        }
+        tvdbIdOptional.ifPresentOrElse(
+            tvdbId -> tvdbIdCacheFunction.apply(tvdbId).store(Value.of(serieMapping)),
+            () -> serieNameCache.store(Value.of(serieMapping)));
         return Optional.of(serieMapping);
     }
 

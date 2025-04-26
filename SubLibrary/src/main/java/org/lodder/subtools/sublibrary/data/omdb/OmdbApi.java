@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
 import org.w3c.dom.Node;
@@ -17,10 +18,8 @@ class OmdbApi {
     private final Manager manager;
 
     public Optional<OmdbDetails> getMovieDetails(int imdbId) throws OmdbException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("OMDB-moviedetails-$imdbId")
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, "OMDB-moviedetails-$imdbId")
+            .getOptional(() -> {
                 final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
                 try {
                     return manager.getAsDocument(url(url))
@@ -29,7 +28,7 @@ class OmdbApi {
                 } catch (Exception e) {
                     throw new OmdbException("Error OMDB API", url, e);
                 }
-            }).getOptional();
+            });
     }
 
     private OmdbDetails parseOMDBDetails(Node node) {

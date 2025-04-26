@@ -29,7 +29,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
-import org.lodder.subtools.sublibrary.util.TriConsumer;
+import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 
 public enum SettingValue {
 
