@@ -21,15 +21,7 @@ public class SerieMapping implements Serializable { // implements SerieMappingIn
     @val int season;
     @var transient String formattedName;
 
-    public SerieMapping(String name, int providerId, String providerName) {
-        this(name, providerId, providerName, 0);
-    }
-
-    public SerieMapping(String name, int providerId, String providerName, int season) {
-        this(name, String.valueOf(providerId), providerName, season);
-    }
-
-    public SerieMapping(String name, String providerId, String providerName, int season) {
+    public SerieMapping(String name, String providerId, String providerName, int season=0) {
         this.name = name;
         this.providerId = providerId;
         this.providerName = providerName;

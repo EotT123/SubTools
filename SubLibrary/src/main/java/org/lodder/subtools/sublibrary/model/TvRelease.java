@@ -24,15 +24,15 @@ public final class TvRelease extends Release {
     // custom name which can be used to search subtitle providers
     @val String customName;
 
-    public TvRelease(Path file=null, String releaseGroup=null, String quality=null, String extension=null, String name,
-        String originalName=null, String customName=null, String title=null, int season, int episode,
+    public TvRelease(String name, int season, int episode, Path file=null, String releaseGroup=null, String quality=
+            null, String extension=null, String originalName=null, String customName=null, String title=null,
         boolean special=false) {
-        this(file, releaseGroup, quality, extension, name, originalName, customName, title, season, List.of(episode),
+        this(name, season, List.of(episode), file, releaseGroup, quality, extension, originalName, customName, title,
             special);
     }
 
-    public TvRelease(Path file=null, String releaseGroup=null, String quality=null, String extension=null, String name,
-        String originalName=null, String customName=null, String title=null, int season, List<Integer> episodes,
+    public TvRelease(String name, int season, List<Integer> episodes, Path file=null, String releaseGroup=null,
+        String quality=null, String extension=null, String originalName=null, String customName=null, String title=null,
         boolean special=false) {
         super(VideoType.EPISODE, file, releaseGroup, quality, extension);
         this.name = name;

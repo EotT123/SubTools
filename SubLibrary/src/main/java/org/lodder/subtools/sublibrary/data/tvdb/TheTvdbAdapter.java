@@ -102,7 +102,7 @@ public class TheTvdbAdapter {
             manager.getCache(CacheType.DISK, "$PROVIDER_NAME-serieId-$encodedSerieName")
                 .store(
                     value:OptionalValue.of(
-                        tvdbSerie.map(tvdbS -> new SerieMapping(serieName, tvdbS.id, tvdbS.serieName))),
+                        tvdbSerie.map(tvdbS -> new SerieMapping(serieName, String.valueOf(tvdbS.id), tvdbS.serieName))),
                     storeTempNullValue:true);
         }
         return tvdbSerie;
