@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
@@ -36,10 +37,11 @@ public class OmdbAdapter {
     }
     public Optional<OmdbDetails> getMovieDetails(int imdbId) {
         try {
+            // TODO don't include optional parameters
             return manager.getCache(CacheType.DISK, "$providerName-movieDetails-$imdbId")
                 .getOptional(
-                    supplier:() -> getApi().getMovieDetails(imdbId),
-                    storeTempNullValue:true);
+                    () -> getApi().getMovieDetails(imdbId),
+                    Retry.NONE, null, true, false);
         } catch (Exception e) {
             LOGGER.error("API $providerName getMovieDetails for id [$imdbId] (${e.getMessage()})", e);
             return Optional.empty();

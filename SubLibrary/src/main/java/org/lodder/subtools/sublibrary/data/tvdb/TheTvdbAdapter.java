@@ -109,9 +109,10 @@ public class TheTvdbAdapter {
     }
 
     public Optional<TheTvdbEpisode> getEpisode(int tvdbId, int season, int episode) {
+        // TODO don't include optional parameters
         return manager.getCache(CacheType.DISK, "%s-episode-%s-%s-%s".formatted(PROVIDER_NAME, tvdbId, season, episode))
             .getOptional(
-                supplier:() -> {
+                () -> {
                     try {
                         return getApi().getEpisode(tvdbId, season, episode, Language.ENGLISH);
                     } catch (TheTvdbException e) {
@@ -121,7 +122,7 @@ public class TheTvdbAdapter {
                         return Optional.empty();
                     }
                 },
-                storeTempNullValue:true);
+                Retry.NONE, null, true, false);
     }
 
     public static synchronized TheTvdbAdapter getInstance(Manager manager,

@@ -9,6 +9,7 @@ import java.util.OptionalInt;
 
 import com.pivovarit.function.ThrowingBiFunction;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbException;
@@ -64,13 +65,14 @@ public class ImdbAdapter {
 
     public OptionalInt getImdbId(String title, Integer year) {
         try {
+            // TODO don't include optional parameters
             return manager.getCache(CacheType.DISK, "%s-id-%s-%s".formatted(PROVIDER_NAME, title, year))
                 .getOptionalInt(
                     () -> getImdbIdOnImdb(title, year)
                         .orElseMap(() -> getImdbIdOnGoogle(title, year))
                         .orElseMap(() -> getImdbIdOnYahoo(title, year))
                         .orElseMap(() -> promptUserToEnterImdbId(title, year)),
-                    storeTempNullValue:true);
+                    Retry.NONE, null, true, false);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(PROVIDER_NAME, title, e.getMessage()), e);
             return OptionalInt.empty();
