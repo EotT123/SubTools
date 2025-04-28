@@ -152,7 +152,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
      * Initialize the contents of the frame.
      */
     private void initialize() {
-        MemoryFolderChooser.getInstance().setMemory(settingsControl.settings.lastOutputDir);
+        MemoryFolderChooser.getInstance().memory = settingsControl.settings.lastOutputDir;
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

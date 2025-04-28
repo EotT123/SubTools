@@ -41,7 +41,7 @@ public enum SettingValue {
         .defaultValue(0)),
     LAST_OUTPUT_DIR(createSettingPath()
         .rootElementFunction(SettingsControl::getSettings)
-        .valueGetter(settings -> MemoryFolderChooser.getInstance().getMemory())
+        .valueGetter(settings -> MemoryFolderChooser.getInstance().memory)
         .valueSetter(Settings::setLastOutputDir)
         .defaultValue(Path.of(""))),
 

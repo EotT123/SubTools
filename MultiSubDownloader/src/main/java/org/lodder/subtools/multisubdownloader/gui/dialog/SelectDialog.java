@@ -3,7 +3,9 @@ package org.lodder.subtools.multisubdownloader.gui.dialog;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Comparator;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableModel;
@@ -29,7 +32,7 @@ public class SelectDialog extends MultiSubDialog {
     /**
      * Create the dialog.
      */
-    public SelectDialog(JFrame frame, List<Subtitle> subtitles, Release release) {
+    public SelectDialog(@Nullable JFrame frame = null, List<Subtitle> subtitles, Release release) {
         super(frame, getText("SelectDialog.SelectCorrectSubtitle"), true);
         this.subtitles =
             subtitles.stream().distinct().sorted(Comparator.comparing(Subtitle::getScore).reversed()).toList();

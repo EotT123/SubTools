@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
@@ -32,7 +33,9 @@ public class DownloadAction {
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public void download(Release release, Subtitle subtitle, Integer version) throws IOException, ManagerException {
+    public void download(Release release, Subtitle subtitle, Integer version=0) throws IOException,
+        ManagerException {
+        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
         switch (release.videoType) {
             case EPISODE -> download(release, subtitle, settings.episodeLibrarySettings, version);
             case MOVIE -> download(release, subtitle, settings.movieLibrarySettings, version);
@@ -40,12 +43,8 @@ public class DownloadAction {
         }
     }
 
-    public void download(Release release, Subtitle subtitle) throws IOException, ManagerException {
-        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
-        download(release, subtitle, 0);
-    }
-
-    private void download(Release release, Subtitle subtitle, LibrarySettings librarySettings, Integer version)
+    private void download(Release release, Subtitle subtitle, LibrarySettings librarySettings,
+        @Nullable Integer version)
         throws IOException, ManagerException {
         LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
         Path path = PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);

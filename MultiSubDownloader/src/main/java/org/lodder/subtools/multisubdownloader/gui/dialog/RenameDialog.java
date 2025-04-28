@@ -19,6 +19,7 @@ import com.google.common.collect.Streams;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -47,8 +48,8 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
     private ProgressDialog progressDialog;
 
-    public RenameDialog(JFrame frame, Settings settings, VideoType videoType, String title, Manager manager,
-        UserInteractionHandler userInteractionHandler) {
+    public RenameDialog(@Nullable JFrame frame=null, Settings settings, VideoType videoType, String title,
+        Manager manager, UserInteractionHandler userInteractionHandler) {
         super(frame, title, false);
         setResizable(false);
         setBounds(100, 100, 650, 680);

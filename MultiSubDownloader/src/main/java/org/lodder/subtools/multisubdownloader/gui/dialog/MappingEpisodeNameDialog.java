@@ -22,6 +22,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
@@ -42,7 +43,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private Optional<SubtitleProvider> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
-    public MappingEpisodeNameDialog(JFrame frame, Manager manager, SubtitleProviderStore subtitleProviderStore,
+    public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
+        SubtitleProviderStore subtitleProviderStore,
         UserInteractionHandlerGUI userInteractionHandler) {
         super(frame, getText("MappingEpisodeNameDialog.Title"), true);
         this.subtitleProviderStore = subtitleProviderStore;

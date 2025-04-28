@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
@@ -96,11 +97,11 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         }
     }
 
-    public String buildSubtitle(Release release, Subtitle sub, String filename, Integer version) {
+    public String buildSubtitle(Release release, Subtitle sub, String filename, @Nullable Integer version) {
         return buildSubtitle(release, filename, sub.language, version);
     }
 
-    public String buildSubtitle(Release release, String filename, Language language, Integer version) {
+    public String buildSubtitle(Release release, String filename, Language language, @Nullable Integer version) {
         final String extension = "." + release.extension;
         String subFileName = filename;
         if (version != null) {
