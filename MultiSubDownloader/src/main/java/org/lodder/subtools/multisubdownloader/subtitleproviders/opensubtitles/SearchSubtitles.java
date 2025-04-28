@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.AiTranslatedEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.ForeignPartsOnlyEnum;
@@ -30,51 +31,51 @@ public final class SearchSubtitles extends OpenSubtitlesExecuter {
     private final Manager manager;
     private final ApiClient apiClient;
 
-    private AiTranslatedEnum aiTranslated;
+    private @Nullable AiTranslatedEnum aiTranslated;
 
-    private Integer episode;
+    private @Nullable Integer episode;
 
-    private ForeignPartsOnlyEnum foreignPartsOnly;
+    private @Nullable ForeignPartsOnlyEnum foreignPartsOnly;
 
-    private HearingImpairedEnum hearingImpaired;
+    private @Nullable HearingImpairedEnum hearingImpaired;
 
-    private Integer id;
+    private @Nullable Integer id;
 
-    private Integer imdbId;
+    private @Nullable Integer imdbId;
 
-    private Language language;
+    private @Nullable Language language;
 
-    private MachineTranslatedEnum machineTranslated;
+    private @Nullable MachineTranslatedEnum machineTranslated;
 
-    private String movieHash;
+    private @Nullable String movieHash;
 
-    private MoviehashMatchEnum movieHashMatch;
+    private @Nullable MoviehashMatchEnum movieHashMatch;
 
-    private SearchSubtitlesEnum orderBy;
+    private @Nullable SearchSubtitlesEnum orderBy;
 
-    private OrderDirectionEnum orderDirection;
+    private @Nullable OrderDirectionEnum orderDirection;
 
-    private Integer page;
+    private @Nullable Integer page;
 
-    private Integer parentFeatureId;
+    private @Nullable Integer parentFeatureId;
 
-    private Integer parentImdbId;
+    private @Nullable Integer parentImdbId;
 
-    private Integer parentTmdbId;
+    private @Nullable Integer parentTmdbId;
 
-    private String query;
+    private @Nullable String query;
 
-    private Integer season;
+    private @Nullable Integer season;
 
-    private Integer tmdbId;
+    private @Nullable Integer tmdbId;
 
-    private TrustedSourcesEnum trustedSources;
+    private @Nullable TrustedSourcesEnum trustedSources;
 
-    private TypeEnum type;
+    private @Nullable TypeEnum type;
 
-    private Integer userId;
+    private @Nullable Integer userId;
 
-    private Integer year;
+    private @Nullable Integer year;
 
     private String userAgent = "SubTools"; // should be set
 

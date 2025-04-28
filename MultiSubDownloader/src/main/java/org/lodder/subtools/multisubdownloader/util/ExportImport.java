@@ -193,5 +193,6 @@ public class ExportImport {
     }
 
     @StandardException
-    private static class CorruptSettingsFileException extends Exception {}
+    public static class CorruptSettingsFileException extends Exception {
+    }
 }

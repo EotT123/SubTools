@@ -14,9 +14,9 @@ public final class ReleaseGroupFilter extends SubtitleFilter {
 
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {
-        if (subtitle.releaseGroup.isEmpty()) {
+        if (StringUtils.isEmpty(subtitle.releaseGroup)) {
             subtitle.releaseGroup =
-                    ReleaseParser.extractReleaseGroup(subtitle.fileName, subtitle.fileName.endsWith(".srt"));
+                ReleaseParser.extractReleaseGroup(subtitle.fileName, StringUtils.endsWith(subtitle.fileName, ".srt"));
         }
         if (!StringUtils.containsAnyIgnoreCase(subtitle.releaseGroup, release.releaseGroup, subtitle.releaseGroup)) {
             return false;

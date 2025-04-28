@@ -15,8 +15,8 @@ public final class DownloadSubtitle extends OpenSubtitlesExecuter {
 
     public Download200Response download() throws OpenSubtitlesException {
         try {
-            return execute(() -> new DownloadApi(apiClient).download("SubTools",
-                new DownloadRequest().fileId(fileId)));
+            return execute(() -> new DownloadApi(apiClient)
+                .download("SubTools", new DownloadRequest().fileId(fileId)));
         } catch (Exception e) {
             throw new OpenSubtitlesException(e);
         }

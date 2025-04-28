@@ -37,6 +37,7 @@ public final class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Pr
     private final JAddic7edProxyGestdownApi jaapi;
     @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
     @val @override String providerName = subtitleSource.name() + "-GESTDOWN";
+    @val @override boolean useSeasonForSerieId = false;
 
     public JAddic7edViaProxyAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -124,11 +125,6 @@ public final class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Pr
     @Override
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<Subtitle> subtitles, Language language) {
         return new HashSet<>(subtitles);
-    }
-
-    @Override
-    public boolean useSeasonForSerieId() {
-        return false;
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import lombok.experimental.ExtensionMethod;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -135,7 +136,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         int season, Integer tvdbId) throws X {
 
         LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
-            "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId() ? season : -1)));
+            "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId ? season : -1)));
         if (tvdbId != null) {
             CacheKey tvdbIdCache = tvdbIdCacheFunction.get();
             if (tvdbIdCache.isPresent()) {
@@ -147,7 +148,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             return Optional.empty();
         }
 
-        int seasonToUse = useSeasonForSerieId() ? season : 0;
+        int seasonToUse = useSeasonForSerieId ? season : 0;
         CacheKey serieNameCache = manager.getCache(CacheType.DISK,
             "%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
         if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameCache.isPresent()) {
@@ -194,7 +195,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 // let the user select the correct provider serie id
                 uriForSerie = getUserInteractionHandler().selectFromList(
                     providerSerieIds,
-                    useSeasonForSerieId() ?
+                    useSeasonForSerieId ?
                         getText("SelectDialog.SelectSerieNameForNameWithSeason", displayName, seasonToUse) :
                         getText("SelectDialog.SelectSerieNameForName", displayName),
                     providerName,
@@ -224,7 +225,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
         return Optional.of(serieMapping);
     }
 
-    boolean useSeasonForSerieId();
+    @val boolean useSeasonForSerieId;
 
     String providerSerieIdToDisplayString(S providerSerieId);
 }

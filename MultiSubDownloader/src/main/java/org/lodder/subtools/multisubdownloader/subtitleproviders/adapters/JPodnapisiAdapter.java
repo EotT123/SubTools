@@ -36,6 +36,7 @@ public final class JPodnapisiAdapter
     private static LazySupplier<JPodnapisiApi> jpapi;
     @val @override SubtitleSource subtitleSource = SubtitleSource.PODNAPISI;
     @val @override String providerName = subtitleSource.name();
+    @val @override boolean useSeasonForSerieId = false;
 
     public JPodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -119,11 +120,6 @@ public final class JPodnapisiAdapter
     public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
         throws PodnapisiException {
         return getApi().getPodnapisiShowName(serieName).stream().toList();
-    }
-
-    @Override
-    public boolean useSeasonForSerieId() {
-        return false;
     }
 
     @Override

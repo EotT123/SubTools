@@ -40,6 +40,7 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
     private static LazySupplier<JAddic7edApi> jaapi;
     @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
     @val @override String providerName = subtitleSource.name();
+    @val @override boolean useSeasonForSerieId = true;
 
     public JAddic7edAdapter(Manager manager, boolean speedy, Credentials credentials=null,
         UserInteractionHandler userInteractionHandler) {
@@ -128,11 +129,6 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
                 .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
             .toList();
-    }
-
-    @Override
-    public boolean useSeasonForSerieId() {
-        return true;
     }
 
     @Override

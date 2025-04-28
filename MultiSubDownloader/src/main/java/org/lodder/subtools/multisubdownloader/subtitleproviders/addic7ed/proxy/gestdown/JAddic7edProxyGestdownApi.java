@@ -31,14 +31,12 @@ public class JAddic7edProxyGestdownApi implements SubtitleApi {
     private static final String DOMAIN = "https://api.gestdown.info";
 
     private final Manager manager;
-    private final TvShowsApi tvShowsApi;
-    private final SubtitlesApi subtitlesApi;
+    private final TvShowsApi tvShowsApi = new TvShowsApi();
+    private final SubtitlesApi subtitlesApi = new SubtitlesApi();
     @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
 
     public JAddic7edProxyGestdownApi(Manager manager) {
         this.manager = manager;
-        tvShowsApi = new TvShowsApi();
-        subtitlesApi = new SubtitlesApi();
     }
 
     public List<ProviderSerieId> getProviderSerieName(String serieName) throws ApiException {

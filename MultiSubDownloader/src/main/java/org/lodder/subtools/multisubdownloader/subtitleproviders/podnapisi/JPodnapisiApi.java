@@ -6,7 +6,6 @@ import static org.lodder.subtools.sublibrary.PageContentParams.*;
 import java.io.Serial;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -39,7 +38,6 @@ public class JPodnapisiApi implements SubtitleApi {
     private static final String DOMAIN = "https://www.podnapisi.net";
     private final Manager manager;
     private final String userAgent;
-    private LocalDateTime nextCheck;
     @val @override SubtitleSource subtitleSource = SubtitleSource.PODNAPISI;
 
     public Optional<ProviderSerieId> getPodnapisiShowName(String showName) throws PodnapisiException {

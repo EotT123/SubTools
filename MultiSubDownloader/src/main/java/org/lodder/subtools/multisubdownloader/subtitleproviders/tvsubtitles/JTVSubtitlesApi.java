@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitlesException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVsubtitlesSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleDescriptor;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.PageContentParams;
@@ -52,17 +52,17 @@ public class JTVSubtitlesApi implements SubtitleApi {
         }
     }
 
-    public Set<TVsubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
+    public Set<TVSubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
         Language language) throws TvSubtitlesException {
         return getEpisodeUrl(SERIE_URL_PREFIX + providerSerieId.providerId, season, episode).mapThrowing(
             (String episodeUrl) -> getSubtitles(episodeUrl, language)).orElseGet(Set::of);
     }
 
-    private Set<TVsubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language)
+    private Set<TVSubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl, Language language)
         throws TvSubtitlesException {
         return manager.getCache(CacheType.MEMORY, subtitleSource.name() + "subtitles-$episodeUrl-$language")
             .getCollection(() -> {
-                Set<TVsubtitlesSubtitleDescriptor> lSubtitles = new HashSet<>();
+                Set<TVSubtitlesSubtitleDescriptor> lSubtitles = new HashSet<>();
                 try {
                     Elements searchEpisodes =
                         manager.getAsJsoupDocument(PageContentParams.params(
@@ -101,7 +101,7 @@ public class JTVSubtitlesApi implements SubtitleApi {
                                 author = getRowValue.apply(row);
                             }
                             if (filename != null && rip != null) {
-                                TVsubtitlesSubtitleDescriptor sub = TVsubtitlesSubtitleDescriptor.builder()
+                                TVSubtitlesSubtitleDescriptor sub = TVSubtitlesSubtitleDescriptor.builder()
                                     .filename(filename)
                                     .url("$DOMAIN/files/" + URLEncoder.encode(
                                         filename.replace(title + ".", "")

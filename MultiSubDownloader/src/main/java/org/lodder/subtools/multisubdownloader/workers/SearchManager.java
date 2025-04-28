@@ -75,8 +75,8 @@ public class SearchManager implements Cancelable {
     }
 
     public void onCompleted(SearchWorker worker) {
-        Release release = worker.getRelease();
-        List<Subtitle> subtitles = new ArrayList<>(worker.getSubtitles());
+        Release release = worker.release;
+        List<Subtitle> subtitles = new ArrayList<>(worker.subtitles);
 
         /* set the score of the found subtitles */
         ScoreCalculator calculator = this.scoreCalculators.get(release);
@@ -124,7 +124,7 @@ public class SearchManager implements Cancelable {
         for (Entry<SubtitleProvider, Queue<Release>> provider : this.queue.entrySet()) {
             jobsLeft += provider.getValue().size();
             SearchWorker worker = this.workers.get(provider.getKey());
-            if (worker.isAlive() && worker.isBusy()) {
+            if (worker.isAlive() && worker.busy) {
                 jobsLeft++;
             }
         }

@@ -45,6 +45,7 @@ public final class JSubsceneAdapter
     private static LazySupplier<SubsceneApi> api;
     @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
     @val @override String providerName = subtitleSource.name();
+    @val @override boolean useSeasonForSerieId = true;
 
     public JSubsceneAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -153,11 +154,6 @@ public final class JSubsceneAdapter
 
     private String getSeasonEpisodeString(int season, int episode) {
         return "S%02dE%02d".formatted(season, episode);
-    }
-
-    @Override
-    public boolean useSeasonForSerieId() {
-        return true;
     }
 
     @Override

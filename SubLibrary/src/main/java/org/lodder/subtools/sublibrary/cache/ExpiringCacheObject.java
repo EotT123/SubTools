@@ -26,11 +26,12 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
     private static final long serialVersionUID = 3852086993086134232L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|lastAccessed:(.*?)|value:(.*)");
 
-    @override @val Time created = Time.now();
+    @override @val Time created;
     @var @set(Private) Time lastAccessed = Time.now();
     @override @var T value;
 
     protected ExpiringCacheObject(T value) {
+        this.created = Time.now();
         this.value = value;
     }
 

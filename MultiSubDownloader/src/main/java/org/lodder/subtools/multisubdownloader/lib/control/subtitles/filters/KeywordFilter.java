@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters;
 
+import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -15,7 +16,7 @@ public final class KeywordFilter extends SubtitleFilter {
     public boolean useSubtitle(Release release, Subtitle subtitle) {
         String keywordsFile = ReleaseParser.getQualityKeyword(getReleaseName(release));
 
-        if (subtitle.quality.isEmpty()) {
+        if (StringUtils.isEmpty(subtitle.quality)) {
             subtitle.quality = ReleaseParser.getQualityKeyword(subtitle.fileName);
         }
         if (!checkKeywordSubtitleMatch(subtitle, keywordsFile)) {

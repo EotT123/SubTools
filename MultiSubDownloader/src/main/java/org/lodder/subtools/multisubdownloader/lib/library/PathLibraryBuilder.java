@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.lib.library;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
@@ -23,7 +24,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
     private final boolean move;
 
     public PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        TheTvdbAdapter tvdbAdapter=null, Path libraryFolder, boolean move) {
+        @Nullable TheTvdbAdapter tvdbAdapter=null, Path libraryFolder, boolean move) {
         super(tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;

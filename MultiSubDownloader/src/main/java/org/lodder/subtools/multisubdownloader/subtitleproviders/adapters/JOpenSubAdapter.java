@@ -43,6 +43,7 @@ public final class JOpenSubAdapter
     private static LazySupplier<OpenSubtitlesApi> osApi;
     @val @override SubtitleSource subtitleSource = SubtitleSource.OPENSUBTITLES;
     @val @override String providerName = subtitleSource.name();
+    @val @override boolean useSeasonForSerieId = false;
 
     public JOpenSubAdapter(Manager manager, Credentials credentials, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -155,11 +156,6 @@ public final class JOpenSubAdapter
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
                     .thenComparing(OpensubtitleSerieId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
             .toList();
-    }
-
-    @Override
-    public boolean useSeasonForSerieId() {
-        return false;
     }
 
     @Override
