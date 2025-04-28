@@ -14,16 +14,17 @@ import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
     @val(Protected) final Map<K, CacheObject<V>> cacheMap;
 
-    protected Cache(Integer maxItems=null) {
+    protected Cache(@Nullable Integer maxItems=null) {
         this.cacheMap = maxItems != null ? new LRUMap<>(maxItems) : new HashMap<>();
     }
 
-    public void put(K key, V value, Time timeToLive=null) {
+    public void put(K key, V value, @Nullable Time timeToLive=null) {
         if (timeToLive == null) {
             put(key, new ExpiringCacheObject<>(value));
         } else {

@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 import com.pivovarit.function.ThrowingBiFunction;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
@@ -62,14 +63,14 @@ public class ImdbAdapter {
             });
     }
 
-    public OptionalInt getImdbId(String title, Integer year) {
+    public OptionalInt getImdbId(String title, @Nullable Integer year) {
         try {
             return manager.getCache(CacheType.DISK, "%s-id-%s-%s".formatted(PROVIDER_NAME, title, year))
                 .getOptionalInt(
                     () -> getImdbIdOnImdb(title, year)
                         .orElseMap(() -> getImdbIdOnGoogle(title, year))
                         .orElseMap(() -> getImdbIdOnYahoo(title, year))
-                        .orElseMap(() -> promptUserToEnterImdbId(title, year)),
+                        .orElseMap(() -> promptUserToEnterImdbId(title)),
                     storeTempNullValue:true);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(PROVIDER_NAME, title, e.getMessage()), e);
@@ -77,19 +78,19 @@ public class ImdbAdapter {
         }
     }
 
-    private OptionalInt getImdbIdOnImdb(String title, Integer year) {
+    private OptionalInt getImdbIdOnImdb(String title, @Nullable Integer year) {
         return getImdbIdCommon(title, year, imdbSearchIdApi.get()::getImdbIdOnImdb);
     }
 
-    private OptionalInt getImdbIdOnGoogle(String title, Integer year) {
+    private OptionalInt getImdbIdOnGoogle(String title, @Nullable Integer year) {
         return getImdbIdCommon(title, year, imdbSearchIdApi.get()::getImdbIdOnGoogle);
     }
 
-    private OptionalInt getImdbIdOnYahoo(String title, Integer year) {
+    private OptionalInt getImdbIdOnYahoo(String title, @Nullable Integer year) {
         return getImdbIdCommon(title, year, imdbSearchIdApi.get()::getImdbIdOnYahoo);
     }
 
-    private OptionalInt getImdbIdCommon(String title, Integer year,
+    private OptionalInt getImdbIdCommon(String title, @Nullable Integer year,
         ThrowingBiFunction<String, Integer, Collection<ProviderSerieId>, ImdbSearchIdException> providerSerieIdSupplier) {
         Collection<ProviderSerieId> providerSerieIds;
         try {
@@ -118,8 +119,8 @@ public class ImdbAdapter {
             .mapToInt(providerSerieId -> Integer.parseInt(providerSerieId.id));
     }
 
-    private OptionalInt promptUserToEnterImdbId(String title, int year) {
-        return userInteractionHandler.enterNumber(PROVIDER_NAME, getText("Prompter.EnterImdbMatchForSerie", title));
+    private OptionalInt promptUserToEnterImdbId(String title) {
+        return userInteractionHandler.enterNumber(PROVIDER_NAME, getText("Prompter.EnterImdbIdForSerie", title));
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {

@@ -18,13 +18,12 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
 
 public class InputPane<T> extends JDialog implements ActionListener, PropertyChangeListener {
 
     private static final long serialVersionUID = 1L;
-    private static final String OK = getText("App.OK");
-    private static final String CANCEL = getText("App.Cancel");
     private final String message;
     private final List<Validator<String>> inputValidators;
     private final Function<String, T> toObjectMapper;
@@ -37,14 +36,14 @@ public class InputPane<T> extends JDialog implements ActionListener, PropertyCha
     private JOptionPane optionPane;
     private T input;
 
-    public InputPane(Frame owner=null,
+    public InputPane(@Nullable Frame owner=null,
         String title,
         String message,
         List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
         Function<String, T> toObjectMapper,
         List<Validator<T>> objectValidators=new ArrayList<Validator<T>>(),
-        String okText=OK,
-        String cancelText=CANCEL) {
+        String okText=getText("App.OK"),
+        String cancelText=getText("App.Cancel")) {
 
         super(owner, true);
         setTitle(title);

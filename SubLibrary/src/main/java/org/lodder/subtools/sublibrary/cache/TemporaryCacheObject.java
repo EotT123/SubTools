@@ -22,12 +22,11 @@ sealed class TemporaryCacheObject<T> implements CacheObject<T> permits Temporary
     @Serial
     private static final long serialVersionUID = -152474119228350222L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
-    @override @val Time created;
+    @override @val Time created = Time.now();
     @val Time timeToLive;
     @override @val T value;
 
     protected TemporaryCacheObject(Time timeToLive, T value) {
-        this.created = Time.now();
         this.timeToLive = timeToLive;
         this.value = value;
     }
@@ -38,7 +37,7 @@ sealed class TemporaryCacheObject<T> implements CacheObject<T> permits Temporary
     }
 
     public boolean isExpired() {
-        return Time.now().compareTo(created + timeToLive) > 0;
+        return Time.now().isAfter(created + timeToLive);
     }
 
 

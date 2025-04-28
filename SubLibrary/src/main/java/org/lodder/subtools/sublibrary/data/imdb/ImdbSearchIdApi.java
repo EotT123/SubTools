@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
@@ -24,7 +25,7 @@ record ImdbSearchIdApi(Manager manager) {
 
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
-    public Set<ProviderSerieId> getImdbIdOnImdb(String title, Integer year) throws ImdbSearchIdException {
+    public Set<ProviderSerieId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-imdb-$title-$year")
             .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("https://www.imdb.com/find?q=");
@@ -45,7 +46,7 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ProviderSerieId> getImdbIdOnYahoo(String title, Integer year) throws ImdbSearchIdException {
+    public Set<ProviderSerieId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-yahoo-$title-$year")
             .getCollection(() -> {
                 StringBuilder sb =
@@ -73,7 +74,7 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ProviderSerieId> getImdbIdOnGoogle(String title, Integer year) throws ImdbSearchIdException {
+    public Set<ProviderSerieId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-google-$title-$year")
             .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("http://www.google.com/search?q=");

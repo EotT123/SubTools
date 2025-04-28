@@ -23,21 +23,19 @@ import java.util.zip.GZIPInputStream;
 import extensions.java.io.InputStream.InputStreamExt;
 import extensions.java.nio.file.Path.PathExt;
 import jakarta.ws.rs.core.HttpHeaders;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.HttpConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 public class HttpClient {
 
     private final CookieManager cookieManager;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
-    public HttpClient() {
-        this(new CookieManager());
+    public HttpClient(CookieManager cookieManager=new CookieManager()) {
+        this.cookieManager = cookieManager;
     }
 
     public String doGet(URL url, String userAgent) throws IOException, HttpClientException {

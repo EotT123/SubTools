@@ -24,6 +24,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.lazy.LazyQuadFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,9 +119,9 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     public DiskCache(
         Class<K> dbKeyType,
         Class<V> dbValueType,
-        Time timeToLive=null,
-        Integer maxItems=null,
-        String tableName=null) {
+        @Nullable Time timeToLive=null,
+        @Nullable Integer maxItems=null,
+        @Nullable String tableName=null) {
 
         super(maxItems);
         if (timeToLive != null && timeToLive.isNegative()) {
@@ -179,7 +180,7 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     }
 
     @Override
-    public void put(K key, V value, Time timeToLive) {
+    public void put(K key, V value, @Nullable Time timeToLive) {
         synchronized (LOCK) {
             super.put(key, value, timeToLive);
             putFromMemoryCache(key);

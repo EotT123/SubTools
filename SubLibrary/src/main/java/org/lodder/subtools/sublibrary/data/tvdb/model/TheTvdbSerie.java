@@ -7,6 +7,7 @@ import java.util.List;
 
 import lombok.ToString;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 
 @ToString
@@ -15,23 +16,23 @@ public class TheTvdbSerie implements Serializable {
     private static final long serialVersionUID = -4036836377513152443L;
     @var int id;
     //@var String serieId;
-    @var Language language;
-    @var String serieName;
-    @var String banner;
+    @var @Nullable Language language;
+    @var @Nullable String serieName;
+    @var @Nullable String banner;
     //@var String overview;
-    @var String firstAired;
-    @var String imdbId;
-    @var String zap2ItId;
+    @var @Nullable String firstAired;
+    @var @Nullable String imdbId;
+    @var @Nullable String zap2ItId;
     @var List<String> actors = new ArrayList<>();
-    @var String airsDayOfWeek;
-    @var String airsTime;
-    @var String contentRating;
+    @var @Nullable String airsDayOfWeek;
+    @var @Nullable String airsTime;
+    @var @Nullable String contentRating;
     @var List<String> genres = new ArrayList<>();
-    @var String network;
-    @var String rating;
-    @var String runtime;
-    @var String status;
-    @var String fanArt;
-    @var String lastUpdated;
-    @var String poster;
+    @var @Nullable String network;
+    @var @Nullable String rating;
+    @var @Nullable String runtime;
+    @var @Nullable String status;
+    @var @Nullable String fanArt;
+    @var @Nullable String lastUpdated;
+    @var @Nullable String poster;
 }

@@ -19,6 +19,14 @@ public class TimeExt {
         return time.value.numerator.compareTo(BigInteger.ZERO) < 0;
     }
 
+    public static boolean isBefore(@This Time time, Time other) {
+        return time.compareTo(other) < 0;
+    }
+
+    public static boolean isAfter(@This Time time, Time other) {
+        return time.compareTo(other) > 0;
+    }
+
     @Extension
     public static Time create(Number duration, TimeUnit unit) {
         return new Time(Rational.get(duration), unit);

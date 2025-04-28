@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static manifold.ext.props.rt.api.PropOption.*;
 import static manifold.science.util.UnitConstants.*;
 
 import java.io.Serial;
@@ -12,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import manifold.science.measures.Time;
@@ -24,12 +26,11 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
     private static final long serialVersionUID = 3852086993086134232L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|lastAccessed:(.*?)|value:(.*)");
 
-    @override @val Time created;
-    @var Time lastAccessed = Time.now();
+    @override @val Time created = Time.now();
+    @var @set(Private) Time lastAccessed = Time.now();
     @override @var T value;
 
     protected ExpiringCacheObject(T value) {
-        this.created = Time.now();
         this.value = value;
     }
 
@@ -40,7 +41,7 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
 
     @Override
     public boolean isExpired(Time ttl) {
-        return Time.now().compareTo(lastAccessed + ttl) > 0;
+        return Time.now().isAfter(lastAccessed + ttl);
     }
 
     @Override

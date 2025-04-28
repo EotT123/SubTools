@@ -10,7 +10,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 
 @ToString
-public class SerieMapping implements Serializable { // implements SerieMappingIntf {
+public class SerieMapping implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6551798252915028805L;
