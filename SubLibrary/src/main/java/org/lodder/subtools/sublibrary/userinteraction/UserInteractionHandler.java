@@ -19,7 +19,8 @@ public interface UserInteractionHandler {
     <T> Optional<T> selectFromList(Iterable<T> options, String message, @Nullable String title=null,
         @Nullable Function<T, String> toStringMapper=null);
 
-    Optional<String> enter(String title, String message, @Nullable List<Validator<String>> inputValidators=null);
+    Optional<String> enter(String message, @Nullable String title=null,
+        @Nullable List<Validator<String>> inputValidators=null);
 
     OptionalInt enterNumber(String title, String message, @Nullable List<Validator<Integer>> objectValidators=null);
 

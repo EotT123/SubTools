@@ -50,7 +50,7 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public Optional<String> enter(String title, String message,
+    public Optional<String> enter(String message, @Nullable String title,
         @Nullable List<Validator<String>> inputValidators) {
         // TODO use extension method
         return PrompterExt.promptString(prompter, message, inputValidators:inputValidators);

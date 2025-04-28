@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -73,7 +74,7 @@ public class Local implements SubtitleProvider {
                     TvReleaseControl epCtrl =
                         new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
                     epCtrl.process();
-                    if (((TvRelease) release).tvdbIdOptional.equals(tvRelease.tvdbIdOptional)) {
+                    if (Objects.equals(release.tvdbId, tvRelease.tvdbId)) {
                         Language detectedLang = DetectLanguage.execute(fileSub);
                         if (detectedLang == language) {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
@@ -116,7 +117,7 @@ public class Local implements SubtitleProvider {
                         MovieReleaseControl movieCtrl =
                             new MovieReleaseControl(release, settings, manager, userInteractionHandler);
                         movieCtrl.process();
-                        if (release.getImdbId().equals(movieRelease.getImdbId())
+                        if (Objects.equals(release.imdbId, movieRelease.imdbId)
                             && DetectLanguage.execute(fileSub) == language) {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(new Subtitle(

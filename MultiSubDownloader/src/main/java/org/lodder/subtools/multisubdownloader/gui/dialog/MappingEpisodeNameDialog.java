@@ -100,7 +100,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                             String message = getText("MappingEpisodeNameDialog.enterNewNameForSerie",
                                 currentName);
                             selectedSubtitleProvider.ifPresent(provider ->
-                                userInteractionHandler.enter(message, message).ifPresent(newName -> {
+                                userInteractionHandler.enter(message).ifPresent(newName -> {
                                     TvRelease tvRelease = new TvRelease(
                                         name:currentName,
                                         season:row.serieMapping.season,

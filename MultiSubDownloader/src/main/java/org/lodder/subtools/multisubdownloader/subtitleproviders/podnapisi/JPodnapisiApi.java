@@ -48,8 +48,8 @@ public class JPodnapisiApi implements SubtitleApi {
             Optional.of(new ProviderSerieId(showName, showName)) : Optional.empty();
     }
 
-    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, int year, int season, int episode,
-        Language language) throws PodnapisiException {
+    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, @Nullable Integer year, int season,
+        int episode, Language language) throws PodnapisiException {
         return getSubtitles(new SerieMapping(movieName, movieName, movieName, season), year, season, episode, language);
 
     }
@@ -60,8 +60,8 @@ public class JPodnapisiApi implements SubtitleApi {
 
     }
 
-    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, Integer year, int season,
-        int episode, Language language) throws PodnapisiException {
+    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, @Nullable Integer year,
+        int season, int episode, Language language) throws PodnapisiException {
         return manager.getCache(CacheType.MEMORY,
                 "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId, season, episode,
                     language))

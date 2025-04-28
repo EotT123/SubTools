@@ -1,7 +1,5 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
@@ -35,20 +33,19 @@ public final class MovieReleaseControl extends ReleaseControl {
         if (StringUtils.isBlank(movieRelease.name)) {
             throw new ReleaseControlException("Unable to extract/find title, check file", movieRelease);
         } else {
-            movieRelease.setImdbId(imdbAdapter.getImdbId(movieRelease.name, movieRelease.year)
-                    .orElseThrow(
-                            () -> new ReleaseControlException("Movie not found on IMDB, check file", movieRelease)));
+            movieRelease.imdbId = imdbAdapter.getImdbId(movieRelease.name, movieRelease.year)
+                .orElseThrow(() -> new ReleaseControlException("Movie not found on IMDB, check file", movieRelease));
 
-            Optional<? extends ReleaseDBIntf> movieDetails =
-                    movieRelease.getImdbId().mapToObj(imdbAdapter::getMovieDetails).orElseGet(Optional::empty);
-            if (movieDetails.isEmpty()) {
-                movieDetails =
-                        movieRelease.getImdbId().mapToObj(omdbAdapter::getMovieDetails).orElseGet(Optional::empty);
+            ReleaseDBIntf movieDetails = imdbAdapter.getMovieDetails(movieRelease.imdbId).orElse(null);
+            if (movieDetails == null) {
+                movieDetails = omdbAdapter.getMovieDetails(movieRelease.imdbId).orElse(null);
             }
-            movieDetails.ifPresentOrElse(info -> {
-                movieRelease.year = info.year;
-                movieRelease.name = info.name;
-            }, () -> LOGGER.error("Unable to get details from OMDB API, continue with filename info $movieRelease"));
+            if (movieDetails != null) {
+                movieRelease.year = movieDetails.year;
+                movieRelease.name = movieDetails.name;
+            } else {
+                LOGGER.error("Unable to get details from OMDB API, continue with filename info $movieRelease");
+            }
         }
     }
 

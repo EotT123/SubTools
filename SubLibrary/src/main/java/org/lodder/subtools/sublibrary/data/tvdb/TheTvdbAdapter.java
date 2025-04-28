@@ -4,7 +4,6 @@ import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.sublibrary.Manager.*;
 
-import javax.swing.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -84,6 +84,7 @@ public class TheTvdbAdapter {
                     PROVIDER_NAME,
                     s -> "${s.serieName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
+                    LOGGER.error("Unknown serie name in tvdb: $serieName");
                     tvdbSerie = askUserToEnterTvdbId(serieName)
                         .mapToObj(tvdbId -> api.getSerie(tvdbId, null).orElse(null));
                 }
@@ -134,16 +135,14 @@ public class TheTvdbAdapter {
     }
 
     private OptionalInt askUserToEnterTvdbId(String showName) {
-        LOGGER.error("Unknown serie name in tvdb: $showName");
-        String tvdbidString = JOptionPane.showInputDialog(null, "Enter tvdb id for serie $showName");
-        if (tvdbidString == null) {
-            return OptionalInt.empty();
-        }
-        try {
-            return OptionalInt.of(Integer.parseInt(tvdbidString));
-        } catch (NumberFormatException e) {
-            LOGGER.error("Invalid tvdb id: $tvdbidString");
-            return askUserToEnterTvdbId(showName);
-        }
+        return userInteractionHandler.enter(Messages.getText("InputPanel.EnterTvdbId", showName))
+            .map(tvdbidString -> {
+                try {
+                    return OptionalInt.of(Integer.parseInt(tvdbidString));
+                } catch (NumberFormatException e) {
+                    LOGGER.error(Messages.getText("InputPanel.invalid.tvdbid", tvdbidString));
+                    return askUserToEnterTvdbId(showName);
+                }
+            }).orElseGet(OptionalInt::empty);
     }
 }

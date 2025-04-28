@@ -4,7 +4,6 @@ import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
 import java.io.Serial;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -58,7 +57,7 @@ public class SubsceneApi implements SubtitleApi {
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 
-    private LocalDateTime lastRequest = LocalDateTime.now();
+    private Time lastRequest = Time.now();
     @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
 
     public SubsceneApi(Manager manager) {
@@ -124,8 +123,7 @@ public class SubsceneApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw new SubsceneException(e);
                 }
-            })
-            .getCollection();
+            });
     }
 
     private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
@@ -151,7 +149,7 @@ public class SubsceneApi implements SubtitleApi {
                 url:url,
                 userAgent:"",
                 retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));
-        lastRequest = LocalDateTime.now();
+        lastRequest = Time.now();
         return document;
     }
 

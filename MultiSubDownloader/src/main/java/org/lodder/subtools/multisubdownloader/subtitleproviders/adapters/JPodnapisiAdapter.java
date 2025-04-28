@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,6 +9,7 @@ import java.util.stream.Stream;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.JPodnapisiApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiException;
@@ -65,8 +65,8 @@ public final class JPodnapisiAdapter
     }
 
     @Override
-    public List<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithName(String name, int year, Language language)
-        throws PodnapisiException {
+    public Collection<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
+        Language language) throws PodnapisiException {
         return getApi().getMovieSubtitles(name, year, 0, 0, language);
     }
 
@@ -116,7 +116,7 @@ public final class JPodnapisiAdapter
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
         throws PodnapisiException {
         return getApi().getPodnapisiShowName(serieName).stream().toList();
     }

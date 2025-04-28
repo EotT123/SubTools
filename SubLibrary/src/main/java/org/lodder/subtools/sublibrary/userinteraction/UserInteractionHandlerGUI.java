@@ -46,7 +46,8 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
     }
 
     @Override
-    public Optional<String> enter(String title, String message, @Nullable List<Validator<String>> inputValidators) {
+    public Optional<String> enter(String message, @Nullable String title,
+        @Nullable List<Validator<String>> inputValidators) {
         synchronized (LOCK) {
             return new InputPane<>(
                 title:title,

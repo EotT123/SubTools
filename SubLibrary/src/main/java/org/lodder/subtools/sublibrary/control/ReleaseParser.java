@@ -21,6 +21,7 @@ import com.google.common.collect.MultimapBuilder;
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.Roman.RomanNumeral;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.AudioEncoding;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Quality;
@@ -368,7 +369,7 @@ public class ReleaseParser {
         }
 
         @SafeVarargs
-        public final <T> T getNamedMatchValue(Tag<T>... tags) {
+        public final <T> @Nullable T getNamedMatchValue(Tag<T>... tags) {
             for (Tag<T> tag : tags) {
                 List<T> namedMatch = getNamedMatch(tag, tag.mapper);
                 if (!namedMatch.isEmpty()) {

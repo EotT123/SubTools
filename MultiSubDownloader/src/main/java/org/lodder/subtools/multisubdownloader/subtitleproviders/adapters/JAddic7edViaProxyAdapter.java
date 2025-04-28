@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.gestdown.invoker.ApiException;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.JAddic7edProxyGestdownApi;
 import org.lodder.subtools.sublibrary.Language;
@@ -60,7 +60,7 @@ public final class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Pr
     }
 
     @Override
-    public Collection<Subtitle> searchMovieSubtitlesWithName(String name, int year, Language language) {
+    public Collection<Subtitle> searchMovieSubtitlesWithName(String name, @Nullable Integer year, Language language) {
         // TODO implement this
         return List.of();
     }
@@ -93,17 +93,17 @@ public final class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Pr
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
         throws ApiException {
-        List<ProviderSerieId> serieIds = tvdbIdOptional.mapToObj(
-            tvdbId -> new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId)).message(
-                    "getProviderSerieName: [$tvdbId]")
+        List<ProviderSerieId> serieIds = tvdbId == null ? List.of() :
+            new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId))
+                .message("getProviderSerieName: [$tvdbId]")
                 .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                 .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
                     LOGGER.info("API %s - Could not find tvdbId [%s]".formatted(providerName, tvdbId));
                     return List.of();
                 })
-                .execute()).orElseGet(List::of);
+                .execute();
 
         if (serieIds.isEmpty()) {
             serieIds = new ExecuteCall<>(() -> getApi().getProviderSerieName(serieName)).message(

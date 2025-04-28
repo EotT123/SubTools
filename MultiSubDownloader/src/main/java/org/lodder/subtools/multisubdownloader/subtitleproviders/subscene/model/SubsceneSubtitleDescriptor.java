@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
 
+import java.io.Serializable;
+
 import com.pivovarit.function.ThrowingSupplier;
 import lombok.EqualsAndHashCode;
 import manifold.ext.props.rt.api.val;
@@ -8,7 +10,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.SeasonEpisode;
 
 @EqualsAndHashCode
-public class SubsceneSubtitleDescriptor {
+public class SubsceneSubtitleDescriptor implements Serializable {
 
     @val Language language;
     @val String name;

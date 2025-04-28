@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.model;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 
 import com.pivovarit.function.ThrowingSupplier;
@@ -7,32 +8,33 @@ import lombok.EqualsAndHashCode;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.builder.EqualsExclude;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 
 @EqualsAndHashCode
-public class Subtitle {
+public class Subtitle implements Serializable {
 
     @val DownloadSource downloadSource;
-    @var String fileName;
-    @var Language language;
-    @var String releaseGroup;
-    @var String uploader;
-    @var SubtitleMatchType subtitleMatchType;
-    @var SubtitleSource subtitleSource;
+    @var @Nullable String fileName;
+    @var @Nullable Language language;
+    @var @Nullable String releaseGroup;
+    @var @Nullable String uploader;
+    @var @Nullable SubtitleMatchType subtitleMatchType;
+    @var @Nullable SubtitleSource subtitleSource;
     @var boolean hearingImpaired;
-    @var String quality;
+    @var @Nullable String quality;
     @var int score;
 
     public Subtitle(DownloadSource downloadSource,
-        String fileName=null,
-        Language language=null,
-        String releaseGroup=null,
-        String uploader=null,
-        SubtitleMatchType subtitleMatchType=null,
-        SubtitleSource subtitleSource=null,
+        @Nullable String fileName=null,
+        @Nullable Language language=null,
+        @Nullable String releaseGroup=null,
+        @Nullable String uploader=null,
+        @Nullable SubtitleMatchType subtitleMatchType=null,
+        @Nullable SubtitleSource subtitleSource=null,
         boolean hearingImpaired=false,
-        String quality=null,
+        @Nullable String quality=null,
         int score=0) {
         this.downloadSource = downloadSource;
         this.fileName = fileName;
@@ -49,15 +51,15 @@ public class Subtitle {
     @EqualsAndHashCode
     public static class DownloadSource {
         @val SourceLocation sourceLocation;
-        @EqualsExclude @val ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
-        @val String url;
-        @val Path file;
+        @EqualsExclude @val @Nullable ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
+        @val @Nullable String url;
+        @val @Nullable Path file;
 
         private DownloadSource(
             SourceLocation sourceLocation,
-            ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier=null,
-            String url=null,
-            Path file=null) {
+            @Nullable ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier=null,
+            @Nullable String url=null,
+            @Nullable Path file=null) {
 
             this.urlSupplier = urlSupplier;
             this.url = url;
@@ -77,7 +79,8 @@ public class Subtitle {
         public static DownloadSource of(Path file) {
             return new DownloadSource(SourceLocation.FILE, file:file);
         }
-
+        
+        @SuppressWarnings("ConstantConditions")
         public String getValue() throws SubtitlesProviderException {
             return switch (sourceLocation) {
                 case FILE -> file.toString();

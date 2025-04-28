@@ -1,19 +1,18 @@
 package org.lodder.subtools.sublibrary.model;
 
 import java.nio.file.Path;
-import java.util.OptionalInt;
 
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.Nullable;
 
 public final class MovieRelease extends Release {
 
     @var String name;
-    @var Integer year;
-    private int imdbId;
-    private int tvdbId;
+    @var @Nullable Integer year;
+    @var @Nullable Integer imdbId;
 
-    public MovieRelease(String name, Path file=null, String releaseGroup=null, String quality=null,
-        String extension=null, Integer year=null) {
+    public MovieRelease(String name, @Nullable Path file=null, @Nullable String releaseGroup=null,
+        @Nullable String quality=null, @Nullable String extension=null, @Nullable Integer year=null) {
         super(VideoType.MOVIE, file, releaseGroup, quality, extension);
         this.name = name;
         this.year = year;
@@ -21,22 +20,6 @@ public final class MovieRelease extends Release {
 
     public String getImdbIdAsString() {
         return "tt%07d".formatted(imdbId);
-    }
-
-    public OptionalInt getTvdbId() {
-        return tvdbId == 0 ? OptionalInt.empty() : OptionalInt.of(tvdbId);
-    }
-
-    public void setTvdbId(int tvdbId) {
-        this.tvdbId = tvdbId;
-    }
-
-    public OptionalInt getImdbId() {
-        return imdbId == 0 ? OptionalInt.empty() : OptionalInt.of(imdbId);
-    }
-
-    public void setImdbId(int imdbId) {
-        this.imdbId = imdbId;
     }
 
     @Override

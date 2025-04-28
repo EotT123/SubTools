@@ -10,12 +10,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesHasher;
@@ -30,6 +30,7 @@ import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,14 +65,14 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 }
             }
         }
-        movieRelease.getImdbId().ifPresent(imdbId -> {
+        if (movieRelease.imdbId != null) {
             try {
-                subtitles.addAll(searchMovieSubtitlesWithId(imdbId, language));
+                subtitles.addAll(searchMovieSubtitlesWithId(movieRelease.imdbId, language));
             } catch (Exception e) {
                 LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(
-                    subtitleSource.name, imdbId, movieRelease.name, e.getMessage()), e);
+                    subtitleSource.name, movieRelease.imdbId, movieRelease.name, e.getMessage()), e);
             }
-        });
+        }
         if (subtitles.isEmpty()) {
             try {
                 subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
@@ -89,7 +90,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
     Collection<T> searchMovieSubtitlesWithId(int tvdbId, Language language) throws X;
 
-    Collection<T> searchMovieSubtitlesWithName(String name, int year, Language language) throws X;
+    Collection<T> searchMovieSubtitlesWithName(String name, @Nullable Integer year, Language language) throws X;
 
     @Override
     default Set<Subtitle> searchSubtitles(TvRelease tvRelease, Language language) {
@@ -107,7 +108,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
     Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<T> subtitles, Language language);
 
-    List<S> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season) throws X;
+    List<S> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season) throws X;
 
     @Override
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X {
@@ -127,21 +128,16 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, Function<TvRelease, String> nameFunction,
         Function<TvRelease, String> customNameFunction) throws X {
         return getProviderSerieId(nameFunction.apply(tvRelease), customNameFunction.apply(tvRelease),
-            tvRelease.displayName, tvRelease.season, tvRelease.getTvdbIdOptional());
-    }
-
-    default Optional<SerieMapping> getProviderSerieId(String serieName, String displayName, int season,
-        OptionalInt tvdbIdOptional) throws X {
-        return getProviderSerieId(serieName, serieName, displayName, season, tvdbIdOptional);
+            tvRelease.displayName, tvRelease.season, tvRelease.tvdbId);
     }
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
-        int season, OptionalInt tvdbIdOptional) throws X {
+        int season, Integer tvdbId) throws X {
 
-        Function<Integer, CacheKey> tvdbIdCacheFunction = tvdbId -> manager.getCache(CacheType.DISK,
-            "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId() ? season : -1));
-        if (tvdbIdOptional.isPresent()) {
-            CacheKey tvdbIdCache = tvdbIdCacheFunction.apply(tvdbIdOptional.orElseThrow());
+        LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
+            "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId() ? season : -1)));
+        if (tvdbId != null) {
+            CacheKey tvdbIdCache = tvdbIdCacheFunction.get();
             if (tvdbIdCache.isPresent()) {
                 // if value using the tvdbId is present, return it
                 return tvdbIdCache.getOptional();
@@ -161,13 +157,14 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                 }
             } else {
                 Optional<SerieMapping> serieMapping = serieNameCache.getOptional();
-                serieMapping.ifPresent(providerSerieName -> tvdbIdOptional.ifPresent(
-                    tvdbId -> tvdbIdCacheFunction.apply(tvdbId).store(Value.of(providerSerieName))));
+                if (tvdbId != null) {
+                    serieMapping.map(Value::of).ifPresent(tvdbIdCacheFunction.get()::store);
+                }
                 return serieMapping;
             }
         }
 
-        List<S> providerSerieIds = getSortedProviderSerieIds(tvdbIdOptional, serieNameToSearchFor, seasonToUse);
+        List<S> providerSerieIds = getSortedProviderSerieIds(tvdbId, serieNameToSearchFor, seasonToUse);
         if (providerSerieIds.isEmpty()) {
             // If no provider serie id's could be found, store a temporary null value with expiration time of 1 day
             // (so the provider isn't contacted every time this method is being called).
@@ -219,9 +216,11 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             // create a serieMapping for the selected value
             serieMapping = new SerieMapping(serieName, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
         }
-        tvdbIdOptional.ifPresentOrElse(
-            tvdbId -> tvdbIdCacheFunction.apply(tvdbId).store(Value.of(serieMapping)),
-            () -> serieNameCache.store(Value.of(serieMapping)));
+        if (tvdbId != null) {
+            tvdbIdCacheFunction.get().store(Value.of(serieMapping));
+        } else {
+            serieNameCache.store(Value.of(serieMapping));
+        }
         return Optional.of(serieMapping);
     }
 

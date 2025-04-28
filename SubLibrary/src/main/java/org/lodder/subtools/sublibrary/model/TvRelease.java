@@ -3,36 +3,36 @@ package org.lodder.subtools.sublibrary.model;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.OptionalInt;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
 
 public final class TvRelease extends Release {
 
     // parsed from the filename
     @val String name;
-    @val List<Integer> episodes;
     @val int season;
-    @var String title;
-    @var int tvdbId;
+    @val List<Integer> episodes;
+    @var @Nullable String title;
     // tvdb name
-    @var String originalName;
+    @var @Nullable String originalName;
     @val boolean special;
     // custom name which can be used to search subtitle providers
-    @val String customName;
+    @val @Nullable String customName;
 
-    public TvRelease(String name, int season, int episode, Path file=null, String releaseGroup=null, String quality=
-            null, String extension=null, String originalName=null, String customName=null, String title=null,
-        boolean special=false) {
+    public TvRelease(String name, int season, int episode, @Nullable Path file=null, @Nullable String releaseGroup=null,
+        @Nullable String quality=null, @Nullable String extension=null, @Nullable String originalName=null,
+        @Nullable String customName=null, @Nullable String title=null, boolean special=false) {
         this(name, season, List.of(episode), file, releaseGroup, quality, extension, originalName, customName, title,
             special);
     }
 
-    public TvRelease(String name, int season, List<Integer> episodes, Path file=null, String releaseGroup=null,
-        String quality=null, String extension=null, String originalName=null, String customName=null, String title=null,
+    public TvRelease(String name, int season, List<Integer> episodes, @Nullable Path file=null,
+        @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String extension=null,
+        @Nullable String originalName=null, @Nullable String customName=null, @Nullable String title=null,
         boolean special=false) {
         super(VideoType.EPISODE, file, releaseGroup, quality, extension);
         this.name = name;
@@ -58,10 +58,6 @@ public final class TvRelease extends Release {
 
     public void updateTvdbEpisodeInfo(TheTvdbEpisode tvdbEpisode) {
         this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
-    }
-
-    public OptionalInt getTvdbIdOptional() {
-        return tvdbId == 0 ? OptionalInt.empty() : OptionalInt.of(tvdbId);
     }
 
     public int getFirstEpisode() {

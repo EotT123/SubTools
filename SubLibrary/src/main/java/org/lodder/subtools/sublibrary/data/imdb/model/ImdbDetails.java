@@ -1,19 +1,17 @@
 package org.lodder.subtools.sublibrary.data.imdb.model;
 
-import lombok.AllArgsConstructor;
-import manifold.ext.props.rt.api.override;
-import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.data.ReleaseDBIntf;
 
-@AllArgsConstructor
-public class ImdbDetails implements ReleaseDBIntf {
-
-    @val String title;
-    @val @override int year;
+public record ImdbDetails(String title, int year) implements ReleaseDBIntf {
 
     @Override
     public String getName() {
         return title;
+    }
+
+    @Override
+    public int getYear() {
+        return year;
     }
 }
 

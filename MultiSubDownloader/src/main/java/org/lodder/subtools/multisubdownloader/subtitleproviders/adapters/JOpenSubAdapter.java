@@ -3,7 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.OptionalInt;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,6 +13,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
@@ -73,8 +74,9 @@ public final class JOpenSubAdapter
     }
 
     @Override
-    public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithName(String name, int year, Language language)
-        throws OpenSubtitlesException {
+    public Collection<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithName(String name,
+        @Nullable Integer year,
+        Language language) throws OpenSubtitlesException {
         return getApi().searchSubtitles().query(name).language(language).searchSubtitles().getData();
     }
 
@@ -83,7 +85,10 @@ public final class JOpenSubAdapter
         Language language) {
         return subtitles.stream()
             .map(org.opensubtitles.model.Subtitle::getAttributes)
-            .filter(attributes -> movieRelease.year == attributes.getFeatureDetails().getYear().intValue())
+            .filter(attributes ->
+                attributes.getFeatureDetails().getYear() != null
+                    ? Objects.equals(attributes.getFeatureDetails().getYear().intValue(), movieRelease.year)
+                    : movieRelease.year == null)
             .flatMap(attributes -> attributes.getFiles().stream().map(file -> createSubtitle(file, attributes)))
             .collect(Collectors.toSet());
     }
@@ -141,13 +146,14 @@ public final class JOpenSubAdapter
     }
 
     @Override
-    public List<OpensubtitleSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+    public List<OpensubtitleSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
         throws OpenSubtitlesException {
         return getApi().getProviderSerieIds(serieName)
             .stream()
-            .sorted(Comparator.comparing((OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+            .sorted(
+                Comparator.comparing((OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                .thenComparing(OpensubtitleSerieId::getYear, Comparator.reverseOrder()))
+                    .thenComparing(OpensubtitleSerieId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
             .toList();
     }
 

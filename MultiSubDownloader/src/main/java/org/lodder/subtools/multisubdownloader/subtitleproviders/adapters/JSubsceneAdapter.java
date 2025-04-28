@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.SubsceneApi;
@@ -75,7 +76,8 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public List<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithName(String name, int year, Language language) {
+    public Collection<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
+        Language language) {
         // TODO implement this
         return List.of();
     }
@@ -104,7 +106,7 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public List<SubSceneSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+    public List<SubSceneSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
         throws SubsceneException {
         ToIntFunction<String> providerTypeFunction = value -> switch (value) {
             case "TV-Serie" -> 1;

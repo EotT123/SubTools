@@ -66,33 +66,30 @@ public class Manager {
     // POST \\
     // ==== \\
 
-    public PostBuilder postBuilder(String url, String userAgent=null) {
+    public PostBuilder postBuilder(String url, @Nullable String userAgent=null) {
         return new PostBuilder(httpClient, url, userAgent);
     }
 
     public static class PostBuilder {
         @val HttpClient httpClient;
         @val String url;
-        @val String userAgent;
-        private Map<String, String> data;
+        @val @Nullable String userAgent;
+        private Map<String, String> data = new HashMap<>();
 
-        public PostBuilder(HttpClient httpClient, String url, String userAgent=null) {
+        public PostBuilder(HttpClient httpClient, String url, @Nullable String userAgent=null) {
             this.httpClient = httpClient;
             this.url = url;
             this.userAgent = userAgent;
         }
 
         public PostBuilder addData(String key, String value) {
-            if (data == null) {
-                data = new HashMap<>();
-            }
             data.put(key, value);
             return this;
         }
 
         public String post() throws ManagerException {
             try {
-                return httpClient.doPost(new URI(url).toURL(), userAgent, data == null ? new HashMap<>() : data);
+                return httpClient.doPost(new URI(url).toURL(), userAgent, data);
             } catch (MalformedURLException | URISyntaxException e) {
                 throw new ManagerException("incorrect url", e);
             } catch (HttpClientException e) {
@@ -122,19 +119,20 @@ public class Manager {
         return get(params).toInputStream(StandardCharsets.UTF_8);
     }
 
-    public @Nullable Document getAsDocument(PageContentParams params, Predicate<String> emptyResultPredicate=null)
+    public @Nullable Document getAsDocument(PageContentParams params,
+        @Nullable Predicate<String> emptyResultPredicate=null)
         throws ParserConfigurationException, ManagerException, IOException {
         Optional<String> asStringDocument = getAsStringDocument(params, emptyResultPredicate);
         return asStringDocument.isPresent() ? XMLHelper.getDocument(asStringDocument.get()) : null;
     }
 
     public org.jsoup.nodes.Document getAsJsoupDocument(PageContentParams params,
-        Predicate<String> emptyResultPredicate=null) throws ManagerException {
+        @Nullable Predicate<String> emptyResultPredicate=null) throws ManagerException {
         return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
     }
 
     private Optional<String> getAsStringDocument(PageContentParams params,
-        Predicate<String> emptyResultPredicate) throws ManagerException {
+        @Nullable Predicate<String> emptyResultPredicate) throws ManagerException {
         if (emptyResultPredicate == null) {
             return Optional.of(get(params));
         }
@@ -268,7 +266,7 @@ public class Manager {
         }
 
         public <V extends Serializable, X extends Exception> Optional<V> getOptional(
-            ThrowingSupplier<Optional<V>, X> supplier, Retry retry=Retry.NONE, Time timeToLive=null,
+            ThrowingSupplier<Optional<V>, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
             boolean storeTempNullValue=false, boolean storeAsTempValue=false) throws X {
             Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
 
@@ -296,7 +294,7 @@ public class Manager {
         }
 
         public <X extends Exception> OptionalInt getOptionalInt(
-            ThrowingSupplier<OptionalInt, X> supplier, Retry retry=Retry.NONE, Time timeToLive=null,
+            ThrowingSupplier<OptionalInt, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
             boolean storeTempNullValue=false, boolean storeAsTempValue=false) throws X {
 
             return manager.getOptionalCache(cacheType).mapThrowing(cache -> {
@@ -321,7 +319,7 @@ public class Manager {
 
         public <V, X extends Exception> void store(ValueIntf<V, X> value,
             Retry retry=Retry.NONE, boolean storeAsTempValue=false, boolean storeTempNullValue=false,
-            Time timeToLive=null) throws X {
+            @Nullable Time timeToLive=null) throws X {
 
             V object = value.supplier != null ? executeSupplier(value.supplier, retry) : value.value;
             Time ttl = null;
