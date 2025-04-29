@@ -143,7 +143,7 @@ public class JTVSubtitlesApi implements SubtitleApi {
                             .map(element -> formattedSeasonEpisode.equals(element.text()))
                             .orElse(false))
                         .map(element -> DOMAIN + "/" +
-                            element.selectNthByTag("td", 2).selectFirstByTag("a").attr("href"))
+                            element.selectNthByTag("td", 1).selectFirstByTag("a").attr("href"))
                         .findAny();
                 } catch (Exception e) {
                     throw new TvSubtitlesException(e);

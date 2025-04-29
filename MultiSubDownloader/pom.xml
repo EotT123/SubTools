@@ -166,11 +166,11 @@
                             <artifactId>manifold-params</artifactId>
                             <version>${manifold.version}</version>
                         </path>
-                        <!--                        <path>-->
-                        <!--                            <groupId>systems.manifold</groupId>-->
-                        <!--                            <artifactId>manifold-strings</artifactId>-->
-                        <!--                            <version>${manifold.version}</version>-->
-                        <!--                        </path>-->
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-strings</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>

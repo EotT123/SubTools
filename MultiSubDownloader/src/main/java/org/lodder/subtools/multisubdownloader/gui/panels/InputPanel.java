@@ -1,8 +1,11 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import javax.swing.*;
 import java.io.Serial;
 
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
 import org.lodder.subtools.sublibrary.Language;
@@ -11,46 +14,27 @@ public abstract sealed class InputPanel extends JPanel permits SearchFileInputPa
 
     @Serial
     private static final long serialVersionUID = 7753220002440733463L;
-    private JButton btnSearch;
-    private JComboBox<Language> cbxLanguage;
-
-    InputPanel() {
-        createComponents();
-    }
+    @val JButton searchButton = new JButton(Messages.getText("InputPanel.SearchForSubtitles"));
+    @val(Protected) JComboBox<Language> languageCbx =
+        new JComboBox<>(Language.values()).toMessageStringRenderer(Language::getMsgCode);
 
     public Language getSelectedLanguage() {
-        return cbxLanguage.getSelectedValue();
+        return languageCbx.getSelectedValue();
     }
 
     public void setSelectedLanguage(Language language) {
-        cbxLanguage.setSelectedItem(language);
+        languageCbx.setSelectedItem(language);
     }
 
     public void addSearchAction(SearchAction searchAction) {
-        if (searchAction != null) {
-            btnSearch.addActionListener(event -> new Thread(searchAction).start());
-        }
+        searchButton.addActionListener(_ -> new Thread(searchAction).start());
     }
 
     public void enableSearchButton() {
-        btnSearch.setEnabled(true);
+        searchButton.setEnabled(true);
     }
 
     public void disableSearchButton() {
-        this.btnSearch.setEnabled(false);
-    }
-
-    protected JButton getSearchButton() {
-        return this.btnSearch;
-    }
-
-    protected JComboBox<Language> getLanguageCbx() {
-        return this.cbxLanguage;
-    }
-
-    private void createComponents() {
-        cbxLanguage = new JComboBox<>(Language.values()).toMessageStringRenderer(Language::getMsgCode);
-
-        btnSearch = new JButton(Messages.getText("InputPanel.SearchForSubtitles"));
+        this.searchButton.setEnabled(false);
     }
 }

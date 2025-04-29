@@ -21,7 +21,7 @@ public class PanelCheckBox extends JPanel {
         boolean panelOnNewLine,
         LayoutManager panelLayout=new MigLayout("insets 0, novisualpadding, fillx"),
         boolean addVerticalSeparator=false,
-        int leftGap=0) {
+        int leftGap=20) {
 
         super(new MigLayout("insets 0, novisualpadding, fillx"));
         this.checkbox = checkbox;
@@ -98,6 +98,6 @@ public class PanelCheckBox extends JPanel {
 
     public JPanel addToPanel(Container parent, @Nullable Object constraints=null) {
         parent.addComponent(this, constraints);
-        return this.panel;
+        return panel;
     }
 }

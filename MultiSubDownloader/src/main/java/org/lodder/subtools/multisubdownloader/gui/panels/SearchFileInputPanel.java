@@ -31,9 +31,9 @@ public final class SearchFileInputPanel extends InputPanel {
         add(btnBrowse, "cell 3 0");
         add(chkRecursive, "cell 2 1 2 1");
         add(chkForceSubtitleOverwrite, "cell 2 3 2 1");
-        add(getSearchButton(), "cell 0 5 3 1,alignx center");
+        add(searchButton, "cell 0 5 3 1,alignx center");
         add(new JLabel(getText("MainWindow.SelectSubtitleLanguage")), "cell 2 2");
-        add(getLanguageCbx(), "cell 3 2");
+        add(languageCbx, "cell 3 2");
     }
 
     private void createComponents() {

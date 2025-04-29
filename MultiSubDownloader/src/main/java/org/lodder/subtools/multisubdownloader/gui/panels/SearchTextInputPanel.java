@@ -39,8 +39,8 @@ public final class SearchTextInputPanel extends InputPanel {
         this.add(new JLabel(getText("App.Episode")), "cell 5 1,alignx trailing");
         this.add(txtInputEpisode, "cell 6 1,growx");
         this.add(new JLabel(getText("MainWindow.SelectSubtitleLanguage")), "cell 1 2 3 1,alignx trailing");
-        this.add(getLanguageCbx(), "cell 4 2 2 1,growx");
-        this.add(getSearchButton(), "cell 2 4 2 1");
+        this.add(languageCbx, "cell 4 2 2 1,growx");
+        this.add(searchButton, "cell 2 4 2 1");
     }
 
     private void setupListeners() {

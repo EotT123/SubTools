@@ -80,7 +80,7 @@ public class Settings implements UserInteractionSettingsIntf {
         return !defaultIncomingFolders.isEmpty();
     }
 
-    public boolean isSerieSource(SubtitleSource subtitleSource) {
+    public boolean useSerieSource(SubtitleSource subtitleSource) {
         // TODO: dynamically inject SubtitleProvider to settings
         return switch (subtitleSource) {
             case ADDIC7ED -> serieSourceAddic7ed;
