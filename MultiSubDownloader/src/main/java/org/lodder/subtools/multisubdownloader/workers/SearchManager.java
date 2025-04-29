@@ -47,6 +47,12 @@ public class SearchManager implements Cancelable {
         this.onFound = onFound;
     }
 
+    public void reset() {
+        queue.clear();
+        workers.clear();
+        scoreCalculators.clear();
+    }
+
     public void addProvider(SubtitleProvider provider) {
         if (this.workers.containsKey(provider)) {
             return;

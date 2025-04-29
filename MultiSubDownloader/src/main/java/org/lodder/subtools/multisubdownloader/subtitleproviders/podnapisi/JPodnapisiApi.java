@@ -90,7 +90,7 @@ public class JPodnapisiApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw new PodnapisiException(e);
                 }
-            });
+            }, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1 Second));
     }
 
 
