@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.JTVSubtitlesApi;
@@ -109,12 +108,9 @@ public final class JTVsubtitlesAdapter
                 subtitleSource:subtitleSource,
                 fileName:sub.filename,
                 language:language,
-                quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.rip),
+                quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.source),
                 subtitleMatchType:SubtitleMatchType.EVERYTHING,
-                releaseGroup:ReleaseParser.extractReleaseGroup(sub.filename,
-                    StringUtils.endsWith(sub.filename, ".srt")),
-                uploader:sub.author,
-                hearingImpaired:false))
+                releaseGroup:sub.releaseGroup))
             .collect(Collectors.toSet());
     }
 
