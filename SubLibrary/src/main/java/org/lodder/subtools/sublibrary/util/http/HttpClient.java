@@ -28,21 +28,16 @@ import org.jsoup.helper.HttpConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpClient {
-
-    private final CookieManager cookieManager;
+public record HttpClient(CookieManager cookieManager=new CookieManager()) {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
-    public HttpClient(CookieManager cookieManager=new CookieManager()) {
-        this.cookieManager = cookieManager;
-    }
-
-    public String doGet(URL url, String userAgent) throws IOException, HttpClientException {
+    public String doGet(URL url, String userAgent, CookieManager cookieManager=null) throws IOException,
+        HttpClientException {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
-            cookieManager.setCookies(conn);
+            getCookieManager(cookieManager).setCookies(conn);
             if (StringUtils.isNotBlank(userAgent)) {
                 conn.setRequestProperty(HttpHeaders.USER_AGENT, userAgent);
             }
@@ -57,7 +52,8 @@ public class HttpClient {
         }
     }
 
-    public String doPost(URL url, String userAgent, Map<String, String> data) throws HttpClientException {
+    public String doPost(URL url, String userAgent, Map<String, String> data, CookieManager cookieManager=null)
+        throws HttpClientException {
         HttpURLConnection conn = null;
 
         try {
@@ -66,7 +62,7 @@ public class HttpClient {
                 .collect(Collectors.joining("&"));
 
             conn = (HttpURLConnection) url.openConnection();
-            cookieManager.setCookies(conn);
+            getCookieManager(cookieManager).setCookies(conn);
             conn.setRequestMethod("POST");
             if (StringUtils.isNotBlank(userAgent)) {
                 conn.setRequestProperty(HttpHeaders.USER_AGENT, userAgent);
@@ -84,10 +80,10 @@ public class HttpClient {
                 out.flush();
             }
 
-            cookieManager.storeCookies(conn);
+            getCookieManager(cookieManager).storeCookies(conn);
 
             if (conn.responseCode == 302 && isUrl(conn.getHeaderField(HttpHeaders.LOCATION))) {
-                return doGet(new URI(conn.getHeaderField(HttpHeaders.LOCATION)).toURL(), userAgent);
+                return doGet(new URI(conn.getHeaderField(HttpHeaders.LOCATION)).toURL(), userAgent, cookieManager);
             }
             return InputStreamExt.asString(conn.getInputStream(), StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
@@ -99,12 +95,12 @@ public class HttpClient {
         }
     }
 
-    public boolean doDownloadFile(URL url, final Path file) {
+    public boolean doDownloadFile(URL url, final Path file, CookieManager cookieManager=null) {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
         boolean success = true;
 
         try (InputStream in = url.getFile().endsWith(".gz") ?
-            new GZIPInputStream(url.openStream()) : getInputStream(url)) {
+            new GZIPInputStream(url.openStream()) : getInputStream(url, getCookieManager(cookieManager))) {
             byte[] data = in.readAllBytes();
 
             if (url.getFile().endsWith(".zip") || PathExt.isZipFile(new ByteArrayInputStream(data))) {
@@ -129,7 +125,7 @@ public class HttpClient {
         return success;
     }
 
-    private InputStream getInputStream(URL url) throws Exception {
+    private InputStream getInputStream(URL url, CookieManager cookieManager=null) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         cookieManager.setCookies(conn);
         conn.addRequestProperty(HttpHeaders.USER_AGENT, "Mozilla");
@@ -151,7 +147,7 @@ public class HttpClient {
                     newUrl = new URI("%s://%s/%s".formatted(url.protocol, conn.getURL().host,
                         locationHeader.trim().replace(" ", "%20"))).toURL();
                 }
-                return getInputStream(newUrl);
+                return getInputStream(newUrl, cookieManager);
             }
             throw new Exception("error: " + status);
         } else {
@@ -177,5 +173,9 @@ public class HttpClient {
 
     public void storeCookies(String domain, Map<String, String> cookieMap) {
         cookieManager.storeCookies(domain, cookieMap);
+    }
+
+    private CookieManager getCookieManager(CookieManager cookieManager) {
+        return cookieManager == null ? this.cookieManager : cookieManager;
     }
 }
