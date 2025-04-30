@@ -38,6 +38,7 @@ import org.lodder.subtools.sublibrary.cache.DiskCache;
 import org.lodder.subtools.sublibrary.cache.InMemoryCache;
 import org.lodder.subtools.sublibrary.util.Nothing;
 import org.lodder.subtools.sublibrary.util.Sleep;
+import org.lodder.subtools.sublibrary.util.http.CookieManager;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.xml.XMLHelper;
@@ -110,7 +111,8 @@ public class Manager {
     public String get(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
             case NONE -> getContentWithoutCache(params);
-            case MEMORY -> inMemoryCache.getOrPut(params.url, () -> getContentWithoutCache(params));
+            case MEMORY -> inMemoryCache.getOrPut(params.url + params.cookieManager(),
+                () -> getContentWithoutCache(params));
             case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
         };
     }
@@ -157,21 +159,23 @@ public class Manager {
     }
 
     private String getContentWithoutCache(PageContentParams params) throws ManagerException {
-        return getContentWithoutCache(params.url, params.userAgent, params.retry);
+        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager);
     }
 
-    private String getContentWithoutCache(String url, String userAgent, Retry retry) throws ManagerException {
+    private String getContentWithoutCache(String url, String userAgent, Retry retry,
+        CookieManager cookieManager) throws ManagerException {
         try {
-            return httpClient.doGet(new URI(url).toURL(), userAgent);
+            return httpClient.doGet(new URI(url).toURL(), userAgent, cookieManager);
         } catch (HttpClientException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep());
+                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
             }
             throw new ManagerException(
-                "Error occurred with httpclient response: %s %s".formatted(e.responseCode, e.responseMessage), e);
+                "Error occurred with httpclient response: %s %s while accessing %s".formatted(e.responseCode,
+                    e.responseMessage, url), e);
         } catch (IOException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                return getContentWithoutCache(url, userAgent, retry.decreaseRetries());
+                return getContentWithoutCache(url, userAgent, retry.decreaseRetries(), cookieManager);
             }
             throw new ManagerException(e);
         } catch (URISyntaxException e) {
@@ -321,7 +325,7 @@ public class Manager {
             Retry retry=Retry.NONE, boolean storeAsTempValue=false, boolean storeTempNullValue=false,
             @Nullable Time timeToLive=null) throws X {
 
-            V object = value.supplier != null ? executeSupplier(value.supplier, retry) : value.value;
+            Object object = value.getBaseValue(retry);
             Time ttl = null;
             if (storeAsTempValue || (storeTempNullValue && object == null)) {
                 ttl = getTemporaryTimeToLive().map(time -> time * 2)
@@ -370,6 +374,8 @@ public class Manager {
     public interface ValueIntf<V, X extends Exception> {
         @val V value;
         @val ThrowingSupplier<V, X> supplier;
+
+        Object getBaseValue(Retry retry) throws X;
     }
 
     public static class Value<V extends Serializable, X extends Exception> implements ValueIntf<V, X> {
@@ -388,6 +394,10 @@ public class Manager {
             this.value = value;
             this.supplier = supplier;
         }
+
+        public Object getBaseValue(Retry retry) throws X {
+            return supplier != null ? executeSupplier(supplier, retry) : value;
+        }
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -405,10 +415,13 @@ public class Manager {
             return new OptionalValue<>(null, supplier);
         }
 
-
         private OptionalValue(Optional<V> value, ThrowingSupplier<Optional<V>, X> supplier) {
             this.value = value;
             this.supplier = supplier;
+        }
+
+        public Object getBaseValue(Retry retry) throws X {
+            return supplier != null ? executeSupplier(supplier, retry).orElse(null) : value.orElse(null);
         }
     }
 
@@ -429,6 +442,11 @@ public class Manager {
             this.value = value;
             this.supplier = supplier;
         }
+
+        public Object getBaseValue(Retry retry) throws X {
+            return supplier != null ? executeSupplier(supplier, retry).mapToObj(i -> i).orElse(null) :
+                value.mapToObj(i -> i).orElse(null);
+        }
     }
 
 
@@ -448,6 +466,10 @@ public class Manager {
         private CollectionValue(C value, ThrowingSupplier<C, X> supplier) {
             this.value = value;
             this.supplier = supplier;
+        }
+
+        public Object getBaseValue(Retry retry) throws X {
+            return supplier != null ? executeSupplier(supplier, retry) : value;
         }
     }
 
