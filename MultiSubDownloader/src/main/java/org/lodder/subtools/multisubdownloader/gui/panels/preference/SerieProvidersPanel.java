@@ -37,7 +37,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     private final JCheckBox chkUserOpenSubtitlesLogin;
     private final MyTextFieldString txtOpenSubtitlesUsername;
     private final MyPasswordField txtOpenSubtitlesPassword;
-    private final JCheckBox chkSourceSubscene;
+    //    private final JCheckBox chkSourceSubscene;
     private final JCheckBox chkSourceLocal;
     private final JListWithImages<Path> localSourcesFoldersList;
 
@@ -93,7 +93,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                         MyPasswordField.builder().requireValue().build().columns(20)));
 
             // SUBSCENE
-            this.chkSourceSubscene = new JCheckBox("Subscene").addTo(titlePanel, "wrap");
+//            this.chkSourceSubscene = new JCheckBox("Subscene").addTo(titlePanel, "wrap");
 
             // LOCAL
             this.chkSourceLocal = new JCheckBox(getText("PreferenceDialog.Local"));
@@ -136,7 +136,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         chkUserOpenSubtitlesLogin.setSelected(settings.loginOpenSubtitlesEnabled);
         txtOpenSubtitlesUsername.setText(settings.loginOpenSubtitlesUsername);
         txtOpenSubtitlesPassword.setText(settings.loginOpenSubtitlesPassword);
-        chkSourceSubscene.setSelected(settings.serieSourceSubscene);
+//        chkSourceSubscene.setSelected(settings.serieSourceSubscene);
         chkSourceLocal.setSelected(settings.serieSourceLocal);
         settings.localSourcesFolders.forEach(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.image, path));
     }
@@ -154,7 +154,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         settings.loginOpenSubtitlesEnabled = chkUserOpenSubtitlesLogin.isSelected();
         settings.loginOpenSubtitlesUsername = txtOpenSubtitlesUsername.getText();
         settings.loginOpenSubtitlesPassword = new String(txtOpenSubtitlesPassword.getPassword());
-        settings.serieSourceSubscene = chkSourceSubscene.isSelected();
+        settings.serieSourceSubscene = false; //chkSourceSubscene.isSelected();
         settings.serieSourceLocal = chkSourceLocal.isSelected();
         settings.localSourcesFolders = localSourcesFoldersList.stream().map(LabelPanel::getObject).toList();
     }
