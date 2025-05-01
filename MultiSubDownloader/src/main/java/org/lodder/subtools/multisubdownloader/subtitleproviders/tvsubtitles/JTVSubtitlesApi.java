@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitlesException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleDescriptor;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleDescriptor.TVSubtitlesSubtitleDescriptorBuilder;
 import org.lodder.subtools.sublibrary.Language;
@@ -37,7 +37,7 @@ public class JTVSubtitlesApi implements SubtitleApi {
         this.manager = manager;
     }
 
-    public List<ProviderSerieId> getUrisForSerieName(String serieName) throws TvSubtitlesException {
+    public List<ProviderSerieId> getUrisForSerieName(String serieName) throws TvSubtitleException {
         try {
             return manager.postBuilder("$DOMAIN/search.php")
                 .addData("qs", serieName)
@@ -48,12 +48,12 @@ public class JTVSubtitlesApi implements SubtitleApi {
                     StringUtils.substringAfterLast(element.attr("href"), "/")))
                 .toList();
         } catch (Exception e) {
-            throw new TvSubtitlesException(e);
+            throw new TvSubtitleException(e);
         }
     }
 
     public Set<TVSubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
-        Language language) throws TvSubtitlesException {
+        Language language) throws TvSubtitleException {
         // https://www.tvsubtitles.net/setlang.php?page=/tvshow-3219-2.html&setlang1=es
         Set<TVSubtitlesSubtitleDescriptor> results = new HashSet<>();
         Optional<EpisodeRow> episodeRow = getSeasonSubtitleInfo(providerSerieId.providerId, season, language).filter(
@@ -68,7 +68,7 @@ public class JTVSubtitlesApi implements SubtitleApi {
     }
 
     private List<EpisodeRow> getSeasonSubtitleInfo(String providerSerieId, int season, Language language)
-        throws TvSubtitlesException {
+        throws TvSubtitleException {
         return manager.getCache(CacheType.MEMORY,
                 subtitleSource.name() + "subtitleInfo-$providerSerieId-$season-$language")
             .getCollection(() -> {
@@ -94,13 +94,13 @@ public class JTVSubtitlesApi implements SubtitleApi {
                                 Integer.parseInt(seasonEpisode[1]), urls);
                         }).filter(episodeRow -> !episodeRow.urls.isEmpty()).toList();
                 } catch (Exception e) {
-                    throw new TvSubtitlesException(e);
+                    throw new TvSubtitleException(e);
                 }
             });
     }
 
     private List<TVSubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl)
-        throws TvSubtitlesException {
+        throws TvSubtitleException {
         return manager.getCache(CacheType.MEMORY, subtitleSource.name() + "subtitles-$episodeUrl")
             .getCollection(() -> {
                 try {
@@ -126,7 +126,7 @@ public class JTVSubtitlesApi implements SubtitleApi {
                             return subtitleBuilder.build();
                         }).toList();
                 } catch (ManagerException e) {
-                    throw new TvSubtitlesException(e);
+                    throw new TvSubtitleException(e);
                 }
             });
     }

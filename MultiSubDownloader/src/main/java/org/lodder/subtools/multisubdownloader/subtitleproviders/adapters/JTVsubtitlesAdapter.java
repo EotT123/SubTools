@@ -14,7 +14,7 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.JTVSubtitlesApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitlesException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleDescriptor;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class JTVsubtitlesAdapter
-    extends AbstractAdapter<TVSubtitlesSubtitleDescriptor, ProviderSerieId, TvSubtitlesException> {
+    extends AbstractAdapter<TVSubtitlesSubtitleDescriptor, ProviderSerieId, TvSubtitleException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JTVsubtitlesAdapter.class);
 
@@ -85,12 +85,12 @@ public final class JTVsubtitlesAdapter
 
     @Override
     public Set<TVSubtitlesSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
-        throws TvSubtitlesException {
+        throws TvSubtitleException {
         return getProviderSerieId(tvRelease).map(
             providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                } catch (TvSubtitlesException e) {
+                } catch (TvSubtitleException e) {
                     LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                         TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                         e.getMessage()), e);
@@ -116,7 +116,7 @@ public final class JTVsubtitlesAdapter
 
     @Override
     public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws TvSubtitlesException {
+        throws TvSubtitleException {
         Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
         return getApi().getUrisForSerieName(serieName)
             .stream()

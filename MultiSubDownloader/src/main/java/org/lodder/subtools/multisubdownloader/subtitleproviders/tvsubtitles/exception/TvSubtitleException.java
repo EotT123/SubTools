@@ -9,7 +9,7 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 @StandardException
-public class TvSubtitlesException extends SubtitlesProviderException {
+public class TvSubtitleException extends SubtitlesProviderException {
 
     @Serial
     private static final long serialVersionUID = -9050358290926245586L;

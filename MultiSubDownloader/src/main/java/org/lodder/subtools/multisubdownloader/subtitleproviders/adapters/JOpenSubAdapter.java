@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 public final class JOpenSubAdapter
-    extends AbstractAdapter<org.opensubtitles.model.Subtitle, OpensubtitleSerieId, OpenSubtitlesException> {
+    extends AbstractAdapter<org.opensubtitles.model.Subtitle, OpensubtitleSerieId, OpenSubtitleException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JOpenSubAdapter.class);
 
@@ -51,7 +51,7 @@ public final class JOpenSubAdapter
             osApi = new LazySupplier<>(() -> {
                 try {
                     return new OpenSubtitlesApi(manager, credentials);
-                } catch (OpenSubtitlesException e) {
+                } catch (OpenSubtitleException e) {
                     throw new SubtitlesProviderInitException(providerName, e);
                 }
             });
@@ -64,20 +64,20 @@ public final class JOpenSubAdapter
 
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithHash(String hash, Language language)
-        throws OpenSubtitlesException {
+        throws OpenSubtitleException {
         return getApi().searchSubtitles().movieHash(hash).language(language).searchSubtitles().getData();
     }
 
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(int tvdbId, Language language)
-        throws OpenSubtitlesException {
+        throws OpenSubtitleException {
         return getApi().searchSubtitles().imdbId(tvdbId).language(language).searchSubtitles().getData();
     }
 
     @Override
     public Collection<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithName(String name,
         @Nullable Integer year,
-        Language language) throws OpenSubtitlesException {
+        Language language) throws OpenSubtitleException {
         return getApi().searchSubtitles().query(name).language(language).searchSubtitles().getData();
     }
 
@@ -96,7 +96,7 @@ public final class JOpenSubAdapter
 
     @Override
     public Set<org.opensubtitles.model.Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language)
-        throws OpenSubtitlesException {
+        throws OpenSubtitleException {
         return getProviderSerieId(tvRelease).map(
             providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
@@ -108,7 +108,7 @@ public final class JOpenSubAdapter
                         .searchSubtitles()
                         .getData()
                         .stream();
-                } catch (OpenSubtitlesException e) {
+                } catch (OpenSubtitleException e) {
                     LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
                         TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
                         e.getMessage()), e);
@@ -148,7 +148,7 @@ public final class JOpenSubAdapter
 
     @Override
     public List<OpensubtitleSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws OpenSubtitlesException {
+        throws OpenSubtitleException {
         return getApi().getProviderSerieIds(serieName)
             .stream()
             .sorted(

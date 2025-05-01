@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.AiTranslatedEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.ForeignPartsOnlyEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.HearingImpairedEnum;
@@ -79,7 +79,7 @@ public final class SearchSubtitles extends OpenSubtitlesExecuter {
 
     private String userAgent = "SubTools"; // should be set
 
-    public Subtitles200Response searchSubtitles() throws OpenSubtitlesException {
+    public Subtitles200Response searchSubtitles() throws OpenSubtitleException {
         return manager.getCache(CacheType.MEMORY,
                 "OpenSubtitles-subtitles-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s".formatted(
                     id, imdbId, tmdbId, type, query, language, movieHash, userId, hearingImpaired, foreignPartsOnly,
@@ -96,7 +96,7 @@ public final class SearchSubtitles extends OpenSubtitlesExecuter {
                             parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
                             getValue(movieHashMatch), page, userAgent));
                 } catch (Exception e) {
-                    throw new OpenSubtitlesException(e);
+                    throw new OpenSubtitleException(e);
                 }
             });
     }
