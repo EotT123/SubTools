@@ -2,7 +2,7 @@ package org.lodder.subtools.multisubdownloader.gui.dialog.progress.search;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,5 +44,10 @@ public class SearchProgressTableModel extends DefaultTableModel {
 
         Object[] row = { source, queue, release };
         this.addRow(row);
+    }
+
+    public void clear() {
+        rowMap.clear();
+        dataVector.removeAllElements();
     }
 }

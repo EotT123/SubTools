@@ -85,6 +85,7 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
     @Override
     public void reset() {
         this.completed = false;
+        tableModel.clear();
     }
 
     @Override

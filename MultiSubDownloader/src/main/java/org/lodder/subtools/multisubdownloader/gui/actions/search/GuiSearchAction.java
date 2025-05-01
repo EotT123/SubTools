@@ -77,4 +77,8 @@ public abstract sealed class GuiSearchAction<P extends InputPanel> extends Searc
             searchPanel.inputPanel.enableSearchButton();
         }
     }
+
+    public void reset() {
+        searchProgressListener.reset();
+    }
 }
