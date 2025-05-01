@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
@@ -28,7 +27,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
         this.librarySettings = librarySettings;
 
         JPanel titlePanel = new TitlePanel(
-            title:Messages.getText("PreferenceDialog.SubtitlesBackup"),
+            title:getText("PreferenceDialog.SubtitlesBackup"),
             margin:new BoxModelProperties(0),
             padding:new BoxModelProperties(0, 20, 0, 0))
             .addToPanel(this, "span, growx");

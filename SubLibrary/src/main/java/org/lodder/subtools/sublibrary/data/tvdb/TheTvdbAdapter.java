@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -134,12 +133,12 @@ public class TheTvdbAdapter {
     }
 
     private OptionalInt askUserToEnterTvdbId(String showName) {
-        return userInteractionHandler.enter(Messages.getText("InputPanel.EnterTvdbId", showName))
+        return userInteractionHandler.enter(getText("InputPanel.EnterTvdbId", showName))
             .map(tvdbidString -> {
                 try {
                     return OptionalInt.of(Integer.parseInt(tvdbidString));
                 } catch (NumberFormatException e) {
-                    LOGGER.error(Messages.getText("InputPanel.invalid.tvdbid", tvdbidString));
+                    LOGGER.error(getText("InputPanel.invalid.tvdbid", tvdbidString));
                     return askUserToEnterTvdbId(showName);
                 }
             }).orElseGet(OptionalInt::empty);

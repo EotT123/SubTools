@@ -1,12 +1,12 @@
 package org.lodder.subtools.multisubdownloader.gui.panels;
 
 import static manifold.ext.props.rt.api.PropOption.*;
+import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
 import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
 import org.lodder.subtools.sublibrary.Language;
 
@@ -14,7 +14,7 @@ public abstract sealed class InputPanel extends JPanel permits SearchFileInputPa
 
     @Serial
     private static final long serialVersionUID = 7753220002440733463L;
-    @val JButton searchButton = new JButton(Messages.getText("InputPanel.SearchForSubtitles"));
+    @val JButton searchButton = new JButton(getText("InputPanel.SearchForSubtitles"));
     @val(Protected) JComboBox<Language> languageCbx =
         new JComboBox<>(Language.values()).toMessageStringRenderer(Language::getMsgCode);
 

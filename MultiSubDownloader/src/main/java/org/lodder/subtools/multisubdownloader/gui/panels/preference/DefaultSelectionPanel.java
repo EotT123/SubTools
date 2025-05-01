@@ -1,9 +1,10 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
 import static java.util.function.Predicate.*;
+import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Collection;
@@ -12,7 +13,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.ArrowButton;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
@@ -30,10 +30,10 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         this.settingsCtrl = settingsCtrl;
 
         unusedPatternsTable =
-            ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUnused"), Source.class)
+            ScrollTable.create(getText("PreferenceDialog.DefaultSelectionUnused"), Source.class)
                 .add(this, "spany 2");
         new ArrowButton(SwingConstants.EAST, 1, 10).actionListener(this::addPattern).addTo(this);
-        usedPatternsTable = ScrollTable.create(Messages.getText("PreferenceDialog.DefaultSelectionUsed"), Source.class)
+        usedPatternsTable = ScrollTable.create(getText("PreferenceDialog.DefaultSelectionUsed"), Source.class)
             .add(this, "spany 2");
         new ArrowButton(SwingConstants.NORTH, 1, 10).actionListener(this::moveRuleRowUp).addTo(this, "wrap");
 

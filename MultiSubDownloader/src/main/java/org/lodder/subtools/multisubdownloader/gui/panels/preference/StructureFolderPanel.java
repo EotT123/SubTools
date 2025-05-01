@@ -7,7 +7,6 @@ import java.io.Serial;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -39,7 +38,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         this.librarySettings = librarySettings;
 
         JPanel titlePanel = new TitlePanel(
-            title:Messages.getText("PreferenceDialog.MoveToLibrary"),
+            title:getText("PreferenceDialog.MoveToLibrary"),
             margin:new BoxModelProperties(0, 20, 0, 0),
             padding:new BoxModelProperties(0, 20, 0, 0),
             useGrid:true,

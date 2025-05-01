@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader;
 
 import static java.time.temporal.ChronoUnit.*;
+import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.time.Instant;
@@ -97,9 +98,9 @@ public class UpdateAvailableGithub {
                     return Optional.of(url);
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
-                        LOGGER.trace(Messages.getText("LoggingPanel.UpdateCheckFailed"), e);
+                        LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
-                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
                     return Optional.empty();
                 }
@@ -132,9 +133,9 @@ public class UpdateAvailableGithub {
                     return Optional.of(downloadUrl);
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
-                        LOGGER.trace(Messages.getText("LoggingPanel.UpdateCheckFailed"), e);
+                        LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
-                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
                     return Optional.empty();
                 }
