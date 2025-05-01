@@ -3,6 +3,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.except
 import java.io.Serial;
 
 import lombok.experimental.StandardException;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
@@ -11,9 +13,6 @@ public class SubsceneException extends SubtitlesProviderException {
 
     @Serial
     private static final long serialVersionUID = -9050358290926245586L;
-
-    @Override
-    public String getSubtitleProvider() {
-        return SubtitleSource.SUBSCENE.name;
-    }
+    
+    @val @override String subtitleProvider = SubtitleSource.SUBSCENE.name;
 }

@@ -3,6 +3,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.excep
 import java.io.Serial;
 
 import lombok.experimental.StandardException;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
@@ -12,8 +14,5 @@ public class PodnapisiException extends SubtitlesProviderException {
     @Serial
     private static final long serialVersionUID = -2390367212064062005L;
 
-    @Override
-    public String getSubtitleProvider() {
-        return SubtitleSource.PODNAPISI.name;
-    }
+    @val @override String subtitleProvider = SubtitleSource.PODNAPISI.name;
 }

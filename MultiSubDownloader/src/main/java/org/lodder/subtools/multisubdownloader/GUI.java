@@ -435,7 +435,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                             LOGGER.error("downloadText", e);
                         } catch (SubtitlesProviderException e) {
                             LOGGER.error("Error while getting url for [%s] for subtitle provider [%s] (%s)"
-                                .formatted(filename, e.getSubtitleProvider(), e.getMessage()), e);
+                                .formatted(filename, e.subtitleProvider, e.getMessage()), e);
                             throw new RuntimeException(e);
                         }
                     }
