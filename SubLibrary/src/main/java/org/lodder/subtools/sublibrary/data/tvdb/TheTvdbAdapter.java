@@ -94,15 +94,15 @@ public class TheTvdbAdapter {
         }
         if (tvdbSerie.isEmpty()) {
             cache.store(
-                value:OptionalValue.of(tvdbSerie),
+                value:Value.ofOptional(tvdbSerie),
                 timeToLive:cache.getTemporaryTimeToLive().map(v -> v * 2).orElseGet(() -> 1 day),
                 storeAsTempValue:true,
                 storeTempNullValue:true);
         } else {
-            cache.store(OptionalValue.of(tvdbSerie));
+            cache.store(Value.ofOptional(tvdbSerie));
             manager.getCache(CacheType.DISK, "$PROVIDER_NAME-serieId-$encodedSerieName")
                 .store(
-                    value:OptionalValue.of(
+                    value:Value.ofOptional(
                         tvdbSerie.map(tvdbS -> new SerieMapping(serieName, String.valueOf(tvdbS.id), tvdbS.serieName))),
                     storeTempNullValue:true);
         }

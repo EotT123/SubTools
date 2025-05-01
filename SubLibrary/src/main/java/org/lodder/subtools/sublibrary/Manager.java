@@ -21,9 +21,9 @@ import java.util.OptionalInt;
 import java.util.function.Predicate;
 
 import lombok.AllArgsConstructor;
-import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -278,7 +278,7 @@ public class Manager {
                 Cache<String, V> cache = optionalCache.get();
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
-                    store(OptionalValue.of(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
+                    store(Value.ofOptional(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
                     return cache.get(key);
                 } else if (containsKey && !isExpiredTemporary()) {
                     return cache.get(key);
@@ -304,7 +304,7 @@ public class Manager {
             return manager.getOptionalCache(cacheType).mapThrowing(cache -> {
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
-                    store(OptionalIntValue.of(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
+                    store(Value.ofOptionalInt(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
                     return cache.get(key).mapToInt(t -> (int) t);
                 } else if (containsKey && !isExpiredTemporary()) {
                     return cache.get(key).mapToInt(t -> (int) t);
@@ -321,11 +321,11 @@ public class Manager {
             }).orElseGetThrowing(supplier);
         }
 
-        public <V, X extends Exception> void store(ValueIntf<V, X> value,
+        public <V, X extends Exception> void store(Value<V, X> value,
             Retry retry=Retry.NONE, boolean storeAsTempValue=false, boolean storeTempNullValue=false,
             @Nullable Time timeToLive=null) throws X {
 
-            Object object = value.getBaseValue(retry);
+            Object object = value.getValue(retry);
             Time ttl = null;
             if (storeAsTempValue || (storeTempNullValue && object == null)) {
                 ttl = getTemporaryTimeToLive().map(time -> time * 2)
@@ -371,105 +371,43 @@ public class Manager {
         return new CacheKeyFilter(this, cacheType, keyFilter);
     }
 
-    public interface ValueIntf<V, X extends Exception> {
-        @val V value;
-        @val ThrowingSupplier<V, X> supplier;
-
-        Object getBaseValue(Retry retry) throws X;
-    }
-
-    public static class Value<V extends Serializable, X extends Exception> implements ValueIntf<V, X> {
-        @override @val V value;
-        @override @val ThrowingSupplier<V, X> supplier;
-
-        public static <V extends Serializable> Value<V, Nothing> of(V value) {
-            return new Value<>(value, null);
-        }
-
-        public static <V extends Serializable, X extends Exception> Value<V, X> of(ThrowingSupplier<V, X> supplier) {
-            return new Value<>(null, supplier);
-        }
-
-        private Value(V value, ThrowingSupplier<V, X> supplier) {
-            this.value = value;
-            this.supplier = supplier;
-        }
-
-        public Object getBaseValue(Retry retry) throws X {
-            return supplier != null ? executeSupplier(supplier, retry) : value;
-        }
-    }
-
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public static class OptionalValue<V extends Serializable, X extends Exception> implements
-        ValueIntf<Optional<V>, X> {
-        @override @val Optional<V> value;
-        @override @val ThrowingSupplier<Optional<V>, X> supplier;
-
-        public static <V extends Serializable> OptionalValue<V, Nothing> of(Optional<V> value) {
-            return new OptionalValue<>(value, null);
+    public record Value<V, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
+        public static <V> Value<V, Nothing> of(V value) {
+            return new Value<>(_ -> value);
         }
 
-        public static <V extends Serializable, X extends Exception> OptionalValue<V, X> of(
-            ThrowingSupplier<Optional<V>, X> supplier) {
-            return new OptionalValue<>(null, supplier);
+        public static <V, X extends Exception> Value<V, X> of(ThrowingSupplier<V, X> supplier) {
+            return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 
-        private OptionalValue(Optional<V> value, ThrowingSupplier<Optional<V>, X> supplier) {
-            this.value = value;
-            this.supplier = supplier;
+        public static <V> Value<V, Nothing> ofOptional(Optional<V> value) {
+            return new Value<>(_ -> value.orElse(null));
         }
 
-        public Object getBaseValue(Retry retry) throws X {
-            return supplier != null ? executeSupplier(supplier, retry).orElse(null) : value.orElse(null);
-        }
-    }
-
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public static class OptionalIntValue<X extends Exception> implements ValueIntf<OptionalInt, X> {
-        @override @val OptionalInt value;
-        @override @val ThrowingSupplier<OptionalInt, X> supplier;
-
-        public static OptionalIntValue<Nothing> of(OptionalInt value) {
-            return new OptionalIntValue<>(value, null);
+        public static <V, X extends Exception> Value<V, X> ofOptional(ThrowingSupplier<Optional<V>, X> supplier) {
+            return new Value<>(retry -> executeSupplier(supplier, retry).orElse(null));
         }
 
-        public static <X extends Exception> OptionalIntValue<X> of(ThrowingSupplier<OptionalInt, X> supplier) {
-            return new OptionalIntValue<>(null, supplier);
+        public static Value<Integer, Nothing> ofOptionalInt(OptionalInt value) {
+            return ofOptional(() -> value.mapToObj(i -> i));
         }
 
-        private OptionalIntValue(OptionalInt value, ThrowingSupplier<OptionalInt, X> supplier) {
-            this.value = value;
-            this.supplier = supplier;
+        public static <X extends Exception> Value<Integer, X> ofOptionalInt(ThrowingSupplier<OptionalInt, X> supplier) {
+            return ofOptional(() -> supplier.get().mapToObj(i -> i));
         }
 
-        public Object getBaseValue(Retry retry) throws X {
-            return supplier != null ? executeSupplier(supplier, retry).mapToObj(i -> i).orElse(null) :
-                value.mapToObj(i -> i).orElse(null);
-        }
-    }
-
-
-    public static class CollectionValue<C extends Collection<V>, V, X extends Exception> implements ValueIntf<C, X> {
-        @override @val C value;
-        @override @val ThrowingSupplier<C, X> supplier;
-
-        public static <C extends Collection<V>, V extends Serializable> CollectionValue<C, V, Nothing> of(C value) {
-            return new CollectionValue<>(value, null);
+        public static <C extends Collection<V>, V> Value<C, Nothing> ofCollection(C value) {
+            return new Value<>(_ -> value);
         }
 
-        public static <C extends Collection<V>, V extends Serializable, X extends Exception> CollectionValue<C, V, X> of(
-            ThrowingSupplier<C, X> supplier) {
-            return new CollectionValue<>(null, supplier);
+        public static <C extends Collection<V>, V, X extends Exception> Value<C, X> ofCollection(ThrowingSupplier<C,
+            X> supplier) {
+            return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 
-        private CollectionValue(C value, ThrowingSupplier<C, X> supplier) {
-            this.value = value;
-            this.supplier = supplier;
-        }
-
-        public Object getBaseValue(Retry retry) throws X {
-            return supplier != null ? executeSupplier(supplier, retry) : value;
+        public V getValue(Retry retry) throws X {
+            return supplier.apply(retry);
         }
     }
 

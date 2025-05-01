@@ -22,7 +22,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesHasher;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
-import org.lodder.subtools.sublibrary.Manager.CollectionValue;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
@@ -210,7 +209,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
                         timeToLive:serieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
                         storeAsTempValue:true,
                         storeTempNullValue:true);
-                    previousResultsCache.store(CollectionValue.of(providerSerieIds));
+                    previousResultsCache.store(Value.ofCollection(providerSerieIds));
                 }
                 return Optional.empty();
             }
