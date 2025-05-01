@@ -9,14 +9,7 @@ public enum LibraryActionType {
     NOTHING("PreferenceDialog.Action.Nothing"),
     RENAME("PreferenceDialog.Action.Rename"),
     MOVE("PreferenceDialog.Action.Move"),
-    MOVEANDRENAME("PreferenceDialog.Action.MoveAndRename");
+    MOVE_AND_RENAME("PreferenceDialog.Action.MoveAndRename");
 
     @val String msgCode;
-
-    @Deprecated(since = "Settings version 2")
-    public static LibraryActionType fromString(String description) {
-        return LibraryActionType.values().stream()
-                .filter(v -> description.equalsIgnoreCase(v.toString())).findAny()
-                .orElse(LibraryActionType.NOTHING);
-    }
 }

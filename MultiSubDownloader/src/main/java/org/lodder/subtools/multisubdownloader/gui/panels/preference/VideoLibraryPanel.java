@@ -92,10 +92,10 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             LibraryOtherFileActionType ofa = cbxLibraryOtherFileAction.getItemAt(i);
             boolean enabled = switch (libraryActionType) {
                 case MOVE ->
-                    LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.RENAME != ofa;
+                    LibraryOtherFileActionType.MOVE_AND_RENAME != ofa && LibraryOtherFileActionType.RENAME != ofa;
                 case RENAME ->
-                    LibraryOtherFileActionType.MOVEANDRENAME != ofa && LibraryOtherFileActionType.MOVE != ofa;
-                case MOVEANDRENAME -> true;
+                    LibraryOtherFileActionType.MOVE_AND_RENAME != ofa && LibraryOtherFileActionType.MOVE != ofa;
+                case MOVE_AND_RENAME -> true;
                 case NOTHING -> LibraryOtherFileActionType.NOTHING == ofa;
             };
             cbxLibraryOtherFileAction.setItemEnabled(i, enabled);
@@ -106,10 +106,10 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
         LibraryActionType libraryActionType = cbxLibraryAction.getSelectedValue();
         boolean pnlStructureFileVisible = switch (libraryActionType) {
             case MOVE, NOTHING -> false;
-            case RENAME, MOVEANDRENAME -> true;
+            case RENAME, MOVE_AND_RENAME -> true;
         };
         boolean pnlStructureFolderVisible = switch (libraryActionType) {
-            case MOVE, MOVEANDRENAME -> true;
+            case MOVE, MOVE_AND_RENAME -> true;
             case RENAME, NOTHING -> false;
         };
         checkEnableStatus(pnlStructureFile, pnlStructureFileVisible);

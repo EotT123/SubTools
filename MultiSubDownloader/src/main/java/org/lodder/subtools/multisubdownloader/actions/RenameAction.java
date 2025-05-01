@@ -32,13 +32,13 @@ public class RenameAction {
     public void rename(Path f, Release release) {
         String filename = switch (librarySettings.action) {
             case MOVE, NOTHING -> f.getFileNameAsString();
-            case MOVEANDRENAME, RENAME -> getNewFilename(f, release);
+            case MOVE_AND_RENAME, RENAME -> getNewFilename(f, release);
         };
         LOGGER.trace("rename: filename [{}]", filename);
 
 
         Path newDir = switch (librarySettings.action) {
-            case MOVE, MOVEANDRENAME ->
+            case MOVE, MOVE_AND_RENAME ->
                 PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
             case RENAME, NOTHING -> release.getPath();
         };
@@ -57,7 +57,7 @@ public class RenameAction {
 
         try {
             if (librarySettings.hasLibraryAction(LibraryActionType.MOVE) ||
-                librarySettings.hasLibraryAction(LibraryActionType.MOVEANDRENAME)) {
+                librarySettings.hasLibraryAction(LibraryActionType.MOVE_AND_RENAME)) {
                 LOGGER.info("Moving [{}] to the library folder [{}] , this might take a while... ", filename, newDir);
                 file.moveToDirAndRename(newDir, filename);
             } else {

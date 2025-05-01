@@ -47,7 +47,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
             includeLanguageCode:libSettings.includeLanguageCode,
             languageTags:libSettings.langCodeMap,
             tvdbAdapter:libSettings.useTVDBNaming ? TheTvdbAdapter.getInstance(manager, userInteractionHandler) : null,
-            rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME));
+            rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVE_AND_RENAME));
     }
 
     @Override

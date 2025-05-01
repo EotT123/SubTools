@@ -11,19 +11,12 @@ public enum LibraryOtherFileActionType {
     REMOVE("PreferenceDialog.Action.Remove"),
     RENAME("PreferenceDialog.Action.Rename"),
     MOVE("PreferenceDialog.Action.Move"),
-    MOVEANDRENAME("PreferenceDialog.Action.MoveAndRename");
+    MOVE_AND_RENAME("PreferenceDialog.Action.MoveAndRename");
 
     private final String msgCode;
 
     @Override
     public String toString() {
         return Messages.getText(msgCode);
-    }
-
-    @Deprecated(since = "Settings version 2")
-    public static LibraryOtherFileActionType fromString(String description) {
-        return LibraryOtherFileActionType.values().stream()
-                .filter(v -> description.equalsIgnoreCase(v.toString())).findAny()
-                .orElse(LibraryOtherFileActionType.NOTHING);
     }
 }

@@ -36,7 +36,7 @@ public class CleanAction {
             .forEach(p -> {
                 switch (librarySettings.otherFileAction) {
                     case MOVE -> move(p, destination);
-                    case MOVEANDRENAME -> moveAndRename(p, destination, videoFileName);
+                    case MOVE_AND_RENAME -> moveAndRename(p, destination, videoFileName);
                     case REMOVE -> delete(p);
                     case RENAME -> rename(p, destination, videoFileName);
                     case NOTHING -> {
