@@ -43,7 +43,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
         JPanel performActionPanel = new TitlePanel(
             title:getText("PreferenceDialog.PerformActions"),
             margin:new BoxModelProperties(0),
-            padding:new BoxModelProperties(0, 20, 0, 0))
+            padding:new BoxModelProperties(left:20))
             .addToPanel(this, "span, growx");
         {
 

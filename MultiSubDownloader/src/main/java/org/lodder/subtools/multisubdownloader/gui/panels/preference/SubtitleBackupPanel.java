@@ -29,7 +29,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
         JPanel titlePanel = new TitlePanel(
             title:getText("PreferenceDialog.SubtitlesBackup"),
             margin:new BoxModelProperties(0),
-            padding:new BoxModelProperties(0, 20, 0, 0))
+            padding:new BoxModelProperties(left:20))
             .addToPanel(this, "span, growx");
         
         {

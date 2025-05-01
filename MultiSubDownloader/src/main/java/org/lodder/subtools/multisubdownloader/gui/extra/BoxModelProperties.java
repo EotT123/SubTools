@@ -15,15 +15,15 @@ public class BoxModelProperties {
         this.right = right;
     }
 
-    public BoxModelProperties(int padding) {
-        this(padding, padding, padding, padding);
+    public BoxModelProperties(int value) {
+        this(value, value, value, value);
     }
 
     public String getInsets() {
-        return "insets %s %s %s %s".formatted(getPadding(top), getPadding(left), getPadding(bottom), getPadding(right));
+        return "insets %s %s %s %s".formatted(getValue(top), getValue(left), getValue(bottom), getValue(right));
     }
 
-    private String getPadding(Integer padding) {
+    private String getValue(Integer padding) {
         return padding == null ? "n" : String.valueOf(padding);
     }
 }

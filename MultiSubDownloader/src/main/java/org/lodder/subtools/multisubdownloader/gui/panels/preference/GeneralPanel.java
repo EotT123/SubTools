@@ -49,7 +49,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
         JPanel settingsPanel = new TitlePanel(
             title:getText("PreferenceDialog.Settings"),
-            padding:new BoxModelProperties(0, 20, 0, 0),
+            padding:new BoxModelProperties(left:20),
             useGrid:true,
             fillContents:false)
             .addToPanel(this, "span, grow, wrap");
@@ -124,7 +124,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
             JPanel updatePanel = new TitlePanel(
                 title:getText("PreferenceDialog.Update"),
-                padding:new BoxModelProperties(0, 20, 0, 0),
+                padding:new BoxModelProperties(left:20),
                 useGrid:true,
                 fillContents:false)
                 .addToPanel(this, "span, grow, wrap");
@@ -143,7 +143,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
             JPanel proxyPanel = new TitlePanel(
                 title:getText("PreferenceDialog.ConfigureProxy"),
-                padding:new BoxModelProperties(0, 20, 0, 0),
+                padding:new BoxModelProperties(left:20),
                 fillContents:false)
                 .addToPanel(this, "span, grow");
 

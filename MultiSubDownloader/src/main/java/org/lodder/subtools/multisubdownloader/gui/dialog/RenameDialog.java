@@ -57,7 +57,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
         new TitlePanel(
             title:getText("PreferenceDialog.Settings"),
-            padding:new BoxModelProperties(0, 20, 0, 0),
+            padding:new BoxModelProperties(left:20),
             fillContents:true)
             .addToPanel(contentPane, "span, grow, wrap")
             .addComponent("shrink", new JLabel(getText("PreferenceDialog.Location")))

@@ -52,8 +52,8 @@ public class StructureFilePanel extends JPanel {
 
         JPanel titlePanel = new TitlePanel(
             title:getText("PreferenceDialog.RenameFiles"),
-            margin:new BoxModelProperties(0, 20, 0, 0),
-            padding:new BoxModelProperties(0, 20, 0, 0))
+            margin:new BoxModelProperties(left:20),
+            padding:new BoxModelProperties(left:20))
             .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
