@@ -121,6 +121,8 @@ public class JTVSubtitlesApi implements SubtitleApi {
                                     }
                                 }
                             }
+                            subtitleBuilder.url(DOMAIN + "/" + subtitleElement.select("a[href^='download-']")
+                                .attr("href"));
                             return subtitleBuilder.build();
                         }).toList();
                 } catch (ManagerException e) {
