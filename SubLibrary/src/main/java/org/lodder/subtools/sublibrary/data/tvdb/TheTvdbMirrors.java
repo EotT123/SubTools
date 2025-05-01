@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
+
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import org.w3c.dom.Node;
 
 /**
  * @author lodder
- *         <a href="http://code.google.com/p/moviejukebox/">Source</a>
+ * <a href="http://code.google.com/p/moviejukebox/">Source</a>
  */
 public class TheTvdbMirrors {
 
@@ -33,19 +35,17 @@ public class TheTvdbMirrors {
     private final List<String> zipList = new ArrayList<>();
 
     public TheTvdbMirrors(String apikey, Manager manager) throws ManagerException, ParserConfigurationException,
-            IOException {
+        IOException {
         synchronized (this) {
-            manager.getPageContentBuilder()
-                    .url("http://www.thetvdb.com/api/" + apikey + "/mirrors.xml")
-                    .getAsDocument()
+            manager.getAsDocument(url("http://www.thetvdb.com/api/$apikey/mirrors.xml"))
                 .getElementsByTagName("Mirror").stream()
-                    .filter(nMirror -> nMirror.getNodeType() == Node.ELEMENT_NODE)
-                    .map(Element.class::cast)
-                    .forEach(eMirror -> {
-                        String url = XMLHelper.getStringTagValue("mirrorpath", eMirror);
-                        int typeMask = XMLHelper.getIntTagValue("typemask", eMirror);
-                        addMirror(typeMask, url);
-                    });
+                .filter(nMirror -> nMirror.getNodeType() == Node.ELEMENT_NODE)
+                .map(Element.class::cast)
+                .forEach(eMirror -> {
+                    String url = XMLHelper.getStringTagValue("mirrorpath", eMirror);
+                    int typeMask = XMLHelper.getIntTagValue("typemask", eMirror);
+                    addMirror(typeMask, url);
+                });
 
         }
     }

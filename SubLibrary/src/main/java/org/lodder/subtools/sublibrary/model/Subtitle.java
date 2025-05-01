@@ -1,121 +1,109 @@
 package org.lodder.subtools.sublibrary.model;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 
 import com.pivovarit.function.ThrowingSupplier;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.builder.EqualsExclude;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
-public class Subtitle {
-    @EqualsExclude
-    @val ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
-    @val String url;
-    @val Path file;
-    @val SourceLocation sourceLocation;
+public class Subtitle implements Serializable {
 
-    @var String fileName;
-    @var Language language;
-    @var String releaseGroup;
-    @var String uploader;
-    @var SubtitleMatchType subtitleMatchType;
-    @var SubtitleSource subtitleSource;
+    @val DownloadSource downloadSource;
+    @var @Nullable String fileName;
+    @var @Nullable Language language;
+    @var @Nullable String releaseGroup;
+    @var @Nullable String uploader;
+    @var @Nullable SubtitleMatchType subtitleMatchType;
+    @var @Nullable SubtitleSource subtitleSource;
     @var boolean hearingImpaired;
-    @var String quality;
+    @var @Nullable String quality;
     @var int score;
+
+    public Subtitle(DownloadSource downloadSource,
+        @Nullable String fileName=null,
+        @Nullable Language language=null,
+        @Nullable String releaseGroup=null,
+        @Nullable String uploader=null,
+        @Nullable SubtitleMatchType subtitleMatchType=null,
+        @Nullable SubtitleSource subtitleSource=null,
+        boolean hearingImpaired=false,
+        @Nullable String quality=null,
+        int score=0) {
+        this.downloadSource = downloadSource;
+        this.fileName = fileName;
+        this.language = language;
+        this.releaseGroup = releaseGroup;
+        this.uploader = uploader;
+        this.subtitleMatchType = subtitleMatchType;
+        this.subtitleSource = subtitleSource;
+        this.hearingImpaired = hearingImpaired;
+        this.quality = quality;
+        this.score = score;
+    }
+
+    @EqualsAndHashCode
+    public static class DownloadSource {
+        @val SourceLocation sourceLocation;
+        @EqualsExclude @val @Nullable ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
+        @val @Nullable String url;
+        @val @Nullable Path file;
+
+        private DownloadSource(
+            SourceLocation sourceLocation,
+            @Nullable ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier=null,
+            @Nullable String url=null,
+            @Nullable Path file=null) {
+
+            this.urlSupplier = urlSupplier;
+            this.url = url;
+            this.file = file;
+            this.sourceLocation = sourceLocation;
+        }
+
+        public static DownloadSource of(
+            ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier) {
+            return new DownloadSource(SourceLocation.URL_SUPPLIER, urlSupplier:urlSupplier);
+        }
+
+        public static DownloadSource of(String url) {
+            return new DownloadSource(SourceLocation.URL, url:url);
+        }
+
+        public static DownloadSource of(Path file) {
+            return new DownloadSource(SourceLocation.FILE, file:file);
+        }
+        
+        @SuppressWarnings("ConstantConditions")
+        public String getValue() throws SubtitlesProviderException {
+            return switch (sourceLocation) {
+                case FILE -> file.toString();
+                case URL -> url;
+                case URL_SUPPLIER -> urlSupplier.get();
+            };
+        }
+
+        @Override public String toString() {
+            return "DownloadSource: " + sourceLocation + " " + switch (sourceLocation) {
+                case FILE -> file;
+                case URL -> url;
+                case URL_SUPPLIER -> "";
+            };
+        }
+    }
 
     public enum SourceLocation {
         URL, URL_SUPPLIER, FILE
-    }
-
-    private Subtitle(ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier) {
-        this.urlSupplier = urlSupplier;
-        this.url = null;
-        this.file = null;
-        this.sourceLocation = SourceLocation.URL_SUPPLIER;
-    }
-
-    private Subtitle(String url) {
-        this.urlSupplier = null;
-        this.url = url;
-        this.file = null;
-        this.sourceLocation = SourceLocation.URL;
-    }
-
-    private Subtitle(Path file) {
-        this.urlSupplier = null;
-        this.url = null;
-        this.file = file;
-        this.sourceLocation = SourceLocation.FILE;
-    }
-
-    public static Subtitle downloadSource(ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier) {
-        return new Subtitle(urlSupplier);
-    }
-
-    public static Subtitle downloadSource(String url) {
-        return new Subtitle(url);
-    }
-
-    public static Subtitle downloadSource(Path file) {
-        return new Subtitle(file);
     }
 
     @Override
     public String toString() {
         return "${getClass().getSimpleName()}: $fileName $quality";
     }
-
-    public Subtitle fileName(String fileName) {
-        this.fileName = fileName;
-        return this;
-    }
-
-    public Subtitle language(Language language) {
-        this.language = language;
-        return this;
-    }
-
-    public Subtitle releaseGroup(String releaseGroup) {
-        this.releaseGroup = releaseGroup;
-        return this;
-    }
-
-    public Subtitle uploader(String uploader) {
-        this.uploader = uploader;
-        return this;
-    }
-
-    public Subtitle subtitleMatchType(SubtitleMatchType subtitleMatchType) {
-        this.subtitleMatchType = subtitleMatchType;
-        return this;
-    }
-
-    public Subtitle subtitleSource(SubtitleSource subtitleSource) {
-        this.subtitleSource = subtitleSource;
-        return this;
-    }
-
-    public Subtitle hearingImpaired(boolean hearingImpaired) {
-        this.hearingImpaired = hearingImpaired;
-        return this;
-    }
-
-    public Subtitle quality(String quality) {
-        this.quality = quality;
-        return this;
-    }
-
-    public Subtitle score(int score) {
-        this.score = score;
-        return this;
-    }
-
 }

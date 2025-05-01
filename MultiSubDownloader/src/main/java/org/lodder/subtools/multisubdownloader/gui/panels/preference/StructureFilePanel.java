@@ -3,7 +3,9 @@ package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.Serial;
 import java.util.LinkedHashMap;
@@ -19,6 +21,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
@@ -47,12 +50,11 @@ public class StructureFilePanel extends JPanel {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.RenameFiles"))
-            .margin(0)
-            .padding(0)
-            .marginLeft(20)
-            .paddingLeft(20)
-            .addTo(this, "span, grow");
+        JPanel titlePanel = new TitlePanel(
+            title:getText("PreferenceDialog.RenameFiles"),
+            margin:new BoxModelProperties(left:20),
+            padding:new BoxModelProperties(left:20))
+            .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
         this.txtFileStructure =
@@ -72,9 +74,8 @@ public class StructureFilePanel extends JPanel {
 
         this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith"));
 
-        PanelCheckBox.checkbox(chkReplaceSpace)
-            .panelOnSameLine()
-            .addTo(titlePanel, "wrap")
+        new PanelCheckBox(checkbox:chkReplaceSpace, panelOnNewLine:false)
+            .addToPanel(titlePanel, "wrap")
             .addComponent("width pref+10px, wrap",
                 this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
@@ -82,10 +83,11 @@ public class StructureFilePanel extends JPanel {
             new JCheckBox(getText("PreferenceDialog.IncludeLanguageInFileName"))
                 .selectedListener(languageMapping::refreshState).addTo(titlePanel, "wrap");
 
-        JPanel languagePanelRoot = PanelCheckBox.checkbox(chkIncludeLanguageCode)
-            .panelOnNewLine()
-            .panelLayout(new MigLayout("insets 0, novisualpadding", "[][][]"))
-            .addTo(titlePanel, "span, growx");
+        JPanel languagePanelRoot = new PanelCheckBox(
+            checkbox:chkIncludeLanguageCode,
+            panelOnNewLine:true,
+            panelLayout:new MigLayout("insets 0, novisualpadding", "[][][]"))
+            .addToPanel(titlePanel, "span, growx");
         {
             JPanel languagePanel = new JPanel(new MigLayout("insets 0, novisualpadding", "[][][][20px]"));
             JScrollPane languageScrollPane =
@@ -150,16 +152,13 @@ public class StructureFilePanel extends JPanel {
     }
 
     private Function<String, FilenameLibraryBuilder> getLibraryStructureBuilder() {
-        return structure -> FilenameLibraryBuilder.builder()
-            .structure(structure)
-            .replaceSpace(chkReplaceSpace.isSelected())
-            .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
-            .includeLanguageCode(chkIncludeLanguageCode.isSelected())
-            .languageTags(languageMapping.toSettingsMap())
-            .useTvdbName(false)
-            .tvdbAdapter(null)
-            .rename(true)
-            .build();
+        return structure -> new FilenameLibraryBuilder(
+            structure:structure,
+            replaceSpace:chkReplaceSpace.isSelected(),
+            replacingSpaceChar:cbxReplaceSpaceChar.getSelectedValue(),
+            includeLanguageCode:chkIncludeLanguageCode.isSelected(),
+            languageTags:languageMapping.toSettingsMap(),
+            rename:true);
     }
 
     @Override

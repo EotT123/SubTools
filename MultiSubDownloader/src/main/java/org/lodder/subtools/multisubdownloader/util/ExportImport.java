@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.util;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -21,11 +23,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.StandardException;
 import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.val;
-import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler.MessageSeverity;
@@ -59,8 +61,8 @@ public class ExportImport {
     public void importSettings(SettingsType listType) {
         chooseFile(listType.fileType).ifPresent(path -> {
             if (Files.notExists(path)) {
-                userInteractionHandler.showMessage(Messages.getText("ImportExport.FileDoesNotExist"),
-                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
+                userInteractionHandler.showMessage(getText("ImportExport.FileDoesNotExist"),
+                    getText("ImportExport.ErrorWhileImporting"), MessageSeverity.WARNING);
                 return;
             }
             try {
@@ -72,11 +74,11 @@ public class ExportImport {
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                 }
             } catch (CorruptSettingsFileException e) {
-                userInteractionHandler.showMessage(Messages.getText("ImportExport.ImportCorruptFile"),
-                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                userInteractionHandler.showMessage(getText("ImportExport.ImportCorruptFile"),
+                    getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             } catch (Exception e) {
-                userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileImporting"),
-                    Messages.getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
+                userInteractionHandler.showMessage(getText("ImportExport.ErrorWhileImporting"),
+                    getText("ImportExport.ErrorWhileImporting"), MessageSeverity.ERROR);
             }
         });
     }
@@ -92,8 +94,8 @@ public class ExportImport {
                         default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                     }
                 } catch (Exception e) {
-                    userInteractionHandler.showMessage(Messages.getText("ImportExport.ErrorWhileExporting"),
-                        Messages.getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
+                    userInteractionHandler.showMessage(getText("ImportExport.ErrorWhileExporting"),
+                        getText("ImportExport.ErrorWhileExporting"), MessageSeverity.ERROR);
                 }
             });
     }
@@ -122,11 +124,8 @@ public class ExportImport {
             List<SeriemappingWithKey> serieMappingsWithKey = MappingType.values().stream()
                 .map(MappingType::getSelectionForKeyPrefixList)
                 .flatMap(Arrays::stream)
-                .flatMap(selectionForKeyPrefix -> manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
-                    .returnType(SerieMapping.class)
-                    .getEntries()
+                .flatMap(selectionForKeyPrefix -> manager.getCache(CacheType.DISK,
+                        k -> k.startsWith(selectionForKeyPrefix.keyPrefix())).getEntries(SerieMapping.class)
                     .stream()
                     .map(pair -> new SeriemappingWithKey(pair.getKey(), pair.getValue())))
                 .toList();
@@ -148,26 +147,22 @@ public class ExportImport {
                     MappingType.values().stream()
                         .map(MappingType::getSelectionForKeyPrefixList)
                         .flatMap(Arrays::stream)
-                        .forEach(selectionForKeyPrefix -> manager.clearExpiredCacheBuilder()
-                            .cacheType(CacheType.DISK)
-                            .keyFilter((String k) -> k.startsWith(selectionForKeyPrefix.keyPrefix()))
-                            .clear());
+                        .forEach(selectionForKeyPrefix ->
+                            manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
+                                .clearExpiredCache());
                 }
-                serieMappings.forEach(serieMapping -> manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .key(serieMapping.key)
-                    .value(serieMapping.serieMapping)
-                    .store());
+                serieMappings.forEach(serieMapping ->
+                    manager.getCache(CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
             });
         }
 
         private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
-            return userInteractionHandler.choice(Arrays.asList(ImportStyle.values()),
-                Messages.getText("ImportExport.OverwriteOrAdd"),
-                Messages.getText("ImportExport.OverwriteOrAddTitle"),
+            return userInteractionHandler.selectFromList(Arrays.asList(ImportStyle.values()),
+                getText("ImportExport.OverwriteOrAdd"),
+                getText("ImportExport.OverwriteOrAddTitle"),
                 option -> switch (option) {
-                    case OVERWRITE -> Messages.getText("ImportExport.Overwrite");
-                    case APPEND -> Messages.getText("ImportExport.Add");
+                    case OVERWRITE -> getText("ImportExport.Overwrite");
+                    case APPEND -> getText("ImportExport.Add");
                 });
         }
 
@@ -198,5 +193,6 @@ public class ExportImport {
     }
 
     @StandardException
-    private static class CorruptSettingsFileException extends Exception {}
+    public static class CorruptSettingsFileException extends Exception {
+    }
 }

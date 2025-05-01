@@ -12,6 +12,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JAddic7edAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JAddic7edViaProxyAdapter;
+import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Manager;
 
 public class Addic7edServiceProvider implements ServiceProvider {
@@ -43,21 +44,21 @@ public class Addic7edServiceProvider implements ServiceProvider {
         Manager manager = app.makeManager();
 
         boolean loginEnabled = false;
-        String username = "";
-        String password = "";
+        Credentials credentials = null;
         if (settings.loginAddic7edEnabled) {
-            username = StringUtils.trim(settings.loginAddic7edUsername);
-            password = StringUtils.trim(settings.loginAddic7edPassword);
+            String username = StringUtils.trim(settings.loginAddic7edUsername);
+            String password = StringUtils.trim(settings.loginAddic7edPassword);
             /* Protect against empty login */
-            loginEnabled = !username.isEmpty() && !password.isEmpty();
+            if (!username.isEmpty() && !password.isEmpty()) {
+                credentials = new Credentials(username, password);
+            }
         }
 
         if (settings.serieSourceAddic7edProxy) {
             return new JAddic7edViaProxyAdapter(manager, userInteractionHandler);
         } else {
-            return new JAddic7edAdapter(loginEnabled, username, password,
-                app.makePreferences().getBoolean(CliOption.SPEEDY.value, false),
-                manager, userInteractionHandler);
+            boolean speedy = app.makePreferences().getBoolean(CliOption.SPEEDY.value, false);
+            return new JAddic7edAdapter(manager, speedy, credentials, userInteractionHandler);
         }
     }
 

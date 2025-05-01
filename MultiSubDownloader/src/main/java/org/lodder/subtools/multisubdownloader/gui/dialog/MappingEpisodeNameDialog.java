@@ -3,9 +3,10 @@ package org.lodder.subtools.multisubdownloader.gui.dialog;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.RowSorter.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
@@ -41,7 +43,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private Optional<SubtitleProvider> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
-    public MappingEpisodeNameDialog(JFrame frame, Manager manager, SubtitleProviderStore subtitleProviderStore,
+    public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
+        SubtitleProviderStore subtitleProviderStore,
         UserInteractionHandlerGUI userInteractionHandler) {
         super(frame, getText("MappingEpisodeNameDialog.Title"), true);
         this.subtitleProviderStore = subtitleProviderStore;
@@ -56,10 +59,10 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             .addComponent(BorderLayout.CENTER, new JPanel()
                 .border(new EmptyBorder(5, 5, 5, 5))
                 .layout(new GridBagLayout()
-                    .columnWidths(new int[]{ 0, 0 })
-                    .rowHeights(new int[]{ 0, 40, 0 })
-                    .columnWeights(new double[]{ 1.0, Double.MIN_VALUE })
-                    .rowWeights(new double[]{ 0.0, 1.0, Double.MIN_VALUE }))
+                    .columnWidths(new int[]{0, 0})
+                    .rowHeights(new int[]{0, 40, 0})
+                    .columnWeights(new double[]{1.0, Double.MIN_VALUE})
+                    .rowWeights(new double[]{0.0, 1.0, Double.MIN_VALUE}))
                 // select provider panel
                 .addComponent(new JPanel()
                     .addComponent(new JLabel(getText("MappingEpisodeNameDialog.SelectProvider")))
@@ -80,12 +83,10 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                         int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                         MappingTableModel model = (MappingTableModel) table.getModel();
                         Row row = (Row) model.getDataVector().get(rowNbr);
-                        manager.valueBuilder().cacheType(CacheType.DISK).key(row.key).remove();
+                        manager.getCache(CacheType.DISK, row.key).remove();
                         if (row.selectionForKeyPrefix.deleteOtherFunction() != null) {
-                            manager.valueBuilder()
-                                .cacheType(CacheType.DISK)
-                                .key(row.selectionForKeyPrefix.deleteOtherFunction().apply(row.key))
-                                .remove();
+                            manager.getCache(CacheType.DISK,
+                                row.selectionForKeyPrefix.deleteOtherFunction().apply(row.key)).remove();
                         }
                         model.removeRow(rowNbr);
                     }))
@@ -101,14 +102,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                             String message = getText("MappingEpisodeNameDialog.enterNewNameForSerie",
                                 currentName);
                             selectedSubtitleProvider.ifPresent(provider ->
-                                userInteractionHandler.enter(message, message).ifPresent(newName -> {
-                                    TvRelease tvRelease = TvRelease.builder()
-                                        .name(currentName)
-                                        .season(row.serieMapping.season)
-                                        .episode(1)
-                                        .originalName(currentName)
-                                        .customName(newName)
-                                        .build();
+                                userInteractionHandler.enter(message).ifPresent(newName -> {
+                                    TvRelease tvRelease = new TvRelease(
+                                        name:currentName,
+                                        season:row.serieMapping.season,
+                                        episode:1,
+                                        originalName:currentName,
+                                        customName:newName);
                                     try {
                                         provider.getProviderSerieId(tvRelease).ifPresentOrElse(serieId -> {
                                             row.serieMapping =
@@ -178,11 +178,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         }
 
         static {
-            MAPPING_SUPPLIER = (manager, selectionForKeyPrefix) -> manager.valueBuilder()
-                .cacheType(CacheType.DISK)
-                .keyFilter(k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
-                .returnType(SerieMapping.class)
-                .getEntries();
+            MAPPING_SUPPLIER = (manager, selectionForKeyPrefix) ->
+                manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix)).getEntries();
         }
 
         MappingType(String name, SubtitleSource subtitleSource, SelectionForKeyPrefix... selectionForKeyPrefixList) {
@@ -229,7 +226,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
         void setMappingType(MappingType mappingType) {
             setDataVector(null,
-                new String[]{ mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn });
+                new String[]{mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn});
             Arrays.stream(mappingType.selectionForKeyPrefixList)
                 .flatMap(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
                     .stream()

@@ -21,6 +21,7 @@ import com.google.common.collect.MultimapBuilder;
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.Roman.RomanNumeral;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.AudioEncoding;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Quality;
@@ -99,7 +100,7 @@ public class ReleaseParser {
 
         if (parserResults.containsNone(SEASON, EPISODES_TEXT)) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
-                // If the season and episode numbers are not found, and neither are the Arabic or Roman numbers, try to
+                // If the season and episode numbers are not found, and neither are the Arabic nor Roman numbers, try to
                 // parse the season + episode numbers (using less 'safe' formats 'see' and 's_ee'), and the title
                 parserResults.parse(name_season_episode_title_Regex(SeasonEpisodeType.X_XX),
                     name_season_episode_title_Regex(SeasonEpisodeType.XXX),
@@ -117,14 +118,13 @@ public class ReleaseParser {
                     if (StringUtils.equals(parserResults.parts.first, fileParseName)) {
                         throw new ReleaseParseException("Could not parse " + fileParseName);
                     }
-                    return MovieRelease.builder()
-                        .name(cleanUnwantedChars(parserResults.parts.first))
-                        .file(file)
-                        .year(parserResults.getNamedMatchValue(YEAR))
-                        .releaseGroup(releaseGroup)
-                        .quality(StringUtils.toRootLowerCase(quality))
-                        .extension(extension)
-                        .build();
+                    return new MovieRelease(
+                        name:cleanUnwantedChars(parserResults.parts.first),
+                        file:file,
+                        year:parserResults.getNamedMatchValue(YEAR),
+                        releaseGroup:releaseGroup,
+                        quality:StringUtils.toRootLowerCase(quality),
+                        extension:extension);
                 }
             }
         }
@@ -171,17 +171,16 @@ public class ReleaseParser {
             throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
         }
 
-        return TvRelease.builder()
-            .name(cleanUnwantedChars(name))
-            .season(season)
-            .episodes(episodes)
-            .file(file)
-            .title(cleanUnwantedChars(parserResults.getNamedMatchValue(TITLE)))
-            .releaseGroup(releaseGroup)
-            .special(isSpecialEpisode(season, episodes))
-            .quality(StringUtils.toRootLowerCase(quality))
-            .extension(extension)
-            .build();
+        return new TvRelease(
+            name:cleanUnwantedChars(name),
+            season:season,
+            episodes:episodes,
+            file:file,
+            title:cleanUnwantedChars(parserResults.getNamedMatchValue(TITLE)),
+            releaseGroup:releaseGroup,
+            special:isSpecialEpisode(season, episodes),
+            quality:StringUtils.toRootLowerCase(quality),
+            extension:extension);
     }
 
     @AllArgsConstructor
@@ -370,7 +369,7 @@ public class ReleaseParser {
         }
 
         @SafeVarargs
-        public final <T> T getNamedMatchValue(Tag<T>... tags) {
+        public final <T> @Nullable T getNamedMatchValue(Tag<T>... tags) {
             for (Tag<T> tag : tags) {
                 List<T> namedMatch = getNamedMatch(tag, tag.mapper);
                 if (!namedMatch.isEmpty()) {

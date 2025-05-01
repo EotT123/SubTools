@@ -6,6 +6,7 @@ import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,17 +62,7 @@ public class CookieManager {
         String domain = getDomainFromHost(conn.getURL().getHost());
 
         // this is where we will store cookies for this domain
-        Map<String, Map<String, String>> domainStore;
-
-        // now let's check the store to see if we have an entry for this domain
-        if (store.containsKey(domain)) {
-            // we do, so lets retrieve it from the store
-            domainStore = store.get(domain);
-        } else {
-            // we don't, so let's create it and put it in the store
-            domainStore = new HashMap<>();
-            store.put(domain, domainStore);
-        }
+        Map<String, Map<String, String>> domainStore = store.computeIfAbsent(domain, _ -> new HashMap<>());
 
         // OK, now we are ready to get the cookies out of the URLConnection
 
@@ -102,12 +93,18 @@ public class CookieManager {
         }
     }
 
-    public void storeCookies(String domain, Map<String, String> cookieMap) {
-        if (cookieMap == null || cookieMap.isEmpty()) {
-            return;
-        }
+    public CookieManager storeCookie(String domain, String cookieName, String cookieValue) {
         Map<String, Map<String, String>> domainStore = store.computeIfAbsent(domain, _ -> new HashMap<>());
-        cookieMap.forEach((k, v) -> domainStore.put(k, Map.of(k, v)));
+        domainStore.put(cookieName, Map.of(cookieName, cookieValue));
+        return this;
+    }
+
+    public CookieManager storeCookies(String domain, Map<String, String> cookieMap) {
+        if (cookieMap != null && !cookieMap.isEmpty()) {
+            Map<String, Map<String, String>> domainStore = store.computeIfAbsent(domain, _ -> new HashMap<>());
+            cookieMap.forEach((k, v) -> domainStore.put(k, Map.of(k, v)));
+        }
+        return this;
     }
 
     /**
@@ -185,5 +182,11 @@ public class CookieManager {
     @Override
     public String toString() {
         return store.toString();
+    }
+
+    public String toString(String domain) {
+        return store.computeIfAbsent(domain, _ -> new HashMap<>()).entrySet().stream()
+            .sorted(Comparator.comparing(Entry::getKey))
+            .map(e -> e.getKey() + "=" + e.getValue().get(e.getKey()) + "\n").reduce("", (a, b) -> a + b);
     }
 }

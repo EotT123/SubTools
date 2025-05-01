@@ -64,6 +64,14 @@
             <artifactId>manifold-props-rt</artifactId>
         </dependency>
         <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-params-rt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-science</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
@@ -151,6 +159,11 @@
                         <path>
                             <groupId>systems.manifold</groupId>
                             <artifactId>manifold-props</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-params</artifactId>
                             <version>${manifold.version}</version>
                         </path>
                         <path>

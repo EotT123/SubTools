@@ -1,18 +1,18 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 
 import static java.nio.charset.StandardCharsets.*;
+import static manifold.science.util.UnitConstants.*;
+import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,43 +20,42 @@ import org.jsoup.select.Elements;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitleDescriptor;
+import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.Html;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
-public class JAddic7edApi extends Html implements SubtitleApi {
+public class JAddic7edApi implements SubtitleApi {
 
-    private static final long RATEDURATION = 1; // seconds
+    private static final Time RATE_DURATION = 1 s; // seconds
 
     private static final String DOMAIN = "https://www.addic7ed.com";
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: (\\d+).(\\d)+");
+    private final Manager manager;
     private final boolean speedy;
-    private LocalDateTime lastRequest = LocalDateTime.now();
+    private Time lastRequest = Time.now();
     @val @override SubtitleSource subtitleSource = SubtitleSource.ADDIC7ED;
 
-    public JAddic7edApi(boolean speedy, Manager manager) {
-        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
+    public JAddic7edApi(Manager manager, boolean speedy, Credentials credentials=null) throws Addic7edException {
+//        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
+        this.manager = manager;
         this.speedy = speedy;
+        if (credentials != null) {
+            login(credentials);
+        }
     }
 
-    public JAddic7edApi(String username, String password, boolean speedy, Manager manager) throws Addic7edException {
-        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
-        this.speedy = speedy;
-        login(username, password);
-    }
-
-    public void login(String username, String password) throws Addic7edException {
+    public void login(Credentials credentials) throws Addic7edException {
         try {
-            manager.postBuilder()
-                .url(DOMAIN + "/dologin.php")
-                .addData("username", username)
-                .addData("password", password)
+            manager.postBuilder("$DOMAIN/dologin.php")
+                .addData("username", credentials.username)
+                .addData("password", credentials.password)
                 .addData("remember", "false")
                 .post();
         } catch (ManagerException e) {
@@ -87,24 +86,13 @@ public class JAddic7edApi extends Html implements SubtitleApi {
         }
     }
 
-    // private List<ProviderSerieId> getAllMappings() throws Addic7edException {
-    // return ALL_MAPPINGS.get();
-    // }
-    //
-    // private final LazyThrowingSupplier<List<ProviderSerieId>, Addic7edException> ALL_MAPPINGS =
-    // new LazyThrowingSupplier<>(() -> getContent(DOMAIN)
-    // .map(doc -> doc.select("#qsShow option").stream()
-    // .map(e -> new ProviderSerieId(e.text(), e.attr("value")))
-    // .toList())
-    // .orElseGet(List::of));
-
     public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode,
         Language language) throws Addic7edException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), addic7edSerieMapping.providerId,
+
+        return manager.getCache(CacheType.MEMORY,
+                "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), addic7edSerieMapping.providerId,
                 season, episode, language))
-            .collectionSupplier(Addic7edSubtitleDescriptor.class, () -> {
+            .getCollection(() -> {
                 List<LanguageId> languageIds = LanguageId.forLanguage(language);
                 String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
                     URLEncoder.encode(addic7edSerieMapping.providerName.replace(" ", "_"), UTF_8), season,
@@ -120,7 +108,6 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                         title = matcher.group(1);
                     }
                 }
-
 
                 Elements blocks = doc.select(".tabel95[width='100%']");
 
@@ -168,13 +155,9 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                                 }
                             }
                             if (lang != null && download != null && title != null) {
-                                Addic7edSubtitleDescriptor sub =
-                                    new Addic7edSubtitleDescriptor().setUploader(uploader)
-                                        .setTitle(title.trim())
-                                        .setVersion(version.trim())
-                                        .setUrl(download)
-                                        .setLanguage(Language.fromValueOptional(lang.trim()).orElse(null))
-                                        .setHearingImpaired(hearingImpaired);
+                                Addic7edSubtitleDescriptor sub = new Addic7edSubtitleDescriptor(version.trim(),
+                                    Language.fromValueOptional(lang.trim()).orElse(null), download, title.trim(),
+                                    uploader, hearingImpaired);
                                 if (!isDuplicate(lSubtitles, sub)) {
                                     lSubtitles.add(sub);
                                 }
@@ -185,34 +168,27 @@ public class JAddic7edApi extends Html implements SubtitleApi {
                     }
                 }
                 return lSubtitles;
-            })
-            .getCollection();
+            });
     }
 
     public boolean isDuplicate(List<Addic7edSubtitleDescriptor> lSubtitles, Addic7edSubtitleDescriptor sub) {
-        return lSubtitles.stream()
-            .anyMatch(s -> s.getLanguage() == sub.getLanguage() && StringUtils.equals(s.getUrl(), sub.getUrl()) &&
-                StringUtils.equals(s.getVersion(), sub.getVersion()));
+        return lSubtitles.stream().anyMatch(s -> s.language == sub.language && StringUtils.equals(s.url, sub.url) &&
+            StringUtils.equals(s.version, sub.version));
     }
 
     private Document getContent(String url) throws Addic7edException {
         try {
-            if (!speedy && !manager.valueBuilder().cacheType(CacheType.MEMORY).key(url).isPresent()) {
+            if (!speedy && !manager.getCache(CacheType.MEMORY, url).isPresent()) {
                 // if (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION) {
                 // LOGGER.info("RateLimit is reached for ADDIC7ed, please wait {} seconds", RATEDURATION);
                 // }
-                while (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION) {
-                    try {
-                        // Pause for 1 seconds
-                        TimeUnit.SECONDS.sleep(1);
-                    } catch (InterruptedException e) {
-                        // restore interrupted status
-                        Thread.currentThread().interrupt();
-                    }
+                Time timeToSleep = RATE_DURATION - Time.now() + lastRequest;
+                if (timeToSleep.isPositive) {
+                    sleep(timeToSleep);
                 }
-                lastRequest = LocalDateTime.now();
+                lastRequest = Time.now();
             }
-            return this.getHtml(url).cacheType(CacheType.NONE).getAsJsoupDocument();
+            return manager.getAsJsoupDocument(PageContentParams.params(url:url, userAgent:""));
         } catch (Exception e) {
             throw new Addic7edException(e);
         }

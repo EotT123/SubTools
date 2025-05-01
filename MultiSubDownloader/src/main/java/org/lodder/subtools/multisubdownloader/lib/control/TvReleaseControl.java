@@ -36,7 +36,7 @@ public final class TvReleaseControl extends ReleaseControl {
             throw new ReleaseControlException("Unable to extract episode details, check file", tvRelease);
         } else {
             LOGGER.debug("process: show name [{}], season [{}], episode [{}]", tvRelease.name, tvRelease.season,
-                    tvRelease.episodeNumbers);
+                tvRelease.episodes);
             if (tvRelease.special) {
                 processSpecial();
             } else {
@@ -49,10 +49,10 @@ public final class TvReleaseControl extends ReleaseControl {
         jtvdba.getSerie(tvRelease.name).useIfPresent(tvdbSerie -> {
             tvRelease.tvdbId = tvdbSerie.id;
             tvRelease.originalName = tvdbSerie.serieName;
-            jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisodeNumber)
+            jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisode)
                     .useIfPresent(tvRelease::updateTvdbEpisodeInfo)
                     .orElseThrow(() -> new ReleaseControlException(
-                            "Season ${tvRelease.season} Episode ${tvRelease.episodeNumbers} not found, check file",
+                        "Season ${tvRelease.season} Episode ${tvRelease.episodes} not found, check file",
                             tvRelease));
         }).orElseThrow(() -> new ReleaseControlException("Show not found, check file", tvRelease));
     }
@@ -62,7 +62,7 @@ public final class TvReleaseControl extends ReleaseControl {
             tvRelease.tvdbId = tvdbSerie.id;
             tvRelease.originalName = tvdbSerie.serieName;
             if (settings.processEpisodeSource == SettingsProcessEpisodeSource.TVDB) {
-                jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisodeNumber)
+                jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisode)
                         .ifPresent(tvRelease::updateTvdbEpisodeInfo);
             }
         }).orElseThrow(() -> new ReleaseControlException("Show not found, check file", tvRelease));

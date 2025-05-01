@@ -6,16 +6,28 @@ import java.util.List;
 import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 public abstract sealed class Release permits MovieRelease, TvRelease {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
     @val VideoType videoType;
-    @val Path filePath;
-    @val String quality;
-    @val String releaseGroup;
-    @val String extension;
+    @val @Nullable Path filePath;
+    @val @Nullable String quality;
+    @val @Nullable String releaseGroup;
+    @val @Nullable String extension;
+    @var @Nullable Integer tvdbId;
+
+    protected Release(VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
+        @Nullable String quality, @Nullable String extension) {
+        this.videoType = videoType;
+        this.filePath = filePath;
+        this.releaseGroup = releaseGroup;
+        this.quality = quality;
+        this.extension = extension;
+    }
 
     public void addMatchingSub(Subtitle sub) {
         matchingSubsSet.add(sub);
@@ -29,14 +41,6 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return matchingSubsSet.size();
     }
 
-    protected Release(VideoType videoType, Path filePath, String releaseGroup, String quality, String extension) {
-        this.videoType = videoType;
-        this.filePath = filePath;
-        this.releaseGroup = releaseGroup;
-        this.quality = quality;
-        this.extension = extension;
-    }
-
     public String getFileName() {
         return filePath != null ? filePath.getFileName().toString() : null;
     }
@@ -45,12 +49,8 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return filePath != null ? filePath.getParent() : null;
     }
 
-    public String getExtension() {
-        return extension;
-    }
-
     public boolean hasExtension(String extension) {
-        return StringUtils.isNotBlank(extension);
+        return StringUtils.isNotBlank(extension) && extension.equals(this.extension);
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -46,9 +47,12 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         this.gui = gui;
         this.settingsCtrl = settingsCtrl;
 
-        JPanel settingsPanel = TitlePanel.title(getText("PreferenceDialog.Settings"))
-            .padding(0).paddingLeft(20).useGrid().fillContents(false)
-            .addTo(this, "span, grow, wrap");
+        JPanel settingsPanel = new TitlePanel(
+            title:getText("PreferenceDialog.Settings"),
+            padding:new BoxModelProperties(left:20),
+            useGrid:true,
+            fillContents:false)
+            .addToPanel(this, "span, grow, wrap");
         {
 
             // Language \\
@@ -64,8 +68,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 "aligny center, span 1 2");
 
             new JScrollPane()
-                .viewportView(this.defaultIncomingFoldersList =
-                    JListWithImages.createForType(Path.class).distinctValues().build())
+                .viewportView(this.defaultIncomingFoldersList = new JListWithImages<>())
                 .addTo(settingsPanel, "growx, span, wrap");
 
             new JButton(getText("PreferenceDialog.AddFolder"))
@@ -86,8 +89,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 .addTo(settingsPanel, "aligny center, span 1 2");
 
             new JScrollPane()
-                .viewportView(this.excludeList =
-                    JListWithImages.createForType(PathOrRegex.class).distinctValues().build())
+                .viewportView(this.excludeList = new JListWithImages<>())
                 .addTo(settingsPanel, "growx, span, wrap");
 
             Consumer<PathMatchType> addExcludeItemConsumer = type -> {
@@ -120,12 +122,12 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
         {
 
-            JPanel updatePanel = TitlePanel.title(getText("PreferenceDialog.Update"))
-                .padding(0)
-                .paddingLeft(20)
-                .useGrid()
-                .fillContents(false)
-                .addTo(this, "span, grow, wrap");
+            JPanel updatePanel = new TitlePanel(
+                title:getText("PreferenceDialog.Update"),
+                padding:new BoxModelProperties(left:20),
+                useGrid:true,
+                fillContents:false)
+                .addToPanel(this, "span, grow, wrap");
 
             new JLabel(getText("PreferenceDialog.NewUpdateCheck")).addTo(updatePanel);
             this.cbxUpdateCheckPeriod = new JComboBox<>(UpdateCheckPeriod.values())
@@ -139,18 +141,18 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
         {
 
-            JPanel proxyPanel = TitlePanel.title(getText("PreferenceDialog.ConfigureProxy"))
-                .padding(0)
-                .paddingLeft(20)
-                .fillContents(false)
-                .addTo(this, "span, grow");
+            JPanel proxyPanel = new TitlePanel(
+                title:getText("PreferenceDialog.ConfigureProxy"),
+                padding:new BoxModelProperties(left:20),
+                fillContents:false)
+                .addToPanel(this, "span, grow");
 
-            PanelCheckBox.checkbox(
-                    this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")))
-                .panelOnSameLine()
-                .panelLayout(new MigLayout("insets 0, fill"))
-                .leftGap(0)
-                .addTo(proxyPanel)
+            new PanelCheckBox(
+                checkbox:this.chkUseProxy = new JCheckBox(getText("PreferenceDialog.UseProxyServer")),
+                panelOnNewLine:false,
+                panelLayout:new MigLayout("insets 0, fill")
+                )
+                .addToPanel(proxyPanel)
                 .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
                 .addComponent("wrap",
                     this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))

@@ -1,12 +1,14 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.Messenger;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
 
@@ -18,18 +20,13 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
     private JProgressBar progressBar;
     private JLabel label;
 
-    public ProgressDialog(JFrame frame, Cancelable sft) {
-        super(frame, Messages.getText("ProgressDialog.Title"), false);
+    public ProgressDialog(@Nullable JFrame frame=null, Cancelable sft) {
+        super(frame, getText("ProgressDialog.Title"), false);
         StatusMessenger.instance.addListener(this);
         initializeUi(sft);
-        setDialogLocation(frame);
-        repaint();
-    }
-
-    public ProgressDialog(Cancelable sft) {
-        super(Messages.getText("ProgressDialog.Title"), false);
-        StatusMessenger.instance.addListener(this);
-        initializeUi(sft);
+        if (frame != null) {
+            setDialogLocation(frame);
+        }
         repaint();
     }
 

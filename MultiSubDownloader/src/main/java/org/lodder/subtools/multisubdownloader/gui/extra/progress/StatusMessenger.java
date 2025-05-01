@@ -3,17 +3,15 @@ package org.lodder.subtools.multisubdownloader.gui.extra.progress;
 import java.util.LinkedList;
 import java.util.List;
 
+import manifold.ext.props.rt.api.val;
+
 public class StatusMessenger implements Messenger {
-    private static final StatusMessenger instance = new StatusMessenger();
+    @val static StatusMessenger instance = new StatusMessenger();
 
     private final List<Messenger> statusMessengers = new LinkedList<>();
 
     private StatusMessenger() {
         // private constructor to prevent instantiation
-    }
-
-    public static StatusMessenger getInstance() {
-        return instance;
     }
 
     public void addListener(Messenger sm) {

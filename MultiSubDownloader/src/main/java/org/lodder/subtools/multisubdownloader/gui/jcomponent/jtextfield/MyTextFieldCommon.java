@@ -1,8 +1,10 @@
 package org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield;
 
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Arrays;
@@ -12,7 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.sublibrary.util.BooleanConsumer;
+import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> extends JTextField implements
     MyTextFieldToStringMapperIntf<T, R>,

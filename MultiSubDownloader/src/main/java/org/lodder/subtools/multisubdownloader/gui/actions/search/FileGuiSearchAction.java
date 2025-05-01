@@ -4,10 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.jspecify.annotations.NonNull;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.FileListAction;
@@ -26,50 +23,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
 
     private final @NonNull FileListAction filelistAction;
 
-    public interface FileGuiSearchActionBuilderSubtitleProviderStore {
-        FileGuiSearchActionBuilderGUI subtitleProviderStore(SubtitleProviderStore subtitleProviderStore);
-    }
-
-    public interface FileGuiSearchActionBuilderGUI {
-        FileGuiSearchActionBuilderSearchPanel mainWindow(GUI mainWindow);
-    }
-
-    public interface FileGuiSearchActionBuilderSearchPanel {
-        FileGuiSearchActionBuilderReleaseFactory searchPanel(SearchPanel<SearchFileInputPanel> searchPanel);
-    }
-
-    public interface FileGuiSearchActionBuilderReleaseFactory {
-        FileGuiSearchActionBuilderBuild releaseFactory(ReleaseFactory releaseFactory);
-    }
-
-    public interface FileGuiSearchActionBuilderBuild {
-        FileGuiSearchAction build();
-    }
-
-    public static FileGuiSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
-        return new FileGuiSearchActionBuilder(settings);
-    }
-
-    @RequiredArgsConstructor
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class FileGuiSearchActionBuilder
-        implements FileGuiSearchActionBuilderBuild, FileGuiSearchActionBuilderReleaseFactory,
-        FileGuiSearchActionBuilderSearchPanel, FileGuiSearchActionBuilderGUI,
-        FileGuiSearchActionBuilderSubtitleProviderStore {
-        private final Settings settings;
-        private SubtitleProviderStore subtitleProviderStore;
-        private GUI mainWindow;
-        private SearchPanel<SearchFileInputPanel> searchPanel;
-        private ReleaseFactory releaseFactory;
-
-        @Override
-        public FileGuiSearchAction build() {
-            return new FileGuiSearchAction(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
-        }
-    }
-
-    private FileGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
+    public FileGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
         SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
         super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
         this.filelistAction = new FileListAction(settings);

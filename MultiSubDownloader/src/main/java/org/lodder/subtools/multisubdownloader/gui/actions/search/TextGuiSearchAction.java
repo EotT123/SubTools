@@ -1,12 +1,8 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -25,50 +21,7 @@ import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
 
-    public interface TextGuiSearchActionBuilderSubtitleProviderStore {
-        TextGuiSearchActionBuilderGUI subtitleProviderStore(SubtitleProviderStore subtitleProviderStore);
-    }
-
-    public interface TextGuiSearchActionBuilderGUI {
-        TextGuiSearchActionBuilderSearchPanel mainWindow(GUI mainWindow);
-    }
-
-    public interface TextGuiSearchActionBuilderSearchPanel {
-        TextGuiSearchActionBuilderReleaseFactory searchPanel(SearchPanel<SearchTextInputPanel> searchPanel);
-    }
-
-    public interface TextGuiSearchActionBuilderReleaseFactory {
-        TextGuiSearchActionBuilderBuild releaseFactory(ReleaseFactory releaseFactory);
-    }
-
-    public interface TextGuiSearchActionBuilderBuild {
-        TextGuiSearchAction build();
-    }
-
-    public static TextGuiSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
-        return new TextGuiSearchActionBuilder(settings);
-    }
-
-    @RequiredArgsConstructor
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class TextGuiSearchActionBuilder
-        implements TextGuiSearchActionBuilderBuild, TextGuiSearchActionBuilderReleaseFactory,
-        TextGuiSearchActionBuilderSearchPanel, TextGuiSearchActionBuilderGUI,
-        TextGuiSearchActionBuilderSubtitleProviderStore {
-        private final Settings settings;
-        private SubtitleProviderStore subtitleProviderStore;
-        private GUI mainWindow;
-        private SearchPanel<SearchTextInputPanel> searchPanel;
-        private ReleaseFactory releaseFactory;
-
-        @Override
-        public TextGuiSearchAction build() {
-            return new TextGuiSearchAction(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
-        }
-    }
-
-    private TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
+    public TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
         SearchPanel<SearchTextInputPanel> searchPanel, ReleaseFactory releaseFactory) {
         super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
     }
@@ -90,16 +43,11 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
 
         // TODO: Redefine what a "release" is.
         Release release = switch (type) {
-            case EPISODE -> TvRelease.builder()
-                .name(name)
-                .season(inputPanel.season)
-                .episode(inputPanel.episode)
-                .quality(inputPanel.quality)
-                .build();
-            case MOVIE -> MovieRelease.builder().name(name).quality(inputPanel.quality).build();
+            case EPISODE ->
+                new TvRelease(name:name, season:inputPanel.season, episode:inputPanel.episode, quality:inputPanel.quality);
+            case MOVIE -> new MovieRelease(name:name, quality:inputPanel.quality);
             default -> releaseFactory.createRelease(Path.of(
-                    name + (Arrays.stream(VideoExtensions.values()).anyMatch(ext -> name.endsWith("." + ext)) ? "" :
-                        ".")),
+                    name + (VideoExtensions.values().stream().anyMatch(ext -> name.endsWith("." + ext)) ? "" : ".")),
                 userInteractionHandler);
         };
         return release != null ? List.of(release) : List.of();

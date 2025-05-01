@@ -6,6 +6,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("java:S106")
 @UtilityClass
 public class Info {
 

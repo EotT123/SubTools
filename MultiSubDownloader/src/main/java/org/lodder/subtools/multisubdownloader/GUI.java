@@ -4,8 +4,10 @@ import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.multisubdownloader.gui.extra.table.SearchColumnName.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseListener;
@@ -63,7 +65,7 @@ import org.lodder.subtools.sublibrary.OsCheck.OSType;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.VideoType;
-import org.lodder.subtools.sublibrary.util.TriConsumer;
+import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,7 +152,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
      * Initialize the contents of the frame.
      */
     private void initialize() {
-        MemoryFolderChooser.getInstance().setMemory(settingsControl.settings.lastOutputDir);
+        MemoryFolderChooser.getInstance().memory = settingsControl.settings.lastOutputDir;
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -189,7 +191,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         contentPane.add(pnlLogging, gbcPnlLogging);
 
         StatusLabel lblStatus = new StatusLabel("");
-        StatusMessenger.getInstance().addListener(lblStatus);
+        StatusMessenger.instance.addListener(lblStatus);
         final GridBagConstraints gbcLblStatus = new GridBagConstraints();
         gbcLblStatus.anchor = GridBagConstraints.SOUTHWEST;
         gbcLblStatus.gridx = 0;
@@ -249,12 +251,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(_ -> downloadText());
 
-        TextGuiSearchAction searchAction = TextGuiSearchAction.createWithSettings(settings)
-            .subtitleProviderStore(app.makeSubtitleProviderStore())
-            .mainWindow(this)
-            .searchPanel(pnlSearchText)
-            .releaseFactory(new ReleaseFactory(settings, app.makeManager()))
-            .build();
+        TextGuiSearchAction searchAction = new TextGuiSearchAction(settings, app.makeSubtitleProviderStore(),
+            this, pnlSearchText, new ReleaseFactory(settings, app.makeManager()));
         pnlSearchTextInput.addSearchAction(searchAction);
     }
 
@@ -279,12 +277,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         resultPanel.setTable(createVideoTable());
 
-        FileGuiSearchAction searchAction = FileGuiSearchAction.createWithSettings(settings)
-            .subtitleProviderStore(app.makeSubtitleProviderStore())
-            .mainWindow(this)
-            .searchPanel(pnlSearchFile)
-            .releaseFactory(new ReleaseFactory(settings, app.makeManager()))
-            .build();
+        FileGuiSearchAction searchAction = new FileGuiSearchAction(settings, app.makeSubtitleProviderStore(), this,
+            pnlSearchFile, new ReleaseFactory(settings, app.makeManager()));
 
         pnlSearchFileInput.addSelectFolderAction(_ -> selectIncomingFolder());
         pnlSearchFileInput.addSearchAction(searchAction);
@@ -388,7 +382,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             text += " ($buildTimestamp)";
         }
         JOptionPane.showConfirmDialog(this, text, ConfigProperties.getProperty(Property.NAME),
-            JOptionPane.CLOSED_OPTION);
+            JOptionPane.DEFAULT_OPTION);
     }
 
     protected void rename() {
@@ -432,12 +426,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
                         }
 
                         try {
-                            if (subtitle.sourceLocation == Subtitle.SourceLocation.FILE) {
-                                subtitle.file.copyToDir(path);
-                            } else {
-                                String url = subtitle.sourceLocation == Subtitle.SourceLocation.URL ? subtitle.url :
-                                    subtitle.urlSupplier.get();
-                                app.makeManager().store(url, path.resolve(filename));
+                            switch (subtitle.downloadSource.sourceLocation) {
+                                case FILE -> subtitle.downloadSource.file.copyToDir(path);
+                                case URL, URL_SUPPLIER -> app.makeManager()
+                                    .store(subtitle.downloadSource.getValue(), path.resolve(filename));
                             }
                         } catch (IOException | ManagerException e) {
                             LOGGER.error("downloadText", e);
@@ -457,7 +449,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     public void showErrorMessage(String message) {
         JOptionPane.showConfirmDialog(this, message, ConfigProperties.getProperty(Property.NAME),
-            JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     private void selectIncomingFolder() {

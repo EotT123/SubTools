@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model;
 
+import java.io.Serializable;
+
 import lombok.Builder;
 import manifold.ext.props.rt.api.var;
 import org.lodder.subtools.sublibrary.Language;
@@ -9,7 +11,7 @@ import org.lodder.subtools.sublibrary.Language;
  * Templates.
  */
 @Builder
-public class PodnapisiSubtitleDescriptor {
+public class PodnapisiSubtitleDescriptor implements Serializable {
 
     @var String subtitleId;
     @var Language language;

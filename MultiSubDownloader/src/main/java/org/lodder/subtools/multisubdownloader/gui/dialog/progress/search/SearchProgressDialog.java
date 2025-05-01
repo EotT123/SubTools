@@ -3,7 +3,7 @@ package org.lodder.subtools.multisubdownloader.gui.dialog.progress.search;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.TableColumn;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serial;
@@ -61,7 +61,7 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
     @Override
     public void progress(SubtitleProvider provider, int jobsLeft, Release release) {
         this.setVisible();
-        this.tableModel.update(provider.getName(), jobsLeft, release == null ? "Done" : release.fileName);
+        this.tableModel.update(provider.name, jobsLeft, release == null ? "Done" : release.fileName);
     }
 
     @Override
@@ -85,6 +85,7 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
     @Override
     public void reset() {
         this.completed = false;
+        tableModel.clear();
     }
 
     @Override

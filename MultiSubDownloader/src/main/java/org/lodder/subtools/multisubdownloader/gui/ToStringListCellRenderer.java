@@ -1,12 +1,13 @@
 package org.lodder.subtools.multisubdownloader.gui;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.Function;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.lodder.subtools.multisubdownloader.Messages;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ToStringListCellRenderer<T> implements ListCellRenderer<T> {
@@ -21,7 +22,7 @@ public final class ToStringListCellRenderer<T> implements ListCellRenderer<T> {
 
     public static <T> ToStringListCellRenderer<T> ofMessage(ListCellRenderer originalRenderer,
             Function<T, String> toStringMapper) {
-        return of(originalRenderer, item -> Messages.getText(toStringMapper.apply(item)));
+        return of(originalRenderer, item -> getText(toStringMapper.apply(item)));
     }
 
     @Override

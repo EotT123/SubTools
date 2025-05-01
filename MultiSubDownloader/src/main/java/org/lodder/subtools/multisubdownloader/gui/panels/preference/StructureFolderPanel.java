@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
@@ -36,9 +37,13 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
 
-        JPanel titlePanel = TitlePanel.title(getText("PreferenceDialog.MoveToLibrary"))
-            .margin(0).padding(0).marginLeft(20).paddingLeft(20).useGrid()
-            .panelColumnConstraints("[shrink][grow][shrink]").addTo(this, "span, grow");
+        JPanel titlePanel = new TitlePanel(
+            title:getText("PreferenceDialog.MoveToLibrary"),
+            margin:new BoxModelProperties(left:20),
+            padding:new BoxModelProperties(left:20),
+            useGrid:true,
+            panelColumnConstraints:"[shrink][grow][shrink]")
+            .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
         this.txtLibraryFolder =
@@ -69,9 +74,11 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         this.chkRemoveEmptyFolder = new JCheckBox(getText("PreferenceDialog.RemoveEmptyFolders"))
             .addTo(titlePanel, "span, wrap");
 
-        PanelCheckBox.checkbox(this.chkReplaceSpace =
-                new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith")))
-            .panelOnSameLine().addTo(titlePanel, "span")
+        new PanelCheckBox(
+            checkbox:this.chkReplaceSpace = new JCheckBox(getText("PreferenceDialog.ReplaceSpaceWith")),
+            panelOnNewLine:false
+            )
+            .addToPanel(titlePanel, "span")
             .addComponent(this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         // behaviour
@@ -81,15 +88,12 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
     }
 
     private Function<String, PathLibraryBuilder> getLibraryStructureBuilder() {
-        return structure -> PathLibraryBuilder.builder()
-            .structure(structure)
-            .replaceSpace(chkReplaceSpace.isSelected())
-            .replacingSpaceChar(cbxReplaceSpaceChar.getSelectedValue())
-            .useTvdbName(false)
-            .tvdbAdapter(null)
-            .libraryFolder(txtLibraryFolder.getObject())
-            .move(true)
-            .build();
+        return structure -> new PathLibraryBuilder(
+            structure:structure,
+            replaceSpace:chkReplaceSpace.isSelected(),
+            replacingSpaceChar:cbxReplaceSpaceChar.getSelectedValue(),
+            libraryFolder:txtLibraryFolder.getObject(),
+            move:true);
     }
 
     @Override

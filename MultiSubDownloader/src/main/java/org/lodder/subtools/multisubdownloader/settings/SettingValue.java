@@ -29,7 +29,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
-import org.lodder.subtools.sublibrary.util.TriConsumer;
+import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 
 public enum SettingValue {
 
@@ -41,7 +41,7 @@ public enum SettingValue {
         .defaultValue(0)),
     LAST_OUTPUT_DIR(createSettingPath()
         .rootElementFunction(SettingsControl::getSettings)
-        .valueGetter(settings -> MemoryFolderChooser.getInstance().getMemory())
+        .valueGetter(settings -> MemoryFolderChooser.getInstance().memory)
         .valueSetter(Settings::setLastOutputDir)
         .defaultValue(Path.of(""))),
 

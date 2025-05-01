@@ -21,12 +21,11 @@ public class ReleaseFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
-    private final ReleaseParser releaseParser;
+    private final ReleaseParser releaseParser = new ReleaseParser();
     private final Settings settings;
     private final Manager manager;
 
     public ReleaseFactory(Settings settings, Manager manager) {
-        this.releaseParser = new ReleaseParser();
         this.settings = settings;
         this.manager = manager;
     }

@@ -5,15 +5,13 @@ import java.io.Serializable;
 
 import lombok.ToString;
 
-
 @ToString
-final class ExpiringSerializableCacheObject<T extends Serializable> extends ExpiringCacheObject<T>
-        implements Serializable {
+final class ExpiringSerializableCacheObject<T extends Serializable> extends ExpiringCacheObject<T> {
 
     @Serial
     private static final long serialVersionUID = 8773462650510864103L;
 
-    protected ExpiringSerializableCacheObject(T value) {
+    ExpiringSerializableCacheObject(T value) {
         super(value);
     }
 }

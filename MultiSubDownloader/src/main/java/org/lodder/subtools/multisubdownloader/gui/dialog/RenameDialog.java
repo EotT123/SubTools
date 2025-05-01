@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -17,8 +19,9 @@ import com.google.common.collect.Streams;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
-import org.lodder.subtools.multisubdownloader.Messages;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
+import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
@@ -45,27 +48,27 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
     private ProgressDialog progressDialog;
 
-    public RenameDialog(JFrame frame, Settings settings, VideoType videoType, String title, Manager manager,
-        UserInteractionHandler userInteractionHandler) {
+    public RenameDialog(@Nullable JFrame frame=null, Settings settings, VideoType videoType, String title,
+        Manager manager, UserInteractionHandler userInteractionHandler) {
         super(frame, title, false);
         setResizable(false);
         setBounds(100, 100, 650, 680);
         contentPane.setLayout(new MigLayout("fill, nogrid", "[]", "[][]20:push[]"));
 
-        TitlePanel.title(Messages.getText("PreferenceDialog.Settings"))
-            .padding(0)
-            .paddingLeft(20)
-            .fillContents(true)
-            .addTo(contentPane, "span, grow, wrap")
-            .addComponent("shrink", new JLabel(Messages.getText("PreferenceDialog.Location")))
+        new TitlePanel(
+            title:getText("PreferenceDialog.Settings"),
+            padding:new BoxModelProperties(left:20),
+            fillContents:true)
+            .addToPanel(contentPane, "span, grow, wrap")
+            .addComponent("shrink", new JLabel(getText("PreferenceDialog.Location")))
             .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().columns(20))
-            .addComponent("shrink, wrap", new JButton(Messages.getText("App.Browse")).actionListener(
+            .addComponent("shrink, wrap", new JButton(getText("App.Browse")).actionListener(
                 () -> MemoryFolderChooser.getInstance()
                     .selectDirectory(contentPane,
-                        Messages.getText("PreferenceDialog.SelectFolderForRenameReplace"))
+                        getText("PreferenceDialog.SelectFolderForRenameReplace"))
                     .ifPresent(txtFolder::setObject)))
             .addComponent("wrap",
-                this.chkRecursive = new JCheckBox(Messages.getText("RenameDialog.RecursiveSearch")));
+                this.chkRecursive = new JCheckBox(getText("RenameDialog.RecursiveSearch")));
 
         if (videoType == VideoType.EPISODE) {
             pnlLibrary = new EpisodeLibraryPanel(settings.episodeLibrarySettings, manager, true,
@@ -78,10 +81,10 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
         new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
             .addTo(contentPane, BorderLayout.SOUTH)
-            .addComponent(new JButton(Messages.getText("RenameDialog.Rename")).defaultButtonFor(getRootPane())
+            .addComponent(new JButton(getText("RenameDialog.Rename")).defaultButtonFor(getRootPane())
                 .actionListener(() -> rename(videoType, settings, manager, userInteractionHandler))
                 .actionCommand("Rename"))
-            .addComponent(new JButton(Messages.getText("App.Cancel")).actionListener(() -> setVisible(false))
+            .addComponent(new JButton(getText("App.Cancel")).actionListener(() -> setVisible(false))
                 .actionCommand("Cancel"));
     }
 
@@ -93,7 +96,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         UserInteractionHandler userInteractionHandler) {
 
         if (!hasValidSettings()) {
-            JOptionPane.showMessageDialog(this, Messages.getText("PreferenceDialog.invalidInput"), "Error",
+            JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"), "Error",
                 JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -117,7 +120,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             } else {
                 final int progress = renameWorker.getProgress();
                 progressDialog.updateProgress(progress);
-                StatusMessenger.instance.message(Messages.getText("RenameDialog.StatusRename"));
+                StatusMessenger.instance.message(getText("RenameDialog.StatusRename"));
             }
         }
     }
@@ -170,7 +173,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
         @Override
         protected void process(List<String> data) {
-            data.forEach(s -> StatusMessenger.instance.message(Messages.getText("MainWindow.RenamingFile", s)));
+            data.forEach(s -> StatusMessenger.instance.message(getText("MainWindow.RenamingFile", s)));
         }
     }
 

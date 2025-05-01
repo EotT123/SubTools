@@ -10,9 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
@@ -29,38 +26,6 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public class SearchManager implements Cancelable {
 
-    public interface SearchManagerLanguage {
-        SearchManagerProgressListener language(@NonNull Language language);
-    }
-
-    public interface SearchManagerProgressListener {
-        SearchManagerUserInteractionHandler progressListener(@NonNull SearchProgressListener progressListener);
-    }
-
-    public interface SearchManagerUserInteractionHandler {
-        SearchManagerOnFound userInteractionHandler(@NonNull UserInteractionHandler userInteractionHandler);
-    }
-
-    public interface SearchManagerOnFound {
-        SearchManager onFound(@NonNull SearchHandler onFound);
-    }
-
-    @Setter
-    @Accessors(fluent = true)
-    public static class SearchManagerBuilder
-        implements SearchManagerOnFound, SearchManagerUserInteractionHandler, SearchManagerProgressListener,
-        SearchManagerLanguage {
-        private Settings settings;
-        private Language language;
-        private SearchProgressListener progressListener;
-        private UserInteractionHandler userInteractionHandler;
-
-        @Override
-        public SearchManager onFound(SearchHandler onFound) {
-            return new SearchManager(settings, onFound, language, progressListener, userInteractionHandler);
-        }
-    }
-
     private final Map<SubtitleProvider, Queue<Release>> queue = new HashMap<>();
     private final Map<SubtitleProvider, SearchWorker> workers = new HashMap<>();
     private final Map<Release, ScoreCalculator> scoreCalculators = new HashMap<>();
@@ -73,17 +38,19 @@ public class SearchManager implements Cancelable {
     private final SearchProgressListener progressListener;
     @val UserInteractionHandler userInteractionHandler;
 
-    public SearchManager(Settings settings, SearchHandler onFound, Language language,
-        SearchProgressListener progressListener, UserInteractionHandler userInteractionHandler) {
+    public SearchManager(Settings settings, Language language, SearchProgressListener progressListener,
+        UserInteractionHandler userInteractionHandler, SearchHandler onFound) {
         this.settings = settings;
-        this.onFound = onFound;
         this.language = language;
         this.progressListener = progressListener;
         this.userInteractionHandler = userInteractionHandler;
+        this.onFound = onFound;
     }
 
-    public static SearchManagerLanguage createWithSettings(Settings settings) {
-        return new SearchManagerBuilder().settings(settings);
+    public void reset() {
+        queue.clear();
+        workers.clear();
+        scoreCalculators.clear();
     }
 
     public void addProvider(SubtitleProvider provider) {
@@ -114,8 +81,8 @@ public class SearchManager implements Cancelable {
     }
 
     public void onCompleted(SearchWorker worker) {
-        Release release = worker.getRelease();
-        List<Subtitle> subtitles = new ArrayList<>(worker.getSubtitles());
+        Release release = worker.release;
+        List<Subtitle> subtitles = new ArrayList<>(worker.subtitles);
 
         /* set the score of the found subtitles */
         ScoreCalculator calculator = this.scoreCalculators.get(release);
@@ -163,7 +130,7 @@ public class SearchManager implements Cancelable {
         for (Entry<SubtitleProvider, Queue<Release>> provider : this.queue.entrySet()) {
             jobsLeft += provider.getValue().size();
             SearchWorker worker = this.workers.get(provider.getKey());
-            if (worker.isAlive() && worker.isBusy()) {
+            if (worker.isAlive() && worker.busy) {
                 jobsLeft++;
             }
         }

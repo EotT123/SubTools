@@ -92,6 +92,14 @@
             <artifactId>manifold-tuple-rt</artifactId>
         </dependency>
         <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-params-rt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-science</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
@@ -114,7 +122,11 @@
             <groupId>net.jodah</groupId>
             <artifactId>typetools</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.pivovarit</groupId>
+            <artifactId>more-gatherers</artifactId>
+        </dependency>
+        
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -159,6 +171,11 @@
                         <path>
                             <groupId>systems.manifold</groupId>
                             <artifactId>manifold-tuple</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-params</artifactId>
                             <version>${manifold.version}</version>
                         </path>
                     </annotationProcessorPaths>

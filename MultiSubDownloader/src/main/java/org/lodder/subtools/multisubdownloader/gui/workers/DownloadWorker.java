@@ -87,7 +87,7 @@ public class DownloadWorker extends SwingWorker<Void, String> implements Cancela
     }
 
     private void showErrorMessage(String message) {
-        JOptionPane.showConfirmDialog(null, message, "JBierSubDownloader", JOptionPane.CLOSED_OPTION,
+        JOptionPane.showConfirmDialog(null, message, "JBierSubDownloader", JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE);
     }
 

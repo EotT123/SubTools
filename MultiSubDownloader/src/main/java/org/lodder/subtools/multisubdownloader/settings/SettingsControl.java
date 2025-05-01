@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.settings;
 
 import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.multisubdownloader.settings.SettingValue.*;
+import static org.lodder.subtools.sublibrary.cache.CacheType.*;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -29,15 +30,15 @@ import org.lodder.subtools.multisubdownloader.settings.model.State;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.TriConsumer;
+import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+@ExtensionMethod({Files.class})
 public class SettingsControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);
@@ -278,10 +279,7 @@ public class SettingsControl {
     public void migrateSettingsV4ToV5() {
         MappingType.ADDIC7ED_PROXY.selectionForKeyPrefixList
             .forEach(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
-                .forEach(serieMappingPair -> manager.valueBuilder()
-                    .cacheType(CacheType.DISK)
-                    .key(serieMappingPair.getKey())
-                    .remove()));
+                .forEach(serieMappingPair -> manager.getCache(DISK, serieMappingPair.getKey()).remove()));
         settings.settingsVersion = 5;
         SETTINGS_VERSION.store(this, preferences);
     }
@@ -383,8 +381,7 @@ public class SettingsControl {
     }
 
     private void migrateDatabase() {
-        int version =
-            manager.valueBuilder().cacheType(CacheType.DISK).key(DATABASE_VERSION_KEY).valueSupplier(() -> 0).get();
+        int version = manager.getCache(DISK, DATABASE_VERSION_KEY).get(() -> 0);
         if (version == 0) {
             migrateDatabaseV0ToV1();
         }
@@ -394,35 +391,33 @@ public class SettingsControl {
     }
 
     private void migrateDatabaseV0ToV1() {
-        manager.valueBuilder().cacheType(CacheType.DISK).keyFilter(k -> k.startsWith("TVDB-SerieMapping-")).remove();
-        manager.valueBuilder().cacheType(CacheType.DISK).keyFilter(k -> k.startsWith("TVDB-SerieId-")).remove();
-        manager.valueBuilder().cacheType(CacheType.DISK).key(DATABASE_VERSION_KEY).value(1).store();
+        manager.getCache(DISK, k -> k.startsWith("TVDB-SerieMapping-")).remove();
+        manager.getCache(DISK, k -> k.startsWith("TVDB-SerieId-")).remove();
+        manager.getCache(DISK, DATABASE_VERSION_KEY).store(Value.of(1));
     }
 
     private void migrateDatabaseV1ToV2() {
-        List<Pair<String, SerieMapping>> entries = manager.valueBuilder()
-            .cacheType(CacheType.DISK)
-            .keyFilter(k -> k.startsWith("SUBSCENE-serieName-"))
-            .returnType(SerieMapping.class)
-            .getEntries();
-        List<Pair<String, SerieMapping>> editedEntries = entries.stream().map(pair -> {
-            int lastIndexOfDash = pair.getKey().lastIndexOf("-");
-            int season;
-            try {
-                season = Integer.parseInt(pair.getKey().substring(lastIndexOfDash + 1));
-            } catch (NumberFormatException e) {
-                season = -1;
-            }
-            String name = pair.getValue().name;
-            String providerId = pair.getValue().providerId;
-            String providerName = pair.getValue().providerName;
-            SerieMapping serieMapping = new SerieMapping(name, providerId, providerName, season);
-            return Pair.of(pair.getKey(), serieMapping);
-        }).toList();
+        List<Pair<String, SerieMapping>> editedEntries =
+            manager.getCache(DISK, k -> k.startsWith("SUBSCENE-serieName-"))
+                .getEntries(SerieMapping.class)
+                .stream().map(pair -> {
+                    int lastIndexOfDash = pair.getKey().lastIndexOf("-");
+                    int season;
+                    try {
+                        season = Integer.parseInt(pair.getKey().substring(lastIndexOfDash + 1));
+                    } catch (NumberFormatException e) {
+                        season = -1;
+                    }
+                    String name = pair.getValue().name;
+                    String providerId = pair.getValue().providerId;
+                    String providerName = pair.getValue().providerName;
+                    SerieMapping serieMapping = new SerieMapping(name, providerId, providerName, season);
+                    return Pair.of(pair.getKey(), serieMapping);
+                }).toList();
         editedEntries.forEach(entry -> {
-            manager.valueBuilder().cacheType(CacheType.DISK).key(entry.getKey()).remove();
-            manager.valueBuilder().cacheType(CacheType.DISK).key(entry.getKey()).value(entry.getValue()).store();
+            manager.getCache(DISK, entry.key).remove();
+            manager.getCache(DISK, entry.key).store(Value.of(entry.getValue()));
         });
-        manager.valueBuilder().cacheType(CacheType.DISK).key(DATABASE_VERSION_KEY).value(2).store();
+        manager.getCache(DISK, DATABASE_VERSION_KEY).store(Value.of(2));
     }
 }

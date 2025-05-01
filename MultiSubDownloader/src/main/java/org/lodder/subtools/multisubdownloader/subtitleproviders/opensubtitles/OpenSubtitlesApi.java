@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import static manifold.science.measures.TimeUnit.*;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -9,7 +11,10 @@ import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitlesException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
+import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Retry;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
@@ -32,20 +37,18 @@ public class OpenSubtitlesApi implements SubtitleApi {
         API_CLIENT.setApiKey(APIKEY);
     }
 
-    public OpenSubtitlesApi(Manager manager) {
+    public OpenSubtitlesApi(Manager manager, Credentials credentials=null) throws OpenSubtitlesException {
         this.manager = manager;
+        if (credentials != null) {
+            login(credentials);
+        }
     }
 
-    public OpenSubtitlesApi(Manager manager, String userName, String password) throws OpenSubtitlesException {
-        this(manager);
-        login(userName, password);
-    }
-
-    public void login(String userName, String password) throws OpenSubtitlesException {
+    public void login(Credentials credentials) throws OpenSubtitlesException {
         try {
             Login200Response loginResponse =
                 new AuthenticationApi(API_CLIENT).login("application/json", USER_AGENT,
-                    new LoginRequest().username(userName).password(password));
+                    new LoginRequest().username(credentials.username).password(credentials.password));
             API_CLIENT.setBearerToken(loginResponse.getToken());
         } catch (ApiException e) {
             throw new OpenSubtitlesException(e);
@@ -72,16 +75,17 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public List<OpensubtitleSerieId> getProviderSerieIds(String serieName) throws OpenSubtitlesException {
         try {
-            return manager.getPageContentBuilder()
-                .url("https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                    + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8))
-                .userAgent("")
-                .cacheType(CacheType.MEMORY)
-                .retries(1)
-                .retryPredicate(exc -> exc instanceof HttpClientException e && e.responseCode == 429)
-                .retryWait(5)
-                .getAsJsonArray()
-                .stream()
+            return manager.getAsJsonArray(PageContentParams.params(
+                    url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
+                        + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
+                    cacheType:CacheType.MEMORY,
+                    userAgent:"",
+                    retry:new Retry(
+                        1,
+                        exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                        5 Second)
+                    ))
+                .streamJsonObjects()
                 .filter(show -> "tv".equals(show.getString("kind")))
                 .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
                     show.getString("year")))

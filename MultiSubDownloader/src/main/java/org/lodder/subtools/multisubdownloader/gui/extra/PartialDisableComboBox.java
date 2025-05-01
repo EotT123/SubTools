@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import java.awt.*;
 import java.io.Serial;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
         });
     }
 
+    @SafeVarargs
     public static <T> PartialDisableComboBox<T> of(T... items) {
         return new PartialDisableComboBox<>(items);
     }

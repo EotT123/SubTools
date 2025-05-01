@@ -96,20 +96,18 @@ public class CLI {
 
     public void search() {
         try {
-            CliSearchAction
-                .createWithSettings(settings)
-                .subtitleProviderStore(app.makeSubtitleProviderStore())
-                .indexingProgressListener(new CLIFileIndexerProgress().verbose(verboseProgress))
-                .searchProgressListener(new CLISearchProgress().verbose(verboseProgress))
-                .cli(this)
-                .fileListAction(new FileListAction(this.settings))
-                .language(language)
-                .releaseFactory(new ReleaseFactory(this.settings, app.makeManager()))
-                .filtering(new SubtitleFiltering(this.settings))
-                .folders(folders)
-                .recursive(recursive)
-                .overwriteSubtitles(force)
-                .build()
+            new CliSearchAction(settings:settings,
+                subtitleProviderStore:app.makeSubtitleProviderStore(),
+                indexingProgressListener:new CLIFileIndexerProgress().verbose(verboseProgress),
+                searchProgressListener:new CLISearchProgress().verbose(verboseProgress),
+                cli:this,
+                fileListAction:new FileListAction(this.settings),
+                language:language,
+                releaseFactory:new ReleaseFactory(this.settings, app.makeManager()),
+                filtering:new SubtitleFiltering(this.settings),
+                folders:folders,
+                recursive:recursive,
+                overwriteSubtitles:force)
                 /* CLI has no benefit of running this in a separate Thread */
                 .run();
         } catch (SearchSetupException e) {

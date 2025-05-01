@@ -4,19 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
+import org.jspecify.annotations.Nullable;
+
 public class MultiSubDialog extends JDialog {
 
     @Serial
     private static final long serialVersionUID = -2357021997104425566L;
 
-    public MultiSubDialog(JFrame frame, String title, boolean modal) {
+    public MultiSubDialog(@Nullable JFrame frame=null, String title, boolean modal) {
         super(frame);
-        setTitle(title);
-        setModal(modal);
-    }
-
-    public MultiSubDialog(String title, boolean modal) {
-        super();
         setTitle(title);
         setModal(modal);
     }

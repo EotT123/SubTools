@@ -1,6 +1,8 @@
 package org.lodder.subtools.multisubdownloader;
 
 import static java.time.temporal.ChronoUnit.*;
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,7 +22,9 @@ import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomProperty;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.Manager.ValueBuilderIsPresentIntf;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
+import org.lodder.subtools.sublibrary.Manager.Value;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,16 +71,15 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewStableGithubRelease() {
-        return manager.valueBuilder()
-            .cacheType(CacheType.MEMORY)
-            .key("GitHub-update")
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, "GitHub-update")
+            .getOptional(() -> {
                 try {
                     String currentVersion = getVersion();
-                    Element element = manager.getPageContentBuilder().url(REPO_URL + "/releases")
-                        .userAgent(null)
-                        .cacheType(CacheType.NONE)
-                        .getAsJsoupDocument()
+                    Element element =
+                        manager.getAsJsoupDocument(PageContentParams.params(
+                                url:"$REPO_URL/releases",
+                                cacheType:CacheType.NONE,
+                                userAgent:null))
                         .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
                     Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
                     String versionText = element.parent().selectFirstByTag("a").text();
@@ -87,38 +90,34 @@ public class UpdateAvailableGithub {
                         return Optional.empty();
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
-                    Element artifactElement = manager.getPageContentBuilder().url(versionBlockUrl)
-                        .userAgent(null)
-                        .cacheType(CacheType.NONE)
-                        .getAsJsoupDocument()
+                    Element artifactElement = manager.getAsJsoupDocument(
+                            PageContentParams.params(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
                     return Optional.of(url);
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
-                        LOGGER.trace(Messages.getText("LoggingPanel.UpdateCheckFailed"), e);
+                        LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
-                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
                     return Optional.empty();
                 }
-            }).getOptional();
+            });
     }
 
     private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return manager.valueBuilder()
-            .cacheType(CacheType.MEMORY)
-            .key("GitHub-update-nightly")
-            .optionalSupplier(() -> {
+        return manager.getCache(CacheType.MEMORY, "GitHub-update-nightly")
+            .getOptional(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
 
                     Element rowElement =
-                        manager.getPageContentBuilder().url(REPO_URL + "/actions?query=branch%3Amaster")
-                            .userAgent(null)
-                            .cacheType(CacheType.MEMORY)
-                            .getAsJsoupDocument()
+                        manager.getAsJsoupDocument(PageContentParams.params(
+                                url:"$REPO_URL/actions?query=branch%3Amaster",
+                                cacheType:CacheType.MEMORY,
+                                userAgent:null))
                             .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
                         rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
@@ -127,23 +126,20 @@ public class UpdateAvailableGithub {
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getPageContentBuilder()
-                        .url(url)
-                        .cacheType(CacheType.MEMORY)
-                        .getAsJsoupDocument()
+                    String downloadUrl = manager.getAsJsoupDocument(params(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();
                     return Optional.of(downloadUrl);
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
-                        LOGGER.trace(Messages.getText("LoggingPanel.UpdateCheckFailed"), e);
+                        LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
-                        LOGGER.error(Messages.getText("LoggingPanel.UpdateCheckFailed"));
+                        LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
                     return Optional.empty();
                 }
-            }).getOptional();
+            });
     }
 
     private LocalDateTime getBuildTista() {
@@ -159,17 +155,16 @@ public class UpdateAvailableGithub {
         return !version.contains("-SNAPSHOT");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static ValueBuilderIsPresentIntf<LocalDate> getUpdateLastUpdateCheckBuilder(Manager manager) {
-        return (ValueBuilderIsPresentIntf) manager.valueBuilder().cacheType(CacheType.DISK).key("LastUpdateCheck");
+    private CacheKey getUpdateLastUpdateCheckCache() {
+        return manager.getCache(CacheType.DISK, "LastUpdateCheck");
     }
 
     private void updateLastUpdateCheck() {
-        getUpdateLastUpdateCheckBuilder(manager).value(LocalDate.now()).store();
+        getUpdateLastUpdateCheckCache().store(Value.of(LocalDate.now()));
     }
 
     private LocalDate getLastUpdateCheck() {
-        return getUpdateLastUpdateCheckBuilder(manager).valueSupplier(() -> LocalDate.MIN).get();
+        return getUpdateLastUpdateCheckCache().get(() -> LocalDate.MIN);
     }
 
     private LocalDateTime zonedDateTimeStringToLocalDateTime(String dateString) {

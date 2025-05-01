@@ -10,8 +10,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.common.base.Objects;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import manifold.ext.props.rt.api.val;
 
 public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
@@ -22,34 +20,11 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
     private final Function<T, String> toStringMapper;
     private final boolean distinctValues;
 
-    private JListWithImages(Function<T, String> toStringMapper, boolean distinctValues) {
-        this.toStringMapper = toStringMapper == null ? Object::toString : toStringMapper;
+    public JListWithImages(Function<T, String> toStringMapper=Object::toString, boolean distinctValues=true) {
+        this.toStringMapper = toStringMapper;
         this.distinctValues = distinctValues;
         setCellRenderer(new ImageListCellRenderer());
         setModel(new DefaultListModel<>());
-    }
-
-    public static <T> JListWithImages<T> forType(Class<T> type) {
-        return createForType(type).build();
-    }
-
-    public static <T> JListWithImagesBuilder<T> createForType(Class<T> type) {
-        return new JListWithImagesBuilder<>();
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class JListWithImagesBuilder<T> {
-        private Function<T, String> toStringMapper;
-        private boolean distinctValues;
-
-        public JListWithImagesBuilder<T> distinctValues() {
-            return distinctValues(true);
-        }
-
-        public JListWithImages<T> build() {
-            return new JListWithImages<>(toStringMapper, distinctValues);
-        }
     }
 
     public void addItems(Image image, Collection<T> values) {

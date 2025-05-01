@@ -20,7 +20,7 @@ public class MovieReleaseAssert extends ReleaseAssert<MovieRelease> {
 
     public @Self MovieReleaseAssert withoutYear() {
         isNotNull();
-        assertThat(actual.year).isZero();
+        assertThat(actual.year).isNull();
         return this;
     }
 

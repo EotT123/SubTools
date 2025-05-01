@@ -1,9 +1,11 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
+import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
+
 import java.io.Serial;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -23,6 +25,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.except
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleDescriptor;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -35,7 +38,6 @@ public class JPodnapisiApi implements SubtitleApi {
     private static final String DOMAIN = "https://www.podnapisi.net";
     private final Manager manager;
     private final String userAgent;
-    private LocalDateTime nextCheck;
     @val @override SubtitleSource subtitleSource = SubtitleSource.PODNAPISI;
 
     public Optional<ProviderSerieId> getPodnapisiShowName(String showName) throws PodnapisiException {
@@ -44,8 +46,8 @@ public class JPodnapisiApi implements SubtitleApi {
             Optional.of(new ProviderSerieId(showName, showName)) : Optional.empty();
     }
 
-    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, int year, int season, int episode,
-        Language language) throws PodnapisiException {
+    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, @Nullable Integer year, int season,
+        int episode, Language language) throws PodnapisiException {
         return getSubtitles(new SerieMapping(movieName, movieName, movieName, season), year, season, episode, language);
 
     }
@@ -56,14 +58,12 @@ public class JPodnapisiApi implements SubtitleApi {
 
     }
 
-    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, Integer year, int season,
-        int episode, Language language) throws PodnapisiException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key(
+    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, @Nullable Integer year,
+        int season, int episode, Language language) throws PodnapisiException {
+        return manager.getCache(CacheType.MEMORY,
                 "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId, season, episode,
                     language))
-            .collectionSupplier(PodnapisiSubtitleDescriptor.class, () -> {
+            .getCollection(() -> {
                 try {
                     StringBuilder url = new StringBuilder("$DOMAIN/sl/ppodnapisi/search?sK=").append(
                         URLEncoder.encode(providerSerieId.providerId.trim().toLowerCase(), StandardCharsets.UTF_8));
@@ -90,22 +90,18 @@ public class JPodnapisiApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw new PodnapisiException(e);
                 }
-            })
-            .getCollection();
+            }, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1 Second));
     }
 
 
     protected @Nullable Document getXml(String url) throws PodnapisiException {
         try {
-            return manager.getPageContentBuilder()
-                .url(url)
-                .userAgent(userAgent)
-                .cacheType(CacheType.MEMORY)
-                .retries(1)
-                .retryPredicate(e -> e instanceof HttpClientException httpClientException &&
-                    httpClientException.responseCode >= 500 && httpClientException.responseCode < 600)
-                .retryWait(5)
-                .getAsJsoupDocument();
+            return manager.getAsJsoupDocument(params(url, CacheType.MEMORY, userAgent,
+                new Retry(
+                    1,
+                    ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&
+                        e.responseCode < 600,
+                    5 Second)));
         } catch (Exception e) {
             throw new PodnapisiException(e);
         }

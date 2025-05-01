@@ -4,17 +4,17 @@ import com.pivovarit.function.ThrowingBiFunction;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class LazyThrowingBiFunction<T, S, V, X extends Exception> {
-
-    private final ThrowingBiFunction<T, S, V, X> function;
-
-    private V object;
+public class LazyThrowingBiFunction<T, U, R, X extends Exception> {
 
     private final Object lock = new Object();
 
+    private final ThrowingBiFunction<T, U, R, X> function;
+
+    private R object;
+
     private volatile boolean initialized = false;
 
-    public V apply(T arg1, S arg2) throws X {
+    public R apply(T arg1, U arg2) throws X {
         if (!initialized) {
             synchronized (lock) {
                 if (!initialized) {

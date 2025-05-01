@@ -1,18 +1,20 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import java.io.Serializable;
 import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
+import manifold.science.measures.Time;
 
-public sealed interface CacheObject<T> permits ExpiringCacheObject, TemporaryCacheObject {
+public sealed interface CacheObject<T> extends Serializable permits ExpiringCacheObject, TemporaryCacheObject {
 
-    @val long created;
+    @val Time created;
     @val T value;
-    @val long age;
+    @val Time age;
 
     void updateLastAccessed();
 
-    boolean isExpired(long ttl);
+    boolean isExpired(Time ttl);
 
     String toString(Function<T, String> valueToStringMapper);
 

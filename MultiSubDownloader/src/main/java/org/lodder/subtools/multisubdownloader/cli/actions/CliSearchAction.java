@@ -7,10 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
@@ -33,7 +29,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+@ExtensionMethod({Files.class})
 public class CliSearchAction extends SearchAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);
@@ -50,89 +46,10 @@ public class CliSearchAction extends SearchAction {
     @get(Protected) @override IndexingProgressListener indexingProgressListener;
     @get(Protected) @override SearchProgressListener searchProgressListener;
 
-    public interface CliSearchActionBuilderSubtitleProviderStore {
-        CliSearchActionBuilderIndexingProgressListener subtitleProviderStore(
-            SubtitleProviderStore subtitleProviderStore);
-    }
-
-    public interface CliSearchActionBuilderIndexingProgressListener {
-        CliSearchActionBuilderSearchProgressListener indexingProgressListener(
-            IndexingProgressListener indexingProgressListener);
-    }
-
-    public interface CliSearchActionBuilderSearchProgressListener {
-        CliSearchActionBuilderCLI searchProgressListener(SearchProgressListener searchProgressListener);
-    }
-
-    public interface CliSearchActionBuilderCLI {
-        CliSearchActionBuilderFileListAction cli(CLI cli);
-    }
-
-    public interface CliSearchActionBuilderFileListAction {
-        CliSearchActionBuilderLanguage fileListAction(FileListAction fileListAction);
-    }
-
-    public interface CliSearchActionBuilderLanguage {
-        CliSearchActionBuilderReleaseFactory language(Language language);
-    }
-
-    public interface CliSearchActionBuilderReleaseFactory {
-        CliSearchActionBuilderFiltering releaseFactory(ReleaseFactory releaseFactory);
-    }
-
-    public interface CliSearchActionBuilderFiltering {
-        CliSearchActionBuilderFolders filtering(@NonNull SubtitleFiltering filtering);
-    }
-
-    public interface CliSearchActionBuilderFolders {
-        CliSearchActionBuilderOther folders(List<Path> folders);
-    }
-
-    public interface CliSearchActionBuilderOther {
-        CliSearchActionBuilderOther overwriteSubtitles(boolean overwriteSubtitles);
-
-        CliSearchActionBuilderOther recursive(boolean recursive);
-
-        CliSearchAction build() throws SearchSetupException;
-    }
-
-    public static CliSearchActionBuilderSubtitleProviderStore createWithSettings(Settings settings) {
-        return new CliSearchActionBuilder(settings);
-    }
-
-    @RequiredArgsConstructor
-    @Setter
-    @Accessors(fluent = true, chain = true)
-    public static class CliSearchActionBuilder
-        implements CliSearchActionBuilderSearchProgressListener, CliSearchActionBuilderIndexingProgressListener,
-        CliSearchActionBuilderSubtitleProviderStore, CliSearchActionBuilderCLI,
-        CliSearchActionBuilderFileListAction, CliSearchActionBuilderLanguage, CliSearchActionBuilderReleaseFactory,
-        CliSearchActionBuilderFiltering, CliSearchActionBuilderFolders, CliSearchActionBuilderOther {
-        private final Settings settings;
-        private SubtitleProviderStore subtitleProviderStore;
-        private IndexingProgressListener indexingProgressListener;
-        private SearchProgressListener searchProgressListener;
-        private CLI cli;
-        private FileListAction fileListAction;
-        private Language language;
-        private ReleaseFactory releaseFactory;
-        private SubtitleFiltering filtering;
-        private List<Path> folders;
-        private boolean overwriteSubtitles;
-        private boolean recursive;
-
-        @Override
-        public CliSearchAction build() throws SearchSetupException {
-            return new CliSearchAction(settings, subtitleProviderStore, indexingProgressListener,
-                searchProgressListener, cli, fileListAction, language, releaseFactory, filtering, folders,
-                overwriteSubtitles, recursive);
-        }
-    }
-
-    private CliSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore,
+    public CliSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore,
         IndexingProgressListener indexingProgressListener, SearchProgressListener searchProgressListener, CLI cli,
-        FileListAction fileListAction, Language language, ReleaseFactory releaseFactory,
-        SubtitleFiltering filtering, List<Path> folders, boolean overwriteSubtitles, boolean recursive)
+        FileListAction fileListAction, Language language, ReleaseFactory releaseFactory, SubtitleFiltering filtering,
+        List<Path> folders, boolean overwriteSubtitles=true, boolean recursive=true)
         throws SearchSetupException {
         super(settings, subtitleProviderStore);
         this.indexingProgressListener = indexingProgressListener;

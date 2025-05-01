@@ -19,7 +19,7 @@ public final class CLISearchProgress extends CLIProgress implements SearchProgre
 
     @Override
     public void progress(SubtitleProvider provider, int jobsLeft, Release release) {
-        this.tableModel.update(provider.getName(), jobsLeft, release == null ? "Done" : release.fileName);
+        this.tableModel.update(provider.name, jobsLeft, release == null ? "Done" : release.fileName);
         this.printProgress();
     }
 
@@ -72,12 +72,5 @@ public final class CLISearchProgress extends CLIProgress implements SearchProgre
 
         /* print progressbar */
         this.printProgBar(this.progress);
-    }
-
-    // TODO: remove this when https://github.com/manifold-systems/manifold/issues/642 is fixed
-    @Override
-    public CLISearchProgress verbose(boolean verbose) {
-        super.verbose(verbose);
-        return this;
     }
 }

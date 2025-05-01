@@ -1,9 +1,12 @@
 package org.lodder.subtools.sublibrary.data.omdb;
 
+import static org.lodder.subtools.sublibrary.PageContentParams.*;
+
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
 import org.w3c.dom.Node;
@@ -15,21 +18,17 @@ class OmdbApi {
     private final Manager manager;
 
     public Optional<OmdbDetails> getMovieDetails(int imdbId) throws OmdbException {
-        return manager.valueBuilder()
-                .memoryCache()
-                .key("OMDB-moviedetails-$imdbId")
-                .optionalSupplier(() -> {
-                    final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
-                    try {
-                        return manager.getPageContentBuilder()
-                                .url(url)
-                                .getAsDocument()
-                            .getElementsByTagName("movie").stream()
-                                .map(this::parseOMDBDetails).findFirst();
-                    } catch (Exception e) {
-                        throw new OmdbException("Error OMDB API", url, e);
-                    }
-                }).getOptional();
+        return manager.getCache(CacheType.MEMORY, "OMDB-moviedetails-$imdbId")
+            .getOptional(() -> {
+                final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
+                try {
+                    return manager.getAsDocument(url(url))
+                        .getElementsByTagName("movie").stream()
+                        .map(this::parseOMDBDetails).findFirst();
+                } catch (Exception e) {
+                    throw new OmdbException("Error OMDB API", url, e);
+                }
+            });
     }
 
     private OmdbDetails parseOMDBDetails(Node node) {

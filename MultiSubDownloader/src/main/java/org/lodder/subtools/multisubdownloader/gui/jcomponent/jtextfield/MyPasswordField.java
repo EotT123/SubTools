@@ -1,8 +1,10 @@
 package org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield;
 
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Objects;
@@ -11,7 +13,7 @@ import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
-import org.lodder.subtools.sublibrary.util.BooleanConsumer;
+import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 public class MyPasswordField extends JPasswordField implements MyPasswordFieldOthersIntf {
 

@@ -3,9 +3,8 @@ package org.lodder.subtools.multisubdownloader.lib.library;
 import java.nio.file.Path;
 import java.util.Map;
 
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
@@ -27,10 +26,10 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     private final Map<Language, String> languageTags;
     private final boolean rename;
 
-    private FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        boolean includeLanguageCode, Map<Language, String> languageTags, boolean useTvdb,
-        TheTvdbAdapter tvdbAdapter, boolean rename) {
-        super(useTvdb, tvdbAdapter);
+    public FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
+        boolean includeLanguageCode, Map<Language, String> languageTags, TheTvdbAdapter tvdbAdapter=null,
+        boolean rename) {
+        super(tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
         this.replacingSpaceChar = replacingSpaceChar;
@@ -39,85 +38,16 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         this.rename = rename;
     }
 
-    public static FilenameLibraryBuilder fromSettings(LibrarySettings librarySettings, Manager manager,
+    public static FilenameLibraryBuilder fromSettings(LibrarySettings libSettings, Manager manager,
         UserInteractionHandler userInteractionHandler) {
-        return FilenameLibraryBuilder.builder()
-            .structure(librarySettings.folderStructure)
-            .replaceSpace(librarySettings.folderReplaceSpace)
-            .replacingSpaceChar(librarySettings.folderReplacingSpaceChar)
-            .includeLanguageCode(librarySettings.includeLanguageCode)
-            .languageTags(librarySettings.langCodeMap)
-            .useTvdbName(librarySettings.useTVDBNaming)
-            .tvdbAdapter(TheTvdbAdapter.getInstance(manager, userInteractionHandler))
-            .rename(librarySettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME))
-            .build();
-    }
-
-    public static FilenameLibraryBuilderStructureIntf builder() {
-        return new FilenameLibraryBuilderBuilder();
-    }
-
-    public interface FilenameLibraryBuilderStructureIntf {
-        FilenameLibraryBuilderReplaceSpaceIntf structure(String structure);
-    }
-
-    public interface FilenameLibraryBuilderReplaceSpaceIntf {
-        FilenameLibraryBuilderReplaceSpaceCharIntf replaceSpace(boolean replaceSpace);
-    }
-
-    public interface FilenameLibraryBuilderReplaceSpaceCharIntf {
-        FilenameLibraryBuilderIncludeLanguageCodeIntf replacingSpaceChar(char replacingSpaceChar);
-    }
-
-    public interface FilenameLibraryBuilderIncludeLanguageCodeIntf {
-        FilenameLibraryBuilderLanguageTagIntf includeLanguageCode(boolean includeLanguageCode);
-    }
-
-    public interface FilenameLibraryBuilderLanguageTagIntf {
-        FilenameLibraryBuilderUseTvdbNameIntf languageTags(Map<Language, String> languageTags);
-    }
-
-    public interface FilenameLibraryBuilderUseTvdbNameIntf extends FilenameLibraryBuilderBuildIntf {
-        FilenameLibraryBuilderTvdbAdapterIntf useTvdbName(boolean useTvdbName);
-    }
-
-    public interface FilenameLibraryBuilderTvdbAdapterIntf {
-        FilenameLibraryBuilderRenameIntf tvdbAdapter(TheTvdbAdapter tvdbAdapter);
-    }
-
-    public interface FilenameLibraryBuilderRenameIntf {
-        FilenameLibraryBuilderBuildIntf rename(boolean rename);
-    }
-
-    public interface FilenameLibraryBuilderBuildIntf {
-        FilenameLibraryBuilder build();
-    }
-
-    @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class FilenameLibraryBuilderBuilder
-        implements FilenameLibraryBuilderStructureIntf, FilenameLibraryBuilderReplaceSpaceIntf,
-        FilenameLibraryBuilderReplaceSpaceCharIntf, FilenameLibraryBuilderIncludeLanguageCodeIntf,
-        FilenameLibraryBuilderLanguageTagIntf, FilenameLibraryBuilderUseTvdbNameIntf,
-        FilenameLibraryBuilderTvdbAdapterIntf, FilenameLibraryBuilderRenameIntf, FilenameLibraryBuilderBuildIntf {
-        private String structure;
-
-        private boolean replaceSpace;
-        private char replacingSpaceChar;
-
-        private boolean includeLanguageCode;
-        private Map<Language, String> languageTags;
-
-        private boolean useTvdbName;
-        private TheTvdbAdapter tvdbAdapter;
-
-        private boolean rename;
-
-        @Override
-        public FilenameLibraryBuilder build() {
-            return new FilenameLibraryBuilder(structure, replaceSpace, replacingSpaceChar, includeLanguageCode,
-                languageTags, useTvdbName, tvdbAdapter, rename);
-        }
+        return new FilenameLibraryBuilder(
+            structure:libSettings.folderStructure,
+            replaceSpace:libSettings.folderReplaceSpace,
+            replacingSpaceChar:libSettings.folderReplacingSpaceChar,
+            includeLanguageCode:libSettings.includeLanguageCode,
+            languageTags:libSettings.langCodeMap,
+            tvdbAdapter:libSettings.useTVDBNaming ? TheTvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVEANDRENAME));
     }
 
     @Override
@@ -129,17 +59,14 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     // order is important!
                     fName = replace(fName, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
                     fName =
-                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG, tvRelease.episodeNumbers,
-                            true);
+                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
+                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes,
+                        false);
+                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
+                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
+                    fName = replace(fName, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
                     fName =
-                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT, tvRelease.episodeNumbers,
-                            false);
-                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formattedNumber(tvRelease.season, true));
-                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formattedNumber(tvRelease.season, false));
-                    fName = replace(fName, SerieStructureTag.EPISODE_LONG,
-                        formattedNumber(tvRelease.firstEpisodeNumber, true));
-                    fName = replace(fName, SerieStructureTag.EPISODE_SHORT,
-                        formattedNumber(tvRelease.firstEpisodeNumber, false));
+                        replace(fName, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
                     fName = replace(fName, SerieStructureTag.TITLE, tvRelease.title);
                     fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, SerieStructureTag.RELEASE_GROUP, release.releaseGroup);
@@ -151,7 +78,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     String fName = structure;
                     // order is important!
                     fName = replace(fName, MovieStructureTag.MOVIE_TITLE, getShowName(movieRelease.name));
-                    fName = replace(fName, MovieStructureTag.YEAR, formattedNumber(movieRelease.year, false));
+                    fName = replace(fName, MovieStructureTag.YEAR, formatNumber(movieRelease.year, false));
                     fName = replace(fName, MovieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, MovieStructureTag.RELEASE_GROUP, release.releaseGroup);
 
@@ -170,11 +97,11 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         }
     }
 
-    public String buildSubtitle(Release release, Subtitle sub, String filename, Integer version) {
+    public String buildSubtitle(Release release, Subtitle sub, String filename, @Nullable Integer version) {
         return buildSubtitle(release, filename, sub.language, version);
     }
 
-    public String buildSubtitle(Release release, String filename, Language language, Integer version) {
+    public String buildSubtitle(Release release, String filename, Language language, @Nullable Integer version) {
         final String extension = "." + release.extension;
         String subFileName = filename;
         if (version != null) {

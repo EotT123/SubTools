@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
-import org.lodder.subtools.sublibrary.util.BooleanConsumer;
+import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @Extension
 @UtilityClass

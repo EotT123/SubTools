@@ -1,5 +1,8 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
+import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.util.Sleep.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -89,11 +92,7 @@ abstract sealed class AbstractAdapter<T, S extends ProviderSerieId, X extends Ex
                     if (retries-- == 0) {
                         throw new RuntimeException("Max retries reached when calling %s".formatted(message));
                     }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e1) {
-                        // continue
-                    }
+                    sleep(5 Second);
                     return execute();
                 } else {
                     try {

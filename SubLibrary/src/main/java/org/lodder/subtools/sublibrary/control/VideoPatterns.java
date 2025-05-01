@@ -101,6 +101,7 @@ public class VideoPatterns {
         WEBRIP("webrip", "webrip", false, false),
         RERIP("rerip", "rerip", false, false),
         WEBDL("web-dl", "web[-.]?dl", false, false),
+        WEB("web", "web", false, false),
         TS("ts", "ts", false, true),
         DVD_SCREENER("dvdscreener", "dvdscreener", false, true),
         R5("r5", "r5", false, true),

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.adapters;
 
+import static org.lodder.subtools.sublibrary.model.Subtitle.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.SubsceneApi;
@@ -42,6 +45,7 @@ public final class JSubsceneAdapter
     private static LazySupplier<SubsceneApi> api;
     @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
     @val @override String providerName = subtitleSource.name();
+    @val @override boolean useSeasonForSerieId = true;
 
     public JSubsceneAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
@@ -73,7 +77,8 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public List<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithName(String name, int year, Language language) {
+    public Collection<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
+        Language language) {
         // TODO implement this
         return List.of();
     }
@@ -89,7 +94,7 @@ public final class JSubsceneAdapter
     public Set<SubsceneSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws SubsceneException {
         return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodeNumbers.stream().flatMap(episode -> {
+            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
                 try {
                     return getApi().getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
                 } catch (SubsceneException e) {
@@ -102,7 +107,7 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public List<SubSceneSerieId> getSortedProviderSerieIds(OptionalInt tvdbIdOptional, String serieName, int season)
+    public List<SubSceneSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
         throws SubsceneException {
         ToIntFunction<String> providerTypeFunction = value -> switch (value) {
             case "TV-Serie" -> 1;
@@ -131,28 +136,24 @@ public final class JSubsceneAdapter
     public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<SubsceneSubtitleDescriptor> subtitles,
         Language language) {
         return subtitles.stream()
-            .filter(sub -> language == sub.getLanguage())
-            .filter(sub -> sub.getName()
-                .contains(getSeasonEpisodeString(tvRelease.season, tvRelease.firstEpisodeNumber)))
-            .map(sub -> Subtitle.downloadSource(sub.getUrlSupplier())
-                .subtitleSource(subtitleSource)
-                .fileName(sub.getName().removeIllegalFilenameChars())
-                .language(sub.getLanguage())
-                .quality(ReleaseParser.getQualityKeyword(sub.getName()))
-                .subtitleMatchType(SubtitleMatchType.EVERYTHING)
-                .releaseGroup(ReleaseParser.extractReleaseGroup(sub.getName(), false))
-                .uploader(sub.getUploader())
-                .hearingImpaired(sub.isHearingImpaired()))
+            .filter(sub -> language == sub.language)
+            .filter(sub -> sub.name
+                .contains(getSeasonEpisodeString(tvRelease.season, tvRelease.firstEpisode)))
+            .map(sub -> new Subtitle(
+                downloadSource:DownloadSource.of(sub.urlSupplier),
+                subtitleSource:subtitleSource,
+                fileName:sub.name.removeIllegalFilenameChars(),
+                language:sub.language,
+                quality:ReleaseParser.getQualityKeyword(sub.name),
+                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                releaseGroup:ReleaseParser.extractReleaseGroup(sub.name, false),
+                uploader:sub.uploader,
+                hearingImpaired:sub.hearingImpaired))
             .collect(Collectors.toSet());
     }
 
     private String getSeasonEpisodeString(int season, int episode) {
         return "S%02dE%02d".formatted(season, episode);
-    }
-
-    @Override
-    public boolean useSeasonForSerieId() {
-        return true;
     }
 
     @Override

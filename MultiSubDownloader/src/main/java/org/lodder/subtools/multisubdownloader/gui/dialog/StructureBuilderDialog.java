@@ -3,8 +3,9 @@ package org.lodder.subtools.multisubdownloader.gui.dialog;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -47,7 +49,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         FILE, FOLDER
     }
 
-    public StructureBuilderDialog(JFrame frame, String title, boolean modal, VideoType videoType,
+    public StructureBuilderDialog(@Nullable JFrame frame=null, String title, boolean modal, VideoType videoType,
         StructureType structureType, Manager manager, UserInteractionHandler userInteractionHandler,
         Function<String, ? extends LibraryBuilder> filenameLibraryBuilder) {
         super(frame, title, modal);

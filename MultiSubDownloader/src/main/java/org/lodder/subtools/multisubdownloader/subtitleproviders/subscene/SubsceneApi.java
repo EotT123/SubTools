@@ -1,8 +1,9 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
+import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.util.Sleep.*;
+
 import java.io.Serial;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -13,10 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import com.pivovarit.function.ThrowingSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,19 +29,20 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.S
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleDescriptor;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.Manager.PageContentBuilderCacheTypeIntf;
+import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
-import org.lodder.subtools.sublibrary.data.Html;
+import org.lodder.subtools.sublibrary.PageContentParams;
+import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import util.Utils;
 
-public class SubsceneApi extends Html implements SubtitleApi {
+public class SubsceneApi implements SubtitleApi {
 
-    private static final int RATE_DURATION_SHORT = 1; // seconds
-    private static final int RATE_DURATION_LONG = 5; // seconds
+    private static final Time RATE_DURATION_SHORT = 1 Second;
+    private static final Time RATE_DURATION_LONG = 5 Second;
     private static final String DOMAIN = "https://subscene.com";
     private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
 
@@ -49,14 +53,16 @@ public class SubsceneApi extends Html implements SubtitleApi {
         default -> false;
     };
 
+    private final Manager manager;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 
-    private LocalDateTime lastRequest = LocalDateTime.now();
+    private Time lastRequest = Time.now();
     @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
 
     public SubsceneApi(Manager manager) {
-        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
+//        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
+        this.manager = manager;
         addCookie("ForeignOnly", "False");
     }
 
@@ -90,36 +96,34 @@ public class SubsceneApi extends Html implements SubtitleApi {
 
     public List<SubsceneSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
         Language language) throws SubsceneException {
-        return manager.valueBuilder()
-            .memoryCache()
-            .key("%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name, providerSerieId.providerId, season,
-                episode, language))
-            .collectionSupplier(SubsceneSubtitleDescriptor.class, () -> {
+        return manager.getCache(CacheType.MEMORY, "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name,
+                providerSerieId.providerId, season, episode, language))
+            .getCollection(() -> {
                 setLanguageWithCookie(language);
                 try {
                     return getJsoupDocument(DOMAIN + providerSerieId.providerId)
                         .selectAllByCss("td.a1")
                         .stream()
-//                        .map(Element::parent)
                         .map(el -> (Element) el.parent())
-                        .map(row -> new SubsceneSubtitleDescriptor().setLanguage(
-                                Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
-                                    .orElse(null))
-                            .setUrlSupplier(() -> getDownloadUrl(
-                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim()))
-                            .setName(row.selectAllByCss(".a1 span:not(.l)").text().trim())
-                            .setHearingImpaired(row.selectFirstByCss(".a41") != null)
-                            .setUploader(row.selectFirstByCss(".a5 > a").text().trim())
-                            .setComment(row.selectFirstByCss(".a6 > div").text().trim()))
-                        .filter(subDescriptor -> subDescriptor.getSeasonEpisode() != null &&
-                            subDescriptor.getSeasonEpisode().episodes.stream()
-                                .anyMatch(ep -> ep == episode))
+                        .map(row -> {
+                            Language lang = Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
+                                .orElse(null);
+                            String name = row.selectAllByCss(".a1 span:not(.l)").text().trim();
+                            boolean hearingImpaired = row.selectFirstByCss(".a41") != null;
+                            String uploader = row.selectFirstByCss(".a5 > a").text().trim();
+                            String comment = row.selectFirstByCss(".a6 > div").text().trim();
+                            ThrowingSupplier<String, SubsceneException> urlSupplier = () -> getDownloadUrl(
+                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim());
+                            return new SubsceneSubtitleDescriptor(lang, name, hearingImpaired, uploader, comment,
+                                urlSupplier);
+                        })
+                        .filter(subDescriptor -> subDescriptor.seasonEpisode != null &&
+                            subDescriptor.seasonEpisode.containsEpisode(episode))
                         .toList();
                 } catch (Exception e) {
                     throw new SubsceneException(e);
                 }
-            })
-            .getCollection();
+            });
     }
 
     private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
@@ -135,21 +139,18 @@ public class SubsceneApi extends Html implements SubtitleApi {
     }
 
     private Document getJsoupDocument(String url) throws ManagerException {
-        while (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATE_DURATION_SHORT) {
-            sleepSeconds(1);
+        Time timeToSleep = RATE_DURATION_SHORT - Time.now() + lastRequest;
+        if (timeToSleep.isPositive) {
+            sleep(timeToSleep);
         }
-        Document document = super.getHtml(url)
-            .retries(1)
-            .retryPredicate(RETRY_PREDICATE)
-            .retryWait(RATE_DURATION_LONG)
-            .getAsJsoupDocument();
-        lastRequest = LocalDateTime.now();
-        return document;
-    }
 
-    @Override
-    public PageContentBuilderCacheTypeIntf getHtml(String url) {
-        throw new IllegalStateException("Should not be used, use getJsoupDocument");
+        Document document =
+            manager.getAsJsoupDocument(PageContentParams.params(
+                url:url,
+                userAgent:"",
+                retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));
+        lastRequest = Time.now();
+        return document;
     }
 
     private void setLanguageWithCookie(Language language) {

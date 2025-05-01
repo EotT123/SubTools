@@ -1,6 +1,6 @@
 package org.lodder.subtools.multisubdownloader;
 
-import static java.util.concurrent.TimeUnit.*;
+import static manifold.science.util.UnitConstants.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,12 +31,11 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
 import org.lodder.subtools.sublibrary.cache.InMemoryCache;
-import org.lodder.subtools.sublibrary.cache.SerializableDiskCache;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+@ExtensionMethod({Files.class})
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -118,10 +117,8 @@ public class App {
                 app.makeSubtitleProviderStore().getAllProviders().stream().map(SubtitleProvider::getProviderName)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
-            manager.clearExpiredCacheBuilder()
-                .cacheType(CacheType.DISK)
-                .keyFilter((String key) -> providerNames.stream().noneMatch(key::startsWith))
-                .clear();
+            manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key::startsWith))
+                .clearExpiredCache();
         }).start();
 
     }
@@ -158,17 +155,19 @@ public class App {
             splash.progressMsg = Messages.getText("App.Starting");
         }
         DiskCache<String, Serializable> diskCache =
-            SerializableDiskCache.cacheBuilder().keyType(String.class).valueType(Serializable.class)
-                .timeToLive(SECONDS.convert(500, DAYS))
-                .maxItems(2500)
-                .build();
+            new DiskCache<>(
+                String.class,
+                Serializable.class,
+                500 day,
+                2500);
 
-        InMemoryCache<String, Serializable> inMemoryCache =
-            InMemoryCache.builder().keyType(String.class).valueType(Serializable.class)
-                .timeToLive(SECONDS.convert(10, MINUTES))
-                .timerInterval(100L)
-                .maxItems(500)
-                .build();
+        InMemoryCache<String, String> inMemoryCache =
+            new InMemoryCache<>(
+                String.class,
+                String.class,
+                10 min,
+                100 ms,
+                500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }

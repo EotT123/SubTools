@@ -9,7 +9,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <manifold.version>2025.1.10</manifold.version>
+        <manifold.version>2025.1.12</manifold.version>
         <lombok.version>1.18.38</lombok.version>
         <maven.compiler.target>24</maven.compiler.target>
         <maven.compiler.source>24</maven.compiler.source>
@@ -149,6 +149,16 @@
             <dependency>
                 <groupId>systems.manifold</groupId>
                 <artifactId>manifold-tuple-rt</artifactId>
+                <version>${manifold.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>systems.manifold</groupId>
+                <artifactId>manifold-params-rt</artifactId>
+                <version>${manifold.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>systems.manifold</groupId>
+                <artifactId>manifold-science</artifactId>
                 <version>${manifold.version}</version>
             </dependency>
             <dependency>
@@ -310,6 +320,11 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>joor</artifactId>
                 <version>0.9.15</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pivovarit</groupId>
+                <artifactId>more-gatherers</artifactId>
+                <version>0.0.2</version>
             </dependency>
 
             <dependency>
