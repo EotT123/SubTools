@@ -11,6 +11,7 @@ import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleMetadata;
@@ -22,7 +23,6 @@ import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.CookieManager;
 
 public class TvSubtitlesApi implements SubtitleApi {
@@ -53,31 +53,33 @@ public class TvSubtitlesApi implements SubtitleApi {
             });
     }
 
-    public Set<TVSubtitlesSubtitleMetadata> getSubtitles(SerieMapping providerSerieId, int season, int episode,
+    public Set<TVSubtitlesSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
         Language language) throws TvSubtitleException {
         // https://www.tvsubtitles.net/setlang.php?page=/tvshow-3219-2.html&setlang1=es
         Set<TVSubtitlesSubtitleMetadata> results = new HashSet<>();
-        Optional<EpisodeRow> episodeRow = getSeasonSubtitleInfo(providerSerieId.providerId, season, language).filter(
-            row -> row.isSameEpisode(season, episode)).findAny();
+        TVSubtitlesLanguage providerLang = TVSubtitlesLanguage.of(language).orElse(null);
+
+        Optional<EpisodeRow> episodeRow = getSeasonSubtitleInfo(providerId, season, providerLang)
+            .filter(row -> row.isSameEpisode(season, episode)).findAny();
         if (episodeRow.isPresent()) {
             for (String url : episodeRow.get().urls) {
-                results.addAll(getSubtitles(url));
+                results.addAll(getSubtitles(url, providerLang));
             }
             return results;
         }
         return results;
     }
 
-    private List<EpisodeRow> getSeasonSubtitleInfo(String providerId, int season, Language language)
-        throws TvSubtitleException {
+    private List<EpisodeRow> getSeasonSubtitleInfo(String providerId, int season,
+        @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleException {
         return getCache("seasonSubtitleInfo",
-            b -> b.add("providerId", providerId).add("season", season).add("language", language))
+            b -> b.add("providerId", providerId).add("season", season).add("language", providerLang))
             .getCollection(() -> {
                 try {
-                    String languageCode = getLanguageCode(language);
                     CookieManager cookieManager = null;
-                    if (languageCode != null) {
-                        cookieManager = new CookieManager().storeCookie("tvsubtitles.net", "setlang", languageCode);
+                    if (providerLang != null) {
+                        cookieManager =
+                            new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
                     }
 //                    DOMAIN + "/setlang.php?page=/$providerId-$season.html&setlang1=$languageCode",
                     return manager.getAsJsoupDocument(PageContentParams.params(
@@ -100,16 +102,16 @@ public class TvSubtitlesApi implements SubtitleApi {
             });
     }
 
-    private List<TVSubtitlesSubtitleMetadata> getSubtitles(String episodeUrl)
-        throws TvSubtitleException {
+    private List<TVSubtitlesSubtitleMetadata> getSubtitles(String episodeUrl,
+        @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleException {
         return getCache("subtitles", b -> b.add("url", episodeUrl))
             .getCollection(() -> {
                 try {
                     return manager.getAsJsoupDocument(PageContentParams.url(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")
                         .stream().map(subtitleElement -> {
-                            TVSubtitlesSubtitleMetadataBuilder subtitleBuilder =
-                                TVSubtitlesSubtitleMetadata.builder();
+                            TVSubtitlesSubtitleMetadataBuilder subtitleBuilder = TVSubtitlesSubtitleMetadata.builder()
+                                .language(providerLang != null ? providerLang.language : null);
                             for (Element titleElement : subtitleElement.select(".subtitle_grid > div > img[title]")) {
                                 String value =
                                     ((Element) titleElement.parent()).nextElementSibling().nextElementSibling().text();
@@ -138,32 +140,46 @@ public class TvSubtitlesApi implements SubtitleApi {
         }
     }
 
-    private String getLanguageCode(Language language) {
-        return switch (language) {
-            case ENGLISH -> "en";
-            case SPANISH -> "es";
-            case FRENCH -> "fr";
-            case GERMAN -> "de";
-            case RUSSIAN -> "ru";
-            case UKRAINIAN -> "ua";
-            case ITALIAN -> "it";
-            case GREEK -> "gr";
-            case ARABIC -> "ar";
-            case HUNGARIAN -> "hu";
-            case POLISH -> "pl";
-            case TURKISH -> "tr";
-            case DUTCH -> "nl";
-            case PORTUGUESE -> "pt";
-            case SWEDISH -> "sv";
-            case DANISH -> "da";
-            case FINNISH -> "fi";
-            case KOREAN -> "ko";
-            case CHINESE_SIMPLIFIED, CHINESE_TRADITIONAL -> "cn";
-            case JAPANESE -> "jp";
-            case BULGARIAN -> "bg";
-            case CZECH -> "cz";
-            case ROMANIAN -> "ro";
-            default -> null;
-        };
+    private enum TVSubtitlesLanguage {
+        ENGLISH(Language.ENGLISH, "en"),
+        SPANISH(Language.SPANISH, "es"),
+        FRENCH(Language.FRENCH, "fr"),
+        GERMAN(Language.GERMAN, "de"),
+        RUSSIAN(Language.RUSSIAN, "ru"),
+        UKRAINIAN(Language.UKRAINIAN, "ua"),
+        ITALIAN(Language.ITALIAN, "it"),
+        GREEK(Language.GREEK, "gr"),
+        ARABIC(Language.ARABIC, "ar"),
+        HUNGARIAN(Language.HUNGARIAN, "hu"),
+        POLISH(Language.POLISH, "pl"),
+        TURKISH(Language.TURKISH, "tr"),
+        DUTCH(Language.DUTCH, "nl"),
+        PORTUGUESE(Language.PORTUGUESE, "pt"),
+        SWEDISH(Language.SWEDISH, "sv"),
+        DANISH(Language.DANISH, "da"),
+        FINNISH(Language.FINNISH, "fi"),
+        KOREAN(Language.KOREAN, "ko"),
+        CHINESE_SIMPLIFIED(Language.CHINESE_SIMPLIFIED, "cn"),
+        JAPANESE(Language.JAPANESE, "jp"),
+        BULGARIAN(Language.BULGARIAN, "bg"),
+        CZECH(Language.CZECH, "cz"),
+        ROMANIAN(Language.ROMANIAN, "ro");
+
+        @val Language language;
+        @val String langCode;
+
+        TVSubtitlesLanguage(Language language, String langCode) {
+            this.language = language;
+            this.langCode = langCode;
+        }
+
+        public static Optional<TVSubtitlesLanguage> of(String langCode) {
+            return TVSubtitlesLanguage.values().stream().filter(lang -> lang.langCode.equals(langCode)).findAny();
+        }
+
+        public static Optional<TVSubtitlesLanguage> of(Language language) {
+            return TVSubtitlesLanguage.values().stream().filter(lang -> lang.language == language).findAny();
+        }
+
     }
 }

@@ -54,5 +54,5 @@ public interface SubtitleProvider<SUB extends Subtitle> {
 
     <X extends Exception> Optional<MovieMapping> getProviderMovieId(MovieRelease movieRelease) throws X;
 
-    <X extends Exception> Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X;
+    <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X;
 }

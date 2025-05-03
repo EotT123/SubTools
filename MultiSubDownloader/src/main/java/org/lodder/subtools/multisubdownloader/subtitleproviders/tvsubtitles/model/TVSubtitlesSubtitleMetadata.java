@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import lombok.Builder;
 import manifold.ext.props.rt.api.val;
+import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
 @Builder
@@ -17,5 +18,5 @@ public class TVSubtitlesSubtitleMetadata implements Serializable {
     @val String url;
     @val Source source;
     @val String releaseGroup;
-
+    @val Language language;
 }

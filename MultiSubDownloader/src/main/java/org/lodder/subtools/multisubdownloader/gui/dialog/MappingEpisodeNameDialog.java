@@ -110,7 +110,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                         originalName:currentName,
                                         customName:newName);
                                     try {
-                                        provider.getProviderSerieId(tvRelease).ifPresentOrElse(serieId -> {
+                                        provider.getProviderSerieMapping(tvRelease).ifPresentOrElse(serieId -> {
                                             row.serieMapping =
                                                 new SerieMapping(currentName, serieId.providerId, serieId.providerName,
                                                     serieId.season);

@@ -3,11 +3,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -24,7 +21,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,28 +65,18 @@ public final class TvSubtitlesAdapter
     }
 
     @Override
-    public Set<TVSubtitlesSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease, Language language)
-        throws TvSubtitleException {
-        return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
-                try {
-                    return api.getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                } catch (TvSubtitleException e) {
-                    LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(source,
-                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                        e.getMessage()), e);
-                    return Stream.empty();
-                }
-            }).collect(Collectors.toSet())).orElseGet(Set::of);
+    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+        Language language) throws TvSubtitleException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override
-    public TvSubtiltesSubtitle convertToSubtitle(TVSubtitlesSubtitleMetadata sub, Language language) {
+    public TvSubtiltesSubtitle convertToSubtitle(TVSubtitlesSubtitleMetadata sub) {
         return new TvSubtiltesSubtitle(
             url:sub.url,
             subtitleSource:source,
             fileName:sub.filename,
-            language:language,
+            language:sub.language,
             quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.source),
             subtitleMatchType:SubtitleMatchType.EVERYTHING,
             releaseGroup:sub.releaseGroup);

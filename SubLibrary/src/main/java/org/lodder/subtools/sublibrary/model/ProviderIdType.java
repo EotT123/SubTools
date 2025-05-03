@@ -1,6 +1,6 @@
 package org.lodder.subtools.sublibrary.model;
 
-public enum ReleaseIdType  {
+public enum ProviderIdType {
 
     IMDB, TVDB, OMDB;
 }

@@ -3,9 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.Getter;
 import manifold.ext.props.rt.api.override;
@@ -22,7 +19,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,25 +59,14 @@ public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, S
     }
 
     @Override
-    public Set<SubdlSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease,
+    public Collection<SubdlSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
         Language language) throws SubdlException {
-        return getProviderSerieId(tvRelease).map(providerSerieId -> tvRelease.episodes.stream()
-            .flatMap(episode -> {
-                try {
-                    return api.getSerieSubtitles(providerSerieId.providerId, tvRelease.season, episode, language)
-                        .stream();
-                } catch (SubdlException e) {
-                    LOGGER.error("API $name searchSubtitles for serie [%s] (%s)".formatted(
-                            TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode), e.getMessage()),
-                        e);
-                    return Stream.empty();
-                }
-            }).collect(Collectors.toSet())).orElseGet(Set::of);
+        return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
     }
 
 
     @Override
-    public SubdlSubtitle convertToSubtitle(SubdlSubtitleMetadata sub, Language language) {
+    public SubdlSubtitle convertToSubtitle(SubdlSubtitleMetadata sub) {
         return new SubdlSubtitle(
             url:sub.url(),
             subtitleSource:source,

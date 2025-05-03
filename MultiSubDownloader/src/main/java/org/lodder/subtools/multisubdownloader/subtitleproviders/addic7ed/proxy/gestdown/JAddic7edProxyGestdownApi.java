@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import extensions.java.lang.String.StringExt;
 import manifold.ext.props.rt.api.override;
@@ -22,7 +21,6 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 // see https://www.gestdown.info/Api
 public class JAddic7edProxyGestdownApi implements SubtitleApi {
@@ -50,18 +48,18 @@ public class JAddic7edProxyGestdownApi implements SubtitleApi {
                 .map(showDto -> new ProviderId(showDto.getName(), showDto.getId().toString())).toList());
     }
 
-    public Set<Addic7edProxyGestdownSubtitle> getSubtitles(SerieMapping providerId, int season, int episode,
+    public Set<Addic7edProxyGestdownSubtitle> getSubtitles(String providerId, int season, int episode,
         Language language) throws ApiException {
-        return getCache("subtitles", b -> b.add("providerId", providerId.providerId)
+        return getCache("subtitles", b -> b.add("providerId", providerId)
             .add("season", season).add("episode", episode).add("language", language.getName()))
             .getCollection(() -> {
                 SubtitleSearchResponse response = subtitlesApi.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(
-                    language.getName(), UUID.fromString(providerId.providerId), season, episode);
+                    language.getName(), UUID.fromString(providerId), season, episode);
                 return response.getMatchingSubtitles()
                     .stream()
                     .filter(SubtitleDto::isCompleted)
                     .map(sub -> mapToSubtitle(sub, response.episode, language))
-                    .collect(Collectors.toSet());
+                    .toSet();
             });
     }
 

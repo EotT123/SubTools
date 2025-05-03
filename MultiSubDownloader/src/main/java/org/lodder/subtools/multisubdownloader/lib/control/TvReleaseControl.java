@@ -6,8 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
+import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.ReleaseIdType;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
@@ -41,37 +41,37 @@ public final class TvReleaseControl extends ReleaseControl {
     }
 
     private void setImdbId() {
-        release.releaseIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchSerie(release.name)
-            .ifPresent(omdbRelease -> release.releaseIds.add(ReleaseIdType.IMDB, omdbRelease.imdbID)));
-        release.releaseIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
-            .ifPresent(imdbId -> release.releaseIds.add(ReleaseIdType.IMDB, imdbId)));
-        release.releaseIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
-            .ifPresent(serie -> release.releaseIds.add(ReleaseIdType.IMDB, serie.imdbId)));
-        if (release.releaseIds.getImdbId().isEmpty()) {
+        release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchSerie(release.name)
+            .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
+        release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
+            .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
+        release.providerIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
+            .ifPresent(serie -> release.providerIds.add(ProviderIdType.IMDB, serie.imdbId)));
+        if (release.providerIds.getImdbId().isEmpty()) {
             throw new IllegalStateException("Unable to find IMDB id for movie: " + release.name);
         }
     }
 
     private void setTvdbId() {
-        release.releaseIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
-            .ifPresent(serie -> release.releaseIds.add(ReleaseIdType.TVDB, serie.id)));
+        release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
+            .ifPresent(serie -> release.providerIds.add(ProviderIdType.TVDB, serie.id)));
         // TODO enable this, also use imdbId if present
-//        release.releaseIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
-//            .ifPresent(imdbDetails -> release.releaseIds.add(ReleaseIdType.TVDB, imdbDetails.tvdbId)));
-        if (release.releaseIds.getTvdbId().isEmpty()) {
+//        release.providerIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
+//            .ifPresent(imdbDetails -> release.providerIds.add(ProviderIdType.TVDB, imdbDetails.tvdbId)));
+        if (release.providerIds.getTvdbId().isEmpty()) {
             throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
         }
     }
 
     private void processTvdbInfo() {
-        release.releaseIds.getTvdbId().ifPresent(
+        release.providerIds.getTvdbId().ifPresent(
             tvdbId -> tvdbAdapter.searchEpisode(tvdbId, tvRelease.season, tvRelease.firstEpisode)
                 .ifPresent(episode -> tvRelease.title = episode.episodeName));
     }
 
     private void processImdbInfo() {
         // TODO implement this
-//        release.releaseIds.getImdbId().ifPresent(
+//        release.providerIds.getImdbId().ifPresent(
 //            imdbId -> imdbAdapter.getSerieDetails(imdbId)
 //                .ifPresent(tvRelease::updateImdbEpisodeInfo));
     }

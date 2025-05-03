@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.pivovarit.function.ThrowingSupplier;
 import lombok.Getter;
@@ -24,6 +22,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,26 +63,14 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public Set<Addic7edProxyGestdownSubtitle> searchSerieSubtitles(TvRelease tvRelease,
-        Language language) throws ApiException {
-        return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
-                try {
-                    return new ExecuteCall<>(
-                        () -> api.getSubtitles(providerSerieId, tvRelease.season, episode, language))
-                        .message("getSubtitles: [%s]".formatted(
-                            TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode)))
-                        .retryWhenHttpCode(ReturnCode.REFRESHING)
-                        .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                        .execute()
-                        .stream();
-                } catch (ApiException e) {
-                    LOGGER.error("API $name searchSubtitles for serie [%s] (%s)".formatted(
-                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                        e.getMessage()), e);
-                    return Stream.empty();
-                }
-            }).collect(Collectors.toSet())).orElseGet(Set::of);
+    public Set<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws ApiException {
+        return new ExecuteCall<>(
+            () -> api.getSubtitles(serieMapping.providerId, season, episode, language))
+            .message("getSubtitles: [%s]".formatted(TvRelease.formatName(serieMapping.providerName, season, episode)))
+            .retryWhenHttpCode(ReturnCode.REFRESHING)
+            .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+            .execute();
     }
 
     @Override
@@ -116,7 +103,7 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public Addic7edProxyGestdownSubtitle convertToSubtitle(Addic7edProxyGestdownSubtitle sub, Language language) {
+    public Addic7edProxyGestdownSubtitle convertToSubtitle(Addic7edProxyGestdownSubtitle sub) {
         return sub;
     }
 

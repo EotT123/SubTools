@@ -8,8 +8,8 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.omdb.OmdbAdapter;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.ReleaseIdType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,27 +41,27 @@ public final class MovieReleaseControl extends ReleaseControl {
     }
 
     private void setImdbId() {
-        release.releaseIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchMovie(release.name)
-            .ifPresent(omdbRelease -> release.releaseIds.add(ReleaseIdType.IMDB, omdbRelease.imdbID)));
-        release.releaseIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
-            .ifPresent(imdbId -> release.releaseIds.add(ReleaseIdType.IMDB, imdbId)));
-        release.releaseIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
-            .ifPresent(movie -> release.releaseIds.add(ReleaseIdType.IMDB, movie.imdbId)));
-        if (release.releaseIds.getImdbId().isEmpty()) {
+        release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchMovie(release.name)
+            .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
+        release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
+            .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
+        release.providerIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
+            .ifPresent(movie -> release.providerIds.add(ProviderIdType.IMDB, movie.imdbId)));
+        if (release.providerIds.getImdbId().isEmpty()) {
             throw new IllegalStateException("Unable to find IMDB id for movie: " + release.name);
         }
     }
 
     private void setTvdbId() {
-        release.releaseIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
-            .ifPresent(movie -> release.releaseIds.add(ReleaseIdType.TVDB, movie.id)));
+        release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
+            .ifPresent(movie -> release.providerIds.add(ProviderIdType.TVDB, movie.id)));
         // TODO enable this, also use imdbId if present
-//        release.releaseIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
-//            .ifPresent(imdbDetails -> release.releaseIds.add(ReleaseIdType.TVDB, imdbDetails.tvdbId)));
+//        release.providerIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
+//            .ifPresent(imdbDetails -> release.providerIds.add(ProviderIdType.TVDB, imdbDetails.tvdbId)));
     }
 
     private void processInfo() {
-        release.releaseIds.getImdbId().ifPresentOrElse(
+        release.providerIds.getImdbId().ifPresentOrElse(
             imdbId -> imdbAdapter.getMovieDetails(imdbId).ifPresent(details -> {
                 movieRelease.year = details.year;
                 movieRelease.name = details.name;

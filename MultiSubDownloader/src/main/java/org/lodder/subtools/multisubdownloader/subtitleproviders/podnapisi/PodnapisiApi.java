@@ -29,7 +29,6 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
 public class PodnapisiApi implements SubtitleApi {
@@ -55,24 +54,25 @@ public class PodnapisiApi implements SubtitleApi {
 
     public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year, int season,
         int episode, Language language) throws PodnapisiException {
-        return getSubtitles(new SerieMapping(title, title, title, season), year, season, episode, language);
+        // TODO is this correct? Title = providerId
+        return getSubtitles(title, year, season, episode, language);
 
     }
 
-    public List<PodnapisiSubtitleMetadata> getSerieSubtitles(SerieMapping providerId, int season, int episode,
+    public List<PodnapisiSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode,
         Language language) throws PodnapisiException {
         return getSubtitles(providerId, null, season, episode, language);
 
     }
 
-    private List<PodnapisiSubtitleMetadata> getSubtitles(SerieMapping providerId, @Nullable Integer year,
+    private List<PodnapisiSubtitleMetadata> getSubtitles(String providerId, @Nullable Integer year,
         int season, int episode, Language language) throws PodnapisiException {
-        return getCache("subtitles", b -> b.add("providerId", providerId.providerId).add("year", year)
+        return getCache("subtitles", b -> b.add("providerId", providerId).add("year", year)
             .add("season", season).add("episode", episode).add("language", language))
             .getCollection(() -> {
                 try {
                     StringBuilder url = new StringBuilder("$DOMAIN/sl/ppodnapisi/search?sK=").append(
-                        URLEncoder.encode(providerId.providerId.trim().toLowerCase(), StandardCharsets.UTF_8));
+                        URLEncoder.encode(providerId.trim().toLowerCase(), StandardCharsets.UTF_8));
                     if (PODNAPISI_LANGS.containsKey(language)) {
                         url.append("&sJ=").append(PODNAPISI_LANGS.get(language));
                     }

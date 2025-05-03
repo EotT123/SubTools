@@ -19,7 +19,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     @val @Nullable String quality;
     @val @Nullable String releaseGroup;
     @val @Nullable String extension;
-    @val ReleaseIds releaseIds = new ReleaseIds();
+    @val ProviderIds providerIds = new ProviderIds();
 
     protected Release(String name, VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
         @Nullable String quality, @Nullable String extension) {
@@ -68,7 +68,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return fileName;
     }
 
-    public boolean hasSameId(Release other, ReleaseIdType releaseIdType) {
-        return releaseIds.isEqual(other.releaseIds, releaseIdType);
+    public boolean hasSameId(Release other, ProviderIdType providerIdType) {
+        return providerIds.isEqual(other.providerIds, providerIdType);
     }
 }

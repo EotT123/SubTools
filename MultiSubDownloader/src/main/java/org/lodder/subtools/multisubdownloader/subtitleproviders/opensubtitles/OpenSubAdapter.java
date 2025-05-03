@@ -5,8 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.Getter;
 import manifold.ext.props.rt.api.override;
@@ -28,7 +26,7 @@ import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.SubtitleAttributes;
 import org.opensubtitles.model.SubtitleAttributesFilesInner;
 import org.slf4j.Logger;
@@ -84,32 +82,21 @@ public final class OpenSubAdapter
                     ? Objects.equals(attributes.getFeatureDetails().getYear().intValue(), movieRelease.year)
                     : movieRelease.year == null)
             .flatMap(attributes -> attributes.getFiles().stream().map(file -> createSubtitle(file, attributes)))
-            .collect(Collectors.toSet());
+            .toSet();
     }
 
     @Override
-    public Set<org.opensubtitles.model.Subtitle> searchSerieSubtitles(TvRelease tvRelease, Language language)
-        throws OpenSubtitleException {
-        return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
-                try {
-                    return api.searchSubtitles(
-                        query:providerSerieId.name,
-                        season:tvRelease.season,
-                        episode:episode,
-                        language:language)
-                        .stream();
-                } catch (OpenSubtitleException e) {
-                    LOGGER.error("API $name searchSubtitles for serie [%s] (%s)".formatted(
-                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                        e.getMessage()), e);
-                    return Stream.empty();
-                }
-            }).collect(Collectors.toSet())).orElseGet(Set::of);
+    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws OpenSubtitleException {
+        return api.searchSubtitles(
+            query:serieMapping.name,
+            season:season,
+            episode:episode,
+            language:language);
     }
 
     @Override
-    public OpenSubtilteSubtitle convertToSubtitle(org.opensubtitles.model.Subtitle sub, Language language) {
+    public OpenSubtilteSubtitle convertToSubtitle(org.opensubtitles.model.Subtitle sub) {
 
 
         String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
@@ -121,7 +108,7 @@ public final class OpenSubAdapter
                 return subFileName.contains(name) ||
                     (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
             }).map(file -> createSubtitle(file, attributes)))
-            .collect(Collectors.toSet());
+            .toSet();
     }
 
     private Subtitle createSubtitle(SubtitleAttributesFilesInner file, SubtitleAttributes attributes) {

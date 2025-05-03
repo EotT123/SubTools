@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
@@ -27,7 +26,7 @@ import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
-import org.lodder.subtools.sublibrary.model.ReleaseIds;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
@@ -86,7 +85,7 @@ public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends
                     movieRelease.name, e.getMessage()), e);
             }
         }
-        return subtitles.stream().map(this::convertToSubtitle).collect(Collectors.toSet());
+        return subtitles.stream().map(this::convertToSubtitle).toSet();
     }
 
     Collection<API_SUB> searchMovieSubtitlesWithHash(String hash, Language language) throws X;
@@ -98,8 +97,7 @@ public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends
     @Override
     default Set<SUB> searchSubtitles(TvRelease tvRelease, Language language) {
         try {
-            return searchSerieSubtitles(tvRelease, language).stream().map(this::convertToSubtitle)
-                .collect(Collectors.toSet());
+            return searchSerieSubtitles(tvRelease, language).stream().map(this::convertToSubtitle).toSet();
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(subtitleSource.name,
@@ -203,7 +201,7 @@ public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends
     }
 
     @Override
-    default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X {
+    default Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {
             return getProviderSerieId(tvRelease, tvRelease.originalName, tvRelease.customName);
         } else {
@@ -217,11 +215,11 @@ public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends
     }
 
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, String name, String customName) throws X {
-        return getProviderSerieId(name, customName, tvRelease.displayName, tvRelease.season, tvRelease.releaseIds);
+        return getProviderSerieId(name, customName, tvRelease.displayName, tvRelease.season, tvRelease.providerIds);
     }
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
-        int season, ReleaseIds releaseIds) throws X {
+        int season, ProviderIds providerIds) throws X {
 
         LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
             "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId ? season : -1)));
@@ -313,12 +311,12 @@ public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends
         return Optional.of(serieMapping);
     }
 
-    default Optional<SerieMapping> getProviderId(String name, ReleaseIds releaseIds,
+    default Optional<SerieMapping> getProviderId(String name, ProviderIds providerIds,
         VideoType videoType, UnaryOperator<CacheKeyBuilder> cacheKeyBuilderConsumer=b -> b) throws X {
 
-        Map<String, CacheKey> releaseIdCacheKeyMap = new HashMap<>();
+        Map<String, CacheKey> providerIdCacheKeyMap = new HashMap<>();
 
-        for (Map.Entry<String, Object> entry : releaseIds.getNonNullIds()) {
+        for (Map.Entry<String, Object> entry : providerIds.getNonNullIds()) {
             CacheKey cacheKey = manager.getCache(CacheType.DISK,
                 new CacheKeyBuilder(source, "providerId")
                     .add("videoType", videoType)
@@ -326,7 +324,7 @@ public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends
             if (cacheKey.isPresent()) {
                 return cacheKey.getOptional();
             }
-            releaseIdCacheKeyMap.put(entry.key, cacheKey);
+            providerIdCacheKeyMap.put(entry.key, cacheKey);
         }
 
         int seasonToUse = useSeasonForSerieId ? season : 0;

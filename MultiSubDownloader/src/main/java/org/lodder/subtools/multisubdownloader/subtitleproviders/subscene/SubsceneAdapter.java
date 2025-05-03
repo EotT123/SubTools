@@ -5,13 +5,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.OptionalInt;
-import java.util.Set;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -28,7 +25,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,19 +65,9 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public Set<SubsceneSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease, Language language)
-        throws SubsceneException {
-        return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
-                try {
-                    return api.getSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                } catch (SubsceneException e) {
-                    LOGGER.error("API $name searchSubtitles for serie [%s] (%s)".formatted(
-                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                        e.getMessage()), e);
-                    return Stream.empty();
-                }
-            }).collect(Collectors.toSet())).orElseGet(Set::of);
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+        Language language) throws SubsceneException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override
@@ -110,7 +97,7 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public SubsceneSubtitle convertToSubtitle(SubsceneSubtitleMetadata sub, Language language) {
+    public SubsceneSubtitle convertToSubtitle(SubsceneSubtitleMetadata sub) {
         return new SubsceneSubtitle(
             urlSupplier:sub.urlSupplier,
             subtitleSource:source,

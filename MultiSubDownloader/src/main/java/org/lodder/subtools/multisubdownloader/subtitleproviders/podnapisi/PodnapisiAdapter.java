@@ -2,9 +2,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -21,7 +18,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,23 +55,13 @@ public final class PodnapisiAdapter
     }
 
     @Override
-    public Set<PodnapisiSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease, Language language)
-        throws PodnapisiException {
-        return getProviderSerieId(tvRelease).map(
-            providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
-                try {
-                    return api.getSerieSubtitles(providerSerieId, tvRelease.season, episode, language).stream();
-                } catch (PodnapisiException e) {
-                    LOGGER.error("API $provider searchSubtitles for serie [%s] (%s)".formatted(
-                        TvRelease.formatName(providerSerieId.providerName, tvRelease.season, episode),
-                        e.getMessage()), e);
-                    return Stream.empty();
-                }
-            }).collect(Collectors.toSet())).orElseGet(Set::of);
+    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+        Language language) throws PodnapisiException {
+        return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override
-    public PodnapisiSubtitle convertToSubtitle(PodnapisiSubtitleMetadata metadata, Language language) {
+    public PodnapisiSubtitle convertToSubtitle(PodnapisiSubtitleMetadata metadata) {
         return new PodnapisiSubtitle(
             url:metadata.url,
             subtitleSource:source,

@@ -34,7 +34,6 @@ import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import util.Utils;
 
@@ -94,14 +93,14 @@ public class SubsceneApi implements SubtitleApi {
         }
     }
 
-    public List<SubsceneSubtitleMetadata> getSubtitles(SerieMapping providerId, int season, int episode,
+    public List<SubsceneSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
         Language language) throws SubsceneException {
         return getCache("subtitles",
-            b -> b.add("providerId", providerId.providerId).add("season", season).add("episode", episode))
+            b -> b.add("providerId", providerId).add("season", season).add("episode", episode))
             .getCollection(() -> {
                 setLanguageWithCookie(language);
                 try {
-                    return getJsoupDocument(DOMAIN + providerId.providerId)
+                    return getJsoupDocument(DOMAIN + providerId)
                         .selectAllByCss("td.a1")
                         .stream()
                         .map(el -> (Element) el.parent())

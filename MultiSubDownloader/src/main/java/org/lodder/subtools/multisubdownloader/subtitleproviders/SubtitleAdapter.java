@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.pivovarit.function.ThrowingSupplier;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,8 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
-import org.lodder.subtools.sublibrary.model.ReleaseIds;
+import org.lodder.subtools.sublibrary.model.ProviderIdType;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
@@ -71,6 +72,10 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         this.userInteractionHandler = userInteractionHandler;
     }
 
+    // ====== \\
+    // MOVIES \\
+    // ====== \\
+
     public Set<SUB> searchSubtitles(MovieRelease movieRelease, Language language) {
         Set<API_SUB> subtitles = new HashSet<>();
         if (StringUtils.isNotBlank(movieRelease.fileName)) {
@@ -86,45 +91,51 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                 }
             }
         }
-        movieRelease.releaseIds.imdbId.ifPresent(imdbId -> {
-            try {
-                subtitles.addAll(searchMovieSubtitlesWithId(imdbId, language));
-            } catch (Exception e) {
-                LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(
-                    source.name, imdbId, movieRelease.name, e.getMessage()), e);
-            }
-        });
-
-        if (movieRelease.imdbId != null) {
-            try {
-                subtitles.addAll(searchMovieSubtitlesWithId(movieRelease.imdbId, language));
-            } catch (Exception e) {
-                LOGGER.error("API %s searchSubtitles using imdbid [%s] for movie [%s] (%s)".formatted(
-                    source.name, movieRelease.imdbId, movieRelease.name, e.getMessage()), e);
-            }
+        try {
+            subtitles.addAll(searchMovieSubtitlesWithId(movieRelease.providerIds, language));
+        } catch (Exception e) {
+            LOGGER.error("API $provider searchSubtitles using id for movie [%s] (%s)"
+                .formatted(movieRelease.name, e.getMessage()), e);
         }
         if (subtitles.isEmpty()) {
             try {
                 subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
             } catch (Exception e) {
-                LOGGER.error("API %s searchSubtitles using title for movie [%s] (%s)".formatted(source.name,
-                    movieRelease.name, e.getMessage()), e);
+                LOGGER.error("API $provider searchSubtitles using title for movie [%s] (%s)"
+                    .formatted(movieRelease.name, e.getMessage()), e);
             }
         }
-        return subtitles.stream().map(this::convertToSubtitle).collect(Collectors.toSet());
+        return subtitles.stream().map(this::convertToSubtitle).toSet();
     }
 
     public abstract Collection<API_SUB> searchMovieSubtitlesWithHash(String hash, Language language) throws X;
 
-    public abstract Collection<API_SUB> searchMovieSubtitlesWithId(int tvdbId, Language language) throws X;
+    public abstract Collection<API_SUB> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) throws X;
 
     public abstract Collection<API_SUB> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws X;
 
+
+    // ====== \\
+    // SERIES \\
+    // ====== \\
+
     public Set<SUB> searchSubtitles(TvRelease tvRelease, Language language) {
         try {
-            return searchSerieSubtitles(tvRelease, language).stream().map(this::convertToSubtitle)
-                .collect(Collectors.toSet());
+            return getProviderSerieMapping(tvRelease)
+                .mapThrowing(mapping -> tvRelease.episodes.stream()
+                    .flatMap(episode -> {
+                        try {
+                            return searchSubtitles(mapping, tvRelease.season, episode, language).stream();
+                        } catch (Exception e) {
+                            LOGGER.error("API $source searchSubtitles for serie [%s] (%s)".formatted(
+                                    TvRelease.formatName(mapping.providerName, tvRelease.season, episode), e.getMessage()),
+                                e);
+                            return Stream.of();
+                        }
+                    })
+                    .map(this::convertToSubtitle).toSet())
+                .orElse(Set.of());
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(source.name,
@@ -133,9 +144,12 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
     }
 
-    public abstract Collection<API_SUB> searchSerieSubtitles(TvRelease tvRelease, Language language) throws X;
+    public abstract Collection<API_SUB> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+        Language language) throws X;
 
-    public abstract SUB convertToSubtitle(API_SUB subtitle, Language language);
+//    public abstract Collection<API_SUB> searchSerieSubtitles(TvRelease tvRelease, Language language) throws X;
+
+    public abstract SUB convertToSubtitle(API_SUB subtitle);
 
     public abstract List<S_ID> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws X;
@@ -226,25 +240,28 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         return Optional.of(serieMapping);
     }
 
-    public Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X {
+    public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {
-            return getProviderSerieId(tvRelease, tvRelease.originalName, tvRelease.customName);
+            return getProviderSerieMapping(tvRelease, tvRelease.originalName, tvRelease.customName);
         } else {
-            Optional<SerieMapping> providerSerieId = getProviderSerieId(tvRelease, tvRelease.originalName);
-            return providerSerieId.isPresent() ? providerSerieId : getProviderSerieId(tvRelease, tvRelease.name);
+            Optional<SerieMapping> providerSerieId = getProviderSerieMapping(tvRelease, tvRelease.originalName);
+            return providerSerieId.isPresent() ? providerSerieId : getProviderSerieMapping(tvRelease, tvRelease.name);
         }
     }
 
-    public Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, String name) throws X {
-        return getProviderSerieId(tvRelease, name, name);
+    public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease, String name) throws X {
+        return getProviderSerieMapping(tvRelease, name, name);
     }
 
-    public Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, String name, String customName) throws X {
-        return getProviderSerieId(name, customName, tvRelease.displayName, tvRelease.season, tvRelease.releaseIds);
+    public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease, String name,
+        String customName) throws X {
+        return getProviderSerieMapping(name, customName, tvRelease.displayName, tvRelease.season,
+            tvRelease.providerIds);
     }
 
-    public Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
-        int season, ReleaseIds releaseIds) throws X {
+    public Optional<SerieMapping> getProviderSerieMapping(String serieName, String serieNameToSearchFor,
+        String displayName,
+        int season, ProviderIds providerIds) throws X {
 
         LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
             "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId ? season : -1)));
@@ -336,20 +353,20 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         return Optional.of(serieMapping);
     }
 
-    public Optional<SerieMapping> getProviderId(String name, ReleaseIds releaseIds,
+    public Optional<SerieMapping> getProviderSerieMapping(String name, ProviderIds providerIds,
         VideoType videoType, UnaryOperator<CacheKeyBuilder> cacheKeyBuilderConsumer=b -> b) throws X {
 
-        Map<String, CacheKey> releaseIdCacheKeyMap = new HashMap<>();
+        Map<ProviderIdType, CacheKey> providerIdCacheKeyMap = new HashMap<>();
 
-        for (Map.Entry<String, Object> entry : releaseIds.getNonNullIds()) {
+        for (Map.Entry<ProviderIdType, Object> entry : providerIds.getNonNullIds()) {
             CacheKey cacheKey = manager.getCache(CacheType.DISK,
                 new CacheKeyBuilder(source, "providerId")
                     .add("videoType", videoType)
-                    .add(entry.key, entry.value));
+                    .add(entry.key.name(), entry.value));
             if (cacheKey.isPresent()) {
                 return cacheKey.getOptional();
             }
-            releaseIdCacheKeyMap.put(entry.key, cacheKey);
+            providerIdCacheKeyMap.put(entry.key, cacheKey);
         }
 
         int seasonToUse = useSeasonForSerieId ? season : 0;
@@ -443,7 +460,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         private final List<HandleException<T, X>> exceptionHandlers = new ArrayList<>();
 
         private record HandleException<T, X extends Exception>(Predicate<X> predicate,
-            Function<X, T> exceptionFunction) {}
+                                                               Function<X, T> exceptionFunction) {
+        }
 
         public @Self ExecuteCall<T, X> retryWhenException(Predicate<X> predicate) {
             retryPredicates.add(predicate);

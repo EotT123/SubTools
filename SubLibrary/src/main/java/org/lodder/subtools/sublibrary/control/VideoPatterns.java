@@ -3,7 +3,6 @@ package org.lodder.subtools.sublibrary.control;
 
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
@@ -149,5 +148,5 @@ public class VideoPatterns {
     }
 
     public static final Set<String> EXTENSIONS =
-        VideoExtensions.values().stream().map(VideoExtensions::getValue).collect(Collectors.toSet());
+        VideoExtensions.values().stream().map(VideoExtensions::getValue).toSet();
 }

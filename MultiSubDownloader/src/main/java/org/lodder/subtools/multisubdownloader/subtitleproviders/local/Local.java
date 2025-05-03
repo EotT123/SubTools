@@ -24,8 +24,8 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.ReleaseIdType;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -76,7 +76,7 @@ public class Local implements SubtitleProvider {
                     TvReleaseControl epCtrl =
                         new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
                     epCtrl.process();
-                    if (release.hasSameId(tvRelease, ReleaseIdType.TVDB)) {
+                    if (release.hasSameId(tvRelease, ProviderIdType.TVDB)) {
                         Language detectedLang = DetectLanguage.execute(fileSub);
                         if (detectedLang == language) {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
@@ -119,7 +119,7 @@ public class Local implements SubtitleProvider {
                         MovieReleaseControl movieCtrl =
                             new MovieReleaseControl(release, settings, manager, userInteractionHandler);
                         movieCtrl.process();
-                        if (release.hasSameId(movieRelease, ReleaseIdType.IMDB)
+                        if (release.hasSameId(movieRelease, ProviderIdType.IMDB)
                             && DetectLanguage.execute(fileSub) == language) {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(new LocalSubtitle(

@@ -30,7 +30,6 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 public class Addic7edApi implements SubtitleApi {
 
@@ -88,16 +87,16 @@ public class Addic7edApi implements SubtitleApi {
         });
     }
 
-    public List<Addic7edSubtitle> getSubtitles(SerieMapping providerId, int season, int episode,
+    public List<Addic7edSubtitle> getSubtitles(String providerId, String providerName, int season, int episode,
         Language language) throws Addic7edException {
 
         return getCache("subtitles",
-            b -> b.add("providerId", providerId.providerId).add("season", season).add("episode", episode)
+            b -> b.add("providerId", providerId).add("season", season).add("episode", episode)
                 .add("language", language))
             .getCollection(() -> {
                 List<LanguageId> languageIds = LanguageId.forLanguage(language);
                 String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
-                    URLEncoder.encode(providerId.providerName.replace(" ", "_"), UTF_8), season, episode,
+                    URLEncoder.encode(providerName.replace(" ", "_"), UTF_8), season, episode,
                     languageIds.size() == 1 ? languageIds.first.id : LanguageId.ALL.id);
 
                 Document doc = getContent(url);
@@ -159,7 +158,7 @@ public class Addic7edApi implements SubtitleApi {
                             if (lang != null && download != null && title != null) {
                                 Addic7edSubtitle sub = new Addic7edSubtitle(
                                     url:download,
-                                    subtitleSource:subtitleSource,
+                                    subtitleSource:source,
                                     fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
                                     language:Language.fromValueOptional(lang.trim()).orElse(null),
                                     quality:ReleaseParser.getQualityKeyword(title + " " + version),
