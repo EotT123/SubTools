@@ -4,13 +4,13 @@ package extensions.java.util.OptionalInt;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import com.pivovarit.function.ThrowingIntFunction;
-import com.pivovarit.function.ThrowingSupplier;
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
+import name.falgout.jeffrey.throwing.ThrowingIntFunction;
 import name.falgout.jeffrey.throwing.ThrowingIntUnaryOperator;
 import name.falgout.jeffrey.throwing.ThrowingRunnable;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 
 
 @Extension
@@ -44,6 +44,11 @@ public class OptionalIntExt {
         ThrowingIntFunction<T, X> mapper) throws X {
         return optionalInt.isPresent() ? Optional.ofNullable(mapper.apply(optionalInt.getAsInt())) : Optional
             .empty();
+    }
+
+    public static <T, X extends Exception> Optional<T> mapToObjThrowing(@This OptionalInt optional,
+        ThrowingIntFunction<T, X> function) throws X {
+        return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsInt())) : Optional.empty();
     }
 
     public static Integer orElseNull(@This OptionalInt optionalInt) {

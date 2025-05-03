@@ -1,7 +1,7 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import com.pivovarit.function.ThrowingBiFunction;
 import lombok.RequiredArgsConstructor;
+import name.falgout.jeffrey.throwing.ThrowingBiFunction;
 
 @RequiredArgsConstructor
 public class LazyThrowingBiFunction<T, U, R, X extends Exception> {

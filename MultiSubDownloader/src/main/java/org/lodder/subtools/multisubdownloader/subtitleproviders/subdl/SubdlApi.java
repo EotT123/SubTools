@@ -5,14 +5,12 @@ import java.util.stream.IntStream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.SubdlException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import subdl.Serie;
 import subdl.Serie.ReleaseType;
@@ -34,46 +32,20 @@ public class SubdlApi implements SubtitleApi {
     }
 
     /**
-     * Fetches subtitle provider ids from SubDL using either an IMDb ID or a release name.
-     * Results are cached to disk.
+     * Fetches subtitle provider ids from SubDL using an IMDb ID.
+     * Results are cached in memory.
      *
      * @param imdbId an optional IMDb ID to use for lookup
-     * @param name the name of the release or movie/show
      * @return a list of matching {@link SubdlId} objects
      * @throws SubdlException if the API call fails
      */
-    public List<SubdlId> getProviderIds(@Nullable Integer imdbId, String name) throws SubdlException {
-        return manager.getCache(CacheType.DISK, "$subtitleSource-providerid-$imdbId-$name")
-            .getCollection(() -> {
-                List<SubdlId> results;
-                if (imdbId != null) {
-                    results = getProviderIdByImdbId(imdbId);
-                    if (!results.isEmpty()) {
-                        return results;
-                    }
-                }
-                results = getProviderIdByReleaseName(name);
-                if (!results.isEmpty()) {
-                    return results;
-                }
-                return List.of();
-            });
-    }
-
-    /**
-     * Fetches provider IDs based on a release name.
-     *
-     * @param name the release name to search for
-     * @return a list of matching {@link SubdlId} objects
-     * @throws SubdlException if the API call fails
-     */
-    private List<SubdlId> getProviderIdByReleaseName(String name) throws SubdlException {
-        return manager.getCache(CacheType.DISK, "$subtitleSource-provideridByReleaseName-" + name)
+    public List<SubdlId> getProviderIds(int imdbId) throws SubdlException {
+        return getCache("providerId", b -> b.add("imdbId", imdbId))
             .getCollection(() -> {
                 try {
                     return Serie.request(API_DOMAIN)
                         .withParam("api_key", API_KEY)
-                        .withParam("film_name ", name)
+                        .withParam("imdb_id ", String.valueOf(imdbId))
                         .getOne("/subtitles").results.stream().map(this::resultsToProviderId).toList();
                 } catch (Exception e) {
                     throw new SubdlException(e);
@@ -82,19 +54,20 @@ public class SubdlApi implements SubtitleApi {
     }
 
     /**
-     * Fetches provider IDs using an IMDb ID.
+     * Fetches subtitle provider ids from SubDL using a release name.
+     * Results are cached in memory.
      *
-     * @param imdbId the IMDb ID
+     * @param name the name of the release or movie/show
      * @return a list of matching {@link SubdlId} objects
      * @throws SubdlException if the API call fails
      */
-    private List<SubdlId> getProviderIdByImdbId(int imdbId) throws SubdlException {
-        return manager.getCache(CacheType.DISK, "$subtitleSource-provideridByImdbId-" + imdbId)
+    public List<SubdlId> getProviderIds(String name) throws SubdlException {
+        return getCache("providerId", b -> b.add("name", name))
             .getCollection(() -> {
                 try {
                     return Serie.request(API_DOMAIN)
                         .withParam("api_key", API_KEY)
-                        .withParam("imdb_id ", String.valueOf(imdbId))
+                        .withParam("film_name ", name)
                         .getOne("/subtitles").results.stream().map(this::resultsToProviderId).toList();
                 } catch (Exception e) {
                     throw new SubdlException(e);

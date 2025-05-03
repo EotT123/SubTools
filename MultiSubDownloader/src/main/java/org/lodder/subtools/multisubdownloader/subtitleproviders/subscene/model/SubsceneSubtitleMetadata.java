@@ -2,9 +2,9 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
 
 import java.io.Serializable;
 
-import com.pivovarit.function.ThrowingSupplier;
 import lombok.EqualsAndHashCode;
 import manifold.ext.props.rt.api.val;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.sublibrary.Language;

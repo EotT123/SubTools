@@ -23,6 +23,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -124,8 +125,8 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public List<OpensubtitleId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
-        String serieName, int season) throws OpenSubtitleException {
+    public List<OpensubtitleId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+        throws OpenSubtitleException {
         return api.getProviderSerieIds(serieName)
             .stream()
             .sorted(

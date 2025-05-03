@@ -10,24 +10,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import com.pivovarit.function.ThrowingSupplier;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.rt.api.Self;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -40,14 +37,11 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
-import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +109,133 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public abstract Collection<API_SUB> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws X;
 
+    /**
+     * Attempts to retrieve a movie mapping from a provider using the specified parameters.
+     * <p>
+     * This method caches the results to prevent redundant provider queries. If no movie mapping is found or if
+     * the user is manually searching with a custom name, it will store temporary cache values to avoid unnecessary
+     * repeated user prompts during the same execution.
+     * </p>
+     * <p>
+     * If {@code nameToSearchFor} differs from {@code name}, it indicates that the user has entered a custom search name.
+     * This distinction is used to determine caching behavior and result matching logic.
+     * </p>
+     *
+     * @param name the name of the movie
+     * @param nameToSearchFor the name to search for in the provider's data. If this differs from the name, it is a
+     * custom name entered by the user.
+     * @param displayName the name to display in the UI
+     * @param year the year to narrow down the search results
+     * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
+     * @return an {@code Optional<MovieMapping>} containing the mapping information if found, or an empty {@code
+     * Optional} if none is found.
+     * @throws X if an error occurs during the retrieval operation
+     */
+    public Optional<MovieMapping> getProviderMovieMapping(String name, String nameToSearchFor, String displayName,
+        @Nullable Integer year, ProviderIds providerIds) throws X {
+
+        CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObj(tvdbId ->
+                getCache("movieMapping", b -> b.add("tvdbId", tvdbId).add("year", year)))
+            .orElse(null);
+        if (tvdbIdCache != null && tvdbIdCache.isPresent()) {
+            return tvdbIdCache.getOptional();
+        }
+        CacheKey imdbIdCache = providerIds.getImdbId().map(imdbId ->
+                getCache("movieMapping", b -> b.add("imdbId", imdbId).add("year", year)))
+            .orElse(null);
+        if (imdbIdCache != null && imdbIdCache.isPresent()) {
+            return imdbIdCache.getOptional();
+        }
+        if (StringUtils.isBlank(nameToSearchFor)) {
+            return Optional.empty();
+        }
+
+        CacheKey movieNameCache = getCache("movieMapping", b -> b.add("name", name).add("year", year));
+        if (StringUtils.equals(nameToSearchFor, name) && movieNameCache.isPresent()) {
+            if (movieNameCache.isTemporaryObject()) {
+                if (!movieNameCache.isExpiredTemporary()) {
+                    return movieNameCache.getOptional();
+                }
+            } else {
+                Optional<MovieMapping> movieMapping = movieNameCache.getOptional();
+                if (tvdbIdCache != null) {
+                    tvdbIdCache.store(Value.of(movieMapping.orElseThrow()));
+                }
+                if (imdbIdCache != null) {
+                    imdbIdCache.store(Value.of(movieMapping.orElseThrow()));
+                }
+                return movieMapping;
+            }
+        }
+
+        List<S_ID> providerMovieIds = getSortedMovieProviderIds(providerIds, nameToSearchFor, year);
+        if (providerMovieIds.isEmpty()) {
+            // If no movie provider ids are found, store a temporary null value in the cache with a 1-day expiration,
+            // to avoid repeatedly querying the provider on each method call.
+            // If a previously cached null value has expired, store it again with double the previous expiration time.
+            movieNameCache.store(
+                value:Value.of(new MovieMapping(name, null, null, year)),
+                timeToLive:movieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
+                storeAsTempValue:true,
+                storeTempNullValue:true);
+            return Optional.empty();
+        }
+
+        MovieMapping movieMapping;
+        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerMovieIds.size() == 1) {
+            // If only one movies mapping is found and the user has disabled confirmation for single results,
+            // automatically select this mapping as the desired one.
+            movieMapping =
+                new MovieMapping(name, providerMovieIds.first.id, providerMovieIds.first.name, year);
+        } else {
+            // If the user didn’t select a movies provider ID (likely because the correct one wasn’t listed),
+            // store it temporarily in the memory cache to avoid prompting the user repeatedly during the same session.
+            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
+                "name-prev-results").add("name", nameToSearchFor).add("year", year));
+
+            Optional<S_ID> uriForMovie;
+            // Skip prompting the user if the previous results for this service were identical.
+            if (previousResultsCache.isPresent() && providerMovieIds.equals(previousResultsCache.getCollection(null))) {
+                uriForMovie = Optional.empty();
+            } else {
+                // Prompt the user to select the correct provider movie id.
+                uriForMovie = userInteractionHandler.selectFromList(
+                    providerMovieIds,
+                    year != null ?
+                        getText("SelectDialog.SelectMovieNameForNameWithSeason", displayName, year) :
+                        getText("SelectDialog.SelectMovieNameForName", displayName),
+                    provider,
+                    this::providerMovieIdToDisplayString);
+            }
+            if (uriForMovie.isEmpty()) {
+                // If the names differ, the user is manually searching using a custom name.
+                // If no result is found, avoid caching it, since the same query is unlikely to be reused.
+                if (nameToSearchFor.equals(name)) {
+                    // If no movie provider id was selected, cache a temporary null value with a 1-day expiration.
+                    // If a temporary null value already exists, update it with double the previous expiration time.
+                    movieNameCache.store(
+                        value:Value.of(new MovieMapping(nameToSearchFor, null, null, year)),
+                        timeToLive:movieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
+                        storeAsTempValue:true,
+                        storeTempNullValue:true);
+                    previousResultsCache.store(Value.ofCollection(providerMovieIds));
+                }
+                return Optional.empty();
+            }
+            // create a movieMapping for the selected value
+            movieMapping = new MovieMapping(name, uriForMovie.get().id, uriForMovie.get().name, year);
+        }
+        // cache the result
+        if (tvdbIdCache != null) {
+            tvdbIdCache.store(Value.of(movieMapping));
+        }
+        if (imdbIdCache != null) {
+            imdbIdCache.store(Value.of(movieMapping));
+        }
+        movieNameCache.store(Value.of(movieMapping));
+
+        return Optional.of(movieMapping);
+    }
 
     // ====== \\
     // SERIES \\
@@ -147,99 +268,6 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public abstract Collection<API_SUB> searchSubtitles(SerieMapping serieMapping, int season, int episode,
         Language language) throws X;
 
-//    public abstract Collection<API_SUB> searchSerieSubtitles(TvRelease tvRelease, Language language) throws X;
-
-    public abstract SUB convertToSubtitle(API_SUB subtitle);
-
-    public abstract List<S_ID> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
-        String serieName, int season) throws X;
-
-    public Optional<MovieMapping> getProviderMovieId(MovieRelease movieRelease) throws X {
-        LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
-            "$providerName-movieName-imdbId:$imdbId"));
-        if (movieRelease.imdbId != null) {
-            CacheKey tvdbIdCache = tvdbIdCacheFunction.get();
-            if (tvdbIdCache.isPresent()) {
-                // if value using the tvdbId is present, return it
-                return tvdbIdCache.getOptional();
-            }
-        }
-        CacheKey movieNameCache = manager.getCache(CacheType.DISK,
-            "$providerName-movieName-name:" + movieRelease.name.toLowerCase());
-        if (movieNameCache.isPresent()) {
-            if (movieNameCache.isTemporaryObject()) {
-                if (!movieNameCache.isExpiredTemporary()) {
-                    return Optional.empty();
-                }
-            } else {
-                Optional<SerieMapping> serieMapping = movieNameCache.getOptional();
-                if (tvdbId != null) {
-                    serieMapping.map(Value::of).ifPresent(tvdbIdCacheFunction.get()::store);
-                }
-                return serieMapping;
-            }
-        }
-
-        List<S_ID> providerSerieIds = getSortedProviderSerieIds(tvdbId, imdbId, serieNameToSearchFor, seasonToUse);
-        if (providerSerieIds.isEmpty()) {
-            // If no provider serie id's could be found, store a temporary null value with expiration time of 1 day
-            // (so the provider isn't contacted every time this method is being called).
-            // If a temporary expired value was already found, persist the null value with a doubled expiration time.
-            movieNameCache.store(
-                value:Value.of(new SerieMapping(serieName, null, null, seasonToUse)),
-                timeToLive:movieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
-                storeAsTempValue:true,
-                storeTempNullValue:true);
-            return Optional.empty();
-        }
-
-        SerieMapping serieMapping;
-        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
-            serieMapping =
-                new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
-        } else {
-            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY,
-                "%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(), seasonToUse));
-
-            boolean previousResultsPresent = previousResultsCache.isPresent();
-            Optional<S_ID> uriForSerie;
-            // Check if the previous results were the same for the service. If so, don't ask the user to select again
-            if (previousResultsPresent && providerSerieIds.equals(previousResultsCache.getCollection(null))) {
-                uriForSerie = Optional.empty();
-            } else {
-                // let the user select the correct provider serie id
-                uriForSerie = getUserInteractionHandler().selectFromList(
-                    providerSerieIds,
-                    useSeasonForSerieId ?
-                        getText("SelectDialog.SelectSerieNameForNameWithSeason", displayName, seasonToUse) :
-                        getText("SelectDialog.SelectSerieNameForName", displayName),
-                    providerName,
-                    this::providerSerieIdToDisplayString);
-            }
-            if (uriForSerie.isEmpty()) {
-                if (serieNameToSearchFor.equals(serieName)) {
-                    // if no provider serie id was selected, store a temporary null value with expiration time of 1 day,
-                    // or the doubled previously temporary value (if present)
-                    movieNameCache.store(
-                        value:Value.of(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse)),
-                        timeToLive:movieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
-                        storeAsTempValue:true,
-                        storeTempNullValue:true);
-                    previousResultsCache.store(Value.ofCollection(providerSerieIds));
-                }
-                return Optional.empty();
-            }
-            // create a serieMapping for the selected value
-            serieMapping = new SerieMapping(serieName, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
-        }
-        if (tvdbId != null) {
-            tvdbIdCacheFunction.get().store(Value.of(serieMapping));
-        } else {
-            movieNameCache.store(Value.of(serieMapping));
-        }
-        return Optional.of(serieMapping);
-    }
-
     public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {
             return getProviderSerieMapping(tvRelease, tvRelease.originalName, tvRelease.customName);
@@ -249,57 +277,80 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
     }
 
-    public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease, String name) throws X {
-        return getProviderSerieMapping(tvRelease, name, name);
+    private Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease, String name, String customName=name)
+        throws X {
+        return getProviderSerieMapping(name, customName, tvRelease.displayName,
+            useSeasonForSerieId ? tvRelease.season : null, tvRelease.providerIds);
     }
 
-    public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease, String name,
-        String customName) throws X {
-        return getProviderSerieMapping(name, customName, tvRelease.displayName, tvRelease.season,
-            tvRelease.providerIds);
-    }
+    /**
+     * Attempts to retrieve a serie mapping from a provider using the specified parameters.
+     * <p>
+     * This method caches the results to prevent redundant provider queries. If no serie mapping is found or if
+     * the user is manually searching with a custom name, it will store temporary cache values to avoid unnecessary
+     * repeated user prompts during the same execution.
+     * </p>
+     * <p>
+     * If {@code nameToSearchFor} differs from {@code name}, it indicates that the user has entered a custom search name.
+     * This distinction is used to determine caching behavior and result matching logic.
+     * </p>
+     *
+     * @param name the name of the serie
+     * @param nameToSearchFor the name to search for in the provider's data. If this differs from the name, it is a
+     * custom name entered by the user.
+     * @param displayName the name to display in the UI
+     * @param season the season number to narrow down the search results
+     * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
+     * @return an {@code Optional<SerieMapping>} containing the mapping information if found, or an empty {@code
+     * Optional} if none is found.
+     * @throws X if an error occurs during the retrieval operation
+     */
+    public Optional<SerieMapping> getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
+        @Nullable Integer season, ProviderIds providerIds) throws X {
 
-    public Optional<SerieMapping> getProviderSerieMapping(String serieName, String serieNameToSearchFor,
-        String displayName,
-        int season, ProviderIds providerIds) throws X {
-
-        LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
-            "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId ? season : -1)));
-        if (tvdbId != null) {
-            CacheKey tvdbIdCache = tvdbIdCacheFunction.get();
-            if (tvdbIdCache.isPresent()) {
-                // if value using the tvdbId is present, return it
-                return tvdbIdCache.getOptional();
-            }
+        int seasonToUse = useSeasonForSerieId ? season : 0;
+        CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObj(tvdbId ->
+                getCache("serieMapping", b -> b.add("tvdbId", tvdbId).add("season", seasonToUse)))
+            .orElse(null);
+        if (tvdbIdCache != null && tvdbIdCache.isPresent()) {
+            return tvdbIdCache.getOptional();
         }
-        if (StringUtils.isBlank(serieNameToSearchFor)) {
+        CacheKey imdbIdCache = providerIds.getImdbId().map(imdbId ->
+                getCache("serieMapping", b -> b.add("imdbId", imdbId).add("season", seasonToUse)))
+            .orElse(null);
+        if (imdbIdCache != null && imdbIdCache.isPresent()) {
+            return imdbIdCache.getOptional();
+        }
+        if (StringUtils.isBlank(nameToSearchFor)) {
             return Optional.empty();
         }
 
-        int seasonToUse = useSeasonForSerieId ? season : 0;
-        CacheKey serieNameCache = manager.getCache(CacheType.DISK,
-            "%s-serieName-name:%s-%s".formatted(providerName, serieName.toLowerCase(), seasonToUse));
-        if (StringUtils.equals(serieNameToSearchFor, serieName) && serieNameCache.isPresent()) {
+        CacheKey serieNameCache = getCache("serieMapping",
+            b -> b.add("name", name).add("season", seasonToUse));
+        if (StringUtils.equals(nameToSearchFor, name) && serieNameCache.isPresent()) {
             if (serieNameCache.isTemporaryObject()) {
                 if (!serieNameCache.isExpiredTemporary()) {
                     return serieNameCache.getOptional();
                 }
             } else {
                 Optional<SerieMapping> serieMapping = serieNameCache.getOptional();
-                if (tvdbId != null) {
-                    serieMapping.map(Value::of).ifPresent(tvdbIdCacheFunction.get()::store);
+                if (tvdbIdCache != null) {
+                    tvdbIdCache.store(Value.of(serieMapping.orElseThrow()));
+                }
+                if (imdbIdCache != null) {
+                    imdbIdCache.store(Value.of(serieMapping.orElseThrow()));
                 }
                 return serieMapping;
             }
         }
 
-        List<S_ID> providerSerieIds = getSortedProviderSerieIds(tvdbId, imdbId, serieNameToSearchFor, seasonToUse);
+        List<S_ID> providerSerieIds = getSortedSerieProviderIds(providerIds, nameToSearchFor, seasonToUse);
         if (providerSerieIds.isEmpty()) {
-            // If no provider serie id's could be found, store a temporary null value with expiration time of 1 day
-            // (so the provider isn't contacted every time this method is being called).
-            // If a temporary expired value was already found, persist the null value with a doubled expiration time.
+            // If no serie provider ids are found, store a temporary null value in the cache with a 1-day expiration,
+            // to avoid repeatedly querying the provider on each method call.
+            // If a previously cached null value has expired, store it again with double the previous expiration time.
             serieNameCache.store(
-                value:Value.of(new SerieMapping(serieName, null, null, seasonToUse)),
+                value:Value.of(new SerieMapping(name, null, null, seasonToUse)),
                 timeToLive:serieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
                 storeAsTempValue:true,
                 storeTempNullValue:true);
@@ -308,33 +359,38 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
         SerieMapping serieMapping;
         if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
+            // If only one series mapping is found and the user has disabled confirmation for single results,
+            // automatically select this mapping as the desired one.
             serieMapping =
-                new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
+                new SerieMapping(name, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
         } else {
-            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY,
-                "%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(), seasonToUse));
+            // If the user didn’t select a series provider ID (likely because the correct one wasn’t listed),
+            // store it temporarily in the memory cache to avoid prompting the user repeatedly during the same session.
+            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
+                "name-prev-results").add("name", nameToSearchFor).add("season", seasonToUse));
 
-            boolean previousResultsPresent = previousResultsCache.isPresent();
             Optional<S_ID> uriForSerie;
-            // Check if the previous results were the same for the service. If so, don't ask the user to select again
-            if (previousResultsPresent && providerSerieIds.equals(previousResultsCache.getCollection(null))) {
+            // Skip prompting the user if the previous results for this service were identical.
+            if (previousResultsCache.isPresent() && providerSerieIds.equals(previousResultsCache.getCollection(null))) {
                 uriForSerie = Optional.empty();
             } else {
-                // let the user select the correct provider serie id
-                uriForSerie = getUserInteractionHandler().selectFromList(
+                // Prompt the user to select the correct provider serie id.
+                uriForSerie = userInteractionHandler.selectFromList(
                     providerSerieIds,
                     useSeasonForSerieId ?
                         getText("SelectDialog.SelectSerieNameForNameWithSeason", displayName, seasonToUse) :
                         getText("SelectDialog.SelectSerieNameForName", displayName),
-                    providerName,
+                    provider,
                     this::providerSerieIdToDisplayString);
             }
             if (uriForSerie.isEmpty()) {
-                if (serieNameToSearchFor.equals(serieName)) {
-                    // if no provider serie id was selected, store a temporary null value with expiration time of 1 day,
-                    // or the doubled previously temporary value (if present)
+                // If the names differ, the user is manually searching using a custom name.
+                // If no result is found, avoid caching it, since the same query is unlikely to be reused.
+                if (nameToSearchFor.equals(name)) {
+                    // If no serie provider id was selected, cache a temporary null value with a 1-day expiration.
+                    // If a temporary null value already exists, update it with double the previous expiration time.
                     serieNameCache.store(
-                        value:Value.of(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse)),
+                        value:Value.of(new SerieMapping(nameToSearchFor, null, null, seasonToUse)),
                         timeToLive:serieNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
                         storeAsTempValue:true,
                         storeTempNullValue:true);
@@ -343,111 +399,39 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                 return Optional.empty();
             }
             // create a serieMapping for the selected value
-            serieMapping = new SerieMapping(serieName, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
+            serieMapping = new SerieMapping(name, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
         }
-        if (tvdbId != null) {
-            tvdbIdCacheFunction.get().store(Value.of(serieMapping));
-        } else {
-            serieNameCache.store(Value.of(serieMapping));
+        // cache the result
+        if (tvdbIdCache != null) {
+            tvdbIdCache.store(Value.of(serieMapping));
         }
+        if (imdbIdCache != null) {
+            imdbIdCache.store(Value.of(serieMapping));
+        }
+        serieNameCache.store(Value.of(serieMapping));
+
         return Optional.of(serieMapping);
     }
 
-    public Optional<SerieMapping> getProviderSerieMapping(String name, ProviderIds providerIds,
-        VideoType videoType, UnaryOperator<CacheKeyBuilder> cacheKeyBuilderConsumer=b -> b) throws X {
+    /**
+     * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
+     * should not be cached in the implementing classes.
+     *
+     * @param providerIds the provider IDs containing various IDs for providers
+     * @param serieName the name of the series
+     * @param season the season number of the series
+     * @return a list of sorted series provider IDs
+     * @throws X if an error occurs during the operation
+     */
+    public abstract List<S_ID> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        int season) throws X;
 
-        Map<ProviderIdType, CacheKey> providerIdCacheKeyMap = new HashMap<>();
 
-        for (Map.Entry<ProviderIdType, Object> entry : providerIds.getNonNullIds()) {
-            CacheKey cacheKey = manager.getCache(CacheType.DISK,
-                new CacheKeyBuilder(source, "providerId")
-                    .add("videoType", videoType)
-                    .add(entry.key.name(), entry.value));
-            if (cacheKey.isPresent()) {
-                return cacheKey.getOptional();
-            }
-            providerIdCacheKeyMap.put(entry.key, cacheKey);
-        }
+    // ====== \\
+    // COMMON \\
+    // ====== \\
 
-        int seasonToUse = useSeasonForSerieId ? season : 0;
-        CacheKey releaseNameCache = manager.getCache(CacheType.DISK,
-            cacheKeyBuilderConsumer.apply(new CacheKeyBuilder(source, "releaseName")
-                .add("videoType", videoType)
-                .add("name", name.toLowerCase())));
-
-        if (StringUtils.equals(serieNameToSearchFor, serieName) && releaseNameCache.isPresent()) {
-            if (releaseNameCache.isTemporaryObject()) {
-                if (!releaseNameCache.isExpiredTemporary()) {
-                    return releaseNameCache.getOptional();
-                }
-            } else {
-                Optional<SerieMapping> serieMapping = releaseNameCache.getOptional();
-                if (tvdbId != null) {
-                    serieMapping.map(Value::of).ifPresent(tvdbIdCacheFunction.get()::store);
-                }
-                return serieMapping;
-            }
-        }
-
-        List<S_ID> providerSerieIds = getSortedProviderSerieIds(tvdbId, imdbId, serieNameToSearchFor, seasonToUse);
-        if (providerSerieIds.isEmpty()) {
-            // If no provider serie id's could be found, store a temporary null value with expiration time of 1 day
-            // (so the provider isn't contacted every time this method is being called).
-            // If a temporary expired value was already found, persist the null value with a doubled expiration time.
-            releaseNameCache.store(
-                value:Value.of(new SerieMapping(serieName, null, null, seasonToUse)),
-                timeToLive:releaseNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
-                storeAsTempValue:true,
-                storeTempNullValue:true);
-            return Optional.empty();
-        }
-
-        SerieMapping serieMapping;
-        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
-            serieMapping =
-                new SerieMapping(serieName, providerSerieIds.first.id, providerSerieIds.first.name, seasonToUse);
-        } else {
-            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY,
-                "%s-serieName-prev-results:%s-%s".formatted(providerName, displayName.toLowerCase(), seasonToUse));
-
-            boolean previousResultsPresent = previousResultsCache.isPresent();
-            Optional<S_ID> uriForSerie;
-            // Check if the previous results were the same for the service. If so, don't ask the user to select again
-            if (previousResultsPresent && providerSerieIds.equals(previousResultsCache.getCollection(null))) {
-                uriForSerie = Optional.empty();
-            } else {
-                // let the user select the correct provider serie id
-                uriForSerie = getUserInteractionHandler().selectFromList(
-                    providerSerieIds,
-                    useSeasonForSerieId ?
-                        getText("SelectDialog.SelectSerieNameForNameWithSeason", displayName, seasonToUse) :
-                        getText("SelectDialog.SelectSerieNameForName", displayName),
-                    providerName,
-                    this::providerSerieIdToDisplayString);
-            }
-            if (uriForSerie.isEmpty()) {
-                if (serieNameToSearchFor.equals(serieName)) {
-                    // if no provider serie id was selected, store a temporary null value with expiration time of 1 day,
-                    // or the doubled previously temporary value (if present)
-                    releaseNameCache.store(
-                        value:Value.of(new SerieMapping(serieNameToSearchFor, null, null, seasonToUse)),
-                        timeToLive:releaseNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
-                        storeAsTempValue:true,
-                        storeTempNullValue:true);
-                    previousResultsCache.store(Value.ofCollection(providerSerieIds));
-                }
-                return Optional.empty();
-            }
-            // create a serieMapping for the selected value
-            serieMapping = new SerieMapping(serieName, uriForSerie.get().id, uriForSerie.get().name, seasonToUse);
-        }
-        if (tvdbId != null) {
-            tvdbIdCacheFunction.get().store(Value.of(serieMapping));
-        } else {
-            releaseNameCache.store(Value.of(serieMapping));
-        }
-        return Optional.of(serieMapping);
-    }
+    public abstract SUB convertToSubtitle(API_SUB subtitle);
 
     public abstract String providerSerieIdToDisplayString(S_ID providerSerieId);
 

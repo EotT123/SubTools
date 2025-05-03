@@ -7,9 +7,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.pivovarit.function.ThrowingSupplier;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;

@@ -5,8 +5,8 @@ import static java.util.Objects.*;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 
-import com.pivovarit.function.ThrowingIntFunction;
 import com.pivovarit.function.exception.WrappedException;
+import name.falgout.jeffrey.throwing.ThrowingIntFunction;
 
 /**
  * Represents a function that accepts one argument and does not return any value;

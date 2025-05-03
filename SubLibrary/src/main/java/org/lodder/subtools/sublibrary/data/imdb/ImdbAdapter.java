@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 
-import com.pivovarit.function.ThrowingBiFunction;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import name.falgout.jeffrey.throwing.ThrowingBiFunction;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;

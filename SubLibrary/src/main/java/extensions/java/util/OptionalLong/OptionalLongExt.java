@@ -3,13 +3,13 @@ package extensions.java.util.OptionalLong;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-import com.pivovarit.function.ThrowingFunction;
-import com.pivovarit.function.ThrowingUnaryOperator;
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
+import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingLongUnaryOperator;
 import name.falgout.jeffrey.throwing.ThrowingRunnable;
+import name.falgout.jeffrey.throwing.ThrowingUnaryOperator;
 
 @Extension
 @UtilityClass

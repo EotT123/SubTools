@@ -17,6 +17,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.Subd
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -79,10 +80,14 @@ public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, S
             hearingImpaired:sub.hearingImpaired);
     }
 
-    @Override
-    public List<SubdlId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<SubdlId> getSortedSerieProviderIds(ProviderIds providerIds,
         String serieName, int season) throws SubdlException {
-        return api.getProviderIds(imdbId, serieName).stream().sorted(Comparator.comparing(
+
+        List<SubdlId> subdlIds =
+            providerIds.getImdbId().mapThrowing(imdbId -> api.getProviderIds(imdbId)).orElse(List.of())
+                .elseIfEmptyThrowing(() -> api.getProviderIds(serieName));
+
+        return subdlIds.stream().sorted(Comparator.comparing(
                 (SubdlId n) -> !serieName.replaceAll("[^A-Za-z]", "")
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
             .thenComparing(SubdlId::getYear, Comparator.nullsLast(Comparator.reverseOrder()))).toList();

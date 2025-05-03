@@ -23,6 +23,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.S
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -71,8 +72,8 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public List<SubSceneId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
-        String serieName, int season) throws SubsceneException {
+    public List<SubSceneId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        int season) throws SubsceneException {
         ToIntFunction<String> providerTypeFunction = value -> switch (value) {
             case "TV-Serie" -> 1;
             case "Exact" -> 2;

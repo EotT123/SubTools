@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.pivovarit.function.ThrowingSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.gestdown.invoker.ApiException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -20,6 +20,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderId;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -74,28 +75,28 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public List<ProviderId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
-        String serieName, int season) throws ApiException {
-        List<ProviderId> serieIds = tvdbId == null ? List.of() :
-            new ExecuteCall<>(() -> api.getProviderId(tvdbId))
-                .message("getProviderSerieName: [$tvdbId]")
-                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                    LOGGER.info("API $name - Could not find tvdbId [%s]".formatted(tvdbId));
-                    return List.of();
-                })
-                .execute();
-
-        if (serieIds.isEmpty()) {
-            serieIds = new ExecuteCall<>(() -> api.getProviderId(serieName)).message(
-                    "getProviderSerieName: [$serieName]")
-                .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                    LOGGER.info("API $providerName - Could not find serie name [$serieName]");
-                    return List.of();
-                })
-                .execute();
-        }
+    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+        throws ApiException {
+        List<ProviderId> serieIds = providerIds.getTvdbId()
+            .mapToObjThrowing(tvdbId ->
+                new ExecuteCall<>(() -> api.getProviderId(tvdbId))
+                    .message("getProviderSerieName: [$tvdbId]")
+                    .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                    .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
+                        LOGGER.info("API $name - Could not find tvdbId [%s]".formatted(tvdbId));
+                        return List.of();
+                    })
+                    .execute())
+            .orElse(List.of())
+            .elseIfEmptyThrowing(() ->
+                new ExecuteCall<>(() -> api.getProviderId(serieName))
+                    .message("getProviderSerieName: [$serieName]")
+                    .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+                    .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
+                        LOGGER.info("API $providerName - Could not find serie name [$serieName]");
+                        return List.of();
+                    })
+                    .execute());
         return serieIds.stream()
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
                 .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))

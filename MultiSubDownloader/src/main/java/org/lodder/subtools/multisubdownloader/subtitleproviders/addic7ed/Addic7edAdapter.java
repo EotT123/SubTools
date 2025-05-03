@@ -17,6 +17,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
@@ -76,8 +77,8 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     }
 
     @Override
-    public List<ProviderId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
-        String serieName, int season) throws Addic7edException {
+    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+        throws Addic7edException {
         return api.getProviderId(serieName)
             .stream()
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")

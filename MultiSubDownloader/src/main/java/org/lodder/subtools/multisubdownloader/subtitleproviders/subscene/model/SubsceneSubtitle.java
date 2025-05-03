@@ -2,7 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
 
 import java.nio.file.Path;
 
-import com.pivovarit.function.ThrowingSupplier;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.sublibrary.Language;

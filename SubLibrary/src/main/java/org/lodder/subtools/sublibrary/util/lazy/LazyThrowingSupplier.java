@@ -1,8 +1,8 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import com.pivovarit.function.ThrowingConsumer;
-import com.pivovarit.function.ThrowingSupplier;
 import lombok.RequiredArgsConstructor;
+import name.falgout.jeffrey.throwing.ThrowingConsumer;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 
 @RequiredArgsConstructor
 public class LazyThrowingSupplier<T, X extends Exception> {

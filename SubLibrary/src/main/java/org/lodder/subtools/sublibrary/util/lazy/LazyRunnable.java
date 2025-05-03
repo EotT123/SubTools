@@ -1,6 +1,6 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import com.pivovarit.function.ThrowingRunnable;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import org.lodder.subtools.sublibrary.util.Nothing;
 
 public class LazyRunnable extends LazyThrowingRunnable<Nothing> {

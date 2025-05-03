@@ -218,11 +218,11 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.18.3</version>
             </dependency>
-            <dependency>
-                <groupId>com.pivovarit</groupId>
-                <artifactId>throwing-function</artifactId>
-                <version>1.6.1</version>
-            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>com.pivovarit</groupId>-->
+            <!--                <artifactId>throwing-function</artifactId>-->
+            <!--                <version>1.6.1</version>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>name.falgout.jeffrey</groupId>
                 <artifactId>throwing-streams</artifactId>
