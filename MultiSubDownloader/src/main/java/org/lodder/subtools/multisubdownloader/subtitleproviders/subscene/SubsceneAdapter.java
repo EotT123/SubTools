@@ -73,7 +73,7 @@ public final class SubsceneAdapter
 
     @Override
     public List<SubSceneId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        int season) throws SubsceneException {
+        @Nullable Integer season) throws SubsceneException {
         ToIntFunction<String> providerTypeFunction = value -> switch (value) {
             case "TV-Serie" -> 1;
             case "Exact" -> 2;

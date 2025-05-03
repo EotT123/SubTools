@@ -75,7 +75,8 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        @Nullable Integer season)
         throws ApiException {
         List<ProviderId> serieIds = providerIds.getTvdbId()
             .mapToObjThrowing(tvdbId ->

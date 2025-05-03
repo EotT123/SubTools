@@ -80,8 +80,9 @@ public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, S
             hearingImpaired:sub.hearingImpaired);
     }
 
-    public List<SubdlId> getSortedSerieProviderIds(ProviderIds providerIds,
-        String serieName, int season) throws SubdlException {
+
+    public List<SubdlId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        @Nullable Integer season) throws SubdlException {
 
         List<SubdlId> subdlIds =
             providerIds.getImdbId().mapThrowing(imdbId -> api.getProviderIds(imdbId)).orElse(List.of())

@@ -76,7 +76,9 @@ public final class PodnapisiAdapter
             hearingImpaired:metadata.hearingImpaired);
     }
 
-    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+    @Override
+    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        @Nullable Integer season)
         throws PodnapisiException {
         return api.getProviderId(serieName).stream().toList();
     }

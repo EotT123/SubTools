@@ -125,7 +125,8 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public List<OpensubtitleId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+    public List<OpensubtitleId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        @Nullable Integer season)
         throws OpenSubtitleException {
         return api.getProviderSerieIds(serieName)
             .stream()

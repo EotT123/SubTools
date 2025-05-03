@@ -308,15 +308,14 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public Optional<SerieMapping> getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
         @Nullable Integer season, ProviderIds providerIds) throws X {
 
-        int seasonToUse = useSeasonForSerieId ? season : 0;
         CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObj(tvdbId ->
-                getCache("serieMapping", b -> b.add("tvdbId", tvdbId).add("season", seasonToUse)))
+                getCache("serieMapping", b -> b.add("tvdbId", tvdbId).add("season", season)))
             .orElse(null);
         if (tvdbIdCache != null && tvdbIdCache.isPresent()) {
             return tvdbIdCache.getOptional();
         }
         CacheKey imdbIdCache = providerIds.getImdbId().map(imdbId ->
-                getCache("serieMapping", b -> b.add("imdbId", imdbId).add("season", seasonToUse)))
+                getCache("serieMapping", b -> b.add("imdbId", imdbId).add("season", season)))
             .orElse(null);
         if (imdbIdCache != null && imdbIdCache.isPresent()) {
             return imdbIdCache.getOptional();
@@ -326,7 +325,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
 
         CacheKey serieNameCache = getCache("serieMapping",
-            b -> b.add("name", name).add("season", seasonToUse));
+            b -> b.add("name", name).add("season", season));
         if (StringUtils.equals(nameToSearchFor, name) && serieNameCache.isPresent()) {
             if (serieNameCache.isTemporaryObject()) {
                 if (!serieNameCache.isExpiredTemporary()) {
@@ -344,7 +343,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             }
         }
 
-        List<S_ID> providerSerieIds = getSortedSerieProviderIds(providerIds, nameToSearchFor, seasonToUse);
+        List<S_ID> providerSerieIds = getSortedSerieProviderIds(providerIds, nameToSearchFor, season);
         if (providerSerieIds.isEmpty()) {
             // If no serie provider ids are found, store a temporary null value in the cache with a 1-day expiration,
             // to avoid repeatedly querying the provider on each method call.
@@ -424,7 +423,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @throws X if an error occurs during the operation
      */
     public abstract List<S_ID> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        int season) throws X;
+        @Nullable Integer season) throws X;
 
 
     // ====== \\

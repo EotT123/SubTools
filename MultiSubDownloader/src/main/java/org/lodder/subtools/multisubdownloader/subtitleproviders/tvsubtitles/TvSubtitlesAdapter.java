@@ -85,7 +85,7 @@ public final class TvSubtitlesAdapter
 
     @Override
     public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        int season) throws TvSubtitleException {
+        @Nullable Integer season) throws TvSubtitleException {
         Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
         return api.getProviderIds(serieName)
             .stream()

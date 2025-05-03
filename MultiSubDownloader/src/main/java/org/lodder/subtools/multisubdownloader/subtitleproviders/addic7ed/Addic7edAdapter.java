@@ -77,7 +77,8 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     }
 
     @Override
-    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName, int season)
+    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        @Nullable Integer season)
         throws Addic7edException {
         return api.getProviderId(serieName)
             .stream()
