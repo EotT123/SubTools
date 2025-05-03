@@ -147,8 +147,8 @@ public final class JOpenSubAdapter
     }
 
     @Override
-    public List<OpensubtitleSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws OpenSubtitleException {
+    public List<OpensubtitleSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+        String serieName, int season) throws OpenSubtitleException {
         return getApi().getProviderSerieIds(serieName)
             .stream()
             .sorted(

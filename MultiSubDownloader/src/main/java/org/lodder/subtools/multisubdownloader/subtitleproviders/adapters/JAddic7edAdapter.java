@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.JAddic7edApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDescriptor, ProviderSerieId,
+public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleMetadata, ProviderSerieId,
     Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edAdapter.class);
@@ -62,33 +62,33 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
 
 
     @Override
-    public List<Addic7edSubtitleDescriptor> searchMovieSubtitlesWithHash(String hash, Language language) {
+    public List<Addic7edSubtitleMetadata> searchMovieSubtitlesWithHash(String hash, Language language) {
         // TODO implement this
         return List.of();
     }
 
     @Override
-    public List<Addic7edSubtitleDescriptor> searchMovieSubtitlesWithId(int tvdbId, Language language) {
+    public List<Addic7edSubtitleMetadata> searchMovieSubtitlesWithId(int tvdbId, Language language) {
         // TODO implement this
         return List.of();
     }
 
     @Override
-    public Collection<Addic7edSubtitleDescriptor> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
+    public Collection<Addic7edSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) {
         // TODO implement this
         return List.of();
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<Addic7edSubtitleDescriptor> subtitles,
+    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<Addic7edSubtitleMetadata> subtitles,
         Language language) {
         // TODO implement this
         return Set.of();
     }
 
     @Override
-    public Set<Addic7edSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
+    public Set<Addic7edSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws Addic7edException {
         return getProviderSerieId(tvRelease).map(
             providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
@@ -104,7 +104,7 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<Addic7edSubtitleDescriptor> subtitles,
+    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<Addic7edSubtitleMetadata> subtitles,
         Language language) {
         return subtitles.stream()
             .filter(sub -> language == sub.language)
@@ -122,8 +122,8 @@ public final class JAddic7edAdapter extends AbstractAdapter<Addic7edSubtitleDesc
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws Addic7edException {
+    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+        String serieName, int season) throws Addic7edException {
         return getApi().getProviderId(serieName)
             .stream()
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")

@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
+import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 public interface SubtitleProvider {
 
     @val Manager manager;
+    @val Settings settings;
     @val SubtitleSource subtitleSource;
     @val String providerName;
     @val String name = subtitleSource.name;

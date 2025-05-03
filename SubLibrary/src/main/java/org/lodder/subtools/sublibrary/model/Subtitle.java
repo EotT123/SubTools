@@ -12,18 +12,17 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 
-@EqualsAndHashCode
 public class Subtitle implements Serializable {
 
     @val DownloadSource downloadSource;
-    @var @Nullable String fileName;
-    @var @Nullable Language language;
-    @var @Nullable String releaseGroup;
-    @var @Nullable String uploader;
-    @var @Nullable SubtitleMatchType subtitleMatchType;
-    @var @Nullable SubtitleSource subtitleSource;
-    @var boolean hearingImpaired;
-    @var @Nullable String quality;
+    @val @Nullable String fileName;
+    @val @Nullable Language language;
+    @val @Nullable String releaseGroup;
+    @val @Nullable String uploader;
+    @val @Nullable SubtitleMatchType subtitleMatchType;
+    @val @Nullable SubtitleSource subtitleSource;
+    @val boolean hearingImpaired;
+    @val @Nullable String quality;
     @var int score;
 
     public Subtitle(DownloadSource downloadSource,
@@ -34,8 +33,7 @@ public class Subtitle implements Serializable {
         @Nullable SubtitleMatchType subtitleMatchType=null,
         @Nullable SubtitleSource subtitleSource=null,
         boolean hearingImpaired=false,
-        @Nullable String quality=null,
-        int score=0) {
+        @Nullable String quality=null) {
         this.downloadSource = downloadSource;
         this.fileName = fileName;
         this.language = language;
@@ -45,7 +43,6 @@ public class Subtitle implements Serializable {
         this.subtitleSource = subtitleSource;
         this.hearingImpaired = hearingImpaired;
         this.quality = quality;
-        this.score = score;
     }
 
     @EqualsAndHashCode
@@ -79,7 +76,7 @@ public class Subtitle implements Serializable {
         public static DownloadSource of(Path file) {
             return new DownloadSource(SourceLocation.FILE, file:file);
         }
-        
+
         @SuppressWarnings("ConstantConditions")
         public String getValue() throws SubtitlesProviderException {
             return switch (sourceLocation) {

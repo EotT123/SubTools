@@ -71,7 +71,7 @@ public class DownloadAction {
             case URL, URL_SUPPLIER -> {
                 try {
                     String url = subtitle.downloadSource.getValue();
-                    boolean result = manager.store(url, subFile);
+                    boolean result = manager.download(url, subFile);
                     LOGGER.debug("doDownload file was [{}] ", result);
                     yield result;
                 } catch (SubtitlesProviderException e) {

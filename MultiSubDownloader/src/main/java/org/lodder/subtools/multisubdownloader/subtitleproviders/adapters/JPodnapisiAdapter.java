@@ -11,9 +11,10 @@ import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
+import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.JPodnapisiApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
@@ -29,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class JPodnapisiAdapter
-    extends AbstractAdapter<PodnapisiSubtitleDescriptor, ProviderSerieId, PodnapisiException> {
+    extends AbstractAdapter<PodnapisiSubtitleMetadata, ProviderSerieId, PodnapisiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPodnapisiAdapter.class);
 
@@ -38,8 +39,8 @@ public final class JPodnapisiAdapter
     @val @override String providerName = subtitleSource.name();
     @val @override boolean useSeasonForSerieId = false;
 
-    public JPodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
+    public JPodnapisiAdapter(Manager manager, Settings settings, UserInteractionHandler userInteractionHandler) {
+        super(manager, settings, userInteractionHandler);
         if (jpapi == null) {
             jpapi = new LazySupplier<>(() -> {
                 try {
@@ -56,29 +57,29 @@ public final class JPodnapisiAdapter
     }
 
     @Override
-    public List<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithHash(String hash, Language language) {
+    public List<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithHash(String hash, Language language) {
         return List.of();
     }
 
     @Override
-    public List<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithId(int tvdbId, Language language) {
+    public List<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithId(int tvdbId, Language language) {
         return List.of();
     }
 
     @Override
-    public Collection<PodnapisiSubtitleDescriptor> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
+    public Collection<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws PodnapisiException {
         return getApi().getMovieSubtitles(name, year, 0, 0, language);
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<PodnapisiSubtitleDescriptor> subtitles,
+    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<PodnapisiSubtitleMetadata> subtitles,
         Language language) {
         return buildListSubtitles(language, subtitles);
     }
 
     @Override
-    public Set<PodnapisiSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
+    public Set<PodnapisiSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws PodnapisiException {
         return getProviderSerieId(tvRelease).map(
             providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
@@ -94,12 +95,12 @@ public final class JPodnapisiAdapter
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<PodnapisiSubtitleDescriptor> subtitles,
+    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<PodnapisiSubtitleMetadata> subtitles,
         Language language) {
         return buildListSubtitles(language, subtitles);
     }
 
-    private Set<Subtitle> buildListSubtitles(Language language, Collection<PodnapisiSubtitleDescriptor> lSubtitles) {
+    private Set<Subtitle> buildListSubtitles(Language language, Collection<PodnapisiSubtitleMetadata> lSubtitles) {
         return lSubtitles.stream()
             .filter(ossd -> StringUtils.isNotBlank(ossd.releaseString))
             .map(ossd -> new Subtitle(
@@ -117,8 +118,8 @@ public final class JPodnapisiAdapter
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws PodnapisiException {
+    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+        String serieName, int season) throws PodnapisiException {
         return getApi().getPodnapisiShowName(serieName).stream().toList();
     }
 

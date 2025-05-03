@@ -26,7 +26,7 @@ import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
@@ -94,7 +94,7 @@ public class SubsceneApi implements SubtitleApi {
         }
     }
 
-    public List<SubsceneSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
+    public List<SubsceneSubtitleMetadata> getSubtitles(SerieMapping providerSerieId, int season, int episode,
         Language language) throws SubsceneException {
         return manager.getCache(CacheType.MEMORY, "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name,
                 providerSerieId.providerId, season, episode, language))
@@ -114,11 +114,11 @@ public class SubsceneApi implements SubtitleApi {
                             String comment = row.selectFirstByCss(".a6 > div").text().trim();
                             ThrowingSupplier<String, SubsceneException> urlSupplier = () -> getDownloadUrl(
                                 DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim());
-                            return new SubsceneSubtitleDescriptor(lang, name, hearingImpaired, uploader, comment,
+                            return new SubsceneSubtitleMetadata(lang, name, hearingImpaired, uploader, comment,
                                 urlSupplier);
                         })
-                        .filter(subDescriptor -> subDescriptor.seasonEpisode != null &&
-                            subDescriptor.seasonEpisode.containsEpisode(episode))
+                        .filter(subMetadata -> subMetadata.seasonEpisode != null &&
+                            subMetadata.seasonEpisode.containsEpisode(episode))
                         .toList();
                 } catch (Exception e) {
                     throw new SubsceneException(e);

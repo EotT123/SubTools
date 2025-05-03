@@ -8,7 +8,7 @@ import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
 @Builder
-public class TVSubtitlesSubtitleDescriptor implements Serializable {
+public class TVSubtitlesSubtitleMetadata implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6423513286301479905L;

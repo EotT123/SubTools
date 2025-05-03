@@ -19,7 +19,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -67,31 +67,33 @@ public class JAddic7edApi implements SubtitleApi {
         if (StringUtils.isBlank(serieName)) {
             return List.of();
         }
-        try {
-            List<ProviderSerieId> providerSerieIds =
-                getContent("$DOMAIN/allshows/" + serieName.split(" ")[0]).selectAllByCss("table.tabel90 td a")
-                    .stream()
-                    .map(elem -> new ProviderSerieId(elem.text(), elem.attr("href").split("/")[2]))
-                    .toList();
-
-            String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
-            List<ProviderSerieId> providerSerieIdsFormatted = providerSerieIds.stream().filter(providerId -> {
-                String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
-                return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
-                    StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
-            }).toList();
-            return !providerSerieIdsFormatted.isEmpty() ? providerSerieIdsFormatted : providerSerieIds;
-        } catch (Exception e) {
-            throw new Addic7edException(e);
-        }
+        return manager.getCache(CacheType.DISK, "$subtitleSource-providerid-$serieName").getCollection(() -> {
+            try {
+                List<ProviderSerieId> providerSerieIds =
+                    getContent("$DOMAIN/allshows/" + serieName.split(" ")[0])
+                        .selectAllByCss("table.tabel90 td a")
+                        .stream().map(elem -> new ProviderSerieId(elem.text(), elem.attr("href").split("/")[2]))
+                        .toList();
+                String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
+                List<ProviderSerieId> providerSerieIdsFormatted =
+                    providerSerieIds.stream().filter(providerId -> {
+                        String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
+                        return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
+                            StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
+                    }).toList();
+                return !providerSerieIdsFormatted.isEmpty() ? providerSerieIdsFormatted : providerSerieIds;
+            } catch (Exception e) {
+                throw new Addic7edException(e);
+            }
+        });
     }
 
-    public List<Addic7edSubtitleDescriptor> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode,
+    public List<Addic7edSubtitleMetadata> getSubtitles(SerieMapping addic7edSerieMapping, int season, int episode,
         Language language) throws Addic7edException {
 
         return manager.getCache(CacheType.MEMORY,
-                "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), addic7edSerieMapping.providerId,
-                season, episode, language))
+                "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), addic7edSerieMapping.providerId, season,
+                    episode, language))
             .getCollection(() -> {
                 List<LanguageId> languageIds = LanguageId.forLanguage(language);
                 String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
@@ -111,7 +113,7 @@ public class JAddic7edApi implements SubtitleApi {
 
                 Elements blocks = doc.select(".tabel95[width='100%']");
 
-                List<Addic7edSubtitleDescriptor> lSubtitles = new ArrayList<>();
+                List<Addic7edSubtitleMetadata> lSubtitles = new ArrayList<>();
                 for (Element block : blocks) {
                     String uploader = "";
                     String version = null;
@@ -155,7 +157,7 @@ public class JAddic7edApi implements SubtitleApi {
                                 }
                             }
                             if (lang != null && download != null && title != null) {
-                                Addic7edSubtitleDescriptor sub = new Addic7edSubtitleDescriptor(version.trim(),
+                                Addic7edSubtitleMetadata sub = new Addic7edSubtitleMetadata(version.trim(),
                                     Language.fromValueOptional(lang.trim()).orElse(null), download, title.trim(),
                                     uploader, hearingImpaired);
                                 if (!isDuplicate(lSubtitles, sub)) {
@@ -171,7 +173,7 @@ public class JAddic7edApi implements SubtitleApi {
             });
     }
 
-    public boolean isDuplicate(List<Addic7edSubtitleDescriptor> lSubtitles, Addic7edSubtitleDescriptor sub) {
+    public boolean isDuplicate(List<Addic7edSubtitleMetadata> lSubtitles, Addic7edSubtitleMetadata sub) {
         return lSubtitles.stream().anyMatch(s -> s.language == sub.language && StringUtils.equals(s.url, sub.url) &&
             StringUtils.equals(s.version, sub.version));
     }

@@ -7,19 +7,19 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 
 @AllArgsConstructor
-public class OpenSubtitlesMovieDescriptor {
+public class OpenSubtitlesMovieMetadata {
 
     @var String name;
     @val int year;
     @val int imdbId;
 
-    public OpenSubtitlesMovieDescriptor(String name, int imdbId) {
+    public OpenSubtitlesMovieMetadata(String name, int imdbId) {
         this(name, -1, imdbId);
     }
 
     @Override
     public boolean equals(Object object) {
-        return object instanceof OpenSubtitlesMovieDescriptor other
+        return object instanceof OpenSubtitlesMovieMetadata other
                 && imdbId == other.imdbId && year == other.year && name.equals(other.name);
     }
 

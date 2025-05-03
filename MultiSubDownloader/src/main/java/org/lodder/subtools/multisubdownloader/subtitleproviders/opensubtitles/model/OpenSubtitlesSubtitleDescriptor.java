@@ -2,7 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.m
 
 import manifold.ext.props.rt.api.var;
 
-public class OpenSubtitlesSubtitleDescriptor {
+public class OpenSubtitlesSubtitleMetadata {
     @var String userNickName;
     @var String subFormat;
     @var int idSubtitle;

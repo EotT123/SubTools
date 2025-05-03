@@ -11,7 +11,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.SeasonEpisode;
 
 @EqualsAndHashCode
-public class SubsceneSubtitleDescriptor implements Serializable {
+public class SubsceneSubtitleMetadata implements Serializable {
 
     @val @Nullable Language language;
     @val @Nullable String name;
@@ -21,7 +21,7 @@ public class SubsceneSubtitleDescriptor implements Serializable {
     @val @Nullable SeasonEpisode seasonEpisode;
     @EqualsAndHashCode.Exclude @val ThrowingSupplier<String, SubsceneException> urlSupplier;
 
-    public SubsceneSubtitleDescriptor(@Nullable Language language,
+    public SubsceneSubtitleMetadata(@Nullable Language language,
         @Nullable String name, boolean hearingImpaired,@Nullable String uploader, @Nullable String comment,
         ThrowingSupplier<String, SubsceneException> urlSupplier) {
         this.language = language;

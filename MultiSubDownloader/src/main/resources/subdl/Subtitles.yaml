@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: Subtitle Search API
+  version: 1.0.0
+
+paths:
+  /search:
+    get:
+      summary: Search for subtitles
+      parameters:
+        - in: query
+          name: api_key
+          required: true
+          schema:
+            type: string
+          description: the api key from subdl account
+        - in: query
+          name: film_name
+          schema:
+            type: string
+          description: Text search by film name.
+        - in: query
+          name: file_name
+          schema:
+            type: string
+          description: Search by file name.
+        - in: query
+          name: sd_id
+          schema:
+            type: integer
+          description: Search by SubDL ID.
+        - in: query
+          name: imdb_id
+          schema:
+            type: integer
+          description: Search by IMDb ID.
+        - in: query
+          name: tmdb_id
+          schema:
+            type: integer
+          description: Search by TMDB ID.
+        - in: query
+          name: season_number
+          schema:
+            type: integer
+          description: Specific season number for TV shows.
+        - in: query
+          name: episode_number
+          schema:
+            type: integer
+          description: Specific episode number for TV shows.
+        - in: query
+          name: type
+          schema:
+            type: string
+          description: Type of the content, either movie or tv.
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Release year of the movie or TV show.
+        - in: query
+          name: languages
+          schema:
+            $ref: '#/components/schemas/Language'
+          description: Comma-separated language codes for subtitle languages.
+        - in: query
+          name: subs_per_page
+          schema:
+            type: integer
+          description: Limit of subtitles returned (default is 10, max is 30).
+        - in: query
+          name: comment
+          schema:
+            type: boolean
+          description: Set to true to get subtitle author comments.
+        - in: query
+          name: releases
+          schema:
+            type: boolean
+          description: Set to true to get release list on subtitle.
+        - in: query
+          name: hi
+          schema:
+            type: boolean
+          description: Set to true to get subtitles for hearing impaired.
+        - in: query
+          name: full_season
+          schema:
+            type: boolean
+          description: Set to true to get full season subtitles.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+              examples:
+                example-1:
+                  summary: Example search response
+                  value:
+                    status: true
+                    results:
+                      - sd_id: 1408780
+                        type: movie
+                        name: "The Last of Us"
+                        imdb_id: ""
+                        tmdb_id: 408417
+                        year: null
+                        slug: "the-last-of-us"
+                    subtitles: []
+                    totalPages: 0
+                    currentPage: 1
+        '403':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                example-1:
+                  value:
+                  status: false
+                  statusCode: 403
+                  message: Not Authorized
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        status:
+          type: boolean
+        statusCode:
+          description: status code of the error
+          type: integer
+        message:
+          description: description of the error
+          type: string
+    Language:
+      type: string
+      enum: [AR, BR_PT, DA, NL, EN, FA, FI, FR, ID, IT, NO, RO, ES, SV, VI, SQ, AZ, BE, BN, ZH_BG, BS, BG, BG_EN, MY, CA, ZH, HR, CS, NL_EN, EN_DE, EO, ET, KA, DE, EL, KL, HE, HI, HU, HU_EN, IS, JA, KO, KU, LV, LT, MK, MS, ML, MNI, PL, PT, RU, SR, SI, SK, SL, TL, TA, TE, TH, TR, UK, UR]
+
+    SearchResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultItem'
+        subtitles:
+          type: array
+          items: {}
+        totalPages:
+          type: integer
+        currentPage:
+          type: integer
+      required:
+        - status
+        - results
+        - subtitles
+        - totalPages
+        - currentPage
+
+    ResultItem:
+      type: object
+      properties:
+        sd_id:
+          type: integer
+        type:
+          type: string
+          enum: [movie, tv]
+        name:
+          type: string
+        imdb_id:
+          type: string
+          nullable: true
+        tmdb_id:
+          type: integer
+        year:
+          type: string
+          nullable: true
+        slug:
+          type: string
+      required:
+        - sd_id
+        - type
+        - name
+        - imdb_id
+        - tmdb_id
+        - slug

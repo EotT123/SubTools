@@ -69,6 +69,14 @@
         </dependency>
         <dependency>
             <groupId>systems.manifold</groupId>
+            <artifactId>manifold-json-rt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-yaml-rt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>systems.manifold</groupId>
             <artifactId>manifold-science</artifactId>
         </dependency>
         <dependency>
@@ -169,6 +177,16 @@
                         <path>
                             <groupId>systems.manifold</groupId>
                             <artifactId>manifold-strings</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-json</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-yaml</artifactId>
                             <version>${manifold.version}</version>
                         </path>
                     </annotationProcessorPaths>

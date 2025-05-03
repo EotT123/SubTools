@@ -11,7 +11,7 @@ import org.lodder.subtools.sublibrary.Language;
  * Templates.
  */
 @Builder
-public class PodnapisiSubtitleDescriptor implements Serializable {
+public class PodnapisiSubtitleMetadata implements Serializable {
 
     @var String subtitleId;
     @var Language language;

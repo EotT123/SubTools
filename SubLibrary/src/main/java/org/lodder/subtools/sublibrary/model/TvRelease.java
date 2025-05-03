@@ -13,7 +13,6 @@ import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
 public final class TvRelease extends Release {
 
     // parsed from the filename
-    @val String name;
     @val int season;
     @val List<Integer> episodes;
     @var @Nullable String title;
@@ -34,8 +33,7 @@ public final class TvRelease extends Release {
         @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String extension=null,
         @Nullable String originalName=null, @Nullable String customName=null, @Nullable String title=null,
         boolean special=false) {
-        super(VideoType.EPISODE, file, releaseGroup, quality, extension);
-        this.name = name;
+        super(name, VideoType.EPISODE, file, releaseGroup, quality, extension);
         this.title = title;
         this.season = season;
         this.episodes = Collections.unmodifiableList(episodes);

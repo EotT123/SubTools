@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
@@ -46,19 +46,19 @@ public class JPodnapisiApi implements SubtitleApi {
             Optional.of(new ProviderSerieId(showName, showName)) : Optional.empty();
     }
 
-    public List<PodnapisiSubtitleDescriptor> getMovieSubtitles(String movieName, @Nullable Integer year, int season,
+    public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String movieName, @Nullable Integer year, int season,
         int episode, Language language) throws PodnapisiException {
         return getSubtitles(new SerieMapping(movieName, movieName, movieName, season), year, season, episode, language);
 
     }
 
-    public List<PodnapisiSubtitleDescriptor> getSerieSubtitles(SerieMapping providerSerieId, int season, int episode,
+    public List<PodnapisiSubtitleMetadata> getSerieSubtitles(SerieMapping providerSerieId, int season, int episode,
         Language language) throws PodnapisiException {
         return getSubtitles(providerSerieId, null, season, episode, language);
 
     }
 
-    private List<PodnapisiSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, @Nullable Integer year,
+    private List<PodnapisiSubtitleMetadata> getSubtitles(SerieMapping providerSerieId, @Nullable Integer year,
         int season, int episode, Language language) throws PodnapisiException {
         return manager.getCache(CacheType.MEMORY,
                 "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name(), providerSerieId.providerId, season, episode,
@@ -107,9 +107,9 @@ public class JPodnapisiApi implements SubtitleApi {
         }
     }
 
-    private PodnapisiSubtitleDescriptor parsePodnapisiSubtitle(Element elem) {
+    private PodnapisiSubtitleMetadata parsePodnapisiSubtitle(Element elem) {
         Function<Element, String> getText = e -> e == null ? null : e.text();
-        return PodnapisiSubtitleDescriptor.builder()
+        return PodnapisiSubtitleMetadata.builder()
             .hearingImpaired(elem.select("new_flags flags")
                 .stream()
                 .anyMatch(flagElem -> "hearing_impaired".equals(flagElem.text())))

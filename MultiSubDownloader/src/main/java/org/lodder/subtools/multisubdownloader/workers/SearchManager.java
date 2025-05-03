@@ -50,7 +50,6 @@ public class SearchManager implements Cancelable {
     public void reset() {
         queue.clear();
         workers.clear();
-        scoreCalculators.clear();
     }
 
     public void addProvider(SubtitleProvider provider) {

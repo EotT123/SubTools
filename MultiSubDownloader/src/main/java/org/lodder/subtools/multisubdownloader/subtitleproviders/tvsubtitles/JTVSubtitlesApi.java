@@ -13,8 +13,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleDescriptor;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleDescriptor.TVSubtitlesSubtitleDescriptorBuilder;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleMetadata;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleMetadata.TVSubtitlesSubtitleMetadataBuilder;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
@@ -52,10 +52,10 @@ public class JTVSubtitlesApi implements SubtitleApi {
         }
     }
 
-    public Set<TVSubtitlesSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
+    public Set<TVSubtitlesSubtitleMetadata> getSubtitles(SerieMapping providerSerieId, int season, int episode,
         Language language) throws TvSubtitleException {
         // https://www.tvsubtitles.net/setlang.php?page=/tvshow-3219-2.html&setlang1=es
-        Set<TVSubtitlesSubtitleDescriptor> results = new HashSet<>();
+        Set<TVSubtitlesSubtitleMetadata> results = new HashSet<>();
         Optional<EpisodeRow> episodeRow = getSeasonSubtitleInfo(providerSerieId.providerId, season, language).filter(
             row -> row.isSameEpisode(season, episode)).findAny();
         if (episodeRow.isPresent()) {
@@ -99,7 +99,7 @@ public class JTVSubtitlesApi implements SubtitleApi {
             });
     }
 
-    private List<TVSubtitlesSubtitleDescriptor> getSubtitles(String episodeUrl)
+    private List<TVSubtitlesSubtitleMetadata> getSubtitles(String episodeUrl)
         throws TvSubtitleException {
         return manager.getCache(CacheType.MEMORY, subtitleSource.name() + "subtitles-$episodeUrl")
             .getCollection(() -> {
@@ -107,8 +107,8 @@ public class JTVSubtitlesApi implements SubtitleApi {
                     return manager.getAsJsoupDocument(PageContentParams.url(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")
                         .stream().map(subtitleElement -> {
-                            TVSubtitlesSubtitleDescriptorBuilder subtitleBuilder =
-                                TVSubtitlesSubtitleDescriptor.builder();
+                            TVSubtitlesSubtitleMetadataBuilder subtitleBuilder =
+                                TVSubtitlesSubtitleMetadata.builder();
                             for (Element titleElement : subtitleElement.select(".subtitle_grid > div > img[title]")) {
                                 String value =
                                     ((Element) titleElement.parent()).nextElementSibling().nextElementSibling().text();

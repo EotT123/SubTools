@@ -94,8 +94,8 @@ public final class JAddic7edViaProxyAdapter extends AbstractAdapter<Subtitle, Pr
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws ApiException {
+    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+        String serieName, int season) throws ApiException {
         List<ProviderSerieId> serieIds = tvdbId == null ? List.of() :
             new ExecuteCall<>(() -> getApi().getProviderSerieName(tvdbId))
                 .message("getProviderSerieName: [$tvdbId]")

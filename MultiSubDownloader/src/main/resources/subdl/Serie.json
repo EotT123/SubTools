@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://subdl.com/schemas/Serie.json",
+  "title": "SearchResponse",
+  "type": "object",
+  "required": ["status", "results", "subtitles", "totalPages", "currentPage"],
+  "properties": {
+    "status": {
+      "type": "boolean"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResultItem"
+      }
+    },
+    "subtitles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Subtitle"
+      }
+    },
+    "totalPages": {
+      "type": "integer"
+    },
+    "currentPage": {
+      "type": "integer"
+    }
+  },
+  "definitions": {
+    "Language": {
+      "type": "string",
+      "enum": ["AR", "BR_PT", "DA", "NL", "EN", "FA", "FI", "FR", "ID", "IT", "NO", "RO", "ES", "SV", "VI", "SQ", "AZ", "BE", "BN", "ZH_BG", "BS", "BG", "BG_EN", "MY", "CA", "ZH", "HR", "CS", "NL_EN", "EN_DE", "EO", "ET", "KA", "DE", "EL", "KL", "HE", "HI", "HU", "HU_EN", "IS", "JA", "KO", "KU", "LV", "LT", "MK", "MS", "ML", "MNI", "PL", "PT", "RU", "SR", "SI", "SK", "SL", "TL", "TA", "TE", "TH", "TR", "UK", "UR"]
+    },
+    "ReleaseType": {
+      "type": "string",
+      "enum": ["movie", "tv"]
+    },
+    "Subtitle": {
+      "type": "object",
+      "properties": {
+        "release_name": {
+          "type": "string",
+          "description": "Release identifier of the subtitle."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the subtitle file."
+        },
+        "lang": {
+          "type": "string",
+          "description": "Language name (human readable)."
+        },
+        "author": {
+          "type": "string",
+          "description": "Uploader or translator's name."
+        },
+        "url": {
+          "type": "string",
+          "description": "Download URL path."
+        },
+        "subtitlePage": {
+          "type": "string",
+          "description": "Page URL for subtitle details."
+        },
+        "season": {
+          "type": "integer",
+          "description": "Season number of the subtitle."
+        },
+        "episode": {
+          "type": ["integer", "null"],
+          "description": "Episode number (can be null for full season)."
+        },
+        "language": {
+          "type": "string",
+          "description": "Language code (e.g., NL, EN)."
+        },
+        "hi": {
+          "type": "boolean",
+          "description": "Indicates if it's for hearing impaired."
+        },
+        "episode_from": {
+          "type": ["integer", "null"],
+          "description": "Start episode (can be null)."
+        },
+        "episode_end": {
+          "type": "integer",
+          "description": "End episode."
+        },
+        "full_season": {
+          "type": "boolean",
+          "description": "True if this is a full-season subtitle."
+        }
+      }
+    },
+    "ResultItem": {
+      "type": "object",
+      "required": ["sd_id", "type", "name", "imdb_id", "tmdb_id", "slug"],
+      "properties": {
+        "sd_id": {
+          "type": "integer"
+        },
+        "type": {
+          "$ref": "#/definitions/ReleaseType"
+        },
+        "name": {
+          "type": "string"
+        },
+        "imdb_id": {
+          "type": ["string", "null"]
+        },
+        "tmdb_id": {
+          "type": "integer"
+        },
+        "year": {
+          "type": ["string", "null"]
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -51,7 +51,7 @@ public class Manager {
     @val InMemoryCache<String, String> inMemoryCache;
     @val DiskCache<String, Serializable> diskCache;
 
-    public boolean store(String downloadLink, Path file) throws ManagerException {
+    public boolean download(String downloadLink, Path file) throws ManagerException {
         try {
             return httpClient.doDownloadFile(new URI(downloadLink).toURL(), file);
         } catch (MalformedURLException | URISyntaxException e) {

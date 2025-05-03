@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
+import java.util.Optional;
+
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +50,8 @@ public final class TvReleaseControl extends ReleaseControl {
     private void processTvdb() throws ReleaseControlException {
         jtvdba.getSerie(tvRelease.name).useIfPresent(tvdbSerie -> {
             tvRelease.tvdbId = tvdbSerie.id;
+            tvRelease.imdbId = Optional.ofNullable(tvdbSerie.imdbId).map(id -> Integer.parseInt(id.replaceAll(
+                "[^0-9]", ""))).orElse(null);
             tvRelease.originalName = tvdbSerie.serieName;
             jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisode)
                     .useIfPresent(tvRelease::updateTvdbEpisodeInfo)
@@ -60,6 +64,8 @@ public final class TvReleaseControl extends ReleaseControl {
     private void processSpecial() throws ReleaseControlException {
         jtvdba.getSerie(tvRelease.name).useIfPresent(tvdbSerie -> {
             tvRelease.tvdbId = tvdbSerie.id;
+            tvRelease.imdbId = Optional.ofNullable(tvdbSerie.imdbId).map(id -> Integer.parseInt(id.replaceAll(
+                "[^0-9]", ""))).orElse(null);
             tvRelease.originalName = tvdbSerie.serieName;
             if (settings.processEpisodeSource == SettingsProcessEpisodeSource.TVDB) {
                 jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisode)

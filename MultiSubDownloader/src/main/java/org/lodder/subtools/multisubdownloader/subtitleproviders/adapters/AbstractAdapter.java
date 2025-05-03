@@ -16,6 +16,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.rt.api.Self;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
+import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
@@ -28,9 +29,10 @@ import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 abstract sealed class AbstractAdapter<T, S extends ProviderSerieId, X extends Exception>
     implements Adapter<T, S, X>, SubtitleProvider
     permits JAddic7edAdapter, JAddic7edViaProxyAdapter, JOpenSubAdapter, JPodnapisiAdapter, JSubsceneAdapter,
-    JTVsubtitlesAdapter {
+    JTVsubtitlesAdapter, JSubDlAdapter {
 
     @val @override Manager manager;
+    @val @override Settings settings;
     @val @override UserInteractionHandler userInteractionHandler;
 
     @RequiredArgsConstructor

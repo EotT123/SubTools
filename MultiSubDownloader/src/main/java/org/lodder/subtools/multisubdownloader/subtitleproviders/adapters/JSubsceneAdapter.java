@@ -23,7 +23,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.SubsceneApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class JSubsceneAdapter
-    extends AbstractAdapter<SubsceneSubtitleDescriptor, SubSceneSerieId, SubsceneException> {
+    extends AbstractAdapter<SubsceneSubtitleMetadata, SubSceneSerieId, SubsceneException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JSubsceneAdapter.class);
 
@@ -65,33 +65,33 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public List<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithHash(String hash, Language language) {
+    public List<SubsceneSubtitleMetadata> searchMovieSubtitlesWithHash(String hash, Language language) {
         // TODO implement this
         return List.of();
     }
 
     @Override
-    public List<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithId(int tvdbId, Language language) {
+    public List<SubsceneSubtitleMetadata> searchMovieSubtitlesWithId(int tvdbId, Language language) {
         // TODO implement this
         return List.of();
     }
 
     @Override
-    public Collection<SubsceneSubtitleDescriptor> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
+    public Collection<SubsceneSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) {
         // TODO implement this
         return List.of();
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<SubsceneSubtitleDescriptor> subtitles,
+    public Set<Subtitle> convertToSubtitles(MovieRelease movieRelease, Set<SubsceneSubtitleMetadata> subtitles,
         Language language) {
         // TODO implement this
         return Set.of();
     }
 
     @Override
-    public Set<SubsceneSubtitleDescriptor> searchSerieSubtitles(TvRelease tvRelease, Language language)
+    public Set<SubsceneSubtitleMetadata> searchSerieSubtitles(TvRelease tvRelease, Language language)
         throws SubsceneException {
         return getProviderSerieId(tvRelease).map(
             providerSerieId -> tvRelease.episodes.stream().flatMap(episode -> {
@@ -107,8 +107,8 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public List<SubSceneSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season)
-        throws SubsceneException {
+    public List<SubSceneSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+        String serieName, int season) throws SubsceneException {
         ToIntFunction<String> providerTypeFunction = value -> switch (value) {
             case "TV-Serie" -> 1;
             case "Exact" -> 2;
@@ -133,7 +133,7 @@ public final class JSubsceneAdapter
     }
 
     @Override
-    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<SubsceneSubtitleDescriptor> subtitles,
+    public Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<SubsceneSubtitleMetadata> subtitles,
         Language language) {
         return subtitles.stream()
             .filter(sub -> language == sub.language)

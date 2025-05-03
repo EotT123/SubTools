@@ -158,6 +158,16 @@
             </dependency>
             <dependency>
                 <groupId>systems.manifold</groupId>
+                <artifactId>manifold-json-rt</artifactId>
+                <version>${manifold.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>systems.manifold</groupId>
+                <artifactId>manifold-yaml-rt</artifactId>
+                <version>${manifold.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>systems.manifold</groupId>
                 <artifactId>manifold-science</artifactId>
                 <version>${manifold.version}</version>
             </dependency>

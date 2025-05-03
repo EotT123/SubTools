@@ -10,7 +10,8 @@ public enum SubtitleSource {
     ADDIC7ED("Addic7ed"),
     TVSUBTITLES("TvSubtitles"),
     LOCAL("Local"),
-    SUBSCENE("Subscene");
+    SUBSCENE("Subscene"),
+    SUBDL("SubDL");
 
     @val String name;
 }

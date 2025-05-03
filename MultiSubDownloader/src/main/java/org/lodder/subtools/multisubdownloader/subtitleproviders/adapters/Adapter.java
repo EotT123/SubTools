@@ -108,7 +108,8 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
 
     Set<Subtitle> convertToSubtitles(TvRelease tvRelease, Collection<T> subtitles, Language language);
 
-    List<S> getSortedProviderSerieIds(@Nullable Integer tvdbId, String serieName, int season) throws X;
+    List<S> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId, String serieName,
+        int season) throws X;
 
     @Override
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X {
@@ -128,11 +129,11 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
     default Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease, Function<TvRelease, String> nameFunction,
         Function<TvRelease, String> customNameFunction) throws X {
         return getProviderSerieId(nameFunction.apply(tvRelease), customNameFunction.apply(tvRelease),
-            tvRelease.displayName, tvRelease.season, tvRelease.tvdbId);
+            tvRelease.displayName, tvRelease.season, tvRelease.tvdbId, tvRelease.imdbId);
     }
 
     default Optional<SerieMapping> getProviderSerieId(String serieName, String serieNameToSearchFor, String displayName,
-        int season, Integer tvdbId) throws X {
+        int season, @Nullable Integer tvdbId, @Nullable Integer imdbId) throws X {
 
         LazySupplier<CacheKey> tvdbIdCacheFunction = new LazySupplier<>(() -> manager.getCache(CacheType.DISK,
             "%s-serieName-tvdbId:%s-%s".formatted(providerName, tvdbId, useSeasonForSerieId ? season : -1)));
@@ -164,7 +165,7 @@ public interface Adapter<T, S extends ProviderSerieId, X extends Exception> exte
             }
         }
 
-        List<S> providerSerieIds = getSortedProviderSerieIds(tvdbId, serieNameToSearchFor, seasonToUse);
+        List<S> providerSerieIds = getSortedProviderSerieIds(tvdbId, imdbId, serieNameToSearchFor, seasonToUse);
         if (providerSerieIds.isEmpty()) {
             // If no provider serie id's could be found, store a temporary null value with expiration time of 1 day
             // (so the provider isn't contacted every time this method is being called).

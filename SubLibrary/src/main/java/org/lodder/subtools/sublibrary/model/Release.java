@@ -13,15 +13,18 @@ import org.jspecify.annotations.Nullable;
 public abstract sealed class Release permits MovieRelease, TvRelease {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
+    @var String name;
     @val VideoType videoType;
     @val @Nullable Path filePath;
     @val @Nullable String quality;
     @val @Nullable String releaseGroup;
     @val @Nullable String extension;
     @var @Nullable Integer tvdbId;
+    @var @Nullable Integer imdbId;
 
-    protected Release(VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
+    protected Release(String name, VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
         @Nullable String quality, @Nullable String extension) {
+        this.name = name;
         this.videoType = videoType;
         this.filePath = filePath;
         this.releaseGroup = releaseGroup;
@@ -51,6 +54,10 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
 
     public boolean hasExtension(String extension) {
         return StringUtils.isNotBlank(extension) && extension.equals(this.extension);
+    }
+
+    public String getImdbIdAsString() {
+        return "tt%07d".formatted(imdbId);
     }
 
     @Override
