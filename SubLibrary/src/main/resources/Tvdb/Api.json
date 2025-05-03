@@ -1,0 +1,6312 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tvdb.com/schemas/Api.json",
+  "title": "SearchResponse",
+  "type": "object",
+  "definitions": {
+    "200": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/Description"
+        },
+        "content": {
+          "$ref": "#/definitions/200_Content"
+        }
+      },
+      "required": [
+        "content",
+        "description"
+      ],
+      "title": "200"
+    },
+    "Welcome1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "openapi": {
+          "type": "string"
+        },
+        "info": {
+          "$ref": "#/definitions/Info"
+        },
+        "security": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Security"
+          }
+        },
+        "paths": {
+          "$ref": "#/definitions/Paths"
+        },
+        "servers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Server"
+          }
+        },
+        "components": {
+          "$ref": "#/definitions/Components"
+        }
+      },
+      "required": [
+        "components",
+        "info",
+        "openapi",
+        "paths",
+        "security",
+        "servers"
+      ],
+      "title": "Welcome1"
+    },
+    "Components": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "securitySchemes": {
+          "$ref": "#/definitions/SecuritySchemes"
+        },
+        "schemas": {
+          "$ref": "#/definitions/Schemas"
+        }
+      },
+      "required": [
+        "schemas",
+        "securitySchemes"
+      ],
+      "title": "Components"
+    },
+    "Schemas": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Alias": {
+          "$ref": "#/definitions/Alias"
+        },
+        "ArtworkBaseRecord": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "ArtworkExtendedRecord": {
+          "$ref": "#/definitions/ArtworkExtendedRecord"
+        },
+        "ArtworkStatus": {
+          "$ref": "#/definitions/ArtworkStatus"
+        },
+        "ArtworkType": {
+          "$ref": "#/definitions/ArtworkType"
+        },
+        "AwardBaseRecord": {
+          "$ref": "#/definitions/AwardBaseRecord"
+        },
+        "AwardCategoryBaseRecord": {
+          "$ref": "#/definitions/AwardCategoryRecord"
+        },
+        "AwardCategoryExtendedRecord": {
+          "$ref": "#/definitions/AwardCategoryRecord"
+        },
+        "AwardExtendedRecord": {
+          "$ref": "#/definitions/AwardExtendedRecord"
+        },
+        "AwardNomineeBaseRecord": {
+          "$ref": "#/definitions/AwardNomineeBaseRecord"
+        },
+        "Biography": {
+          "$ref": "#/definitions/Biography"
+        },
+        "Character": {
+          "$ref": "#/definitions/Character"
+        },
+        "Company": {
+          "$ref": "#/definitions/Company"
+        },
+        "ParentCompany": {
+          "$ref": "#/definitions/ParentCompanyClass"
+        },
+        "CompanyRelationShip": {
+          "$ref": "#/definitions/CompanyRelationShip"
+        },
+        "CompanyType": {
+          "$ref": "#/definitions/CompanyType"
+        },
+        "ContentRating": {
+          "$ref": "#/definitions/ContentRating"
+        },
+        "Country": {
+          "$ref": "#/definitions/Country"
+        },
+        "Entity": {
+          "$ref": "#/definitions/Entity"
+        },
+        "EntityType": {
+          "$ref": "#/definitions/EntityType"
+        },
+        "EntityUpdate": {
+          "$ref": "#/definitions/EntityUpdate"
+        },
+        "EpisodeBaseRecord": {
+          "$ref": "#/definitions/EpisodeBaseRecord"
+        },
+        "EpisodeExtendedRecord": {
+          "$ref": "#/definitions/EpisodeExtendedRecord"
+        },
+        "Favorites": {
+          "$ref": "#/definitions/Favorites"
+        },
+        "FavoriteRecord": {
+          "$ref": "#/definitions/FavoriteRecord"
+        },
+        "Gender": {
+          "$ref": "#/definitions/Gender"
+        },
+        "GenreBaseRecord": {
+          "$ref": "#/definitions/GenreBaseRecord"
+        },
+        "Language": {
+          "$ref": "#/definitions/LanguageClass"
+        },
+        "ListBaseRecord": {
+          "$ref": "#/definitions/ListBaseRecord"
+        },
+        "ListExtendedRecord": {
+          "$ref": "#/definitions/ListExtendedRecord"
+        },
+        "MovieBaseRecord": {
+          "$ref": "#/definitions/MovieBaseRecord"
+        },
+        "MovieExtendedRecord": {
+          "$ref": "#/definitions/MovieExtendedRecord"
+        },
+        "PeopleBaseRecord": {
+          "$ref": "#/definitions/PeopleBaseRecord"
+        },
+        "PeopleExtendedRecord": {
+          "$ref": "#/definitions/PeopleExtendedRecord"
+        },
+        "PeopleType": {
+          "$ref": "#/definitions/Gender"
+        },
+        "Race": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "RecordInfo": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "Release": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "RemoteID": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SearchResult": {
+          "$ref": "#/definitions/SearchResult"
+        },
+        "SearchByRemoteIdResult": {
+          "$ref": "#/definitions/SearchByRemoteIDResult"
+        },
+        "SeasonBaseRecord": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SeasonExtendedRecord": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SeasonType": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SeriesAirsDays": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SeriesBaseRecord": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SeriesExtendedRecord": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "SourceType": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "Status": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "StudioBaseRecord": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "Tag": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "TagOption": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "Trailer": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "Translation": {
+          "$ref": "#/definitions/ArtworkBaseRecord"
+        },
+        "TranslationSimple": {
+          "$ref": "#/definitions/TranslationSimple"
+        },
+        "TranslationExtended": {
+          "$ref": "#/definitions/TranslationExtended"
+        },
+        "TagOptionEntity": {
+          "$ref": "#/definitions/TagOptionEntity"
+        },
+        "UserInfo": {
+          "$ref": "#/definitions/UserInfo"
+        },
+        "Inspiration": {
+          "$ref": "#/definitions/Inspiration"
+        },
+        "InspirationType": {
+          "$ref": "#/definitions/InspirationType"
+        },
+        "ProductionCountry": {
+          "$ref": "#/definitions/ProductionCountry"
+        },
+        "Companies": {
+          "$ref": "#/definitions/Companies"
+        },
+        "Links": {
+          "$ref": "#/definitions/Links"
+        }
+      },
+      "required": [
+        "Alias",
+        "ArtworkBaseRecord",
+        "ArtworkExtendedRecord",
+        "ArtworkStatus",
+        "ArtworkType",
+        "AwardBaseRecord",
+        "AwardCategoryBaseRecord",
+        "AwardCategoryExtendedRecord",
+        "AwardExtendedRecord",
+        "AwardNomineeBaseRecord",
+        "Biography",
+        "Character",
+        "Companies",
+        "Company",
+        "CompanyRelationShip",
+        "CompanyType",
+        "ContentRating",
+        "Country",
+        "Entity",
+        "EntityType",
+        "EntityUpdate",
+        "EpisodeBaseRecord",
+        "EpisodeExtendedRecord",
+        "FavoriteRecord",
+        "Favorites",
+        "Gender",
+        "GenreBaseRecord",
+        "Inspiration",
+        "InspirationType",
+        "Language",
+        "Links",
+        "ListBaseRecord",
+        "ListExtendedRecord",
+        "MovieBaseRecord",
+        "MovieExtendedRecord",
+        "ParentCompany",
+        "PeopleBaseRecord",
+        "PeopleExtendedRecord",
+        "PeopleType",
+        "ProductionCountry",
+        "Race",
+        "RecordInfo",
+        "Release",
+        "RemoteID",
+        "SearchByRemoteIdResult",
+        "SearchResult",
+        "SeasonBaseRecord",
+        "SeasonExtendedRecord",
+        "SeasonType",
+        "SeriesAirsDays",
+        "SeriesBaseRecord",
+        "SeriesExtendedRecord",
+        "SourceType",
+        "Status",
+        "StudioBaseRecord",
+        "Tag",
+        "TagOption",
+        "TagOptionEntity",
+        "Trailer",
+        "Translation",
+        "TranslationExtended",
+        "TranslationSimple",
+        "UserInfo"
+      ],
+      "title": "Schemas"
+    },
+    "Alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/AliasProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "Alias"
+    },
+    "AliasProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "$ref": "#/definitions/Language"
+        },
+        "name": {
+          "$ref": "#/definitions/Language"
+        }
+      },
+      "required": [
+        "language",
+        "name"
+      ],
+      "title": "AliasProperties"
+    },
+    "Language": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "maximum": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "maximum",
+        "type"
+      ],
+      "title": "Language"
+    },
+    "ArtworkBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ArtworkBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ArtworkBaseRecord"
+    },
+    "ArtworkBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "id": {
+          "$ref": "#/definitions/ID"
+        },
+        "image": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "includesText": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "language": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "score": {
+          "$ref": "#/definitions/Score"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "type": {
+          "$ref": "#/definitions/TypeClass"
+        },
+        "width": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "country": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "date": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "detail": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "sourceName": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "imageType": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "number": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "companies": {
+          "$ref": "#/definitions/TranslationsClass"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "artwork": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "episodes": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "trailers": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "translations": {
+          "$ref": "#/definitions/TranslationsClass"
+        },
+        "alternateName": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "friday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "monday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "saturday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "sunday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "thursday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "tuesday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "wednesday": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "aliases": {
+          "$ref": "#/definitions/PurpleAliases"
+        },
+        "averageRuntime": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "defaultSeasonType": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "firstAired": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "isOrderRandomized": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "lastAired": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nextAired": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "originalCountry": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "originalLanguage": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "slug": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "status": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "abbreviation": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsDays": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "airsTime": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "artworks": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "characters": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "contentRatings": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "lists": {
+          "$ref": "#/definitions/Lists"
+        },
+        "genres": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "originalNetwork": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "overview": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "latestNetwork": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "remoteIds": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "seasons": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "seasonTypes": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "tags": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "postfix": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "prefix": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "sort": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "keepUpdated": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "recordType": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "parentStudio": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "allowsMultiple": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "helpText": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "options": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "tag": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "tagName": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "url": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "runtime": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "isAlias": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "isPrimary": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "tagline": {
+          "$ref": "#/definitions/Tagline"
+        }
+      },
+      "required": [],
+      "title": "ArtworkBaseRecordProperties"
+    },
+    "AdditionalProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AdditionalProperties"
+    },
+    "AirsDays": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$ref": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "$ref"
+      ],
+      "title": "AirsDays"
+    },
+    "PurpleAliases": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasesType"
+        },
+        "x-go-name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "items",
+        "type"
+      ],
+      "title": "PurpleAliases"
+    },
+    "ParentCompany": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$ref": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [],
+      "title": "ParentCompany"
+    },
+    "AllowsMultiple": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "x-go-name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AllowsMultiple"
+    },
+    "Artwork": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasesType"
+        },
+        "x-go-name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "items",
+        "type",
+        "x-go-name"
+      ],
+      "title": "Artwork"
+    },
+    "AverageRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "nullable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "nullable",
+        "type"
+      ],
+      "title": "AverageRuntime"
+    },
+    "TranslationsClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "$ref": {
+          "type": "string"
+        },
+        "items": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [],
+      "title": "TranslationsClass"
+    },
+    "ContentRatings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/AliasesType"
+        },
+        "items": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [
+        "items",
+        "type"
+      ],
+      "title": "ContentRatings"
+    },
+    "DefaultSeasonType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "$ref": "#/definitions/Format"
+        },
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "x-go-name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "nullable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "format",
+        "type",
+        "x-go-name"
+      ],
+      "title": "DefaultSeasonType"
+    },
+    "ID": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "x-go-name": {
+          "type": "string"
+        },
+        "format": {
+          "$ref": "#/definitions/Format"
+        },
+        "nullable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "ID"
+    },
+    "Lists": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "title": "Lists"
+    },
+    "NameTranslations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasesType"
+        },
+        "x-go-name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "items",
+        "type",
+        "x-go-name"
+      ],
+      "title": "NameTranslations"
+    },
+    "Score": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "format": {
+          "$ref": "#/definitions/Format"
+        },
+        "x-go-name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "Score"
+    },
+    "Tagline": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        }
+      },
+      "required": [
+        "description",
+        "type"
+      ],
+      "title": "Tagline"
+    },
+    "TypeClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "$ref": "#/definitions/Format"
+        },
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "x-go-name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "$ref": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "TypeClass"
+    },
+    "ArtworkExtendedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ArtworkExtendedRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ArtworkExtendedRecord"
+    },
+    "ArtworkExtendedRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "episodeId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "height": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "includesText": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "language": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "movieId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "networkId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "peopleId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "score": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "seasonId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "seriesPeopleId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "status": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "thumbnailHeight": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "thumbnailWidth": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "type": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "width": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        }
+      },
+      "required": [
+        "episodeId",
+        "height",
+        "id",
+        "image",
+        "includesText",
+        "language",
+        "movieId",
+        "networkId",
+        "peopleId",
+        "score",
+        "seasonId",
+        "seriesId",
+        "seriesPeopleId",
+        "status",
+        "tagOptions",
+        "thumbnail",
+        "thumbnailHeight",
+        "thumbnailWidth",
+        "type",
+        "updatedAt",
+        "width"
+      ],
+      "title": "ArtworkExtendedRecordProperties"
+    },
+    "ArtworkStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ArtworkStatusProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ArtworkStatus"
+    },
+    "ArtworkStatusProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "ArtworkStatusProperties"
+    },
+    "ArtworkType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ArtworkTypeProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ArtworkType"
+    },
+    "ArtworkTypeProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "$ref": "#/definitions/Height"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "imageFormat": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "recordType": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "slug": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "thumbHeight": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "thumbWidth": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "width": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        }
+      },
+      "required": [
+        "height",
+        "id",
+        "imageFormat",
+        "name",
+        "recordType",
+        "slug",
+        "thumbHeight",
+        "thumbWidth",
+        "width"
+      ],
+      "title": "ArtworkTypeProperties"
+    },
+    "Height": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "$ref": "#/definitions/Format"
+        },
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        }
+      },
+      "required": [
+        "format",
+        "type"
+      ],
+      "title": "Height"
+    },
+    "AwardBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/AwardBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "AwardBaseRecord"
+    },
+    "AwardBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "AwardBaseRecordProperties"
+    },
+    "AwardCategoryRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/AwardCategoryBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "AwardCategoryRecord"
+    },
+    "AwardCategoryBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowCoNominees": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "award": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "forMovies": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "forSeries": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nominees": {
+          "$ref": "#/definitions/Artwork"
+        }
+      },
+      "required": [
+        "allowCoNominees",
+        "award",
+        "forMovies",
+        "forSeries",
+        "id",
+        "name"
+      ],
+      "title": "AwardCategoryBaseRecordProperties"
+    },
+    "AwardExtendedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/AwardExtendedRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "AwardExtendedRecord"
+    },
+    "AwardExtendedRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "id": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "score": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        }
+      },
+      "required": [
+        "categories",
+        "id",
+        "name",
+        "score"
+      ],
+      "title": "AwardExtendedRecordProperties"
+    },
+    "AwardNomineeBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/AwardNomineeBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "AwardNomineeBaseRecord"
+    },
+    "AwardNomineeBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "character": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "details": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "episode": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "isWinner": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "movie": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "series": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "category": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "category",
+        "character",
+        "details",
+        "episode",
+        "id",
+        "isWinner",
+        "movie",
+        "name",
+        "series",
+        "year"
+      ],
+      "title": "AwardNomineeBaseRecordProperties"
+    },
+    "Biography": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/BiographyProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "Biography"
+    },
+    "BiographyProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "biography": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "language": {
+          "$ref": "#/definitions/AllowsMultiple"
+        }
+      },
+      "required": [
+        "biography",
+        "language"
+      ],
+      "title": "BiographyProperties"
+    },
+    "Character": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/CharacterProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "Character"
+    },
+    "CharacterProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "episode": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "episodeId": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "isFeatured": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "movieId": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "movie": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "peopleId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "personImgURL": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "peopleType": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "series": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "sort": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "type": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "url": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "personName": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aliases",
+        "episode",
+        "episodeId",
+        "id",
+        "image",
+        "isFeatured",
+        "movie",
+        "movieId",
+        "name",
+        "nameTranslations",
+        "overviewTranslations",
+        "peopleId",
+        "peopleType",
+        "personImgURL",
+        "personName",
+        "series",
+        "seriesId",
+        "sort",
+        "tagOptions",
+        "type",
+        "url"
+      ],
+      "title": "CharacterProperties"
+    },
+    "Companies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/CompaniesProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "Companies"
+    },
+    "CompaniesProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "studio": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "network": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "production": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "distributor": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "special_effects": {
+          "$ref": "#/definitions/ContentRatings"
+        }
+      },
+      "required": [
+        "distributor",
+        "network",
+        "production",
+        "special_effects",
+        "studio"
+      ],
+      "title": "CompaniesProperties"
+    },
+    "Company": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/CompanyProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "Company"
+    },
+    "CompanyProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activeDate": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "country": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "inactiveDate": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "primaryCompanyType": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "slug": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "parentCompany": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        }
+      },
+      "required": [
+        "activeDate",
+        "aliases",
+        "country",
+        "id",
+        "inactiveDate",
+        "name",
+        "nameTranslations",
+        "overviewTranslations",
+        "parentCompany",
+        "primaryCompanyType",
+        "slug",
+        "tagOptions"
+      ],
+      "title": "CompanyProperties"
+    },
+    "CompanyRelationShip": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/CompanyRelationShipProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "CompanyRelationShip"
+    },
+    "CompanyRelationShipProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "typeName": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "id",
+        "typeName"
+      ],
+      "title": "CompanyRelationShipProperties"
+    },
+    "CompanyType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "properties": {
+          "$ref": "#/definitions/CompanyTypeProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "CompanyType"
+    },
+    "CompanyTypeProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "companyTypeId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "companyTypeName": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "companyTypeId",
+        "companyTypeName"
+      ],
+      "title": "CompanyTypeProperties"
+    },
+    "ContentRating": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ContentRatingProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ContentRating"
+    },
+    "ContentRatingProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "description": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "country": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "contentType": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "order": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "fullName": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "contentType",
+        "country",
+        "description",
+        "fullName",
+        "id",
+        "name",
+        "order"
+      ],
+      "title": "ContentRatingProperties"
+    },
+    "Country": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/CountryProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "Country"
+    },
+    "CountryProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "shortCode": {
+          "$ref": "#/definitions/AllowsMultiple"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "shortCode"
+      ],
+      "title": "CountryProperties"
+    },
+    "Entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/EntityProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "Entity"
+    },
+    "EntityProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "movieId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "order": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "movieId",
+        "order",
+        "seriesId"
+      ],
+      "title": "EntityProperties"
+    },
+    "EntityType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/EntityTypeProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "EntityType"
+    },
+    "EntityTypeProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "hasSpecials": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "hasSpecials",
+        "id",
+        "name"
+      ],
+      "title": "EntityTypeProperties"
+    },
+    "EntityUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/EntityUpdateProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "EntityUpdate"
+    },
+    "EntityUpdateProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "entityType": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "methodInt": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "method": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "extraInfo": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "userId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "recordType": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "recordId": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "timeStamp": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "mergeToId": {
+          "$ref": "#/definitions/Height"
+        },
+        "mergeToEntityType": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "entityType",
+        "extraInfo",
+        "mergeToEntityType",
+        "mergeToId",
+        "method",
+        "methodInt",
+        "recordId",
+        "recordType",
+        "seriesId",
+        "timeStamp",
+        "userId"
+      ],
+      "title": "EntityUpdateProperties"
+    },
+    "EpisodeBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/EpisodeBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "EpisodeBaseRecord"
+    },
+    "EpisodeBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "absoluteNumber": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "aired": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsAfterSeason": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsBeforeEpisode": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsBeforeSeason": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "finaleType": {
+          "$ref": "#/definitions/Tagline"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "imageType": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "isMovie": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "linkedMovie": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "number": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overview": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "runtime": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "seasonNumber": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "seasons": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "seasonName": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "absoluteNumber",
+        "aired",
+        "airsAfterSeason",
+        "airsBeforeEpisode",
+        "airsBeforeSeason",
+        "finaleType",
+        "id",
+        "image",
+        "imageType",
+        "isMovie",
+        "lastUpdated",
+        "linkedMovie",
+        "name",
+        "nameTranslations",
+        "number",
+        "overview",
+        "overviewTranslations",
+        "runtime",
+        "seasonName",
+        "seasonNumber",
+        "seasons",
+        "seriesId",
+        "year"
+      ],
+      "title": "EpisodeBaseRecordProperties"
+    },
+    "EpisodeExtendedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/EpisodeExtendedRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "EpisodeExtendedRecord"
+    },
+    "EpisodeExtendedRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aired": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsAfterSeason": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsBeforeEpisode": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "airsBeforeSeason": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "awards": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "characters": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "companies": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "contentRatings": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "finaleType": {
+          "$ref": "#/definitions/Tagline"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "imageType": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "isMovie": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "linkedMovie": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "networks": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "nominations": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "number": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overview": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "productionCode": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "remoteIds": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "runtime": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "seasonNumber": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "seasons": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "seriesId": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "studios": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "trailers": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "translations": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aired",
+        "airsAfterSeason",
+        "airsBeforeEpisode",
+        "airsBeforeSeason",
+        "awards",
+        "characters",
+        "companies",
+        "contentRatings",
+        "finaleType",
+        "id",
+        "image",
+        "imageType",
+        "isMovie",
+        "lastUpdated",
+        "linkedMovie",
+        "name",
+        "nameTranslations",
+        "networks",
+        "nominations",
+        "number",
+        "overview",
+        "overviewTranslations",
+        "productionCode",
+        "remoteIds",
+        "runtime",
+        "seasonNumber",
+        "seasons",
+        "seriesId",
+        "studios",
+        "tagOptions",
+        "trailers",
+        "translations",
+        "year"
+      ],
+      "title": "EpisodeExtendedRecordProperties"
+    },
+    "FavoriteRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/FavoriteRecordProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "FavoriteRecord"
+    },
+    "FavoriteRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "movie": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "episode": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "artwork": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "people": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "list": {
+          "$ref": "#/definitions/AllowsMultiple"
+        }
+      },
+      "required": [
+        "artwork",
+        "episode",
+        "list",
+        "movie",
+        "people",
+        "series"
+      ],
+      "title": "FavoriteRecordProperties"
+    },
+    "Favorites": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/FavoritesProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "Favorites"
+    },
+    "FavoritesProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "movies": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "episodes": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "artwork": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "people": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "lists": {
+          "$ref": "#/definitions/NameTranslations"
+        }
+      },
+      "required": [
+        "artwork",
+        "episodes",
+        "lists",
+        "movies",
+        "people",
+        "series"
+      ],
+      "title": "FavoritesProperties"
+    },
+    "Gender": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/GenderProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "Gender"
+    },
+    "GenderProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "GenderProperties"
+    },
+    "GenreBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/GenreBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "GenreBaseRecord"
+    },
+    "GenreBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "slug": {
+          "$ref": "#/definitions/AllowsMultiple"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug"
+      ],
+      "title": "GenreBaseRecordProperties"
+    },
+    "Inspiration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/InspirationProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "Inspiration"
+    },
+    "InspirationProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "type": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "type_name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "url": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "type_name",
+        "url"
+      ],
+      "title": "InspirationProperties"
+    },
+    "InspirationType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/InspirationTypeProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "InspirationType"
+    },
+    "InspirationTypeProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "description": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "reference_name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "url": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "description",
+        "id",
+        "name",
+        "reference_name",
+        "url"
+      ],
+      "title": "InspirationTypeProperties"
+    },
+    "LanguageClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/LanguageProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "LanguageClass"
+    },
+    "LanguageProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "nativeName": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "shortCode": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "nativeName",
+        "shortCode"
+      ],
+      "title": "LanguageProperties"
+    },
+    "Links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/LinksProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "Links"
+    },
+    "LinksProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prev": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "self": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "next": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "total_items": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "page_size": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "next",
+        "page_size",
+        "prev",
+        "self",
+        "total_items"
+      ],
+      "title": "LinksProperties"
+    },
+    "ListBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ListBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ListBaseRecord"
+    },
+    "ListBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "imageIsFallback": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "isOfficial": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overview": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "remoteIds": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "tags": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "score": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "url": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aliases",
+        "id",
+        "image",
+        "imageIsFallback",
+        "isOfficial",
+        "name",
+        "nameTranslations",
+        "overview",
+        "overviewTranslations",
+        "remoteIds",
+        "score",
+        "tags",
+        "url"
+      ],
+      "title": "ListBaseRecordProperties"
+    },
+    "ListExtendedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ListExtendedRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "ListExtendedRecord"
+    },
+    "ListExtendedRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "entities": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "imageIsFallback": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "isOfficial": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overview": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "score": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "url": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aliases",
+        "entities",
+        "id",
+        "image",
+        "imageIsFallback",
+        "isOfficial",
+        "name",
+        "nameTranslations",
+        "overview",
+        "overviewTranslations",
+        "score",
+        "url"
+      ],
+      "title": "ListExtendedRecordProperties"
+    },
+    "MovieBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/MovieBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "MovieBaseRecord"
+    },
+    "MovieBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "score": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "slug": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "status": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "runtime": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aliases",
+        "id",
+        "image",
+        "lastUpdated",
+        "name",
+        "nameTranslations",
+        "overviewTranslations",
+        "runtime",
+        "score",
+        "slug",
+        "status",
+        "year"
+      ],
+      "title": "MovieBaseRecordProperties"
+    },
+    "MovieExtendedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/MovieExtendedRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "MovieExtendedRecord"
+    },
+    "MovieExtendedRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "artworks": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "audioLanguages": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "awards": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "boxOffice": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "boxOfficeUS": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "budget": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "characters": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "companies": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "contentRatings": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "first_release": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "genres": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "inspirations": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "lists": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "name": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "originalCountry": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "originalLanguage": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "production_countries": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "releases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "remoteIds": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "runtime": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "score": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "slug": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "spoken_languages": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "status": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "studios": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "subtitleLanguages": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "trailers": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "translations": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aliases",
+        "artworks",
+        "audioLanguages",
+        "awards",
+        "boxOffice",
+        "boxOfficeUS",
+        "budget",
+        "characters",
+        "companies",
+        "contentRatings",
+        "first_release",
+        "genres",
+        "id",
+        "image",
+        "inspirations",
+        "lastUpdated",
+        "lists",
+        "name",
+        "nameTranslations",
+        "originalCountry",
+        "originalLanguage",
+        "overviewTranslations",
+        "production_countries",
+        "releases",
+        "remoteIds",
+        "runtime",
+        "score",
+        "slug",
+        "spoken_languages",
+        "status",
+        "studios",
+        "subtitleLanguages",
+        "tagOptions",
+        "trailers",
+        "translations",
+        "year"
+      ],
+      "title": "MovieExtendedRecordProperties"
+    },
+    "ParentCompanyClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "properties": {
+          "$ref": "#/definitions/ParentCompanyProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "ParentCompanyClass"
+    },
+    "ParentCompanyProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AverageRuntime"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "relation": {
+          "$ref": "#/definitions/ParentCompany"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "relation"
+      ],
+      "title": "ParentCompanyProperties"
+    },
+    "PeopleBaseRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/PeopleBaseRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "PeopleBaseRecord"
+    },
+    "PeopleBaseRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "score": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        }
+      },
+      "required": [
+        "aliases",
+        "id",
+        "image",
+        "lastUpdated",
+        "name",
+        "nameTranslations",
+        "overviewTranslations",
+        "score"
+      ],
+      "title": "PeopleBaseRecordProperties"
+    },
+    "PeopleExtendedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/PeopleExtendedRecordProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "x-go-package": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type",
+        "x-go-package"
+      ],
+      "title": "PeopleExtendedRecord"
+    },
+    "PeopleExtendedRecordProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "awards": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "biographies": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "birth": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "birthPlace": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "characters": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "death": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "gender": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "image": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "lastUpdated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "nameTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/NameTranslations"
+        },
+        "races": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "remoteIds": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "score": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "slug": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "tagOptions": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "translations": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [
+        "aliases",
+        "awards",
+        "biographies",
+        "birth",
+        "birthPlace",
+        "characters",
+        "death",
+        "gender",
+        "id",
+        "image",
+        "lastUpdated",
+        "name",
+        "nameTranslations",
+        "overviewTranslations",
+        "races",
+        "remoteIds",
+        "score",
+        "slug",
+        "tagOptions",
+        "translations"
+      ],
+      "title": "PeopleExtendedRecordProperties"
+    },
+    "ProductionCountry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/ProductionCountryProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "ProductionCountry"
+    },
+    "ProductionCountryProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/DefaultSeasonType"
+        },
+        "country": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "country",
+        "id",
+        "name"
+      ],
+      "title": "ProductionCountryProperties"
+    },
+    "SearchByRemoteIDResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/SearchByRemoteIDResultProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties"
+      ],
+      "title": "SearchByRemoteIDResult"
+    },
+    "SearchByRemoteIDResultProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "people": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "movie": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "episode": {
+          "$ref": "#/definitions/ParentCompany"
+        },
+        "company": {
+          "$ref": "#/definitions/ParentCompany"
+        }
+      },
+      "required": [
+        "company",
+        "episode",
+        "movie",
+        "people",
+        "series"
+      ],
+      "title": "SearchByRemoteIDResultProperties"
+    },
+    "SearchResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/SearchResultProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "SearchResult"
+    },
+    "SearchResultProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "companies": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "companyType": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "country": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "director": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "first_air_time": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "genres": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "id": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "image_url": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "is_official": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name_translated": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "network": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "objectID": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "officialList": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overview": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "overviews": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "overview_translated": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "poster": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "posters": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "primary_language": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "remote_ids": {
+          "$ref": "#/definitions/Artwork"
+        },
+        "status": {
+          "$ref": "#/definitions/AllowsMultiple"
+        },
+        "slug": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "studios": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "title": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "translations": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "translationsWithLang": {
+          "$ref": "#/definitions/CompaniesClass"
+        },
+        "tvdb_id": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "year": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "aliases",
+        "companies",
+        "companyType",
+        "country",
+        "director",
+        "first_air_time",
+        "genres",
+        "id",
+        "image_url",
+        "is_official",
+        "name",
+        "name_translated",
+        "network",
+        "objectID",
+        "officialList",
+        "overview",
+        "overview_translated",
+        "overviews",
+        "poster",
+        "posters",
+        "primary_language",
+        "remote_ids",
+        "slug",
+        "status",
+        "studios",
+        "thumbnail",
+        "title",
+        "translations",
+        "translationsWithLang",
+        "tvdb_id",
+        "type",
+        "year"
+      ],
+      "title": "SearchResultProperties"
+    },
+    "CompaniesClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasesType"
+        }
+      },
+      "required": [
+        "items",
+        "type"
+      ],
+      "title": "CompaniesClass"
+    },
+    "TagOptionEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "properties": {
+          "$ref": "#/definitions/TagOptionEntityProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "TagOptionEntity"
+    },
+    "TagOptionEntityProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "tagName": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "tagId": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "name",
+        "tagId",
+        "tagName"
+      ],
+      "title": "TagOptionEntityProperties"
+    },
+    "TranslationExtended": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/TranslationExtendedProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "TranslationExtended"
+    },
+    "TranslationExtendedProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nameTranslations": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "overviewTranslations": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "alias": {
+          "$ref": "#/definitions/CompaniesClass"
+        }
+      },
+      "required": [
+        "alias",
+        "nameTranslations",
+        "overviewTranslations"
+      ],
+      "title": "TranslationExtendedProperties"
+    },
+    "TranslationSimple": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "example": {
+          "$ref": "#/definitions/ExampleClass"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "additionalProperties",
+        "description",
+        "example",
+        "type"
+      ],
+      "title": "TranslationSimple"
+    },
+    "ExampleClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ara": {
+          "type": "string"
+        },
+        "ces": {
+          "type": "string"
+        },
+        "deu": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ara",
+        "ces",
+        "deu"
+      ],
+      "title": "ExampleClass"
+    },
+    "UserInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "properties": {
+          "$ref": "#/definitions/UserInfoProperties"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "type"
+      ],
+      "title": "UserInfo"
+    },
+    "UserInfoProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "language": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "name": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "id",
+        "language",
+        "name",
+        "type"
+      ],
+      "title": "UserInfoProperties"
+    },
+    "SecuritySchemes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bearerAuth": {
+          "$ref": "#/definitions/BearerAuth"
+        }
+      },
+      "required": [
+        "bearerAuth"
+      ],
+      "title": "SecuritySchemes"
+    },
+    "BearerAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "scheme": {
+          "type": "string"
+        },
+        "bearerFormat": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bearerFormat",
+        "scheme",
+        "type"
+      ],
+      "title": "BearerAuth"
+    },
+    "Info": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "title",
+        "version"
+      ],
+      "title": "Info"
+    },
+    "Paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "/login": {
+          "$ref": "#/definitions/Login"
+        },
+        "/artwork/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/artwork/{id}/extended": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/artwork/statuses": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/artwork/types": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/awards": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/awards/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/awards/{id}/extended": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/awards/categories/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/awards/categories/{id}/extended": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/characters/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/companies": {
+          "$ref": "#/definitions/EpisodesClass"
+        },
+        "/companies/types": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/companies/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/content/ratings": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/countries": {
+          "$ref": "#/definitions/Countries"
+        },
+        "/entities": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/episodes": {
+          "$ref": "#/definitions/EpisodesClass"
+        },
+        "/episodes/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/episodes/{id}/extended": {
+          "$ref": "#/definitions/IDExtended"
+        },
+        "/episodes/{id}/translations/{language}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/genders": {
+          "$ref": "#/definitions/Countries"
+        },
+        "/genres": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/genres/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/inspiration/types": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/languages": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/lists": {
+          "$ref": "#/definitions/ListsClass"
+        },
+        "/lists/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/lists/slug/{slug}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/lists/{id}/extended": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/lists/{id}/translations/{language}": {
+          "$ref": "#/definitions/ListsIDTranslationsLanguage"
+        },
+        "/movies": {
+          "$ref": "#/definitions/EpisodesClass"
+        },
+        "/movies/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/movies/{id}/extended": {
+          "$ref": "#/definitions/IesIDExtended"
+        },
+        "/movies/filter": {
+          "$ref": "#/definitions/MoviesFilter"
+        },
+        "/movies/slug/{slug}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/movies/{id}/translations/{language}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/movies/statuses": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/people": {
+          "$ref": "#/definitions/EpisodesClass"
+        },
+        "/people/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/people/{id}/extended": {
+          "$ref": "#/definitions/IDExtended"
+        },
+        "/people/{id}/translations/{language}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/people/types": {
+          "$ref": "#/definitions/Countries"
+        },
+        "/search": {
+          "$ref": "#/definitions/EpisodesClass"
+        },
+        "/search/remoteid/{remoteId}": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/seasons": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/seasons/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/seasons/{id}/extended": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/seasons/types": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/seasons/{id}/translations/{language}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/series": {
+          "$ref": "#/definitions/EpisodesClass"
+        },
+        "/series/{id}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/series/{id}/artworks": {
+          "$ref": "#/definitions/SeriesIDArtworks"
+        },
+        "/series/{id}/nextAired": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/series/{id}/extended": {
+          "$ref": "#/definitions/IesIDExtended"
+        },
+        "/series/{id}/episodes/{season-type}": {
+          "$ref": "#/definitions/SeriesIDEpisodesSeasonType"
+        },
+        "/series/{id}/episodes/{season-type}/{lang}": {
+          "$ref": "#/definitions/SeriesIDEpisodesSeasonTypeLang"
+        },
+        "/series/filter": {
+          "$ref": "#/definitions/SeriesFilter"
+        },
+        "/series/slug/{slug}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/series/{id}/translations/{language}": {
+          "$ref": "#/definitions/ArtworkID"
+        },
+        "/series/statuses": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/sources/types": {
+          "$ref": "#/definitions/ArtworkStatuses"
+        },
+        "/updates": {
+          "$ref": "#/definitions/Updates"
+        },
+        "/user": {
+          "$ref": "#/definitions/User"
+        },
+        "/user/{id}": {
+          "$ref": "#/definitions/User"
+        },
+        "/user/favorites": {
+          "$ref": "#/definitions/UserFavorites"
+        }
+      },
+      "required": [
+        "/artwork/statuses",
+        "/artwork/types",
+        "/artwork/{id}",
+        "/artwork/{id}/extended",
+        "/awards",
+        "/awards/categories/{id}",
+        "/awards/categories/{id}/extended",
+        "/awards/{id}",
+        "/awards/{id}/extended",
+        "/characters/{id}",
+        "/companies",
+        "/companies/types",
+        "/companies/{id}",
+        "/content/ratings",
+        "/countries",
+        "/entities",
+        "/episodes",
+        "/episodes/{id}",
+        "/episodes/{id}/extended",
+        "/episodes/{id}/translations/{language}",
+        "/genders",
+        "/genres",
+        "/genres/{id}",
+        "/inspiration/types",
+        "/languages",
+        "/lists",
+        "/lists/slug/{slug}",
+        "/lists/{id}",
+        "/lists/{id}/extended",
+        "/lists/{id}/translations/{language}",
+        "/login",
+        "/movies",
+        "/movies/filter",
+        "/movies/slug/{slug}",
+        "/movies/statuses",
+        "/movies/{id}",
+        "/movies/{id}/extended",
+        "/movies/{id}/translations/{language}",
+        "/people",
+        "/people/types",
+        "/people/{id}",
+        "/people/{id}/extended",
+        "/people/{id}/translations/{language}",
+        "/search",
+        "/search/remoteid/{remoteId}",
+        "/seasons",
+        "/seasons/types",
+        "/seasons/{id}",
+        "/seasons/{id}/extended",
+        "/seasons/{id}/translations/{language}",
+        "/series",
+        "/series/filter",
+        "/series/slug/{slug}",
+        "/series/statuses",
+        "/series/{id}",
+        "/series/{id}/artworks",
+        "/series/{id}/episodes/{season-type}",
+        "/series/{id}/episodes/{season-type}/{lang}",
+        "/series/{id}/extended",
+        "/series/{id}/nextAired",
+        "/series/{id}/translations/{language}",
+        "/sources/types",
+        "/updates",
+        "/user",
+        "/user/favorites",
+        "/user/{id}"
+      ],
+      "title": "Paths"
+    },
+    "ArtworkStatuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/ArtworkStatusesGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "ArtworkStatuses"
+    },
+    "ArtworkStatusesGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PurpleResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PurpleParameter"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "responses",
+        "tags"
+      ],
+      "title": "ArtworkStatusesGet"
+    },
+    "PurpleParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "in": {
+          "$ref": "#/definitions/In"
+        },
+        "name": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "description",
+        "in",
+        "name",
+        "schema"
+      ],
+      "title": "PurpleParameter"
+    },
+    "PurpleResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/200_Content"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "PurpleResponse"
+    },
+    "200_Content": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/PurpleApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "200_Content"
+    },
+    "PurpleApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/PurpleSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "PurpleApplicationJSON"
+    },
+    "PurpleSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/PurpleProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "PurpleSchema"
+    },
+    "PurpleProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "data",
+        "status"
+      ],
+      "title": "PurpleProperties"
+    },
+    "ArtworkID": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/ArtworkIDGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "ArtworkID"
+    },
+    "ArtworkIDGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PurpleParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FluffyResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "ArtworkIDGet"
+    },
+    "FluffyResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/PurpleContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "FluffyResponse"
+    },
+    "PurpleContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/FluffyApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "PurpleContent"
+    },
+    "FluffyApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/FluffySchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "FluffyApplicationJSON"
+    },
+    "FluffySchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/FluffyProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "FluffySchema"
+    },
+    "FluffyProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "data",
+        "status"
+      ],
+      "title": "FluffyProperties"
+    },
+    "EpisodesClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/CompaniesGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "EpisodesClass"
+    },
+    "CompaniesGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PurpleParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/TentacledResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "CompaniesGet"
+    },
+    "TentacledResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/FluffyContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "TentacledResponse"
+    },
+    "FluffyContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/TentacledApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "FluffyContent"
+    },
+    "TentacledApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/TentacledSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "TentacledApplicationJSON"
+    },
+    "TentacledSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TentacledProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "TentacledSchema"
+    },
+    "TentacledProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ContentRatings"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "links": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [
+        "data",
+        "links",
+        "status"
+      ],
+      "title": "TentacledProperties"
+    },
+    "Countries": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/CountriesGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "Countries"
+    },
+    "CountriesGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "responses": {
+          "$ref": "#/definitions/Responses"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "responses",
+        "tags"
+      ],
+      "title": "CountriesGet"
+    },
+    "Responses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "200": {
+          "$ref": "#/definitions/200"
+        }
+      },
+      "required": [
+        "200"
+      ],
+      "title": "Responses"
+    },
+    "IDExtended": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/EpisodesIDExtendedGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "IDExtended"
+    },
+    "EpisodesIDExtendedGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FluffyParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FluffyResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "EpisodesIDExtendedGet"
+    },
+    "FluffyParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "in": {
+          "$ref": "#/definitions/In"
+        },
+        "name": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/StickySchema"
+        }
+      },
+      "required": [
+        "in",
+        "name",
+        "schema"
+      ],
+      "title": "FluffyParameter"
+    },
+    "StickySchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "StickySchema"
+    },
+    "ListsClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/ListsGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "ListsClass"
+    },
+    "ListsGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PurpleParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/StickyResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "ListsGet"
+    },
+    "StickyResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/TentacledContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "StickyResponse"
+    },
+    "TentacledContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/StickyApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "TentacledContent"
+    },
+    "StickyApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/IndigoSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "StickyApplicationJSON"
+    },
+    "IndigoSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/TentacledProperties"
+        }
+      },
+      "required": [
+        "properties"
+      ],
+      "title": "IndigoSchema"
+    },
+    "ListsIDTranslationsLanguage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/ListsIDTranslationsLanguageGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "ListsIDTranslationsLanguage"
+    },
+    "ListsIDTranslationsLanguageGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PurpleParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PurpleResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "ListsIDTranslationsLanguageGet"
+    },
+    "Login": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "post": {
+          "$ref": "#/definitions/LoginPost"
+        }
+      },
+      "required": [
+        "post"
+      ],
+      "title": "Login"
+    },
+    "LoginPost": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "requestBody": {
+          "$ref": "#/definitions/PurpleRequestBody"
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/IndigoResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "requestBody",
+        "responses",
+        "summary",
+        "tags"
+      ],
+      "title": "LoginPost"
+    },
+    "PurpleRequestBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "$ref": "#/definitions/StickyContent"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "content",
+        "required"
+      ],
+      "title": "PurpleRequestBody"
+    },
+    "StickyContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/IndigoApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "StickyContent"
+    },
+    "IndigoApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/IndecentSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "IndigoApplicationJSON"
+    },
+    "IndecentSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/StickyProperties"
+        }
+      },
+      "required": [
+        "properties",
+        "required",
+        "type"
+      ],
+      "title": "IndecentSchema"
+    },
+    "StickyProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "apikey": {
+          "$ref": "#/definitions/AdditionalProperties"
+        },
+        "pin": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "apikey",
+        "pin"
+      ],
+      "title": "StickyProperties"
+    },
+    "IndigoResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/IndigoContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "IndigoResponse"
+    },
+    "IndigoContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/IndecentApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "IndigoContent"
+    },
+    "IndecentApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/HilariousSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "IndecentApplicationJSON"
+    },
+    "HilariousSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/IndigoProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "HilariousSchema"
+    },
+    "IndigoProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/PurpleData"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "data",
+        "status"
+      ],
+      "title": "IndigoProperties"
+    },
+    "PurpleData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/IndecentProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "PurpleData"
+    },
+    "IndecentProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "title": "IndecentProperties"
+    },
+    "MoviesFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/MoviesFilterGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "MoviesFilter"
+    },
+    "MoviesFilterGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TentacledParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PurpleResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "MoviesFilterGet"
+    },
+    "TentacledParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "in": {
+          "$ref": "#/definitions/In"
+        },
+        "name": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/AmbitiousSchema"
+        }
+      },
+      "required": [
+        "description",
+        "in",
+        "name",
+        "required",
+        "schema"
+      ],
+      "title": "TentacledParameter"
+    },
+    "AmbitiousSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "example": {
+          "$ref": "#/definitions/ExampleElement"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExampleElement"
+          }
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AmbitiousSchema"
+    },
+    "IesIDExtended": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/MoviesIDExtendedGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "IesIDExtended"
+    },
+    "MoviesIDExtendedGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StickyParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FluffyResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "MoviesIDExtendedGet"
+    },
+    "StickyParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "in": {
+          "$ref": "#/definitions/In"
+        },
+        "name": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/CunningSchema"
+        }
+      },
+      "required": [
+        "description",
+        "in",
+        "name",
+        "required",
+        "schema"
+      ],
+      "title": "StickyParameter"
+    },
+    "CunningSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Enum"
+          }
+        },
+        "example": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "CunningSchema"
+    },
+    "SeriesFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/SeriesFilterGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "SeriesFilter"
+    },
+    "SeriesFilterGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TentacledParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/IndecentResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "SeriesFilterGet"
+    },
+    "IndecentResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/IndecentContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "IndecentResponse"
+    },
+    "IndecentContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/HilariousApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "IndecentContent"
+    },
+    "HilariousApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/MagentaSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "HilariousApplicationJSON"
+    },
+    "MagentaSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/HilariousProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "MagentaSchema"
+    },
+    "HilariousProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ContentRatings"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "title": "HilariousProperties"
+    },
+    "SeriesIDArtworks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/SeriesIDArtworksGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "SeriesIDArtworks"
+    },
+    "SeriesIDArtworksGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IndigoParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FluffyResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "SeriesIDArtworksGet"
+    },
+    "IndigoParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "in": {
+          "$ref": "#/definitions/In"
+        },
+        "name": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/FriskySchema"
+        }
+      },
+      "required": [
+        "description",
+        "in",
+        "name",
+        "required",
+        "schema"
+      ],
+      "title": "IndigoParameter"
+    },
+    "FriskySchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "example": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "FriskySchema"
+    },
+    "SeriesIDEpisodesSeasonType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/SeriesIDEpisodesSeasonTypeGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "SeriesIDEpisodesSeasonType"
+    },
+    "SeriesIDEpisodesSeasonTypeGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IndecentParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/HilariousResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "SeriesIDEpisodesSeasonTypeGet"
+    },
+    "IndecentParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "$ref": "#/definitions/In"
+        },
+        "name": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/definitions/MischievousSchema"
+        },
+        "description": {
+          "type": "string"
+        },
+        "examples": {
+          "$ref": "#/definitions/Examples"
+        }
+      },
+      "required": [
+        "in",
+        "name",
+        "required",
+        "schema"
+      ],
+      "title": "IndecentParameter"
+    },
+    "Examples": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/Absolute"
+        },
+        "official": {
+          "$ref": "#/definitions/Absolute"
+        },
+        "dvd": {
+          "$ref": "#/definitions/Absolute"
+        },
+        "absolute": {
+          "$ref": "#/definitions/Absolute"
+        },
+        "alternate": {
+          "$ref": "#/definitions/Absolute"
+        },
+        "regional": {
+          "$ref": "#/definitions/Absolute"
+        }
+      },
+      "required": [
+        "absolute",
+        "alternate",
+        "default",
+        "dvd",
+        "official",
+        "regional"
+      ],
+      "title": "Examples"
+    },
+    "Absolute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Absolute"
+    },
+    "MischievousSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/LanguageType"
+        },
+        "default": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "MischievousSchema"
+    },
+    "HilariousResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/HilariousContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "HilariousResponse"
+    },
+    "HilariousContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/AmbitiousApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "HilariousContent"
+    },
+    "AmbitiousApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/BraggadociousSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "AmbitiousApplicationJSON"
+    },
+    "BraggadociousSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/AmbitiousProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "BraggadociousSchema"
+    },
+    "AmbitiousProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/FluffyData"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "data",
+        "status"
+      ],
+      "title": "AmbitiousProperties"
+    },
+    "FluffyData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "properties": {
+          "$ref": "#/definitions/CunningProperties"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "FluffyData"
+    },
+    "CunningProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "$ref": "#/definitions/AirsDays"
+        },
+        "episodes": {
+          "$ref": "#/definitions/ContentRatings"
+        }
+      },
+      "required": [
+        "episodes",
+        "series"
+      ],
+      "title": "CunningProperties"
+    },
+    "SeriesIDEpisodesSeasonTypeLang": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/SeriesIDEpisodesSeasonTypeLangGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "SeriesIDEpisodesSeasonTypeLang"
+    },
+    "SeriesIDEpisodesSeasonTypeLangGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IndecentParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/AmbitiousResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "SeriesIDEpisodesSeasonTypeLangGet"
+    },
+    "AmbitiousResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/AmbitiousContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "AmbitiousResponse"
+    },
+    "AmbitiousContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/CunningApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "AmbitiousContent"
+    },
+    "CunningApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/Schema1"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "CunningApplicationJSON"
+    },
+    "Schema1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/MagentaProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "Schema1"
+    },
+    "MagentaProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/TentacledData"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "data",
+        "status"
+      ],
+      "title": "MagentaProperties"
+    },
+    "TentacledData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        },
+        "properties": {
+          "$ref": "#/definitions/FriskyProperties"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "TentacledData"
+    },
+    "FriskyProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [
+        "series"
+      ],
+      "title": "FriskyProperties"
+    },
+    "Updates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/UpdatesGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "Updates"
+    },
+    "UpdatesGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FluffyParameter"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/TentacledResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "parameters",
+        "responses",
+        "tags"
+      ],
+      "title": "UpdatesGet"
+    },
+    "User": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/UserGet"
+        }
+      },
+      "required": [
+        "get"
+      ],
+      "title": "User"
+    },
+    "UserGet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/CunningResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PurpleParameter"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "responses",
+        "tags"
+      ],
+      "title": "UserGet"
+    },
+    "CunningResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/definitions/CunningContent"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "CunningResponse"
+    },
+    "CunningContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/MagentaApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "CunningContent"
+    },
+    "MagentaApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/Schema2"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "MagentaApplicationJSON"
+    },
+    "Schema2": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/MischievousProperties"
+        },
+        "type": {
+          "$ref": "#/definitions/AliasType"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "Schema2"
+    },
+    "MischievousProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Lists"
+        },
+        "status": {
+          "$ref": "#/definitions/AdditionalProperties"
+        }
+      },
+      "required": [
+        "data",
+        "status"
+      ],
+      "title": "MischievousProperties"
+    },
+    "UserFavorites": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "get": {
+          "$ref": "#/definitions/UserGet"
+        },
+        "post": {
+          "$ref": "#/definitions/UserFavoritesPost"
+        }
+      },
+      "required": [
+        "get",
+        "post"
+      ],
+      "title": "UserFavorites"
+    },
+    "UserFavoritesPost": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "requestBody": {
+          "$ref": "#/definitions/FluffyRequestBody"
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/MagentaResponse"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "operationId",
+        "requestBody",
+        "responses",
+        "tags"
+      ],
+      "title": "UserFavoritesPost"
+    },
+    "FluffyRequestBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "$ref": "#/definitions/MagentaContent"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "title": "FluffyRequestBody"
+    },
+    "MagentaContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application/json": {
+          "$ref": "#/definitions/FriskyApplicationJSON"
+        }
+      },
+      "required": [
+        "application/json"
+      ],
+      "title": "MagentaContent"
+    },
+    "FriskyApplicationJSON": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/AirsDays"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "FriskyApplicationJSON"
+    },
+    "MagentaResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "MagentaResponse"
+    },
+    "Security": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bearerAuth": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "bearerAuth"
+      ],
+      "title": "Security"
+    },
+    "Server": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "qt-uri-protocols": [
+            "https"
+          ]
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "Server"
+    },
+    "ExampleElement": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "title": "ExampleElement"
+    },
+    "Enum": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "title": "Enum"
+    },
+    "LanguageType": {
+      "type": "string",
+      "enum": [
+        "integer",
+        "boolean",
+        "string",
+        "number"
+      ],
+      "title": "LanguageType"
+    },
+    "AliasType": {
+      "type": "string",
+      "enum": [
+        "string",
+        "object"
+      ],
+      "title": "AliasType"
+    },
+    "AliasesType": {
+      "type": "string",
+      "enum": [
+        "array"
+      ],
+      "title": "AliasesType"
+    },
+    "Format": {
+      "type": "string",
+      "enum": [
+        "int64",
+        "double"
+      ],
+      "title": "Format"
+    },
+    "In": {
+      "type": "string",
+      "enum": [
+        "path",
+        "query"
+      ],
+      "title": "In"
+    },
+    "Description": {
+      "type": "string",
+      "enum": [
+        "response"
+      ],
+      "title": "Description"
+    }
+  }
+}

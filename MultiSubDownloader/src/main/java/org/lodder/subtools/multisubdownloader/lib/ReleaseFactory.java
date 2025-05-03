@@ -45,7 +45,7 @@ public class ReleaseFactory {
             if (validate) {
                 releaseControl.process();
             }
-            return releaseControl.videoFile;
+            return releaseControl.release;
 
         } catch (ReleaseParseException | ReleaseControlException e) {
             LOGGER.error("createRelease: " + e.getMessage(), e);

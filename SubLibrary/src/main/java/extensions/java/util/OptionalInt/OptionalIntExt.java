@@ -10,10 +10,12 @@ import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingIntUnaryOperator;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
 
 
 @Extension
 @UtilityClass
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalIntExt {
 
     /**
@@ -46,5 +48,18 @@ public class OptionalIntExt {
 
     public static Integer orElseNull(@This OptionalInt optionalInt) {
         return optionalInt.isPresent() ? optionalInt.getAsInt() : null;
+    }
+
+    public static void ifNotPresent(@This OptionalInt optional, Runnable runnable) {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
+    }
+
+    public static <X extends Throwable> void ifNotPresentThrowing(@This OptionalInt optional,
+        ThrowingRunnable<X> runnable) throws X {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
     }
 }

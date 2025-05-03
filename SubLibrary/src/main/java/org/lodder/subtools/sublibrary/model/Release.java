@@ -19,8 +19,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     @val @Nullable String quality;
     @val @Nullable String releaseGroup;
     @val @Nullable String extension;
-    @var @Nullable Integer tvdbId;
-    @var @Nullable Integer imdbId;
+    @val ReleaseIds releaseIds = new ReleaseIds();
 
     protected Release(String name, VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
         @Nullable String quality, @Nullable String extension) {
@@ -56,9 +55,9 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return StringUtils.isNotBlank(extension) && extension.equals(this.extension);
     }
 
-    public String getImdbIdAsString() {
-        return "tt%07d".formatted(imdbId);
-    }
+//    public String getImdbIdAsString() {
+//        return "tt%07d".formatted(imdbId);
+//    }
 
     @Override
     public String toString() {
@@ -67,5 +66,9 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
 
     public String getReleaseDescription() {
         return fileName;
+    }
+
+    public boolean hasSameId(Release other, ReleaseIdType releaseIdType) {
+        return releaseIds.isEqual(other.releaseIds, releaseIdType);
     }
 }

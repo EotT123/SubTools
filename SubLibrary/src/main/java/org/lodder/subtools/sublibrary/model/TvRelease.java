@@ -8,7 +8,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
+import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 
 public final class TvRelease extends Release {
 
@@ -54,9 +54,14 @@ public final class TvRelease extends Release {
         return "S%02dE%02d".formatted(season, episode);
     }
 
-    public void updateTvdbEpisodeInfo(TheTvdbEpisode tvdbEpisode) {
-        this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
+//    public void updateTvdbEpisodeInfo(TvdbEpisode tvdbEpisode) {
+//        this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
+//    }
+
+    public void updateImdbEpisodeInfo(ImdbDetails tvdbEpisode) {
+        // TODO implement this
     }
+
 
     public int getFirstEpisode() {
         return episodes.first;

@@ -1,12 +1,17 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model;
 
+import java.nio.file.Path;
+
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 public class SubdlSubtitle extends Subtitle {
+
+    private final String url;
 
     public SubdlSubtitle(String url,
         @Nullable String fileName=null,
@@ -17,11 +22,13 @@ public class SubdlSubtitle extends Subtitle {
         @Nullable SubtitleSource subtitleSource=null,
         boolean hearingImpaired=false,
         @Nullable String quality=null) {
-        super(DownloadSource.of(url), fileName, language, releaseGroup, uploader, subtitleMatchType, subtitleSource,
+
+        super(fileName, language, releaseGroup, uploader, subtitleMatchType, subtitleSource,
             hearingImpaired, quality);
+        this.url = url;
     }
 
-    public void download(){
+    public Path download() throws SubtitlesProviderException {
 
     }
 }

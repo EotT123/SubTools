@@ -1,16 +1,13 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
-import java.util.Optional;
-
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseIdType;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
@@ -20,57 +17,56 @@ public final class TvReleaseControl extends ReleaseControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
 
-    private final TheTvdbAdapter jtvdba;
     private final TvRelease tvRelease;
-    @val @override Release videoFile;
+    @val @override Release release;
 
     public TvReleaseControl(TvRelease tvRelease, Settings settings, Manager manager,
-            UserInteractionHandler userInteractionHandler) {
-        super(settings, manager);
+        UserInteractionHandler userInteractionHandler) {
+        super(settings, manager, userInteractionHandler);
         this.tvRelease = tvRelease;
-        this.videoFile = tvRelease;
-        this.jtvdba = TheTvdbAdapter.getInstance(manager, userInteractionHandler);
+        this.release = tvRelease;
     }
 
     @Override
     public void process() throws ReleaseControlException {
         if (StringUtils.isBlank(tvRelease.name)) {
             throw new ReleaseControlException("Unable to extract episode details, check file", tvRelease);
-        } else {
-            LOGGER.debug("process: show name [{}], season [{}], episode [{}]", tvRelease.name, tvRelease.season,
-                tvRelease.episodes);
-            if (tvRelease.special) {
-                processSpecial();
-            } else {
-                processTvdb();
-            }
         }
+        LOGGER.debug("process: serie [{}], season [{}], episode [{}]", tvRelease.name, tvRelease.season,
+                tvRelease.episodes);
+        setImdbId();
+        setTvdbId();
+        processTvdbInfo();
+        processImdbInfo();
     }
 
-    private void processTvdb() throws ReleaseControlException {
-        jtvdba.getSerie(tvRelease.name).useIfPresent(tvdbSerie -> {
-            tvRelease.tvdbId = tvdbSerie.id;
-            tvRelease.imdbId = Optional.ofNullable(tvdbSerie.imdbId).map(id -> Integer.parseInt(id.replaceAll(
-                "[^0-9]", ""))).orElse(null);
-            tvRelease.originalName = tvdbSerie.serieName;
-            jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisode)
-                    .useIfPresent(tvRelease::updateTvdbEpisodeInfo)
-                    .orElseThrow(() -> new ReleaseControlException(
-                        "Season ${tvRelease.season} Episode ${tvRelease.episodes} not found, check file",
-                            tvRelease));
-        }).orElseThrow(() -> new ReleaseControlException("Show not found, check file", tvRelease));
+    private void setImdbId() {
+        release.releaseIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchSerie(release.name)
+            .ifPresent(omdbRelease -> release.releaseIds.add(ReleaseIdType.IMDB, omdbRelease.imdbID)));
+        release.releaseIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
+            .ifPresent(imdbId -> release.releaseIds.add(ReleaseIdType.IMDB, imdbId)));
+        release.releaseIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
+            .ifPresent(serie -> release.releaseIds.add(ReleaseIdType.IMDB, serie.imdbId)));
     }
 
-    private void processSpecial() throws ReleaseControlException {
-        jtvdba.getSerie(tvRelease.name).useIfPresent(tvdbSerie -> {
-            tvRelease.tvdbId = tvdbSerie.id;
-            tvRelease.imdbId = Optional.ofNullable(tvdbSerie.imdbId).map(id -> Integer.parseInt(id.replaceAll(
-                "[^0-9]", ""))).orElse(null);
-            tvRelease.originalName = tvdbSerie.serieName;
-            if (settings.processEpisodeSource == SettingsProcessEpisodeSource.TVDB) {
-                jtvdba.getEpisode(tvdbSerie.id, tvRelease.season, tvRelease.firstEpisode)
-                        .ifPresent(tvRelease::updateTvdbEpisodeInfo);
-            }
-        }).orElseThrow(() -> new ReleaseControlException("Show not found, check file", tvRelease));
+    private void setTvdbId() {
+        release.releaseIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
+            .ifPresent(serie -> release.releaseIds.add(ReleaseIdType.TVDB, serie.id)));
+        // TODO enable this, also use imdbId if present
+//        release.releaseIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
+//            .ifPresent(imdbDetails -> release.releaseIds.add(ReleaseIdType.TVDB, imdbDetails.tvdbId)));
+    }
+
+    private void processTvdbInfo() {
+        release.releaseIds.getTvdbId().ifPresent(
+            tvdbId -> tvdbAdapter.searchEpisode(tvdbId, tvRelease.season, tvRelease.firstEpisode)
+                .ifPresent(episode -> tvRelease.title = episode.episodeName));
+    }
+
+    private void processImdbInfo() {
+        // TODO implement this
+//        release.releaseIds.getImdbId().ifPresent(
+//            imdbId -> imdbAdapter.getSerieDetails(imdbId)
+//                .ifPresent(tvRelease::updateImdbEpisodeInfo));
     }
 }

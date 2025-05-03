@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
@@ -26,7 +27,8 @@ record ImdbSearchIdApi(Manager manager) {
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
     public Set<ProviderSerieId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-imdb-$title-$year")
+        return manager.getCache(CacheType.MEMORY,
+                new CacheKeyBuilder("IMDB", "imdbid-imdb").add("title", title).add("year", year))
             .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("https://www.imdb.com/find?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
@@ -47,7 +49,8 @@ record ImdbSearchIdApi(Manager manager) {
     }
 
     public Set<ProviderSerieId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-yahoo-$title-$year")
+        return manager.getCache(CacheType.MEMORY,
+                new CacheKeyBuilder("IMDB", "imdbid-yahoo").add("title", title).add("year", year))
             .getCollection(() -> {
                 StringBuilder sb =
                     new StringBuilder("http://search.yahoo.com/search;_ylt=A1f4cfvx9C1I1qQAACVjAQx.?p=");
@@ -75,7 +78,8 @@ record ImdbSearchIdApi(Manager manager) {
     }
 
     public Set<ProviderSerieId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY, "IMDB-imdbid-google-$title-$year")
+        return manager.getCache(CacheType.MEMORY,
+                new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
             .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("http://www.google.com/search?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
@@ -108,7 +112,7 @@ record ImdbSearchIdApi(Manager manager) {
                 String href = toHrefMapper.apply(element);
                 Matcher matcher = IMDB_URL_ID_PATTERN.matcher(href);
                 if (matcher.find()) {
-                    set.add(new ProviderSerieId(name, matcher.group().replace("/title/tt", "")));
+                    set.add(new ProviderSerieId(name, matcher.group().replace("/title/tt", "tt")));
                 }
             }));
     }

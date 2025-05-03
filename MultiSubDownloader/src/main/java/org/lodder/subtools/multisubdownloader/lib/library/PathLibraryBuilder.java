@@ -9,7 +9,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStr
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
+import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -24,7 +24,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
     private final boolean move;
 
     public PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        @Nullable TheTvdbAdapter tvdbAdapter=null, Path libraryFolder, boolean move) {
+        @Nullable TvdbAdapter tvdbAdapter=null, Path libraryFolder, boolean move) {
         super(tvdbAdapter);
         this.structure = structure;
         this.replaceSpace = replaceSpace;
@@ -39,7 +39,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
             structure:libSettings.folderStructure,
             replaceSpace:libSettings.folderReplaceSpace,
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
-            tvdbAdapter:libSettings.useTVDBNaming ? TheTvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            tvdbAdapter:libSettings.useTVDBNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
             libraryFolder:libSettings.folder,
             move:libSettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVE_AND_RENAME));
     }

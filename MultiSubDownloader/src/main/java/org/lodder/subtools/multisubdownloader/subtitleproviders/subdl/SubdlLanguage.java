@@ -79,7 +79,11 @@ public enum SubdlLanguage {
         this.langCode = langCode;
     }
 
-    public static SubdlLanguage fromLanguage(Language language) {
+    public static SubdlLanguage of(Language language) {
         return SubdlLanguage.values().stream().filter(l -> l.language == language).findFirst().orElse(null);
     }
+
+    public static SubdlLanguage of(String langCode) {
+        return SubdlLanguage.values().stream().filter(l -> l.langCode.equals(langCode)).findFirst().orElse(null);
     }
+}

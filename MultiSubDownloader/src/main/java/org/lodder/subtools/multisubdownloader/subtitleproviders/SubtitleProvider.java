@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -13,20 +12,21 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.LoggerFactory;
 
-public interface SubtitleProvider {
+public interface SubtitleProvider<SUB extends Subtitle> {
 
     @val Manager manager;
-    @val Settings settings;
-    @val SubtitleSource subtitleSource;
-    @val String providerName;
-    @val String name = subtitleSource.name;
+    //    @val SubtitleSource subtitleSource;
+    //    @val String providerName;
+    @val SubtitleSource source;
+    @val String name = source.name;
 
-    Set<Subtitle> searchSubtitles(TvRelease tvRelease, Language language);
+    Set<SUB> searchSubtitles(TvRelease tvRelease, Language language);
 
-    Set<Subtitle> searchSubtitles(MovieRelease movieRelease, Language language);
+    Set<SUB> searchSubtitles(MovieRelease movieRelease, Language language);
 
     /**
      * Starts a search for subtitles
@@ -35,7 +35,7 @@ public interface SubtitleProvider {
      * @param language The language of the desired subtitles
      * @return The found subtitles
      */
-    default Set<Subtitle> search(Release release, Language language) {
+    default Set<SUB> search(Release release, Language language) {
         try {
             return switch (release) {
                 case MovieRelease movieRelease -> this.searchSubtitles(movieRelease, language);
@@ -49,8 +49,10 @@ public interface SubtitleProvider {
     }
 
     default void clearCache() {
-        manager.getCache(CacheType.DISK, k -> k.startsWith(providerName + "-")).clearExpiredCache();
+        manager.getCache(CacheType.DISK, k -> k.startsWith(source + "-")).clearExpiredCache();
     }
+
+    <X extends Exception> Optional<MovieMapping> getProviderMovieId(MovieRelease movieRelease) throws X;
 
     <X extends Exception> Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X;
 }

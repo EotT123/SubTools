@@ -32,7 +32,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
-import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ProviderSerieId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -46,6 +45,7 @@ public class SubsceneApi implements SubtitleApi {
     private static final String DOMAIN = "https://subscene.com";
     private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
 
+
     private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
         case HttpClientException httpClientException ->
             httpClientException.responseCode == 409 || httpClientException.responseCode == 429;
@@ -53,12 +53,12 @@ public class SubsceneApi implements SubtitleApi {
         default -> false;
     };
 
-    private final Manager manager;
+    @val @override Manager manager;
+    @val @override SubtitleSource source = SubtitleSource.SUBSCENE;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 
     private Time lastRequest = Time.now();
-    @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
 
     public SubsceneApi(Manager manager) {
 //        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
@@ -71,7 +71,7 @@ public class SubsceneApi implements SubtitleApi {
      * @return a {@link Map} containing a list of {@link ProviderSerieId provider serie ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public Map<String, List<SubSceneSerieId>> getSubSceneSerieNames(String serieName) throws SubsceneException {
+    public Map<String, List<SubSceneSerieId>> getSerieNames(String serieName) throws SubsceneException {
         try {
             if (StringUtils.isBlank(serieName)) {
                 return Map.of();
@@ -94,14 +94,14 @@ public class SubsceneApi implements SubtitleApi {
         }
     }
 
-    public List<SubsceneSubtitleMetadata> getSubtitles(SerieMapping providerSerieId, int season, int episode,
+    public List<SubsceneSubtitleMetadata> getSubtitles(SerieMapping providerId, int season, int episode,
         Language language) throws SubsceneException {
-        return manager.getCache(CacheType.MEMORY, "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name,
-                providerSerieId.providerId, season, episode, language))
+        return getCache("subtitles",
+            b -> b.add("providerId", providerId.providerId).add("season", season).add("episode", episode))
             .getCollection(() -> {
                 setLanguageWithCookie(language);
                 try {
-                    return getJsoupDocument(DOMAIN + providerSerieId.providerId)
+                    return getJsoupDocument(DOMAIN + providerId.providerId)
                         .selectAllByCss("td.a1")
                         .stream()
                         .map(el -> (Element) el.parent())
@@ -117,8 +117,12 @@ public class SubsceneApi implements SubtitleApi {
                             return new SubsceneSubtitleMetadata(lang, name, hearingImpaired, uploader, comment,
                                 urlSupplier);
                         })
-                        .filter(subMetadata -> subMetadata.seasonEpisode != null &&
-                            subMetadata.seasonEpisode.containsEpisode(episode))
+                        .filter(metadata -> metadata.seasonEpisode != null &&
+                            metadata.seasonEpisode.containsEpisode(episode))
+                        // TODO is this needed?
+                        .filter(metadata -> metadata.language == language)
+                        // TODO is this needed
+                        .filter(sub -> sub.name.contains("S%02dE%02d".formatted(season, episode)))
                         .toList();
                 } catch (Exception e) {
                     throw new SubsceneException(e);

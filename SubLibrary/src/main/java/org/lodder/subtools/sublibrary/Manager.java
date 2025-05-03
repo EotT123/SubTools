@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,7 @@ import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.DiskCache;
 import org.lodder.subtools.sublibrary.cache.InMemoryCache;
+import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.Nothing;
 import org.lodder.subtools.sublibrary.util.Sleep;
 import org.lodder.subtools.sublibrary.util.http.CookieManager;
@@ -216,6 +218,10 @@ public class Manager {
             return manager.getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
         }
 
+        public boolean isNotPresent() {
+            return !isPresent();
+        }
+
         public boolean isExpiredTemporary() {
             return manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryExpired(key)).orElse(false);
         }
@@ -363,8 +369,8 @@ public class Manager {
         };
     }
 
-    public CacheKey getCache(CacheType cacheType, String key) {
-        return new CacheKey(this, cacheType, key);
+    public CacheKey getCache(CacheType cacheType, CacheKeyBuilder cacheKeyBuilder) {
+        return new CacheKey(this, cacheType, cacheKeyBuilder.build());
     }
 
     public CacheKeyFilter getCache(CacheType cacheType, Predicate<String> keyFilter) {
@@ -409,6 +415,34 @@ public class Manager {
         public V getValue(Retry retry) throws X {
             return supplier.apply(retry);
         }
+    }
+
+    public static class CacheKeyBuilder {
+        @val String source;
+        @val String operation;
+        private final Map<String, Object> extraParams = new LinkedHashMap<>();
+
+        public CacheKeyBuilder(SubtitleSource source, String operation) {
+            this(source.name, operation);
+        }
+
+        public CacheKeyBuilder(String source, String operation) {
+            this.source = source;
+            this.operation = operation;
+        }
+
+        public CacheKeyBuilder add(String name, Object value) {
+            extraParams.put(name, value);
+            return this;
+        }
+
+        public String build() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(source).append("-").append(operation);
+            extraParams.entrySet().forEach(entry -> sb.append("-").append(entry.key).append(":").append(entry.value));
+            return sb.toString().toLowerCase();
+        }
+
     }
 
     // ############## \\

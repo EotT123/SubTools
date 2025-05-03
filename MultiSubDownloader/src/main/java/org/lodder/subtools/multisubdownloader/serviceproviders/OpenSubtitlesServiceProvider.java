@@ -9,7 +9,7 @@ import org.lodder.subtools.multisubdownloader.framework.service.providers.Servic
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JOpenSubAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 
 public class OpenSubtitlesServiceProvider implements ServiceProvider {
@@ -48,7 +48,7 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
                 credentials = new Credentials(username, password);
             }
         }
-        return new JOpenSubAdapter(app.makeManager(), credentials, userInteractionHandler);
+        return new OpenSubAdapter(app.makeManager(), credentials, userInteractionHandler);
     }
 
     private void registerListener(SubtitleProviderStore subtitleProviderStore,

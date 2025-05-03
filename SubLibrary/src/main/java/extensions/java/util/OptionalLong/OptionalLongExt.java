@@ -9,9 +9,11 @@ import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingLongUnaryOperator;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
 
 @Extension
 @UtilityClass
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalLongExt {
 
     /**
@@ -46,5 +48,19 @@ public class OptionalLongExt {
     public static <T, X extends Exception> Optional<T> mapToObj(@This OptionalLong optional,
             ThrowingFunction<Long, T, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsLong())) : Optional.empty();
+    }
+
+
+    public static void ifNotPresent(@This OptionalLong optional, Runnable runnable) {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
+    }
+
+    public static <X extends Throwable> void ifNotPresentThrowing(@This OptionalLong optional,
+        ThrowingRunnable<X> runnable) throws X {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
     }
 }

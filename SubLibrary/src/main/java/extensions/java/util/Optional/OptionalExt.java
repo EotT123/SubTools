@@ -9,6 +9,7 @@ import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import name.falgout.jeffrey.throwing.ThrowingToIntFunction;
 
@@ -38,6 +39,11 @@ public class OptionalExt {
         return optional.isPresent() ? OptionalInt.of(mapper.applyAsInt(optional.get())) : OptionalInt.empty();
     }
 
+    public static <T, X extends Exception> Optional<T> orElseMap(@This Optional<T> optional,
+        ThrowingSupplier<Optional<T>, X> supplier) throws X {
+        return optional.isPresent() ? optional : supplier.get();
+    }
+
     public static <T, X extends Exception> @Self Optional<T> useIfPresent(@This Optional<T> optional,
             ThrowingConsumer<T, X> consumer) throws X {
         if (optional.isPresent()) {
@@ -49,6 +55,19 @@ public class OptionalExt {
     public static <T, X extends Throwable> T orElseGetThrowing(@This Optional<T> optional,
         ThrowingSupplier<T, X> supplier) throws X {
         return optional.isPresent() ? optional.get() : supplier.get();
+    }
+
+    public static <T> void ifNotPresent(@This Optional<T> optional, Runnable runnable) {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
+    }
+
+    public static <T, X extends Throwable> void ifNotPresentThrowing(@This Optional<T> optional,
+        ThrowingRunnable<X> runnable) throws X {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
     }
 
 }
