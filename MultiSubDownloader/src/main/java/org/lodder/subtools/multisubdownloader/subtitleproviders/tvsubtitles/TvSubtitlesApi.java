@@ -25,6 +25,9 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.CookieManager;
 
+/**
+ * Api for retrieving serie information from tvsubtitles.net
+ */
 public class TvSubtitlesApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
@@ -36,7 +39,7 @@ public class TvSubtitlesApi implements SubtitleApi {
     }
 
     public List<ProviderId> getProviderIds(String serieName) throws TvSubtitleException {
-        return getCache("providerIds", b -> b.add("serieName", serieName))
+        return getCache("providerIds", b -> b.add("name", serieName))
             .getCollection(() -> {
                 try {
                     return manager.postBuilder("$DOMAIN/search.php")

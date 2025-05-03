@@ -48,8 +48,8 @@ public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, S
     }
 
     @Override
-    public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithId(int tvdbId,
-        Language language) throws SubdlException {
+    public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
+        throws SubdlException {
         return api.searchSubtitles().imdbId(tvdbId).language(language).searchSubtitles().getData();
     }
 

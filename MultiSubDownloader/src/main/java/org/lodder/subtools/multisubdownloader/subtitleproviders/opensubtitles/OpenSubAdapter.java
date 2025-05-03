@@ -62,7 +62,7 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(int tvdbId, Language language)
+    public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws OpenSubtitleException {
         return api.searchSubtitles(imdbId:tvdbId, language:language);
     }
@@ -126,8 +126,7 @@ public final class OpenSubAdapter
 
     @Override
     public List<OpensubtitleId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season)
-        throws OpenSubtitleException {
+        @Nullable Integer season) throws OpenSubtitleException {
         return api.getProviderSerieIds(serieName)
             .stream()
             .sorted(

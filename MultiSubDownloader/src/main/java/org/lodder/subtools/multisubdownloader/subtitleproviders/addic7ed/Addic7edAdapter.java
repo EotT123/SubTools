@@ -53,7 +53,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     }
 
     @Override
-    public List<Addic7edSubtitle> searchMovieSubtitlesWithId(int tvdbId, Language language) {
+    public List<Addic7edSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) {
         // TODO implement this
         return List.of();
     }
@@ -78,8 +78,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
 
     @Override
     public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season)
-        throws Addic7edException {
+        @Nullable Integer season) throws Addic7edException {
         return api.getProviderId(serieName)
             .stream()
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")

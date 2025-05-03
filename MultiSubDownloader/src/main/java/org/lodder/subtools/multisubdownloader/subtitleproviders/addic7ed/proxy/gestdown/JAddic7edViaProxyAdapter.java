@@ -50,7 +50,8 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(int tvdbId, Language language)
+    public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds,
+        Language language)
         throws ApiException {
         // TODO implement this
         return List.of();
@@ -76,8 +77,7 @@ public final class JAddic7edViaProxyAdapter extends
 
     @Override
     public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season)
-        throws ApiException {
+        @Nullable Integer season) throws ApiException {
         List<ProviderId> serieIds = providerIds.getTvdbId()
             .mapToObjThrowing(tvdbId ->
                 new ExecuteCall<>(() -> api.getProviderId(tvdbId))

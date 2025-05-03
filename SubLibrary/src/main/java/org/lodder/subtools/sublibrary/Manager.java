@@ -436,6 +436,12 @@ public class Manager {
             return this;
         }
 
+        public CacheKeyBuilder add(Map<String, Object> params) {
+            params.entrySet().stream().sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> add(entry.getKey(), entry.getValue()));
+            return this;
+        }
+
         public String build() {
             StringBuilder sb = new StringBuilder();
             sb.append(source).append("-").append(operation);

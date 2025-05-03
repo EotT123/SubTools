@@ -22,6 +22,7 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,41 +47,56 @@ public final class TvSubtitlesAdapter
         }
     }
 
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
     @Override
     public List<TVSubtitlesSubtitleMetadata> searchMovieSubtitlesWithHash(String hash, Language language) {
-        // TODO implement this
+        // no movie information available for provider
         return List.of();
     }
 
     @Override
-    public List<TVSubtitlesSubtitleMetadata> searchMovieSubtitlesWithId(int tvdbId, Language language) {
-        // TODO implement this
+    public List<TVSubtitlesSubtitleMetadata> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) {
+        // no movie information available for provider
         return List.of();
     }
 
     @Override
     public Collection<TVSubtitlesSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) {
-        // TODO implement this
+        // no movie information available for provider
         return List.of();
     }
+
+    @Override
+    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(MovieMapping movieMapping, int season, int episode,
+        Language language) throws TvSubtitleException {
+        // no movie information available for provider
+        return List.of();
+    }
+
+    @Override
+    public List<ProviderId> getSortedMovieProviderIds(ProviderIds providerIds, String title,
+        @Nullable Integer year) throws TvSubtitleException {
+        // no movie information available for provider
+        return List.of();
+    }
+
+    @Override
+    public String providerMovieIdToDisplayString(ProviderId providerId) {
+        return providerId.name;
+    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
 
     @Override
     public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
         Language language) throws TvSubtitleException {
         return api.getSubtitles(serieMapping.providerId, season, episode, language);
-    }
-
-    @Override
-    public TvSubtiltesSubtitle convertToSubtitle(TVSubtitlesSubtitleMetadata sub) {
-        return new TvSubtiltesSubtitle(
-            url:sub.url,
-            subtitleSource:source,
-            fileName:sub.filename,
-            language:sub.language,
-            quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.source),
-            subtitleMatchType:SubtitleMatchType.EVERYTHING,
-            releaseGroup:sub.releaseGroup);
     }
 
     @Override
@@ -104,5 +120,21 @@ public final class TvSubtitlesAdapter
     @Override
     public String providerSerieIdToDisplayString(ProviderId providerId) {
         return providerId.name;
+    }
+
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    @Override
+    public TvSubtiltesSubtitle convertToSubtitle(TVSubtitlesSubtitleMetadata sub) {
+        return new TvSubtiltesSubtitle(
+            url:sub.url,
+            subtitleSource:source,
+            fileName:sub.filename,
+            language:sub.language,
+            quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.source),
+            subtitleMatchType:SubtitleMatchType.EVERYTHING,
+            releaseGroup:sub.releaseGroup);
     }
 }

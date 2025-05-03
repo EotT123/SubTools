@@ -9,6 +9,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,8 @@ import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneMovieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -41,9 +44,10 @@ public class SubsceneApi implements SubtitleApi {
 
     private static final Time RATE_DURATION_SHORT = 1 Second;
     private static final Time RATE_DURATION_LONG = 5 Second;
-    private static final String DOMAIN = "https://subscene.com";
-    private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
-
+    private static final String DOMAIN = "https://sub-scene.com";
+    private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
+    private static final Pattern SERIE_NAME_PATTERN =
+        Pattern.compile("(?<name>.*?) - (?<seasonName>[A-Z][a-z]*) Season.*");
 
     private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
         case HttpClientException httpClientException ->
@@ -65,32 +69,47 @@ public class SubsceneApi implements SubtitleApi {
         addCookie("ForeignOnly", "False");
     }
 
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
     /**
-     * @param serieName the serie name
+     * @param title the movie title
      * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public Map<String, List<SubSceneId>> getSerieNames(String serieName) throws SubsceneException {
-        try {
-            if (StringUtils.isBlank(serieName)) {
-                return Map.of();
+    public Map<String, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
+        return getProviderIds(title, elem -> {
+            Matcher matcher = MOVIE_NAME_PATTERN.matcher(elem.text());
+            if (matcher.matches()) {
+                String _title = matcher.group("title");
+                int _year = Integer.parseInt(matcher.group("year"));
+                return new SubSceneMovieId(elem.text(), elem.attr("href"), _title, _year);
             }
-            String url = "$DOMAIN/subtitles/searchbytitle?query=" + serieName.urlEncode();
-            return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
-                .stream()
-                .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
-                    titleElement.nextElementSibling().selectAllByTag("a").stream().map(elem -> {
-                        Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
-                        int season = 0;
-                        if (matcher.matches()) {
-                            season = OrdinalNumber.optionalFromValue(matcher.group(1))
-                                .mapToInt(OrdinalNumber::getNumber).orElse(-1);
-                        }
-                        return new SubSceneId(elem.text(), elem.attr("href"), season);
-                    }).toList())));
-        } catch (Exception e) {
-            throw new SubsceneException(e);
-        }
+            return new SubSceneMovieId(elem.text(), elem.attr("href"));
+        });
+    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
+
+    /**
+     * @param serieName the name of the serie
+     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
+     * @throws SubsceneException SubsceneException
+     */
+    public Map<String, List<SubSceneSerieId>> getSerieProviderIds(String serieName) throws SubsceneException {
+        return getProviderIds(serieName, elem -> {
+            Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
+            if (matcher.matches()) {
+                String name = matcher.group("name");
+                Integer season = OrdinalNumber.optionalFromValue(matcher.group("seasonName"))
+                    .map(OrdinalNumber::getNumber).orElse(null);
+                return new SubSceneSerieId(elem.text(), elem.attr("href"), name, season);
+            }
+            return new SubSceneSerieId(elem.text(), elem.attr("href"));
+        });
     }
 
     public List<SubsceneSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
@@ -127,6 +146,33 @@ public class SubsceneApi implements SubtitleApi {
                     throw new SubsceneException(e);
                 }
             });
+    }
+
+
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    /**
+     * @param name the release name
+     * @param <S> the type of the {@link SubSceneId} contained in the {@link Map}
+     * @return a {@link Map} containing a list of {@link ProviderId provider release ids} per type
+     * @throws SubsceneException SubsceneException
+     */
+    public <S extends SubSceneId> Map<String, List<S>> getProviderIds(String name,
+        Function<Element, S> subsceneIdCreator) throws SubsceneException {
+        try {
+            if (StringUtils.isBlank(name)) {
+                return Map.of();
+            }
+            String url = "$DOMAIN/subtitles/searchbytitle?query=" + name.urlEncode();
+            return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
+                .stream()
+                .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
+                    titleElement.nextElementSibling().selectAllByTag("a").stream().map(subsceneIdCreator).toList())));
+        } catch (Exception e) {
+            throw new SubsceneException(e);
+        }
     }
 
     private String getDownloadUrl(String seriePageUrl) throws SubsceneException {

@@ -45,7 +45,7 @@ public final class PodnapisiAdapter
     }
 
     @Override
-    public List<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithId(int tvdbId, Language language) {
+    public List<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) {
         return List.of();
     }
 
@@ -78,8 +78,7 @@ public final class PodnapisiAdapter
 
     @Override
     public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season)
-        throws PodnapisiException {
+        @Nullable Integer season) throws PodnapisiException {
         return api.getProviderId(serieName).stream().toList();
     }
 
