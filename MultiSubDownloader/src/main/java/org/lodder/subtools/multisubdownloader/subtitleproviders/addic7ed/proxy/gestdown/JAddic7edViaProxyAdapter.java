@@ -21,7 +21,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 public final class JAddic7edViaProxyAdapter extends
-    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, ProviderSerieId, ApiException> {
+    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, ProviderId, ApiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edViaProxyAdapter.class);
 
@@ -87,9 +87,9 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<ProviderId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws ApiException {
-        List<ProviderSerieId> serieIds = tvdbId == null ? List.of() :
+        List<ProviderId> serieIds = tvdbId == null ? List.of() :
             new ExecuteCall<>(() -> api.getProviderId(tvdbId))
                 .message("getProviderSerieName: [$tvdbId]")
                 .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
@@ -121,8 +121,8 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
-    public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.name;
+    public String providerSerieIdToDisplayString(ProviderId providerId) {
+        return providerId.name;
     }
 
     @Getter

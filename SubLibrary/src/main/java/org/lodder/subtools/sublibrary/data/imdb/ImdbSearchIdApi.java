@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import util.Utils;
 
@@ -26,7 +26,7 @@ record ImdbSearchIdApi(Manager manager) {
 
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
-    public Set<ProviderSerieId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ProviderId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-imdb").add("title", title).add("year", year))
             .getCollection(() -> {
@@ -48,7 +48,7 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ProviderSerieId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ProviderId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-yahoo").add("title", title).add("year", year))
             .getCollection(() -> {
@@ -77,7 +77,7 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ProviderSerieId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ProviderId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
             .getCollection(() -> {
@@ -101,7 +101,7 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    private Set<ProviderSerieId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,
+    private Set<ProviderId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,
         Function<Element, String> toHrefMapper) {
         return searchResults.stream().collect(Utils.setCollector(
             (set, element) -> {
@@ -112,7 +112,7 @@ record ImdbSearchIdApi(Manager manager) {
                 String href = toHrefMapper.apply(element);
                 Matcher matcher = IMDB_URL_ID_PATTERN.matcher(href);
                 if (matcher.find()) {
-                    set.add(new ProviderSerieId(name, matcher.group().replace("/title/tt", "tt")));
+                    set.add(new ProviderId(name, matcher.group().replace("/title/tt", "tt")));
                 }
             }));
     }

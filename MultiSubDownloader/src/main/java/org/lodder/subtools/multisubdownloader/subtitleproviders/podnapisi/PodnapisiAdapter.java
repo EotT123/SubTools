@@ -18,7 +18,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class PodnapisiAdapter
-    extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderSerieId, PodnapisiException> {
+    extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PodnapisiAdapter.class);
 
@@ -89,13 +89,13 @@ public final class PodnapisiAdapter
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<ProviderId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws PodnapisiException {
         return api.getProviderId(serieName).stream().toList();
     }
 
     @Override
-    public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.name;
+    public String providerSerieIdToDisplayString(ProviderId providerId) {
+        return providerId.name;
     }
 }

@@ -27,7 +27,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -65,23 +65,23 @@ public class Addic7edApi implements SubtitleApi {
         }
     }
 
-    public List<ProviderSerieId> getProviderId(String serieName) throws Addic7edException {
+    public List<ProviderId> getProviderId(String serieName) throws Addic7edException {
         if (StringUtils.isBlank(serieName)) {
             return List.of();
         }
         return getCache("providerId", b -> b.add("serieName", serieName)).getCollection(() -> {
             try {
-                List<ProviderSerieId> providerSerieIds =
+                List<ProviderId> providerIds =
                     getContent("$DOMAIN/allshows/" + serieName.split(" ")[0]).selectAllByCss("table.tabel90 td a")
-                        .stream().map(elem -> new ProviderSerieId(elem.text(), elem.attr("href").split("/")[2]))
+                        .stream().map(elem -> new ProviderId(elem.text(), elem.attr("href").split("/")[2]))
                         .toList();
                 String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
-                List<ProviderSerieId> providerSerieIdsFormatted = providerSerieIds.stream().filter(providerId -> {
+                List<ProviderId> providerIdsFormatted = providerIds.stream().filter(providerId -> {
                     String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
                     return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
                         StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
                 }).toList();
-                return !providerSerieIdsFormatted.isEmpty() ? providerSerieIdsFormatted : providerSerieIds;
+                return !providerIdsFormatted.isEmpty() ? providerIdsFormatted : providerIds;
             } catch (Exception e) {
                 throw new Addic7edException(e);
             }

@@ -25,14 +25,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
@@ -68,10 +68,10 @@ public class SubsceneApi implements SubtitleApi {
 
     /**
      * @param serieName the serie name
-     * @return a {@link Map} containing a list of {@link ProviderSerieId provider serie ids} per type
+     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public Map<String, List<SubSceneSerieId>> getSerieNames(String serieName) throws SubsceneException {
+    public Map<String, List<SubSceneId>> getSerieNames(String serieName) throws SubsceneException {
         try {
             if (StringUtils.isBlank(serieName)) {
                 return Map.of();
@@ -87,7 +87,7 @@ public class SubsceneApi implements SubtitleApi {
                             season = OrdinalNumber.optionalFromValue(matcher.group(1))
                                 .mapToInt(OrdinalNumber::getNumber).orElse(-1);
                         }
-                        return new SubSceneSerieId(elem.text(), elem.attr("href"), season);
+                        return new SubSceneId(elem.text(), elem.attr("href"), season);
                     }).toList())));
         } catch (Exception e) {
             throw new SubsceneException(e);

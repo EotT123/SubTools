@@ -27,7 +27,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
@@ -44,12 +44,12 @@ public class PodnapisiApi implements SubtitleApi {
         this.userAgent = userAgent;
     }
 
-    public Optional<ProviderSerieId> getProviderId(String name) throws PodnapisiException {
+    public Optional<ProviderId> getProviderId(String name) throws PodnapisiException {
         return getCache("providerId", b -> b.add("name", name))
             .getOptional(() -> {
                 String url = DOMAIN + "/sl/ppodnapisi/search?sK=" + name.trim().toLowerCase().urlEncode();
                 return getXml(url).selectFirstByClass("subtitle-entry") != null ?
-                    Optional.of(new ProviderSerieId(name, name)) : Optional.empty();
+                    Optional.of(new ProviderId(name, name)) : Optional.empty();
             });
     }
 

@@ -9,7 +9,7 @@ import manifold.ext.props.rt.api.val;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ProviderSerieId implements Serializable {
+public class ProviderId implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -120703658294502220L;

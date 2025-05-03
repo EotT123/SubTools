@@ -20,14 +20,12 @@ import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
-import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ReleaseIds;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -42,19 +40,19 @@ import org.slf4j.LoggerFactory;
 /**
  * @param <API_SUB> type of the subtitle objects returned by the api
  * @param <SUB> type of the converted subtitle objects
- * @param <S_ID> type of the ProviderSerieId
+ * @param <S_ID> type of the ProviderId
  * @param <X> type of the exception thrown by the api
  */
 @ExtensionMethod({Files.class})
-public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends ProviderSerieId, X extends Exception> extends
+public interface SubtitleAdapterIntf<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception> extends
     SubtitleProvider<SUB> {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapterIntf.class);
 
-    default UserInteractionSettingsIntf getUserInteractionSettings() {
-        return getUserInteractionHandler().settings;
-    }
+//    default UserInteractionSettingsIntf getUserInteractionSettings() {
+//        return getUserInteractionHandler().settings;
+//    }
 
-    UserInteractionHandler getUserInteractionHandler();
+//    UserInteractionHandler getUserInteractionHandler();
 
     @Override
     default Set<SUB> searchSubtitles(MovieRelease movieRelease, Language language) {

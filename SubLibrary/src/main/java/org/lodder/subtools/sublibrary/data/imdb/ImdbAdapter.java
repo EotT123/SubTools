@@ -12,7 +12,7 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbException;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
@@ -83,31 +83,31 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     private Optional<String> getImdbIdCommon(String title, @Nullable Integer year,
-        ThrowingBiFunction<String, Integer, Collection<ProviderSerieId>, ImdbSearchIdException> providerSerieIdSupplier) {
-        Collection<ProviderSerieId> providerSerieIds;
+        ThrowingBiFunction<String, Integer, Collection<ProviderId>, ImdbSearchIdException> providerSerieIdSupplier) {
+        Collection<ProviderId> providerIds;
         try {
-            providerSerieIds = providerSerieIdSupplier.apply(title, year);
+            providerIds = providerSerieIdSupplier.apply(title, year);
         } catch (ImdbSearchIdException e) {
             LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(provider, title, year,
                 e.getMessage()), e);
             return Optional.empty();
         }
-        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerSerieIds.size() == 1) {
+        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerIds.size() == 1) {
             // found single exact match
-            return Optional.of(providerSerieIds.iterator().next().id);
+            return Optional.of(providerIds.iterator().next().id);
         }
         String formattedTitle = title.replaceAll("[^A-Za-z]", "");
         return userInteractionHandler
             .selectFromList(
-                providerSerieIds.stream().sorted(Comparator
-                        .comparing((ProviderSerieId providerSerieId) -> providerSerieId.name.replaceAll(
+                providerIds.stream().sorted(Comparator
+                        .comparing((ProviderId providerId) -> providerId.name.replaceAll(
                                 "[^A-Za-z]", "")
                             .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
-                        .thenComparing(ProviderSerieId::getName))
+                        .thenComparing(ProviderId::getName))
                     .toList(),
                 getText("Prompter.SelectImdbMatchForSerie", title),
                 provider,
-                ProviderSerieId::getName)
+                ProviderId::getName)
             .map(providerSerieId -> providerSerieId.id);
     }
 

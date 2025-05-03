@@ -19,7 +19,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -38,16 +38,16 @@ public class JAddic7edProxyGestdownApi implements SubtitleApi {
         this.manager = manager;
     }
 
-    public List<ProviderSerieId> getProviderId(String name) throws ApiException {
+    public List<ProviderId> getProviderId(String name) throws ApiException {
         return getCache("providerId", b -> b.add("name", name))
             .getCollection(() -> tvShowsApi.showsSearchSearchGet(name).getShows().stream()
-                .map(showDto -> new ProviderSerieId(showDto.getName(), showDto.getId().toString())).toList());
+                .map(showDto -> new ProviderId(showDto.getName(), showDto.getId().toString())).toList());
     }
 
-    public List<ProviderSerieId> getProviderId(int tvdbId) throws ApiException {
+    public List<ProviderId> getProviderId(int tvdbId) throws ApiException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
             .getCollection(() -> tvShowsApi.showsExternalTvdbTvdbIdGet(tvdbId).getShows().stream()
-                .map(showDto -> new ProviderSerieId(showDto.getName(), showDto.getId().toString())).toList());
+                .map(showDto -> new ProviderId(showDto.getName(), showDto.getId().toString())).toList());
     }
 
     public Set<Addic7edProxyGestdownSubtitle> getSubtitles(SerieMapping providerId, int season, int episode,

@@ -18,7 +18,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpenSubtilteSubtitle;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleId;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 public final class OpenSubAdapter
-    extends SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleSerieId,
+    extends SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId,
     OpenSubtitleException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenSubAdapter.class);
@@ -137,19 +137,19 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public List<OpensubtitleSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<OpensubtitleId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws OpenSubtitleException {
         return api.getProviderSerieIds(serieName)
             .stream()
             .sorted(
-                Comparator.comparing((OpensubtitleSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                Comparator.comparing((OpensubtitleId n) -> !serieName.replaceAll("[^A-Za-z]", "")
                         .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                    .thenComparing(OpensubtitleSerieId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
+                    .thenComparing(OpensubtitleId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
             .toList();
     }
 
     @Override
-    public String providerSerieIdToDisplayString(OpensubtitleSerieId providerSerieId) {
+    public String providerSerieIdToDisplayString(OpensubtitleId providerSerieId) {
         return "${providerSerieId.name} (${providerSerieId.year})";
     }
 }

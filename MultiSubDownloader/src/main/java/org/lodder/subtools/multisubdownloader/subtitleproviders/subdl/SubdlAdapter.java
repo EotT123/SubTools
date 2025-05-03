@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.SubdlException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSerieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId,
+public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlId,
     SubdlException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubdlAdapter.class);
@@ -94,16 +94,16 @@ public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, S
     }
 
     @Override
-    public List<SubdlSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<SubdlId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws SubdlException {
         return api.getProviderIds(imdbId, serieName).stream().sorted(Comparator.comparing(
-                (SubdlSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                (SubdlId n) -> !serieName.replaceAll("[^A-Za-z]", "")
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-            .thenComparing(SubdlSerieId::getYear, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
+            .thenComparing(SubdlId::getYear, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
     }
 
     @Override
-    public String providerSerieIdToDisplayString(SubdlSerieId SubdlSerieId) {
+    public String providerSerieIdToDisplayString(SubdlId SubdlSerieId) {
         return "${SubdlSerieId.name} (${SubdlSerieId.year} - ${SubdlSerieId.releaseType})";
     }
 }

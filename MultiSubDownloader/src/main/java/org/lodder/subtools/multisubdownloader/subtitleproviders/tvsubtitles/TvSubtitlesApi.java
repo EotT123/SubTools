@@ -20,7 +20,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.CookieManager;
@@ -35,7 +35,7 @@ public class TvSubtitlesApi implements SubtitleApi {
         this.manager = manager;
     }
 
-    public List<ProviderSerieId> getProviderIds(String serieName) throws TvSubtitleException {
+    public List<ProviderId> getProviderIds(String serieName) throws TvSubtitleException {
         return getCache("providerIds", b -> b.add("serieName", serieName))
             .getCollection(() -> {
                 try {
@@ -44,7 +44,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                         .postAsJsoupDocument()
                         .select(".left_articles > ul > li a")
                         .stream()
-                        .map(element -> new ProviderSerieId(element.text(),
+                        .map(element -> new ProviderId(element.text(),
                             StringUtils.substringAfterLast(element.attr("href"), "/")))
                         .toList();
                 } catch (Exception e) {

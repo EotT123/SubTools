@@ -18,7 +18,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.A
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Addic7edSubtitle, ProviderSerieId,
+public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Addic7edSubtitle, ProviderId,
     Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edAdapter.class);
@@ -89,7 +89,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<ProviderId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws Addic7edException {
         return api.getProviderId(serieName)
             .stream()
@@ -99,7 +99,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     }
 
     @Override
-    public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.name;
+    public String providerSerieIdToDisplayString(ProviderId providerId) {
+        return providerId.name;
     }
 }

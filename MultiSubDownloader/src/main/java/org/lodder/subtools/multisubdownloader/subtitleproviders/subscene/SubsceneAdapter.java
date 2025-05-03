@@ -20,7 +20,7 @@ import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class SubsceneAdapter
-    extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneSerieId, SubsceneException> {
+    extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneId, SubsceneException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubsceneAdapter.class);
 
@@ -84,7 +84,7 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public List<SubSceneSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<SubSceneId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws SubsceneException {
         ToIntFunction<String> providerTypeFunction = value -> switch (value) {
             case "TV-Serie" -> 1;
@@ -99,12 +99,12 @@ public final class SubsceneAdapter
             .sorted(Comparator.comparingInt(entry -> providerTypeFunction.applyAsInt(entry.getKey())))
             .map(Entry::getValue)
             .flatMap(List::stream)
-            .sorted(Comparator.comparing((SubSceneSerieId serieId) -> serieId.season == 0)
+            .sorted(Comparator.comparing((SubSceneId serieId) -> serieId.season == 0)
                 .thenComparing(serieId -> {
                     Matcher matcher = yearPattern.matcher(serieId.name);
                     return matcher.find() ? Integer.parseInt(matcher.group()) : 0;
                 }, Comparator.reverseOrder())
-                .thenComparing(SubSceneSerieId::getSeason, Comparator.reverseOrder()))
+                .thenComparing(SubSceneId::getSeason, Comparator.reverseOrder()))
             .distinct()
             .toList();
     }
@@ -124,7 +124,7 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public String providerSerieIdToDisplayString(SubSceneSerieId providerSerieId) {
+    public String providerSerieIdToDisplayString(SubSceneId providerSerieId) {
         if (providerSerieId.id.endsWith("-season")) {
             OptionalInt season = IntStream.rangeClosed(1, 100)
                 .filter(i -> providerSerieId.id.endsWith("-${SubsceneApi.getOrdinalName(i).toLowerCase()}-season"))

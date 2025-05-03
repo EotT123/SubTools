@@ -13,7 +13,7 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleSerieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.AiTranslatedEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.ForeignPartsOnlyEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.HearingImpairedEnum;
@@ -161,7 +161,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-    public List<OpensubtitleSerieId> getProviderSerieIds(String serieName) throws OpenSubtitleException {
+    public List<OpensubtitleId> getProviderSerieIds(String serieName) throws OpenSubtitleException {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
             .getCollection(() -> {
                 try {
@@ -177,7 +177,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
-                        .map(show -> new OpensubtitleSerieId(show.getString("name"), show.getInt("id"),
+                        .map(show -> new OpensubtitleId(show.getString("name"), show.getInt("id"),
                             show.getString("year")))
                         .toList();
                 } catch (Exception e) {

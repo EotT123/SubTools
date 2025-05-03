@@ -4,11 +4,11 @@ import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import subdl.Serie;
 import subdl.Serie.ReleaseType;
 
-public class SubdlSerieId extends ProviderSerieId {
+public class SubdlId extends ProviderId {
 
     @Serial
     private static final long serialVersionUID = 5858875211782260667L;
@@ -16,7 +16,7 @@ public class SubdlSerieId extends ProviderSerieId {
     @val  @Nullable Integer  year;
     @val ReleaseType releaseType;
 
-    public SubdlSerieId(String name, String id, @Nullable Integer year, Serie.ReleaseType releaseType) {
+    public SubdlId(String name, String id, @Nullable Integer year, Serie.ReleaseType releaseType) {
         super(name, id);
         this.year = year;
         this.releaseType = releaseType;

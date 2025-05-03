@@ -8,7 +8,7 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.SubdlException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSerieId;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -39,13 +39,13 @@ public class SubdlApi implements SubtitleApi {
      *
      * @param imdbId an optional IMDb ID to use for lookup
      * @param name the name of the release or movie/show
-     * @return a list of matching {@link SubdlSerieId} objects
+     * @return a list of matching {@link SubdlId} objects
      * @throws SubdlException if the API call fails
      */
-    public List<SubdlSerieId> getProviderIds(@Nullable Integer imdbId, String name) throws SubdlException {
+    public List<SubdlId> getProviderIds(@Nullable Integer imdbId, String name) throws SubdlException {
         return manager.getCache(CacheType.DISK, "$subtitleSource-providerid-$imdbId-$name")
             .getCollection(() -> {
-                List<SubdlSerieId> results;
+                List<SubdlId> results;
                 if (imdbId != null) {
                     results = getProviderIdByImdbId(imdbId);
                     if (!results.isEmpty()) {
@@ -64,10 +64,10 @@ public class SubdlApi implements SubtitleApi {
      * Fetches provider IDs based on a release name.
      *
      * @param name the release name to search for
-     * @return a list of matching {@link SubdlSerieId} objects
+     * @return a list of matching {@link SubdlId} objects
      * @throws SubdlException if the API call fails
      */
-    private List<SubdlSerieId> getProviderIdByReleaseName(String name) throws SubdlException {
+    private List<SubdlId> getProviderIdByReleaseName(String name) throws SubdlException {
         return manager.getCache(CacheType.DISK, "$subtitleSource-provideridByReleaseName-" + name)
             .getCollection(() -> {
                 try {
@@ -85,10 +85,10 @@ public class SubdlApi implements SubtitleApi {
      * Fetches provider IDs using an IMDb ID.
      *
      * @param imdbId the IMDb ID
-     * @return a list of matching {@link SubdlSerieId} objects
+     * @return a list of matching {@link SubdlId} objects
      * @throws SubdlException if the API call fails
      */
-    private List<SubdlSerieId> getProviderIdByImdbId(int imdbId) throws SubdlException {
+    private List<SubdlId> getProviderIdByImdbId(int imdbId) throws SubdlException {
         return manager.getCache(CacheType.DISK, "$subtitleSource-provideridByImdbId-" + imdbId)
             .getCollection(() -> {
                 try {
@@ -103,13 +103,13 @@ public class SubdlApi implements SubtitleApi {
     }
 
     /**
-     * Maps a {@link Serie.ResultItem} to a {@link SubdlSerieId}.
+     * Maps a {@link Serie.ResultItem} to a {@link SubdlId}.
      *
      * @param resultItem the result item to convert
-     * @return a new {@code SubdlSerieId} instance
+     * @return a new {@code SubdlId} instance
      */
-    private SubdlSerieId resultsToProviderId(Serie.ResultItem resultItem) {
-        return new SubdlSerieId(resultItem.name, String.valueOf(resultItem.sd_id),
+    private SubdlId resultsToProviderId(Serie.ResultItem resultItem) {
+        return new SubdlId(resultItem.name, String.valueOf(resultItem.sd_id),
             resultItem.year == null ? null : Integer.parseInt(resultItem.year), resultItem.type);
     }
 

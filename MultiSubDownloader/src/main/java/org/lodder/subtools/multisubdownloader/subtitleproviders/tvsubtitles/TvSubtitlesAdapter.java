@@ -20,7 +20,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.mode
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class TvSubtitlesAdapter
-    extends SubtitleAdapter<TVSubtitlesSubtitleMetadata, TvSubtiltesSubtitle, ProviderSerieId, TvSubtitleException> {
+    extends SubtitleAdapter<TVSubtitlesSubtitleMetadata, TvSubtiltesSubtitle, ProviderId, TvSubtitleException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvSubtitlesAdapter.class);
 
@@ -96,15 +96,15 @@ public final class TvSubtitlesAdapter
     }
 
     @Override
-    public List<ProviderSerieId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
+    public List<ProviderId> getSortedProviderSerieIds(@Nullable Integer tvdbId, @Nullable Integer imdbId,
         String serieName, int season) throws TvSubtitleException {
         Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
         return api.getProviderIds(serieName)
             .stream()
-            .sorted(Comparator.comparing((ProviderSerieId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+            .sorted(Comparator.comparing((ProviderId n) -> !serieName.replaceAll("[^A-Za-z]", "")
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                .thenComparing((ProviderSerieId providerSerieId) -> {
-                    Matcher matcher = yearPatter.matcher(providerSerieId.name);
+                .thenComparing((ProviderId providerId) -> {
+                    Matcher matcher = yearPatter.matcher(providerId.name);
                     if (matcher.find()) {
                         return Integer.parseInt(matcher.group(2));
                     }
@@ -114,7 +114,7 @@ public final class TvSubtitlesAdapter
     }
 
     @Override
-    public String providerSerieIdToDisplayString(ProviderSerieId providerSerieId) {
-        return providerSerieId.name;
+    public String providerSerieIdToDisplayString(ProviderId providerId) {
+        return providerId.name;
     }
 }
