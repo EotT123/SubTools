@@ -1,8 +1,6 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +33,7 @@ public class TvdbApi implements ApiIntf {
     public List<Series> searchSeries(String serieName, @Nullable Language language=null) throws TvdbException {
         return getCache("series", b -> b.add("serieName", serieName).add("language", language))
             .getCollection(() -> {
-                String encodedSerieName =
-                    URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
+                String encodedSerieName = serieName.toLowerCase().replace(" ", "-").urlEncode();
                 try {
                     Response<SeriesResultsResponse> response =
                         api.search()
