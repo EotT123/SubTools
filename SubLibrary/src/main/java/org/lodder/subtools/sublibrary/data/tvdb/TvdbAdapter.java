@@ -79,7 +79,7 @@ public class TvdbAdapter implements AdapterIntf {
                     serieIds.stream().sorted(comparator).toList(),
                     getText("Prompter.SelectTvdbMatchForSerie", serieName),
                     provider,
-                    s -> "${s.serieName} (${s.firstAired})");
+                    s -> "${s.seriesName} (${s.firstAired})");
                 if (tvdbSerie.isEmpty()) {
                     LOGGER.error("Unknown serie name in tvdb: $serieName");
                     tvdbSerie = promptUserToEnterTvdbId(serieName)
@@ -114,7 +114,7 @@ public class TvdbAdapter implements AdapterIntf {
                         return api.searchEpisode(tvdbId, season, episode, Language.ENGLISH);
                     } catch (TvdbException e) {
                         LOGGER.error(
-                            "API $PROVIDER getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
+                            "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
                                 TvRelease.formatSeasonEpisode(season, episode)), e);
                         return Optional.ofNullable((Episode) null);
                     }

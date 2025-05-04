@@ -24,7 +24,7 @@ public class OmdbAdapter implements AdapterIntf {
         this.api = new OmdbApi(manager);
     }
 
-    public Optional<Omdb.Release> searchRelease(int imdbId) {
+    public Optional<Omdb.Release> searchReleaseWithImdbId(String imdbId) {
         try {
             return getCache("release", b -> b.add("imdbId", imdbId))
                 .getOptional(
