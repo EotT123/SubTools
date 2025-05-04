@@ -59,14 +59,13 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
     @Override
     public Set<LocalSubtitle> searchSubtitles(TvRelease tvRelease, Language language) {
         Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
-        ReleaseParser vfp = new ReleaseParser();
 
         String name = !tvRelease.originalName.isEmpty() ? tvRelease.originalName : tvRelease.name;
         String filter = name.replaceAll("[^A-Za-z]", "").trim();
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                Release release = vfp.parse(fileSub);
+                Release release = ReleaseParser.parse(fileSub);
                 if ((release.videoType == VideoType.EPISODE)
                     && (((TvRelease) release).season == tvRelease.season &&
                     new HashSet<>(((TvRelease) release).episodes).containsAll(tvRelease.episodes))) {
@@ -78,14 +77,19 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
                         Language detectedLang = DetectLanguage.execute(fileSub);
                         if (detectedLang == language) {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
-                            listFoundSubtitles.add(new LocalSubtitle(
-                                path:fileSub,
-                                fileName:fileSub.fileNameAsString,
-                                language:language,
-                                quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
-                                releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true),
-                                uploader:fileSub.toAbsolutePath().toString(),
-                                hearingImpaired:false));
+                            listFoundSubtitles.add(ReleaseParser.parse(fileSub.fileNameAsString)
+                                .map(r -> new LocalSubtitle(
+                                    path:fileSub,
+                                    fileName:fileSub.fileNameAsString,
+                                    language:language,
+                                    quality:r.quality,
+                                    releaseGroup:r.releaseGroup))
+                                .orElseGet(() -> new LocalSubtitle(
+                                    path:fileSub,
+                                    fileName:fileSub.fileNameAsString,
+                                    language:language,
+                                    quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
+                                    releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))));
                         }
                     }
                 }
@@ -104,13 +108,12 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
     @Override
     public Set<LocalSubtitle> searchSubtitles(MovieRelease movieRelease, Language language) {
         Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
-        ReleaseParser releaseParser = new ReleaseParser();
 
         String filter = movieRelease.name;
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                switch (releaseParser.parse(fileSub)) {
+                switch (ReleaseParser.parse(fileSub)) {
                     case MovieRelease release -> {
                         MovieReleaseControl movieCtrl =
                             new MovieReleaseControl(release, settings, manager, userInteractionHandler);
@@ -118,14 +121,19 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
                         if (release.hasSameId(movieRelease, ProviderIdType.IMDB)
                             && DetectLanguage.execute(fileSub) == language) {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
-                            listFoundSubtitles.add(new LocalSubtitle(
-                                path:fileSub,
-                                fileName:fileSub.fileNameAsString,
-                                language:language,// TODO previously: language(""). This was not correct?
-                                quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
-                                releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true),
-                                uploader:fileSub.toAbsolutePath().toString(),
-                                hearingImpaired:false));
+                            listFoundSubtitles.add(ReleaseParser.parse(fileSub.fileNameAsString)
+                                .map(r -> new LocalSubtitle(
+                                    path:fileSub,
+                                    fileName:fileSub.fileNameAsString,
+                                    language:language,
+                                    quality:r.quality,
+                                    releaseGroup:r.releaseGroup))
+                                .orElseGet(() -> new LocalSubtitle(
+                                    path:fileSub,
+                                    fileName:fileSub.fileNameAsString,
+                                    language:language,
+                                    quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
+                                    releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))));
                         }
                     }
                     default -> {

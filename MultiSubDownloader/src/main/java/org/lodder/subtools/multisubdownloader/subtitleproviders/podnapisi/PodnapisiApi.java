@@ -194,7 +194,7 @@ public class PodnapisiApi implements SubtitleApi {
             subtitleId:elem.selectFirst("id").text(),
             name:elem.selectFirst("title").text(),
             imdb:getText.apply(elem.selectFirst("imdb")),
-            language:Language.ofLangCode(elem.selectFirst("language").text()),
+            language:Language.ofLangCode(elem.selectFirst("languageName").text()),
             uploaderName:elem.selectFirst("uploaderName").text(),
             releaseString:elem.selectFirst("release").text().length() > 10 ? elem.selectFirst("release").text() :
                 elem.selectFirst("title").text().replace(":", "") + " " + elem.selectFirst("release").text(),

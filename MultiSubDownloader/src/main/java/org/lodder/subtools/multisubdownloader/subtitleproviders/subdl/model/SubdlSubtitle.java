@@ -15,14 +15,14 @@ public class SubdlSubtitle extends Subtitle {
     private final String url;
 
     public SubdlSubtitle(String url,
-        @Nullable String fileName=null,
+        @Nullable String title=null,
         @Nullable Language language=null,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         boolean hearingImpaired=false,
         @Nullable String quality=null) {
 
-        super(fileName, language, releaseGroup, uploader, SubtitleSource.SUBDL, hearingImpaired, quality);
+        super(title, language, releaseGroup, uploader, SubtitleSource.SUBDL, hearingImpaired, quality);
         this.url = url;
     }
 

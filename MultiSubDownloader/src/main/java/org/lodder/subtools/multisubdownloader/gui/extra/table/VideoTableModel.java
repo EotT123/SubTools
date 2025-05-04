@@ -136,7 +136,7 @@ public class VideoTableModel extends DefaultTableModel {
                 case FILENAME -> subtitle.fileName;
                 case SELECT -> false;
                 case OBJECT -> subtitle;
-                case SOURCE -> subtitle.subtitleSource;
+                case SOURCE -> subtitle.source;
                 case SCORE -> subtitle.score;
                 default -> throw new IllegalArgumentException("Unexpected value: " + searchColumn);
             }).collect(Collectors.toCollection(Vector::new));

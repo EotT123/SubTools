@@ -79,17 +79,25 @@ public final class PodnapisiAdapter
     // COMMON \\
     // ====== \\
 
-    
     @Override
     public PodnapisiSubtitle convertToSubtitle(PodnapisiSubtitleMetadata metadata) {
-        return new PodnapisiSubtitle(
-            url:metadata.url,
-            fileName:metadata.releaseString,
-            language:metadata.language,
-            quality:ReleaseParser.getQualityKeyword(metadata.releaseString),
-            releaseGroup:ReleaseParser.extractReleaseGroup(metadata.releaseString,
-                StringUtils.endsWith(metadata.releaseString, ".srt")),
-            uploader:metadata.uploaderName,
-            hearingImpaired:metadata.hearingImpaired);
+        return ReleaseParser.parse(metadata.releaseString)
+            .map(release -> new PodnapisiSubtitle(
+                url:metadata.url,
+                fileName:metadata.releaseString,
+                language:metadata.language,
+                quality:release.quality,
+                releaseGroup:release.releaseGroup,
+                uploader:metadata.uploaderName,
+                hearingImpaired:metadata.hearingImpaired))
+            .orElseGet(() -> new PodnapisiSubtitle(
+                url:metadata.url,
+                fileName:metadata.releaseString,
+                language:metadata.language,
+                quality:ReleaseParser.getQualityKeyword(metadata.releaseString),
+                releaseGroup:ReleaseParser.extractReleaseGroup(metadata.releaseString,
+                    StringUtils.endsWith(metadata.releaseString, ".srt")),
+                uploader:metadata.uploaderName,
+                hearingImpaired:metadata.hearingImpaired));
     }
 }

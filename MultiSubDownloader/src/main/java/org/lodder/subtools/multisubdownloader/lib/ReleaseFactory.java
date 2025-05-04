@@ -21,7 +21,6 @@ public class ReleaseFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
-    private final ReleaseParser releaseParser = new ReleaseParser();
     private final Settings settings;
     private final Manager manager;
 
@@ -37,7 +36,7 @@ public class ReleaseFactory {
     public Release createRelease(Path file, UserInteractionHandler userInteractionHandler,
         boolean validate) {
         try {
-            ReleaseControl releaseControl = switch (releaseParser.parse(file)) {
+            ReleaseControl releaseControl = switch (ReleaseParser.parse(file)) {
                 case TvRelease tvRelease -> new TvReleaseControl(tvRelease, settings, manager, userInteractionHandler);
                 case MovieRelease movieRelease -> new MovieReleaseControl(movieRelease, settings, manager,
                     userInteractionHandler);

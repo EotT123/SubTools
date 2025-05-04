@@ -35,7 +35,6 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
 
     private static Addic7edApi api;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
-    @val @override Manager manager;
     @val @override boolean useSeasonForSerieId = true;
 
     public Addic7edAdapter(Manager manager, boolean speedy, Credentials credentials=null,

@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
+import static manifold.ext.props.rt.api.PropOption.*;
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
@@ -63,7 +64,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     @val @override Manager manager;
     @val UserInteractionHandler userInteractionHandler;
     @val @override String provider = source.name();
-    @val boolean useSeasonForSerieId;
+    @val(Abstract) boolean useSeasonForSerieId;
 
     protected SubtitleAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;

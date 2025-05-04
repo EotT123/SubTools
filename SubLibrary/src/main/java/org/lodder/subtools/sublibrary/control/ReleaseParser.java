@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +44,10 @@ public class ReleaseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
 
+    private ReleaseParser() {
+        // hide utility class constructor
+    }
+
     /**
      * Parses the provided file path to determine the release type (movie or TV show) and its details.
      *
@@ -50,7 +55,7 @@ public class ReleaseParser {
      * @return A Release object representing the parsed data.
      * @throws ReleaseParseException if the file's name cannot be parsed.
      */
-    public final Release parse(Path file) throws ReleaseParseException {
+    public static Release parse(Path file) throws ReleaseParseException {
         if (file.getParent() != null) {
             try {
                 return parsePatternResult(file, file.getParent().fileName.toString(), null);
@@ -67,6 +72,28 @@ public class ReleaseParser {
     }
 
     /**
+     * Attempts to parse the given file name to extract release information,
+     * including whether it's a movie or TV show, along with other details.
+     * <p>
+     * If the file name ends with a known archive or subtitle extension (e.g., .srt, .zip, .rar),
+     * the extension is stripped before parsing.
+     * </p>
+     *
+     * @param fileName the name of the file to parse
+     * @return an {@link Optional} containing the {@link Release} if parsing was successful;
+     * otherwise, {@link Optional#empty()}
+     */
+    public static Optional<Release> parse(String fileName) {
+        String text = !StringUtils.endsWithAny(fileName, ".srt", ".zip", ".rar") ? fileName :
+            fileName.substring(0, fileName.length() - 4);
+        try {
+            return Optional.of(parsePatternResult(null, text, null));
+        } catch (ReleaseParseException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Parses the given file's name using a series of regex patterns to extract relevant metadata and constructs the
      * corresponding {@link Release} object (either a {@link MovieRelease} or {@link TvRelease}). The method attempts to
      * identify and parse key details such as the release type, season, episodes, quality, and release group from the
@@ -78,7 +105,8 @@ public class ReleaseParser {
      * @return A {@link Release} object representing the parsed release information (either a movie or TV show).
      * @throws ReleaseParseException If the file name cannot be parsed into a valid release format.
      */
-    private Release parsePatternResult(Path file, String fileParseName, String extension) throws ReleaseParseException {
+    private static Release parsePatternResult(Path file, String fileParseName,
+        String extension) throws ReleaseParseException {
         ParserResults parserResults = new ParserResults(fileParseName);
 
         parseReleaseType(parserResults);
@@ -396,7 +424,7 @@ public class ReleaseParser {
      * @param text The input text to clean.
      * @return The cleaned text.
      */
-    private String cleanUnwantedChars(String text) {
+    private static String cleanUnwantedChars(String text) {
         if (text == null) {
             return null;
         }
@@ -433,13 +461,57 @@ public class ReleaseParser {
         return getQualityKeyWordsAlreadyParsed(parserResults);
     }
 
-    public static List<String> removeQualityFromString(String text) {
-        ParserResults parserResults = new ParserResults(text);
-        parseReleaseType(parserResults);
-        return parserResults.parts;
+    public static ReleaseParserExtraInfo parseExtraInfo(String text) {
+        return ReleaseParserExtraInfo.parseExtraInfo(text);
     }
 
-    private static List<String> getQualityKeyWordsAlreadyParsed(ParserResults parserResults) {
+    public static class ReleaseParserExtraInfo {
+
+        private final String text;
+        private final ParserResults parserResults;
+
+        private ReleaseParserExtraInfo(String extraInfo) {
+            String info = StringUtils.endsWithAny(extraInfo, ".srt", ".zip", ".rar") ? extraInfo.substring(0,
+                extraInfo.length() - 4) : extraInfo;
+            info = StringUtils.replaceIgnoreCase(info, "REPACK.", "");
+            info = StringUtils.replaceIgnoreCase(info, "REPACK-", "");
+            info = StringUtils.replaceIgnoreCase(info, "INTERNAL.", "");
+            info = StringUtils.replaceIgnoreCase(info, "INTERNAL-", "");
+            this.text = info;
+            this.parserResults = new ParserResults(extraInfo);
+            parseReleaseType(parserResults);
+        }
+
+        public static ReleaseParserExtraInfo parseExtraInfo(String text) {
+            return new ReleaseParserExtraInfo(text);
+        }
+
+        public String getQualityKeyword() {
+            return String.join(" ", getQualityKeyWordsAlreadyParsed(parserResults));
+        }
+
+        public String getReleaseGroupBestEffort() {
+            if (parserResults.parts.isEmpty()) {
+                return null;
+            }
+            if (StringUtils.containsIgnoreCase(text, "retail")) {
+                return "RETAIL";
+            }
+            return parserResults.parts.getLast();
+//            return text.endsWith(parserResults.parts.getLast()) ? parserResults.parts.getLast() : null;
+        }
+
+        public List<String> getRemainingParts() {
+            return parserResults.parts;
+        }
+
+        public String getRemainingPartsAsString() {
+            return String.join(" ", parserResults.parts);
+        }
+    }
+
+
+    private static List<String> getQualityKeyWordsAlreadyParsed(ReleaseParser.ParserResults parserResults) {
         return Stream.of(
                 parserResults.getNamedMatch(QUALITY),
                 parserResults.getNamedMatch(SOURCE),

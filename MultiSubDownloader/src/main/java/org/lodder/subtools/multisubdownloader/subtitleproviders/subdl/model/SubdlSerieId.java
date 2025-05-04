@@ -15,16 +15,11 @@ public class SubdlSerieId extends ProviderId {
 
     @val @Nullable Integer year;
     @val ReleaseType releaseType;
-//    @val ReleaseType type;
-//    @val Optional<String> imdbId;
-//    @val OptionalInt tmdbId;
 
     public SubdlSerieId(Serie.ResultItem resultItem) {
         super(resultItem.name, String.valueOf(resultItem.sd_id));
         this.year = resultItem.year == null ? null : Integer.parseInt(resultItem.year);
-//        this.type = resultItem.type;
-//        this.imdbId = Optional.ofNullable(resultItem.imdb_id);
-//        this.tmdbId = resultItem.tmdb_id == 0 ? OptionalInt.empty() : OptionalInt.of(resultItem.tmdb_id);
+        this.releaseType = resultItem.type;
     }
 
     /**

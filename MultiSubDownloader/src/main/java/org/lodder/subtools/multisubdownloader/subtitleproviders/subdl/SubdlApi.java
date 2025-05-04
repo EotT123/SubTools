@@ -238,7 +238,7 @@ public class SubdlApi implements SubtitleApi {
         } else {
             episodes = List.of(sub.episode);
         }
-        return new SubdlSubtitleMetadata(sub.release_name, sub.name, DOMAIN + sub.url, sub.season, episodes,
-            sub.author, sub.hi, SubdlLanguage.of(sub.language).language);
+        return new SubdlSubtitleMetadata(sub.release_name.split("/").last(), sub.name.split("/").last(),
+            DOMAIN + sub.url, sub.season, episodes, sub.author, sub.hi, SubdlLanguage.of(sub.language).language);
     }
 }

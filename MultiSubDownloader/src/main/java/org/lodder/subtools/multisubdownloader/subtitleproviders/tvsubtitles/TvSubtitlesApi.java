@@ -83,7 +83,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                     return manager.getAsJsoupDocument(PageContentParams.params(
                             DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
                             cookieManager:cookieManager))
-                        .select("#table4 table tr[bgcolor]")
+                        .select("#table5 tr[bgcolor]")
                         .stream()
                         .filter(episodeRow -> StringUtils.isNotBlank(episodeRow.selectFirstByTag("td").text()))
                         .map(episodeRow -> {

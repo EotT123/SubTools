@@ -88,10 +88,7 @@ public final class TvSubtitlesAdapter
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
                 .thenComparing((ProviderId providerId) -> {
                     Matcher matcher = yearPatter.matcher(providerId.name);
-                    if (matcher.find()) {
-                        return Integer.parseInt(matcher.group(2));
-                    }
-                    return 0;
+                    return matcher.find() ? Integer.parseInt(matcher.group(2)) : 0;
                 }, Comparator.reverseOrder()))
             .toList();
     }

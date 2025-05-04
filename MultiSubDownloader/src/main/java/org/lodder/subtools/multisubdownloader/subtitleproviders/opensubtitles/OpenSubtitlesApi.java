@@ -33,6 +33,7 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.opensubtitles.api.AuthenticationApi;
@@ -43,6 +44,7 @@ import org.opensubtitles.invoker.ApiException;
 import org.opensubtitles.model.DownloadRequest;
 import org.opensubtitles.model.Login200Response;
 import org.opensubtitles.model.LoginRequest;
+import org.opensubtitles.model.SubtitleAttributes;
 
 public class OpenSubtitlesApi implements SubtitleApi {
 
@@ -204,15 +206,28 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
 
     private List<OpenSubtilteSubtitle> createSubtitles(org.opensubtitles.model.Subtitle sub) {
-        return sub.getAttributes().getFiles().stream().map(file ->
-            new OpenSubtilteSubtitle(
-                urlSupplier:() -> getDownloadUrl(file.getFileId().intValue()),
-                fileName:file.getFileName(),
-                language:Language.ofLangCodeOptional(sub.getAttributes().getLanguage()).orElse(null),
-                releaseGroup:ReleaseParser.extractReleaseGroup(file.getFileName(), file.getFileName().endsWith(".srt")),
-                uploader:sub.getAttributes().getUploader() != null ? sub.getAttributes().getUploader().getName() : null,
-                quality:ReleaseParser.getQualityKeyword(file.getFileName()),
-                hearingImpaired:Boolean.TRUE == sub.getAttributes().isHearingImpaired()));
+        SubtitleAttributes attr = sub.getAttributes();
+        Language language = Language.ofLangCodeOptional(attr.language).orElse(null);
+        return ReleaseParser.parse(attr.getRelease())
+            .map(release -> new OpenSubtilteSubtitle(
+                urlSupplier:() -> getDownloadUrl(Integer.parseInt(attr.subtitleId)),
+                fileName:attr.release,
+                language:language,
+                releaseGroup:release.releaseGroup,
+                uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                quality:release.quality,
+                hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
+            .orElseGet(() -> {
+                ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
+                return new OpenSubtilteSubtitle(
+                    urlSupplier:() -> getDownloadUrl(Integer.parseInt(attr.subtitleId)),
+                    fileName:attr.release,
+                    language:Language.ofLangCodeOptional(attr.getLanguage()).orElse(null),
+                    releaseGroup:extraInfo.getReleaseGroupBestEffort(),
+                    uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                    quality:extraInfo.qualityKeyword,
+                    hearingImpaired:Boolean.TRUE == attr.isHearingImpaired());
+            });
     }
 
     public String getDownloadUrl(int fileId) throws OpenSubtitleException {

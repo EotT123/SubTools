@@ -29,6 +29,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
@@ -203,21 +204,13 @@ public class Addic7edApi implements SubtitleApi {
                                 }
                             }
                             if (lang != null && download != null && title != null) {
-                                String qualityKeyword = ReleaseParser.getQualityKeyword(version);
-                                String releaseGroup =
-                                    String.join(" ", ReleaseParser.removeQualityFromString(version));
-                                releaseGroup = StringUtils.replaceIgnoreCase(releaseGroup, "REPACK.", "");
-                                releaseGroup = StringUtils.replaceIgnoreCase(releaseGroup, "REPACK-", "");
-                                if (releaseGroup.toLowerCase().contains("retail")) {
-                                    releaseGroup = "RETAIL";
-                                }
-
+                                ReleaseParserExtraInfo extraInfoParser = ReleaseParser.parseExtraInfo(version);
                                 Addic7edSubtitle sub = new Addic7edSubtitle(
                                     url:download,
                                     fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
                                     language:lang.language,
-                                    quality:ReleaseParser.getQualityKeyword(version),
-                                    releaseGroup:releaseGroup,
+                                    quality:extraInfoParser.getQualityKeyword(),
+                                    releaseGroup:extraInfoParser.getReleaseGroupBestEffort(),
                                     uploader:uploader,
                                     hearingImpaired:hearingImpaired,
                                     version:version);

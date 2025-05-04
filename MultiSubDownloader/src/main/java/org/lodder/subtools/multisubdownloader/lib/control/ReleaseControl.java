@@ -20,7 +20,7 @@ public abstract sealed class ReleaseControl permits MovieReleaseControl, TvRelea
     @val(Protected) ImdbAdapter imdbAdapter;
     @val(Protected) OmdbAdapter omdbAdapter;
 
-    @val Release release;
+    @val(Abstract) Release release;
 
     ReleaseControl(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
         this.settings = settings;

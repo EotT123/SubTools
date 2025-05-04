@@ -19,11 +19,10 @@ public class LocalSubtitle extends Subtitle {
         @Nullable String fileName=null,
         @Nullable Language language=null,
         @Nullable String releaseGroup=null,
-        @Nullable String uploader=null,
         boolean hearingImpaired=false,
         @Nullable String quality=null) {
 
-        super(fileName, language, releaseGroup, uploader, SubtitleSource.LOCAL, hearingImpaired, quality);
+        super(fileName, language, releaseGroup, null, SubtitleSource.LOCAL, hearingImpaired, quality);
         this.path = path;
     }
 
