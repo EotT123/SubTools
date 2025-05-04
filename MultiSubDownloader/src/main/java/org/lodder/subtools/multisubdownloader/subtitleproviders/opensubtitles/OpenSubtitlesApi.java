@@ -33,7 +33,6 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.opensubtitles.api.AuthenticationApi;
@@ -205,16 +204,15 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
 
     private List<OpenSubtilteSubtitle> createSubtitles(org.opensubtitles.model.Subtitle sub) {
-        return sub.attributes.files.stream().map(file ->
+        return sub.getAttributes().getFiles().stream().map(file ->
             new OpenSubtilteSubtitle(
                 urlSupplier:() -> getDownloadUrl(file.getFileId().intValue()),
                 fileName:file.getFileName(),
-                language:Language.ofLangCodeOptional(sub.attributes.getLanguage()).orElse(null),
-                releaseGroup:ReleaseParser.extractReleaseGroup(file.fileName, file.fileName.endsWith(".srt")),
-                uploader:sub.attributes.getUploader() != null ? sub.attributes.getUploader().getName() : null,
-                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                language:Language.ofLangCodeOptional(sub.getAttributes().getLanguage()).orElse(null),
+                releaseGroup:ReleaseParser.extractReleaseGroup(file.getFileName(), file.getFileName().endsWith(".srt")),
+                uploader:sub.getAttributes().getUploader() != null ? sub.getAttributes().getUploader().getName() : null,
                 quality:ReleaseParser.getQualityKeyword(file.getFileName()),
-                hearingImpaired:Boolean.TRUE == sub.attributes.isHearingImpaired()));
+                hearingImpaired:Boolean.TRUE == sub.getAttributes().isHearingImpaired()));
     }
 
     public String getDownloadUrl(int fileId) throws OpenSubtitleException {

@@ -71,7 +71,7 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewStableGithubRelease() {
-        return manager.getCache(CacheType.MEMORY, "GitHub-update")
+        return new CacheKey(manager, CacheType.MEMORY, "GitHub-update")
             .getOptional(() -> {
                 try {
                     String currentVersion = getVersion();
@@ -108,7 +108,7 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return manager.getCache(CacheType.MEMORY, "GitHub-update-nightly")
+        return new CacheKey(manager, CacheType.MEMORY, "GitHub-update-nightly")
             .getOptional(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
@@ -156,7 +156,7 @@ public class UpdateAvailableGithub {
     }
 
     private CacheKey getUpdateLastUpdateCheckCache() {
-        return manager.getCache(CacheType.DISK, "LastUpdateCheck");
+        return new CacheKey(manager, CacheType.MEMORY, "LastUpdateCheck");
     }
 
     private void updateLastUpdateCheck() {

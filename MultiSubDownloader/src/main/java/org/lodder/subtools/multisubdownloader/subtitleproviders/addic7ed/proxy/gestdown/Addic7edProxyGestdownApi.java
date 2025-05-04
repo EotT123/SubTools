@@ -20,7 +20,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 /**
@@ -103,11 +102,9 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
     private Addic7edProxyGestdownSubtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {
         return new Addic7edProxyGestdownSubtitle(
             url:DOMAIN + sub.getDownloadUri(),
-            subtitleSource:source,
             fileName:StringExt.removeIllegalFilenameChars("${episodedto.show} - ${episodedto.title} - ${sub.version}"),
             language:language,
             quality:ReleaseParser.getQualityKeyword(episodedto.getTitle() + " " + sub.getVersion()),
-            subtitleMatchType:SubtitleMatchType.EVERYTHING,
             releaseGroup:sub.getVersion(),
             uploader:"",
             hearingImpaired:false);

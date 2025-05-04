@@ -72,7 +72,7 @@ public class DownloadAction {
             throw new RuntimeException(e);
         } catch (IOException | ManagerException e) {
             LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
-                "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
+                "(${e.getMessage()})", e);
             throw e;
         }
 

@@ -27,7 +27,9 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -40,7 +42,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private final SubtitleProviderStore subtitleProviderStore;
     private final JButton btnAddCustomMapping;
     private final JTable table;
-    private Optional<SubtitleProvider> selectedSubtitleProvider;
+    private Optional<SubtitleProvider<? extends Subtitle>> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
     public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
@@ -83,9 +85,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                         int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                         MappingTableModel model = (MappingTableModel) table.getModel();
                         Row row = (Row) model.getDataVector().get(rowNbr);
-                        manager.getCache(CacheType.DISK, row.key).remove();
+                        new CacheKey(manager, CacheType.DISK, row.key).remove();
                         if (row.selectionForKeyPrefix.deleteOtherFunction() != null) {
-                            manager.getCache(CacheType.DISK,
+                            new CacheKey(manager, CacheType.DISK,
                                 row.selectionForKeyPrefix.deleteOtherFunction().apply(row.key)).remove();
                         }
                         model.removeRow(rowNbr);
@@ -137,7 +139,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
             .stream()
-            .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.providerName))
+            .filter(subtitleProvider -> subtitleProvider.name.equals(mappingType.providerName))
             .findAny();
         btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
         mappingTableModel.mappingType = mappingType;

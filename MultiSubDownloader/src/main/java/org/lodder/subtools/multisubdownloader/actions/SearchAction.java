@@ -95,7 +95,7 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
         /* Tell the manager which providers to use */
         searchManager.reset();
         this.subtitleProviderStore.getAllProviders().stream()
-            .filter(subtitleProvider -> settings.useSerieSource(subtitleProvider.subtitleSource))
+            .filter(subtitleProvider -> settings.useSerieSource(subtitleProvider.source))
             .forEach(searchManager::addProvider);
 
         /* Tell the manager which releases to search. */

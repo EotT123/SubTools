@@ -20,7 +20,6 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -111,11 +110,9 @@ public final class SubsceneAdapter
     public SubsceneSubtitle convertToSubtitle(SubsceneSubtitleMetadata sub) {
         return new SubsceneSubtitle(
             urlSupplier:sub.urlSupplier,
-            subtitleSource:source,
             fileName:sub.name.removeIllegalFilenameChars(),
             language:sub.language,
             quality:ReleaseParser.getQualityKeyword(sub.name),
-            subtitleMatchType:SubtitleMatchType.EVERYTHING,
             releaseGroup:ReleaseParser.extractReleaseGroup(sub.name, false),
             uploader:sub.uploader,
             hearingImpaired:sub.hearingImpaired);

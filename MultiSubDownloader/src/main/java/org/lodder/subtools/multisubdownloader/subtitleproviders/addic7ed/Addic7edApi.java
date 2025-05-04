@@ -30,7 +30,6 @@ import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 public class Addic7edApi implements SubtitleApi {
@@ -215,11 +214,9 @@ public class Addic7edApi implements SubtitleApi {
 
                                 Addic7edSubtitle sub = new Addic7edSubtitle(
                                     url:download,
-                                    subtitleSource:source,
                                     fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
                                     language:lang.language,
                                     quality:ReleaseParser.getQualityKeyword(version),
-                                    subtitleMatchType:SubtitleMatchType.EVERYTHING,
                                     releaseGroup:releaseGroup,
                                     uploader:uploader,
                                     hearingImpaired:hearingImpaired,

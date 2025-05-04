@@ -27,6 +27,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -152,7 +153,7 @@ public class ExportImport {
                                 .clearExpiredCache());
                 }
                 serieMappings.forEach(serieMapping ->
-                    manager.getCache(CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
+                    new CacheKey(manager, CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
             });
         }
 

@@ -20,7 +20,6 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
@@ -110,11 +109,9 @@ public final class TvSubtitlesAdapter
     public TvSubtiltesSubtitle convertToSubtitle(TVSubtitlesSubtitleMetadata sub) {
         return new TvSubtiltesSubtitle(
             url:sub.url,
-            subtitleSource:source,
             fileName:sub.filename,
             language:sub.language,
             quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.source),
-            subtitleMatchType:SubtitleMatchType.EVERYTHING,
             releaseGroup:sub.releaseGroup);
     }
 }

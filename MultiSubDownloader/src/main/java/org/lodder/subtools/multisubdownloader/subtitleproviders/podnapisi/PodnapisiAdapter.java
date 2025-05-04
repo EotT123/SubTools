@@ -17,7 +17,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -85,11 +84,9 @@ public final class PodnapisiAdapter
     public PodnapisiSubtitle convertToSubtitle(PodnapisiSubtitleMetadata metadata) {
         return new PodnapisiSubtitle(
             url:metadata.url,
-            subtitleSource:source,
             fileName:metadata.releaseString,
             language:metadata.language,
             quality:ReleaseParser.getQualityKeyword(metadata.releaseString),
-            subtitleMatchType:SubtitleMatchType.EVERYTHING,
             releaseGroup:ReleaseParser.extractReleaseGroup(metadata.releaseString,
                 StringUtils.endsWith(metadata.releaseString, ".srt")),
             uploader:metadata.uploaderName,

@@ -26,7 +26,6 @@ import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
@@ -81,11 +80,9 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
                             listFoundSubtitles.add(new LocalSubtitle(
                                 path:fileSub,
-                                subtitleSource:source,
                                 fileName:fileSub.fileNameAsString,
                                 language:language,
                                 quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
-                                subtitleMatchType:SubtitleMatchType.EVERYTHING,
                                 releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true),
                                 uploader:fileSub.toAbsolutePath().toString(),
                                 hearingImpaired:false));
@@ -123,11 +120,9 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(new LocalSubtitle(
                                 path:fileSub,
-                                subtitleSource:source,
                                 fileName:fileSub.fileNameAsString,
                                 language:language,// TODO previously: language(""). This was not correct?
                                 quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
-                                subtitleMatchType:SubtitleMatchType.EVERYTHING,
                                 releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true),
                                 uploader:fileSub.toAbsolutePath().toString(),
                                 hearingImpaired:false));

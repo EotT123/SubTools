@@ -8,7 +8,6 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 public class Addic7edProxyGestdownSubtitle extends Subtitle {
@@ -20,13 +19,10 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
         @Nullable Language language=null,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
-        @Nullable SubtitleMatchType subtitleMatchType=null,
-        @Nullable SubtitleSource subtitleSource=null,
         boolean hearingImpaired=false,
         @Nullable String quality=null) {
 
-        super(fileName, language, releaseGroup, uploader, subtitleMatchType, subtitleSource,
-            hearingImpaired, quality);
+        super(fileName, language, releaseGroup, uploader, SubtitleSource.ADDIC7ED, hearingImpaired, quality);
         this.url = url;
     }
 

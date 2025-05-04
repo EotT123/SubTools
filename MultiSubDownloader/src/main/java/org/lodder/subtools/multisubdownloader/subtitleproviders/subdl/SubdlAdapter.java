@@ -18,7 +18,6 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
@@ -99,11 +98,9 @@ public final class SubdlAdapter extends
     public SubdlSubtitle convertToSubtitle(SubdlSubtitleMetadata sub) {
         return new SubdlSubtitle(
             url:sub.url(),
-            subtitleSource:source,
             fileName:sub.url.split("/").last().replace(".zip", ""),
             language:sub.language,
             quality:ReleaseParser.getQualityKeyword(sub.title + " " + sub.fileName),
-            subtitleMatchType:SubtitleMatchType.EVERYTHING,
             releaseGroup:ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".zip")),
             uploader:sub.uploader,
             hearingImpaired:sub.hearingImpaired);
