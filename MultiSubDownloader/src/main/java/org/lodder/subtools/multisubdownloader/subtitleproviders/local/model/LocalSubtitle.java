@@ -1,9 +1,12 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.local.model;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
@@ -28,7 +31,10 @@ public class LocalSubtitle extends Subtitle {
         this.path = path;
     }
 
-    public Path download() throws SubtitlesProviderException {
-
+    @Override
+    public boolean download(Manager manager, Path destination) throws SubtitlesProviderException, IOException,
+        ManagerException {
+        path.copyToDir(path.parent);
+        return true;
     }
 }

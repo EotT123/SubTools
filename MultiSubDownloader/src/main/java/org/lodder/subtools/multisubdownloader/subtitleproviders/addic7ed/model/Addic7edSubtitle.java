@@ -1,11 +1,13 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
+import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
@@ -32,7 +34,8 @@ public class Addic7edSubtitle extends Subtitle {
         this.version = version;
     }
 
-    public Path download() throws SubtitlesProviderException {
-
+    @Override
+    public boolean download(Manager manager, Path destination) throws IOException, ManagerException {
+        return manager.download(url, destination);
     }
 }

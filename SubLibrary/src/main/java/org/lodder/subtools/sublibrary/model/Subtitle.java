@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.model;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
 
@@ -7,6 +8,8 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 
 public abstract class Subtitle implements Serializable {
@@ -39,61 +42,8 @@ public abstract class Subtitle implements Serializable {
         this.quality = quality;
     }
 
-    public abstract Path download() throws SubtitlesProviderException;
-
-//    @EqualsAndHashCode
-//    public static class DownloadSource {
-//        @val SourceLocation sourceLocation;
-//        @EqualsExclude @val @Nullable ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier;
-//        @val @Nullable String url;
-//        @val @Nullable Path file;
-//
-//        private DownloadSource(
-//            SourceLocation sourceLocation,
-//            @Nullable ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier=null,
-//            @Nullable String url=null,
-//            @Nullable Path file=null) {
-//
-//            this.urlSupplier = urlSupplier;
-//            this.url = url;
-//            this.file = file;
-//            this.sourceLocation = sourceLocation;
-//        }
-//
-//        public static DownloadSource of(
-//            ThrowingSupplier<String, ? extends SubtitlesProviderException> urlSupplier) {
-//            return new DownloadSource(SourceLocation.URL_SUPPLIER, urlSupplier:urlSupplier);
-//        }
-//
-//        public static DownloadSource of(String url) {
-//            return new DownloadSource(SourceLocation.URL, url:url);
-//        }
-//
-//        public static DownloadSource of(Path file) {
-//            return new DownloadSource(SourceLocation.FILE, file:file);
-//        }
-//
-//        @SuppressWarnings("ConstantConditions")
-//        public String getValue() throws SubtitlesProviderException {
-//            return switch (sourceLocation) {
-//                case FILE -> file.toString();
-//                case URL -> url;
-//                case URL_SUPPLIER -> urlSupplier.get();
-//            };
-//        }
-//
-//        @Override public String toString() {
-//            return "DownloadSource: " + sourceLocation + " " + switch (sourceLocation) {
-//                case FILE -> file;
-//                case URL -> url;
-//                case URL_SUPPLIER -> "";
-//            };
-//        }
-//    }
-
-//    public enum SourceLocation {
-//        URL, URL_SUPPLIER, FILE
-//    }
+    public abstract boolean download(Manager manager, Path destination) throws IOException, ManagerException,
+        SubtitlesProviderException;
 
     @Override
     public String toString() {

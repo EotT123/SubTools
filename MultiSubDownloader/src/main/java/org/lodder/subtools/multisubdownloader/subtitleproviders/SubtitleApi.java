@@ -11,5 +11,4 @@ public interface SubtitleApi extends ApiIntf {
     default String getProvider() {
         return source.name;
     }
-
 }

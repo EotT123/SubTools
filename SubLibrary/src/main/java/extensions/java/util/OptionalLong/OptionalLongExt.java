@@ -9,7 +9,6 @@ import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingLongUnaryOperator;
 import name.falgout.jeffrey.throwing.ThrowingRunnable;
-import name.falgout.jeffrey.throwing.ThrowingUnaryOperator;
 
 @Extension
 @UtilityClass
@@ -34,7 +33,7 @@ public class OptionalLongExt {
     }
 
     /**
-     * If the value is present, apply the {@link ThrowingUnaryOperator} and return the value wrapped in an @{link
+     * If the value is present, apply the {@link ThrowingFunction} and return the value wrapped in an @{link
      * Optional}. Otherwise, return an empty {@code Optional}
      *
      * @param optional input object of the extension method

@@ -426,11 +426,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                         }
 
                         try {
-                            switch (subtitle.downloadSource.sourceLocation) {
-                                case FILE -> subtitle.downloadSource.file.copyToDir(path);
-                                case URL, URL_SUPPLIER -> app.makeManager()
-                                    .download(subtitle.downloadSource.getValue(), path.resolve(filename));
-                            }
+                            subtitle.download(manager, path.resolve(filename));
                         } catch (IOException | ManagerException e) {
                             LOGGER.error("downloadText", e);
                         } catch (SubtitlesProviderException e) {

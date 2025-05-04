@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 public interface SubtitleProvider<SUB extends Subtitle> {
 
     @val Manager manager;
-    //    @val SubtitleSource subtitleSource;
-    //    @val String providerName;
     @val SubtitleSource source;
     @val String name = source.name;
 
@@ -50,8 +48,6 @@ public interface SubtitleProvider<SUB extends Subtitle> {
     default void clearCache() {
         manager.getCache(CacheType.DISK, k -> k.startsWith(source + "-")).clearExpiredCache();
     }
-
-//    <X extends Exception> Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X;
 
     <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X;
 }

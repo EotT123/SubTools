@@ -58,7 +58,6 @@ public class TvSubtitlesApi implements SubtitleApi {
 
     public Set<TVSubtitlesSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
         Language language) throws TvSubtitleException {
-        // https://www.tvsubtitles.net/setlang.php?page=/tvshow-3219-2.html&setlang1=es
         Set<TVSubtitlesSubtitleMetadata> results = new HashSet<>();
         TVSubtitlesLanguage providerLang = TVSubtitlesLanguage.of(language).orElse(null);
 
@@ -79,12 +78,8 @@ public class TvSubtitlesApi implements SubtitleApi {
             b -> b.add("providerId", providerId).add("season", season).add("language", providerLang))
             .getCollection(() -> {
                 try {
-                    CookieManager cookieManager = null;
-                    if (providerLang != null) {
-                        cookieManager =
+                    CookieManager cookieManager = providerLang == null ? null :
                             new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
-                    }
-//                    DOMAIN + "/setlang.php?page=/$providerId-$season.html&setlang1=$languageCode",
                     return manager.getAsJsoupDocument(PageContentParams.params(
                             DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
                             cookieManager:cookieManager))
@@ -141,48 +136,5 @@ public class TvSubtitlesApi implements SubtitleApi {
         public boolean isSameEpisode(int season, int episode) {
             return this.season == season && this.episode == episode;
         }
-    }
-
-    private enum TVSubtitlesLanguage {
-        ENGLISH(Language.ENGLISH, "en"),
-        SPANISH(Language.SPANISH, "es"),
-        FRENCH(Language.FRENCH, "fr"),
-        GERMAN(Language.GERMAN, "de"),
-        RUSSIAN(Language.RUSSIAN, "ru"),
-        UKRAINIAN(Language.UKRAINIAN, "ua"),
-        ITALIAN(Language.ITALIAN, "it"),
-        GREEK(Language.GREEK, "gr"),
-        ARABIC(Language.ARABIC, "ar"),
-        HUNGARIAN(Language.HUNGARIAN, "hu"),
-        POLISH(Language.POLISH, "pl"),
-        TURKISH(Language.TURKISH, "tr"),
-        DUTCH(Language.DUTCH, "nl"),
-        PORTUGUESE(Language.PORTUGUESE, "pt"),
-        SWEDISH(Language.SWEDISH, "sv"),
-        DANISH(Language.DANISH, "da"),
-        FINNISH(Language.FINNISH, "fi"),
-        KOREAN(Language.KOREAN, "ko"),
-        CHINESE_SIMPLIFIED(Language.CHINESE_SIMPLIFIED, "cn"),
-        JAPANESE(Language.JAPANESE, "jp"),
-        BULGARIAN(Language.BULGARIAN, "bg"),
-        CZECH(Language.CZECH, "cz"),
-        ROMANIAN(Language.ROMANIAN, "ro");
-
-        @val Language language;
-        @val String langCode;
-
-        TVSubtitlesLanguage(Language language, String langCode) {
-            this.language = language;
-            this.langCode = langCode;
-        }
-
-        public static Optional<TVSubtitlesLanguage> of(String langCode) {
-            return TVSubtitlesLanguage.values().stream().filter(lang -> lang.langCode.equals(langCode)).findAny();
-        }
-
-        public static Optional<TVSubtitlesLanguage> of(Language language) {
-            return TVSubtitlesLanguage.values().stream().filter(lang -> lang.language == language).findAny();
-        }
-
     }
 }

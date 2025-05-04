@@ -71,9 +71,10 @@ public final class SubdlAdapter extends
         @Nullable Integer season) throws SubdlException {
 
         List<SubdlSerieId> subdlSerieIds =
-            providerIds.getImdbId().mapThrowing(imdbId -> api.getProviderIdsUsingImdbId(imdbId)).orElse(List.of())
-                .elseIfEmptyThrowing(() -> api.getProviderIdsUsingSerieName(serieName));
-
+            providerIds.getImdbId().mapThrowing(imdbId -> api.getProviderIdsUsingImdbId(imdbId)).orElse(List.of());
+        if (subdlSerieIds.isEmpty()) {
+            subdlSerieIds = api.getProviderIdsUsingSerieName(serieName);
+        }
         return subdlSerieIds.stream().filter(serieId -> serieId.releaseType == ReleaseType.tv)
             .sorted(Comparator.comparing((SubdlSerieId serieId) -> serieId.calculateLevenshteinDistance(serieName))
                 .thenComparing(SubdlSerieId::getYear, Comparator.nullsLast(Comparator.reverseOrder()))).toList();

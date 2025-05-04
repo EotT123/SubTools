@@ -37,7 +37,7 @@ class OmdbApi implements ApiIntf {
             .getOptional(() -> search(req -> req.withParam("t", name).withParam("type", "series")));
     }
 
-    private static Optional<Release> search(Consumer<Requester<Release>> extraParamConsumer) {
+    private static Optional<Release> search(Consumer<Requester<Release>> extraParamConsumer) throws OmdbException {
         try {
             Requester<Release> request = Release.request(API_DOMAIN).withParam("apikey", API_KEY);
             extraParamConsumer.accept(request);

@@ -23,7 +23,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+@ExtensionMethod({Files.class})
 @RequiredArgsConstructor
 public class DownloadAction {
 
@@ -44,8 +44,7 @@ public class DownloadAction {
     }
 
     private void download(Release release, Subtitle subtitle, LibrarySettings librarySettings,
-        @Nullable Integer version)
-        throws IOException, ManagerException {
+        @Nullable Integer version) throws IOException, ManagerException {
         LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
         Path path = PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
         if (!path.exists()) {
@@ -63,26 +62,21 @@ public class DownloadAction {
         String subFileName = filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, version);
         Path subFile = path.resolve(subFileName);
 
-        boolean success = switch (subtitle.downloadSource.sourceLocation) {
-            case FILE -> {
-                subtitle.downloadSource.file.copyToDir(path);
-                yield true;
-            }
-            case URL, URL_SUPPLIER -> {
-                try {
-                    String url = subtitle.downloadSource.getValue();
-                    boolean result = manager.download(url, subFile);
-                    LOGGER.debug("doDownload file was [{}] ", result);
-                    yield result;
-                } catch (SubtitlesProviderException e) {
-                    LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
-                        "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
-                    throw new RuntimeException(e);
-                }
-            }
-        };
+        boolean result;
+        try {
+            result = subtitle.download(manager, subFile);
+            LOGGER.debug("download file status [{}] ", result ? "successful" : "unsuccessful");
+        } catch (SubtitlesProviderException e) {
+            LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
+                "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
+            throw new RuntimeException(e);
+        } catch (IOException | ManagerException e) {
+            LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
+                "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
+            throw e;
+        }
 
-        if (success) {
+        if (result) {
             if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {
                 Path oldLocationFile = release.getPath().resolve(release.fileName);
                 if (oldLocationFile.exists()) {
