@@ -116,7 +116,7 @@ public class TvdbAdapter implements AdapterIntf {
                         LOGGER.error(
                             "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
                                 TvRelease.formatSeasonEpisode(season, episode)), e);
-                        return Optional.ofNullable((Episode) null);
+                        return Optional.ofNullable(null);
                     }
                 },
                 storeTempNullValue:true);
