@@ -5,6 +5,7 @@ import java.util.stream.IntStream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.SubdlException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlId;
@@ -30,6 +31,106 @@ public class SubdlApi implements SubtitleApi {
     public SubdlApi(Manager manager) {
         this.manager = manager;
     }
+
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
+    /**
+     * Fetches a list of available movie subtitles for the given title, language and year.
+     * Results are cached in memory.
+     *
+     * @param title the movie title
+     * @param language the subtitle language
+     * @param year the year of the movie (nullable)
+     * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
+     * @throws SubdlException if the API call fails
+     */
+    public List<SubdlSubtitleMetadata> getMovieSubtitles(String title, Language language,
+        @Nullable Integer year) throws SubdlException {
+        return getCache("movieSubtitles", b -> b.add("title", title).add("language", language).add("year", year))
+            .getCollection(() -> {
+                try {
+                    return Serie.request(API_DOMAIN)
+                        .withParam("api_key", API_KEY)
+                        .withParam("film_name", title)
+                        .withParam("year", year == null ? null : String.valueOf(year))
+//                        .withParam("sd_id", year)
+                        .withParam("languages", SubdlLanguage.of(language).langCode)
+                        .withParam("type", ReleaseType.movie.toString())
+                        .getOne("/subtitles")
+                        .subtitles.stream().map(this::convertToSubtitleMetadata).toList();
+                } catch (Exception e) {
+                    throw new SubdlException(e);
+                }
+            });
+    }
+
+    /**
+     * Fetches a list of available movie subtitles for a given imdbId and language.
+     * Results are cached in memory.
+     *
+     * @param imdbId the imdb id of the movie
+     * @param language the subtitle language
+     * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
+     * @throws SubdlException if the API call fails
+     */
+    public List<SubdlSubtitleMetadata> getMovieSubtitles(String imdbId, Language language) throws SubdlException {
+        return getCache("movieSubtitles", b -> b.add("imdbId", imdbId).add("language", language))
+            .getCollection(() -> {
+                try {
+                    return Serie.request(API_DOMAIN)
+                        .withParam("api_key", API_KEY)
+                        .withParam("imdb_id", imdbId)
+                        .withParam("languages", SubdlLanguage.of(language).langCode)
+                        .withParam("type", ReleaseType.movie.toString())
+                        .getOne("/subtitles")
+                        .subtitles.stream().map(this::convertToSubtitleMetadata).toList();
+                } catch (Exception e) {
+                    throw new SubdlException(e);
+                }
+            });
+    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
+
+    /**
+     * Fetches a list of available serie subtitles for a given id, season, episode, language.
+     * Results are cached in memory.
+     *
+     * @param providerId the SubDL ID
+     * @param season the season number
+     * @param episode the episode number
+     * @param language the subtitle language
+     * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
+     * @throws SubdlException if the API call fails
+     */
+    public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode,
+        Language language) throws SubdlException {
+        return getCache("serieSubtitles", b -> b.add("providerId", providerId)
+            .add("season", season).add("episode", episode).add("language", language))
+            .getCollection(() -> {
+                try {
+                    return Serie.request(API_DOMAIN)
+                        .withParam("api_key", API_KEY)
+                        .withParam("sd_id", providerId)
+                        .withParam("season_number", String.valueOf(season))
+//                        .withParam("episode_number", String.valueOf(episode))
+                        .withParam("languages", SubdlLanguage.of(language).langCode)
+                        .withParam("type", ReleaseType.tv.toString())
+                        .getOne("/subtitles")
+                        .subtitles.stream().map(this::convertToSubtitleMetadata).toList();
+                } catch (Exception e) {
+                    throw new SubdlException(e);
+                }
+            }).stream().filter(sub -> sub.episodes.contains(episode)).toList();
+    }
+
+    // ====== \\
+    // COMMON \\
+    // ====== \\
 
     /**
      * Fetches subtitle provider ids from SubDL using an IMDb ID.
@@ -86,63 +187,6 @@ public class SubdlApi implements SubtitleApi {
             resultItem.year == null ? null : Integer.parseInt(resultItem.year), resultItem.type);
     }
 
-    /**
-     * Fetches a list of available movie subtitles for a given id and language.
-     * Results are cached in memory.
-     *
-     * @param providerId the SubDL ID
-     * @param language the subtitle language
-     * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
-     * @throws SubdlException if the API call fails
-     */
-    public List<SubdlSubtitleMetadata> getMovieSubtitles(String providerId, Language language) throws SubdlException {
-        return getCache("movieSubtitles", b -> b.add("providerId", providerId).add("language", language))
-            .getCollection(() -> {
-                try {
-                    return Serie.request(API_DOMAIN)
-                        .withParam("api_key", API_KEY)
-                        .withParam("sd_id", providerId)
-                        .withParam("languages", SubdlLanguage.of(language).langCode)
-                        .withParam("type", ReleaseType.movie.toString())
-                        .getOne("/subtitles")
-                        .subtitles.stream().map(this::convertToSubtitleMetadata).toList();
-                } catch (Exception e) {
-                    throw new SubdlException(e);
-                }
-            });
-    }
-
-    /**
-     * Fetches a list of available serie subtitles for a given id, season, episode, language.
-     * Results are cached in memory.
-     *
-     * @param providerId the SubDL ID
-     * @param season the season number
-     * @param episode the episode number
-     * @param language the subtitle language
-     * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
-     * @throws SubdlException if the API call fails
-     */
-    public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode,
-        Language language) throws SubdlException {
-        return getCache("serieSubtitles", b -> b.add("providerId", providerId)
-            .add("season", season).add("episode", episode).add("language", language))
-            .getCollection(() -> {
-                try {
-                    return Serie.request(API_DOMAIN)
-                        .withParam("api_key", API_KEY)
-                        .withParam("sd_id", providerId)
-                        .withParam("season_number", String.valueOf(season))
-//                        .withParam("episode_number", String.valueOf(episode))
-                        .withParam("languages", SubdlLanguage.of(language).langCode)
-                        .withParam("type", ReleaseType.tv.toString())
-                        .getOne("/subtitles")
-                        .subtitles.stream().map(this::convertToSubtitleMetadata).toList();
-                } catch (Exception e) {
-                    throw new SubdlException(e);
-                }
-            }).stream().filter(sub -> sub.episodes.contains(episode)).toList();
-    }
 
     /**
      * Converts a SubDL subtitle API result into a {@link SubdlSubtitleMetadata}.

@@ -53,11 +53,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @param <API_SUB> type of the subtitle objects returned by the api
  * @param <SUB> type of the converted subtitle objects
- * @param <S_ID> type of the ProviderId
+ * @param <S_ID> type of the serie provider id
+ * @param <M_ID> type of the movie provider id
+ * @param <P_ID> type of the provider id
  * @param <X> type of the exception thrown by the api
  */
 @ExtensionMethod({Files.class})
-public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception>
+public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends P_ID,
+    M_ID extends P_ID, P_ID extends ProviderId, X extends Exception>
     implements SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
 
@@ -77,19 +80,6 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
     public Set<SUB> searchSubtitles(MovieRelease movieRelease, Language language) {
         Set<API_SUB> subtitles = new HashSet<>();
-        if (StringUtils.isNotBlank(movieRelease.fileName)) {
-            Path file = movieRelease.getPath().resolve(movieRelease.fileName);
-            if (file.exists()) {
-                try {
-                    subtitles.addAll(searchMovieSubtitlesWithHash(FileHasher.computeHash(file), language));
-                } catch (IOException e) {
-                    LOGGER.error("Error calculating file hash", e);
-                } catch (Exception e) {
-                    LOGGER.error("API $provider searchSubtitles using file hash for movie [%s] (%s)"
-                        .formatted(movieRelease.name, e.getMessage()), e);
-                }
-            }
-        }
         try {
             subtitles.addAll(searchMovieSubtitlesWithId(movieRelease.providerIds, language));
         } catch (Exception e) {
@@ -104,6 +94,21 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     .formatted(movieRelease.name, e.getMessage()), e);
             }
         }
+        if (subtitles.isEmpty()) {
+            if (StringUtils.isNotBlank(movieRelease.fileName)) {
+                Path file = movieRelease.getPath().resolve(movieRelease.fileName);
+                if (file.exists()) {
+                    try {
+                        subtitles.addAll(searchMovieSubtitlesWithHash(FileHasher.computeHash(file), language));
+                    } catch (IOException e) {
+                        LOGGER.error("Error calculating file hash", e);
+                    } catch (Exception e) {
+                        LOGGER.error("API $provider searchSubtitles using file hash for movie [%s] (%s)"
+                            .formatted(movieRelease.name, e.getMessage()), e);
+                    }
+                }
+            }
+        }
         return subtitles.stream().map(this::convertToSubtitle).toSet();
     }
 
@@ -114,6 +119,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public abstract Collection<API_SUB> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws X;
 
+
+    @Override
     public Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X {
         return getProviderMovieMapping(movieRelease.name, movieRelease.name, movieRelease.name, movieRelease.year,
             movieRelease.providerIds);
@@ -144,14 +151,14 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     private Optional<MovieMapping> getProviderMovieMapping(String name, String nameToSearchFor, String displayName,
         @Nullable Integer year, ProviderIds providerIds) throws X {
 
-        ThrowingBiFunction<ProviderIds, String, List<S_ID>, X> providerReleaseIdsFunction
+        ThrowingBiFunction<ProviderIds, String, List<M_ID>, X> providerReleaseIdsFunction
             = (_providerIds, _nameToSearchFor) -> getSortedMovieProviderIds(_providerIds, _nameToSearchFor, year);
         TriFunction<String, String, String, MovieMapping> releaseMappingConstructor =
             (_name, providerId, providerName) -> new MovieMapping(_name, providerId, providerName, year);
         UnaryOperator<String> selectFromListMessage =
             _displayName -> year == null ? getText("SelectDialog.SelectMovieNameForName", _displayName) :
                 getText("SelectDialog.SelectMovieNameForNameWithSeason", _displayName, year);
-        Function<S_ID, String> providerReleaseIdToDisplayStringFunction = this::providerMovieIdToDisplayString;
+        Function<M_ID, String> providerReleaseIdToDisplayStringFunction = this::providerMovieIdToDisplayString;
 
         return getProviderReleaseMapping(name,
             nameToSearchFor, displayName,
@@ -173,7 +180,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @return a list of sorted movie provider IDs
      * @throws X if an error occurs during the operation
      */
-    public abstract List<S_ID> getSortedMovieProviderIds(ProviderIds providerIds, String serieName,
+    public abstract List<M_ID> getSortedMovieProviderIds(ProviderIds providerIds, String serieName,
         @Nullable Integer year) throws X;
 
     /**
@@ -182,7 +189,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @param providerMovieId the provider-specific movie identifier to be converted to a display string
      * @return a string representation of the movie id suitable for display purposes
      */
-    public abstract String providerMovieIdToDisplayString(S_ID providerMovieId);
+    public abstract String providerMovieIdToDisplayString(M_ID providerMovieId);
 
     // ===== \\
     // SERIE \\
@@ -327,17 +334,18 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @param providerReleaseIdToDisplayStringFunction a function that converts a provider-specific release ID to a
      * string that is used in the GUI.
      * @param <M> the type of the {@link ReleaseMapping} to return
+     * @param <P> the type of the {@link P_ID} used to identify the provider-specific release ID
      * @return an {@code Optional<ReleaseMapping>} containing the mapping information if found, or an empty {@code
      * Optional} if none is found.
      * @throws X if an error occurs during the retrieval operation
      */
-    public <M extends ReleaseMapping> Optional<M> getProviderReleaseMapping(String name,
+    public <M extends ReleaseMapping, P extends P_ID> Optional<M> getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
         Map<String, Object> extraParams, ProviderIds providerIds,
-        ThrowingBiFunction<ProviderIds, String, List<S_ID>, X> providerReleaseIdsFunction,
+        ThrowingBiFunction<ProviderIds, String, List<P>, X> providerReleaseIdsFunction,
         TriFunction<String, String, String, M> releaseMappingConstructor,
         UnaryOperator<String> selectFromListMessage,
-        Function<S_ID, String> providerReleaseIdToDisplayStringFunction) throws X {
+        Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
 
         CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObj(tvdbId ->
                 getCache("releaseMapping", b -> b.add("tvdbId", tvdbId).add(extraParams)))
@@ -374,7 +382,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             }
         }
 
-        List<S_ID> providerReleaseIds = providerReleaseIdsFunction.apply(providerIds, nameToSearchFor);
+        List<P> providerReleaseIds = providerReleaseIdsFunction.apply(providerIds, nameToSearchFor);
         if (providerReleaseIds.isEmpty()) {
             // If no release provider ids are found, store a temporary null value in the cache with a 1-day expiration,
             // to avoid repeatedly querying the provider on each method call.
@@ -399,7 +407,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
                 "name-prev-results").add("name", nameToSearchFor).add(extraParams));
 
-            Optional<S_ID> uriForRelease;
+            Optional<P> uriForRelease;
             // Skip prompting the user if the previous results for this service were identical.
             if (previousResultsCache.isPresent() &&
                 providerReleaseIds.equals(previousResultsCache.getCollection(null))) {

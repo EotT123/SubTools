@@ -26,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneMovieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
@@ -78,7 +79,7 @@ public class SubsceneApi implements SubtitleApi {
      * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public Map<String, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
+    public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
         return getProviderIds(title, elem -> {
             Matcher matcher = MOVIE_NAME_PATTERN.matcher(elem.text());
             if (matcher.matches()) {
@@ -99,7 +100,7 @@ public class SubsceneApi implements SubtitleApi {
      * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public Map<String, List<SubSceneSerieId>> getSerieProviderIds(String serieName) throws SubsceneException {
+    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(String serieName) throws SubsceneException {
         return getProviderIds(serieName, elem -> {
             Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
             if (matcher.matches()) {
@@ -159,7 +160,7 @@ public class SubsceneApi implements SubtitleApi {
      * @return a {@link Map} containing a list of {@link ProviderId provider release ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public <S extends SubSceneId> Map<String, List<S>> getProviderIds(String name,
+    public <S extends SubSceneId> Map<SearchResultType, List<S>> getProviderIds(String name,
         Function<Element, S> subsceneIdCreator) throws SubsceneException {
         try {
             if (StringUtils.isBlank(name)) {
@@ -168,7 +169,7 @@ public class SubsceneApi implements SubtitleApi {
             String url = "$DOMAIN/subtitles/searchbytitle?query=" + name.urlEncode();
             return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
                 .stream()
-                .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
+                .collect(Utils.mapCollector((map, titleElement) -> map.put(SearchResultType.of(titleElement.text()),
                     titleElement.nextElementSibling().selectAllByTag("a").stream().map(subsceneIdCreator).toList())));
         } catch (Exception e) {
             throw new SubsceneException(e);

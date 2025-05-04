@@ -52,7 +52,7 @@ public interface SubtitleProvider<SUB extends Subtitle> {
         manager.getCache(CacheType.DISK, k -> k.startsWith(source + "-")).clearExpiredCache();
     }
 
-    <X extends Exception> Optional<MovieMapping> getProviderMovieId(MovieRelease movieRelease) throws X;
+    <X extends Exception> Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X;
 
     <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X;
 }

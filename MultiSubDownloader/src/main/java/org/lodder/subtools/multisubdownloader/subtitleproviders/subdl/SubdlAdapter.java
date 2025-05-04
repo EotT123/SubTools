@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import lombok.Getter;
 import manifold.ext.props.rt.api.override;
@@ -14,6 +15,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
@@ -25,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlId,
+public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlId, SubdlId,
     SubdlException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubdlAdapter.class);
@@ -41,23 +43,49 @@ public final class SubdlAdapter extends SubtitleAdapter<SubdlSubtitleMetadata, S
         }
     }
 
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
     @Override
-    public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithHash(String hash,
-        Language language) throws SubdlException {
-        return api.searchSubtitles().movieHash(hash).language(language).searchSubtitles().getData();
+    public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithHash(String hash, Language language)
+        throws SubdlException {
+        return List.of();
     }
 
     @Override
     public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws SubdlException {
-        return api.searchSubtitles().imdbId(tvdbId).language(language).searchSubtitles().getData();
+        return providerIds.getImdbId().mapThrowing(imdbId -> api.getMovieSubtitles(imdbId, language)).orElse(List.of());
     }
 
     @Override
     public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws SubdlException {
-        return api.getMovieSubtitles().query(name).language(language).searchSubtitles().getData();
+        return api.getMovieSubtitles(name, language, year);
     }
+
+    @Override
+    public List<SubdlId> getSortedMovieProviderIds(ProviderIds providerIds, String title,
+        @Nullable Integer year) throws SubsceneException {
+        return api.getMovieProviderIds(title)
+            .entrySet()
+            .stream()
+            .sorted(Comparator.comparingInt(entry -> providerTypeFunction.applyAsInt(entry.getKey())))
+            .map(Entry::getValue)
+            .flatMap(values -> values.stream().sorted(Comparator.comparing(s -> s.getScore(title, year))))
+            .distinct()
+            .toList();
+    }
+
+    @Override
+    public String providerMovieIdToDisplayString(SubdlId providerSerieId) {
+        return providerSerieId.name;
+    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
 
     @Override
     public Collection<SubdlSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
