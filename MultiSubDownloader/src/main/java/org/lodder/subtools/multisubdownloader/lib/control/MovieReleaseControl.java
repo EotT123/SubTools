@@ -67,7 +67,11 @@ public final class MovieReleaseControl extends ReleaseControl {
                 movieRelease.name = details.name;
             }),
             () -> omdbAdapter.searchMovie(release.name).ifPresent(omdbRelease -> {
-                movieRelease.year = omdbRelease.year;
+                try {
+                    movieRelease.year = Integer.parseInt(omdbRelease.year);
+                } catch (NumberFormatException e) {
+                    // continue
+                }
                 movieRelease.name = omdbRelease.title;
             }));
     }

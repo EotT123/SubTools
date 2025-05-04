@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpenSubtilteSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.AiTranslatedEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.ForeignPartsOnlyEnum;
@@ -32,8 +31,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.opensubtitles.api.AuthenticationApi;
@@ -44,7 +41,6 @@ import org.opensubtitles.invoker.ApiException;
 import org.opensubtitles.model.DownloadRequest;
 import org.opensubtitles.model.Login200Response;
 import org.opensubtitles.model.LoginRequest;
-import org.opensubtitles.model.SubtitleAttributes;
 
 public class OpenSubtitlesApi implements SubtitleApi {
 
@@ -126,7 +122,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     // ====== \\
 
 
-    public List<OpenSubtilteSubtitle> searchSubtitles(
+    public List<org.opensubtitles.model.Subtitle> searchSubtitles(
         @Nullable AiTranslatedEnum aiTranslated=null,
         @Nullable Integer episode=null,
         @Nullable ForeignPartsOnlyEnum foreignPartsOnly=null,
@@ -188,8 +184,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             getValue(machineTranslated), getValue(aiTranslated),
                             orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
                             parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
-                            getValue(movieHashMatch), page, userAgent)).data
-                        .stream().flatMap(sub -> createSubtitles(sub).stream()).toList();
+                            getValue(movieHashMatch), page, userAgent)).data;
                     // TODO is this filtering needed?
                     // String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
                     // String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName, "[^A-Za-z]", ""));
@@ -204,31 +199,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-
-    private List<OpenSubtilteSubtitle> createSubtitles(org.opensubtitles.model.Subtitle sub) {
-        SubtitleAttributes attr = sub.getAttributes();
-        Language language = Language.ofLangCodeOptional(attr.language).orElse(null);
-        return ReleaseParser.parse(attr.getRelease())
-            .map(release -> new OpenSubtilteSubtitle(
-                urlSupplier:() -> getDownloadUrl(Integer.parseInt(attr.subtitleId)),
-                fileName:attr.release,
-                language:language,
-                releaseGroup:release.releaseGroup,
-                uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
-                quality:release.quality,
-                hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
-            .orElseGet(() -> {
-                ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
-                return new OpenSubtilteSubtitle(
-                    urlSupplier:() -> getDownloadUrl(Integer.parseInt(attr.subtitleId)),
-                    fileName:attr.release,
-                    language:Language.ofLangCodeOptional(attr.getLanguage()).orElse(null),
-                    releaseGroup:extraInfo.getReleaseGroupBestEffort(),
-                    uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
-                    quality:extraInfo.qualityKeyword,
-                    hearingImpaired:Boolean.TRUE == attr.isHearingImpaired());
-            });
-    }
 
     public String getDownloadUrl(int fileId) throws OpenSubtitleException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))

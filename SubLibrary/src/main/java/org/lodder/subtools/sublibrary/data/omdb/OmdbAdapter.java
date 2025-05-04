@@ -8,12 +8,9 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OmdbAdapter implements AdapterIntf {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OmdbAdapter.class);
     private static OmdbAdapter instance;
     private final OmdbApi api;
     @val @override Manager manager;

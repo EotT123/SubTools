@@ -63,12 +63,16 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
     @val @override Manager manager;
     @val UserInteractionHandler userInteractionHandler;
-    @val @override String provider = source.name();
     @val(Abstract) boolean useSeasonForSerieId;
 
     protected SubtitleAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
+    }
+
+    @Override
+    public String getProvider() {
+        return source.name();
     }
 
     // ===== \\

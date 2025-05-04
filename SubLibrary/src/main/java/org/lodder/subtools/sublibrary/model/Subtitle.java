@@ -6,7 +6,6 @@ import java.nio.file.Path;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -18,12 +17,12 @@ public abstract class Subtitle implements Serializable {
 
     @val @Nullable String fileName;
     @val @Nullable Language language;
-    @val String releaseGroup;
+    @val @Nullable String releaseGroup;
     @val @Nullable String uploader;
     @val SubtitleSource source;
     @val boolean hearingImpaired;
     @val String quality;
-    
+
     @var @Nullable SubtitleMatchType subtitleMatchType;
     @var int score;
 
@@ -36,8 +35,7 @@ public abstract class Subtitle implements Serializable {
         @Nullable String quality=null) {
         this.fileName = fileName;
         this.language = language;
-        this.releaseGroup = releaseGroup != null ? releaseGroup :
-            ReleaseParser.extractReleaseGroup(fileName, StringUtils.endsWith(fileName, ".srt"));
+        this.releaseGroup = releaseGroup;
         this.uploader = uploader;
         this.source = source;
         this.hearingImpaired = hearingImpaired;

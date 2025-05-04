@@ -24,14 +24,10 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Addic7edSubtitle, ProviderId,
     Addic7edException> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edAdapter.class);
 
     private static Addic7edApi api;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;

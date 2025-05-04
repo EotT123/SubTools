@@ -7,7 +7,7 @@
       "type": "string"
     },
     "Year": {
-      "type": "integer"
+      "type": "string"
     },
     "Rated": {
       "type": "string"
@@ -65,10 +65,10 @@
       }
     },
     "Metascore": {
-      "type": "integer"
+      "type": "string"
     },
     "imdbRating": {
-      "type": "number"
+      "type": "string"
     },
     "imdbVotes": {
       "type": "string"

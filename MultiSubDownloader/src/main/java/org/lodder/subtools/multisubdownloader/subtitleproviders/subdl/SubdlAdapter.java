@@ -20,15 +20,11 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import subdl.Serie.ReleaseType;
 
 @Getter
 public final class SubdlAdapter extends
     SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId, SubdlException> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SubdlAdapter.class);
 
     private static SubdlApi api;
     @val @override SubtitleSource source = SubtitleSource.SUBDL;

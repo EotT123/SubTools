@@ -22,13 +22,9 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class TvSubtitlesAdapter
     extends SubtitleAdapter<TVSubtitlesSubtitleMetadata, TvSubtiltesSubtitle, ProviderId, TvSubtitleException> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TvSubtitlesAdapter.class);
 
     private static TvSubtitlesApi api;
     @val @override SubtitleSource source = SubtitleSource.TVSUBTITLES;

@@ -16,14 +16,17 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.mo
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.opensubtitles.model.SubtitleAttributes;
 
 @Getter
 public final class OpenSubAdapter
-    extends SubtitleAdapter<OpenSubtilteSubtitle, OpenSubtilteSubtitle, OpensubtitleId,
+    extends SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId,
     OpenSubtitleException> {
 
     private static OpenSubtitlesApi api;
@@ -42,20 +45,20 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public List<OpenSubtilteSubtitle> searchMovieSubtitlesWithHash(String hash, Language language)
+    public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithHash(String hash, Language language)
         throws OpenSubtitleException {
         return api.searchSubtitles(movieHash:hash, language:language);
     }
 
     @Override
-    public List<OpenSubtilteSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
+    public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws OpenSubtitleException {
         return providerIds.getImdbId().mapThrowing(imdbId -> api.searchSubtitles(imdbId:imdbId, language:language))
             .orElse(List.of());
     }
 
     @Override
-    public Collection<OpenSubtilteSubtitle> searchMovieSubtitlesWithName(String name,
+    public Collection<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithName(String name,
         @Nullable Integer year, Language language) throws OpenSubtitleException {
         return api.searchSubtitles(query:name, language:language);
     }
@@ -82,7 +85,7 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public Collection<OpenSubtilteSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws OpenSubtitleException {
         return api.searchSubtitles(
             query:serieMapping.name,
@@ -97,7 +100,28 @@ public final class OpenSubAdapter
     // ====== \\
 
     @Override
-    public OpenSubtilteSubtitle convertToSubtitle(OpenSubtilteSubtitle sub) {
-        return sub;
+    public OpenSubtilteSubtitle convertToSubtitle(org.opensubtitles.model.Subtitle sub) {
+        SubtitleAttributes attr = sub.getAttributes();
+        Language language = Language.ofLangCodeOptional(attr.language).orElse(null);
+        return ReleaseParser.parse(attr.getRelease())
+            .map(release -> new OpenSubtilteSubtitle(
+                urlSupplier:() -> api.getDownloadUrl(Integer.parseInt(attr.subtitleId)),
+                fileName:attr.release,
+                language:language,
+                releaseGroup:release.releaseGroup,
+                uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                quality:release.quality,
+                hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
+            .orElseGet(() -> {
+                ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
+                return new OpenSubtilteSubtitle(
+                    urlSupplier:() -> api.getDownloadUrl(Integer.parseInt(attr.subtitleId)),
+                    fileName:attr.release,
+                    language:Language.ofLangCodeOptional(attr.getLanguage()).orElse(null),
+                    releaseGroup:extraInfo.getReleaseGroupBestEffort(),
+                    uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                    quality:extraInfo.qualityKeyword,
+                    hearingImpaired:Boolean.TRUE == attr.isHearingImpaired());
+            });
     }
 }
