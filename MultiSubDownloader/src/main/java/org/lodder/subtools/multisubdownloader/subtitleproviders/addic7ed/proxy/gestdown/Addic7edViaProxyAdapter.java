@@ -86,7 +86,7 @@ public final class Addic7edViaProxyAdapter extends
                     .message("getProviderSerieName: [$serieName]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                        LOGGER.info("API $providerName - Could not find serie name [$serieName]");
+                        LOGGER.info("API $provider - Could not find serie name [$serieName]");
                         return List.of();
                     })
                     .execute());

@@ -22,7 +22,6 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,25 +67,6 @@ public final class TvSubtitlesAdapter
         Language language) {
         // no movie information available for provider
         return List.of();
-    }
-
-    @Override
-    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(MovieMapping movieMapping, int season, int episode,
-        Language language) throws TvSubtitleException {
-        // no movie information available for provider
-        return List.of();
-    }
-
-    @Override
-    public List<ProviderId> getSortedMovieProviderIds(ProviderIds providerIds, String title,
-        @Nullable Integer year) throws TvSubtitleException {
-        // no movie information available for provider
-        return List.of();
-    }
-
-    @Override
-    public String providerMovieIdToDisplayString(ProviderId providerId) {
-        return providerId.name;
     }
 
     // ===== \\

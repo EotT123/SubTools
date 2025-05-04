@@ -27,7 +27,6 @@ import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneMovieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
@@ -73,23 +72,23 @@ public class SubsceneApi implements SubtitleApi {
     // MOVIE \\
     // ===== \\
 
-    /**
-     * @param title the movie title
-     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
-     * @throws SubsceneException SubsceneException
-     */
-    public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
-        return getProviderIds(title, elem -> {
-            String _title = null;
-            Integer _year = null;
-            Matcher matcher = MOVIE_NAME_PATTERN.matcher(elem.text());
-            if (matcher.matches()) {
-                _title = matcher.group("title");
-                _year = Integer.parseInt(matcher.group("year"));
-            }
-            return new SubSceneMovieId(elem.text(), elem.attr("href"), _title, _year);
-        });
-    }
+//    /**
+//     * @param title the movie title
+//     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
+//     * @throws SubsceneException SubsceneException
+//     */
+//    public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
+//        return getProviderIds(title, elem -> {
+//            String _title = null;
+//            Integer _year = null;
+//            Matcher matcher = MOVIE_NAME_PATTERN.matcher(elem.text());
+//            if (matcher.matches()) {
+//                _title = matcher.group("title");
+//                _year = Integer.parseInt(matcher.group("year"));
+//            }
+//            return new SubSceneMovieId(elem.text(), elem.attr("href"), _title, _year);
+//        });
+//    }
 
     // ===== \\
     // SERIE \\

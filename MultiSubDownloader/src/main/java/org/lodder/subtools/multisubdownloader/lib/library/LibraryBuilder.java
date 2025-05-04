@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbSerie;
 import org.lodder.subtools.sublibrary.model.Release;
 
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
     public abstract Path build(Release release);
 
     protected String getShowName(String name) {
-        return tvdbAdapter != null ? tvdbAdapter.searchSerie(name).map(TvdbSerie::getSerieName).orElse(name) : name;
+        return tvdbAdapter != null ? tvdbAdapter.searchSerie(name).map(s -> s.seriesName).orElse(name) : name;
     }
 
     protected String replace(String structure, StructureTag tag, String value) {

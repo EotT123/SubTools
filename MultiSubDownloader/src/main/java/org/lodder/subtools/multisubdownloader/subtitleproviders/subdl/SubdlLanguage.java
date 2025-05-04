@@ -67,7 +67,7 @@ public enum SubdlLanguage {
     TAMIL(Language.TAMIL, "TA"),
     TELUGU(Language.TELUGU, "TE"),
     THAI(Language.THAI, "TH"),
-    TURKISH(Language.TURKISH, "TR")
+    TURKISH(Language.TURKISH, "TR");
 //    UKRANIAN(Language.UKRANIAN,"UK"),
 //    URDU(Language.URDU,"UR");
 
