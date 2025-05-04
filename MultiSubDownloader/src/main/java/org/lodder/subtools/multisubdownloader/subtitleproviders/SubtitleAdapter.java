@@ -44,7 +44,6 @@ import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.Logger;
@@ -54,13 +53,10 @@ import org.slf4j.LoggerFactory;
  * @param <API_SUB> type of the subtitle objects returned by the api
  * @param <SUB> type of the converted subtitle objects
  * @param <S_ID> type of the serie provider id
- * @param <M_ID> type of the movie provider id
- * @param <P_ID> type of the provider id
  * @param <X> type of the exception thrown by the api
  */
 @ExtensionMethod({Files.class})
-public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends P_ID,
-    M_ID extends P_ID, P_ID extends ProviderId, X extends Exception>
+public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception>
     implements SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
 
@@ -120,76 +116,76 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         Language language) throws X;
 
 
-    @Override
-    public Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X {
-        return getProviderMovieMapping(movieRelease.name, movieRelease.name, movieRelease.name, movieRelease.year,
-            movieRelease.providerIds);
-    }
+//    @Override
+//    public Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X {
+//        return getProviderMovieMapping(movieRelease.name, movieRelease.name, movieRelease.name, movieRelease.year,
+//            movieRelease.providerIds);
+//    }
 
-    /**
-     * Attempts to retrieve a movie mapping from a provider using the specified parameters.
-     * <p>
-     * This method caches the results to prevent redundant provider queries. If no movie mapping is found or if
-     * the user is manually searching with a custom name, it will store temporary cache values to avoid unnecessary
-     * repeated user prompts during the same execution.
-     * </p>
-     * <p>
-     * If {@code nameToSearchFor} differs from {@code name}, it indicates that the user has entered a custom search name.
-     * This distinction is used to determine caching behavior and result matching logic.
-     * </p>
-     *
-     * @param name the name of the movie
-     * @param nameToSearchFor the name to search for in the provider's data. If this differs from the name, it is a
-     * custom name entered by the user.
-     * @param displayName the name to display in the UI
-     * @param year the year to narrow down the search results
-     * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
-     * @return an {@code Optional<MovieMapping>} containing the mapping information if found, or an empty {@code
-     * Optional} if none is found.
-     * @throws X if an error occurs during the retrieval operation
-     */
-    private Optional<MovieMapping> getProviderMovieMapping(String name, String nameToSearchFor, String displayName,
-        @Nullable Integer year, ProviderIds providerIds) throws X {
-
-        ThrowingBiFunction<ProviderIds, String, List<M_ID>, X> providerReleaseIdsFunction
-            = (_providerIds, _nameToSearchFor) -> getSortedMovieProviderIds(_providerIds, _nameToSearchFor, year);
-        TriFunction<String, String, String, MovieMapping> releaseMappingConstructor =
-            (_name, providerId, providerName) -> new MovieMapping(_name, providerId, providerName, year);
-        UnaryOperator<String> selectFromListMessage =
-            _displayName -> year == null ? getText("SelectDialog.SelectMovieNameForName", _displayName) :
-                getText("SelectDialog.SelectMovieNameForNameWithSeason", _displayName, year);
-        Function<M_ID, String> providerReleaseIdToDisplayStringFunction = this::providerMovieIdToDisplayString;
-
-        return getProviderReleaseMapping(name,
-            nameToSearchFor, displayName,
-            Map.of("year", year),
-            providerIds,
-            providerReleaseIdsFunction,
-            releaseMappingConstructor,
-            selectFromListMessage,
-            providerReleaseIdToDisplayStringFunction);
-    }
-
-    /**
-     * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
-     * should not be cached in the implementing classes.
-     *
-     * @param providerIds the provider IDs containing various IDs for providers
-     * @param serieName the name of the movie
-     * @param year the year number of the movie
-     * @return a list of sorted movie provider IDs
-     * @throws X if an error occurs during the operation
-     */
-    public abstract List<M_ID> getSortedMovieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer year) throws X;
-
-    /**
-     * Converts a provider-specific movie id to a displayable string format.
-     *
-     * @param providerMovieId the provider-specific movie identifier to be converted to a display string
-     * @return a string representation of the movie id suitable for display purposes
-     */
-    public abstract String providerMovieIdToDisplayString(M_ID providerMovieId);
+//    /**
+//     * Attempts to retrieve a movie mapping from a provider using the specified parameters.
+//     * <p>
+//     * This method caches the results to prevent redundant provider queries. If no movie mapping is found or if
+//     * the user is manually searching with a custom name, it will store temporary cache values to avoid unnecessary
+//     * repeated user prompts during the same execution.
+//     * </p>
+//     * <p>
+//     * If {@code nameToSearchFor} differs from {@code name}, it indicates that the user has entered a custom search name.
+//     * This distinction is used to determine caching behavior and result matching logic.
+//     * </p>
+//     *
+//     * @param name the name of the movie
+//     * @param nameToSearchFor the name to search for in the provider's data. If this differs from the name, it is a
+//     * custom name entered by the user.
+//     * @param displayName the name to display in the UI
+//     * @param year the year to narrow down the search results
+//     * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
+//     * @return an {@code Optional<MovieMapping>} containing the mapping information if found, or an empty {@code
+//     * Optional} if none is found.
+//     * @throws X if an error occurs during the retrieval operation
+//     */
+//    private Optional<MovieMapping> getProviderMovieMapping(String name, String nameToSearchFor, String displayName,
+//        @Nullable Integer year, ProviderIds providerIds) throws X {
+//
+//        ThrowingBiFunction<ProviderIds, String, List<M_ID>, X> providerReleaseIdsFunction
+//            = (_providerIds, _nameToSearchFor) -> getSortedMovieProviderIds(_providerIds, _nameToSearchFor, year);
+//        TriFunction<String, String, String, MovieMapping> releaseMappingConstructor =
+//            (_name, providerId, providerName) -> new MovieMapping(_name, providerId, providerName, year);
+//        UnaryOperator<String> selectFromListMessage =
+//            _displayName -> year == null ? getText("SelectDialog.SelectMovieNameForName", _displayName) :
+//                getText("SelectDialog.SelectMovieNameForNameWithSeason", _displayName, year);
+//        Function<M_ID, String> providerReleaseIdToDisplayStringFunction = this::providerMovieIdToDisplayString;
+//
+//        return getProviderReleaseMapping(name,
+//            nameToSearchFor, displayName,
+//            Map.of("year", year),
+//            providerIds,
+//            providerReleaseIdsFunction,
+//            releaseMappingConstructor,
+//            selectFromListMessage,
+//            providerReleaseIdToDisplayStringFunction);
+//    }
+//
+//    /**
+//     * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
+//     * should not be cached in the implementing classes.
+//     *
+//     * @param providerIds the provider IDs containing various IDs for providers
+//     * @param serieName the name of the movie
+//     * @param year the year number of the movie
+//     * @return a list of sorted movie provider IDs
+//     * @throws X if an error occurs during the operation
+//     */
+//    public abstract List<M_ID> getSortedMovieProviderIds(ProviderIds providerIds, String serieName,
+//        @Nullable Integer year) throws X;
+//
+//    /**
+//     * Converts a provider-specific movie id to a displayable string format.
+//     *
+//     * @param providerMovieId the provider-specific movie identifier to be converted to a display string
+//     * @return a string representation of the movie id suitable for display purposes
+//     */
+//    public abstract String providerMovieIdToDisplayString(M_ID providerMovieId);
 
     // ===== \\
     // SERIE \\
@@ -334,12 +330,11 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @param providerReleaseIdToDisplayStringFunction a function that converts a provider-specific release ID to a
      * string that is used in the GUI.
      * @param <M> the type of the {@link ReleaseMapping} to return
-     * @param <P> the type of the {@link P_ID} used to identify the provider-specific release ID
      * @return an {@code Optional<ReleaseMapping>} containing the mapping information if found, or an empty {@code
      * Optional} if none is found.
      * @throws X if an error occurs during the retrieval operation
      */
-    public <M extends ReleaseMapping, P extends P_ID> Optional<M> getProviderReleaseMapping(String name,
+    public <M extends ReleaseMapping, P extends ProviderId> Optional<M> getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
         Map<String, Object> extraParams, ProviderIds providerIds,
         ThrowingBiFunction<ProviderIds, String, List<P>, X> providerReleaseIdsFunction,
@@ -402,7 +397,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             releaseMapping =
                 releaseMappingConstructor.apply(name, providerReleaseIds.first.id, providerReleaseIds.first.name);
         } else {
-            // If the user didn’t select a releases provider ID (likely because the correct one wasn’t listed),
+            // If the user didn’t select a release provider ID (likely because the correct one wasn’t listed),
             // store it temporarily in the memory cache to avoid prompting the user repeatedly during the same session.
             CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
                 "name-prev-results").add("name", nameToSearchFor).add(extraParams));

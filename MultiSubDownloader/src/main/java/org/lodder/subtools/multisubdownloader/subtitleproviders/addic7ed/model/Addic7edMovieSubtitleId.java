@@ -1,24 +1,21 @@
-package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
+package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model;
 
 import java.io.Serial;
 import java.time.YearMonth;
 
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 
-public class SubSceneMovieId extends SubSceneId {
+public class Addic7edMovieSubtitleId extends ProviderId {
 
-    @Serial
-    private static final long serialVersionUID = 5858875211782260667L;
-
+    @Serial private static final long serialVersionUID = 5858875211782260667L;
     @val @Nullable String title;
     @val @Nullable Integer year;
 
-    public SubSceneMovieId(String text, String id, @Nullable String title=null, @Nullable Integer year=null) {
+    public Addic7edMovieSubtitleId(String text, String id, @Nullable String title=null, @Nullable Integer year=null) {
         super(text, id);
-        this.title = StringUtils.trimToNull(title);
+        this.title = title;
         this.year = year;
     }
 
@@ -34,9 +31,9 @@ public class SubSceneMovieId extends SubSceneId {
         } else if (this.year != null) {
             score += Math.abs(YearMonth.now().year - this.year);
         } else {
-            score += 100;
+            score += 10;
         }
-        int distance = new LevenshteinDistance(100).apply(this.title != null ? this.title : name, title);
+        int distance = calculateLevenshteinDistance(this.title != null ? this.title : name, title);
         score += distance == -1 ? 100 : distance;
         return score;
     }

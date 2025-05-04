@@ -31,6 +31,6 @@ public class SubsceneSubtitle extends Subtitle {
     }
 
     public Path download() throws SubtitlesProviderException {
-
+        urlSupplier.get()
     }
 }

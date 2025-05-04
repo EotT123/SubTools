@@ -45,4 +45,12 @@ public class StringExt {
             return Optional.empty();
         }
     }
+
+    public static @Nullable String keepLettersOnly(@This @Nullable String text) {
+        return text == null ? null : text.replaceAll("[^A-Za-z]", "");
+    }
+
+    public static @Nullable String keepNumbersOnly(@This @Nullable String text) {
+        return text == null ? null : text.replaceAll("[^0-9]", "");
+    }
 }

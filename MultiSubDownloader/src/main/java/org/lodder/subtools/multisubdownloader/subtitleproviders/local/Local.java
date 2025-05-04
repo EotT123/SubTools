@@ -26,7 +26,6 @@ import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -37,14 +36,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ExtensionMethod({ Files.class })
-public class Local implements SubtitleProvider {
+public class Local implements SubtitleProvider<LocalSubtitle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
 
     private final Settings settings;
     private final UserInteractionHandler userInteractionHandler;
     @val @override Manager manager;
-    @val @override SubtitleSource subtitleSource = SubtitleSource.LOCAL;
+    @val @override SubtitleSource source = SubtitleSource.LOCAL;
 
     public Local(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
         this.settings = settings;
@@ -59,8 +58,8 @@ public class Local implements SubtitleProvider {
     }
 
     @Override
-    public Set<Subtitle> searchSubtitles(TvRelease tvRelease, Language language) {
-        Set<Subtitle> listFoundSubtitles = new HashSet<>();
+    public Set<LocalSubtitle> searchSubtitles(TvRelease tvRelease, Language language) {
+        Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
         ReleaseParser vfp = new ReleaseParser();
 
         String name = !tvRelease.originalName.isEmpty() ? tvRelease.originalName : tvRelease.name;
@@ -82,7 +81,7 @@ public class Local implements SubtitleProvider {
                             LOGGER.debug("Local Sub found, adding [{}]", fileSub);
                             listFoundSubtitles.add(new LocalSubtitle(
                                 path:fileSub,
-                                subtitleSource:subtitleSource,
+                                subtitleSource:source,
                                 fileName:fileSub.fileNameAsString,
                                 language:language,
                                 quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
@@ -106,8 +105,8 @@ public class Local implements SubtitleProvider {
     }
 
     @Override
-    public Set<Subtitle> searchSubtitles(MovieRelease movieRelease, Language language) {
-        Set<Subtitle> listFoundSubtitles = new HashSet<>();
+    public Set<LocalSubtitle> searchSubtitles(MovieRelease movieRelease, Language language) {
+        Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
         ReleaseParser releaseParser = new ReleaseParser();
 
         String filter = movieRelease.name;
@@ -124,7 +123,7 @@ public class Local implements SubtitleProvider {
                             LOGGER.debug("Local Sub found, adding {}", fileSub);
                             listFoundSubtitles.add(new LocalSubtitle(
                                 path:fileSub,
-                                subtitleSource:subtitleSource,
+                                subtitleSource:source,
                                 fileName:fileSub.fileNameAsString,
                                 language:language,// TODO previously: language(""). This was not correct?
                                 quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
@@ -165,7 +164,7 @@ public class Local implements SubtitleProvider {
     }
 
     @Override
-    public <X extends Exception> Optional<SerieMapping> getProviderSerieId(TvRelease tvRelease) throws X {
+    public <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         throw new NotImplementedException();
     }
 }

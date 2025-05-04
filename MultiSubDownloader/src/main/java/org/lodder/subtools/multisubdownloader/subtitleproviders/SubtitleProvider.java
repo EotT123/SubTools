@@ -12,7 +12,6 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +51,7 @@ public interface SubtitleProvider<SUB extends Subtitle> {
         manager.getCache(CacheType.DISK, k -> k.startsWith(source + "-")).clearExpiredCache();
     }
 
-    <X extends Exception> Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X;
+//    <X extends Exception> Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X;
 
     <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X;
 }

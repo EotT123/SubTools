@@ -1,8 +1,11 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 
+import static org.lodder.subtools.multisubdownloader.Messages.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Getter;
 import manifold.ext.props.rt.api.override;
@@ -11,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edMovieSubtitleId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitle;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
@@ -46,40 +50,61 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
         }
     }
 
+
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
     @Override
     public List<Addic7edSubtitle> searchMovieSubtitlesWithHash(String hash, Language language) {
-        // TODO implement this
         return List.of();
     }
 
     @Override
     public List<Addic7edSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) {
-        // TODO implement this
         return List.of();
     }
-
     @Override
-    public Collection<Addic7edSubtitle> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) {
-        // TODO implement this
-        return List.of();
+    public Collection<Addic7edSubtitle> searchMovieSubtitlesWithName(String title, @Nullable Integer year,
+        Language language) throws Addic7edException {
+        return getMovieProviderId(title, year).mapThrowing(
+            providerId -> api.searchMovieSubtitles(providerId.id, language)).orElse(List.of());
     }
 
-    @Override
-    public Collection<Addic7edSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language) throws Addic7edException {
-        return api.getSubtitles(serieMapping, season, episode, language);
+    private Optional<Addic7edMovieSubtitleId> getMovieProviderId(String title, @Nullable Integer year)
+        throws Addic7edException {
+        List<Addic7edMovieSubtitleId> sortedMovieProviderIds = api.getMovieProviderIds(title, year)
+            .stream()
+            .sorted(Comparator.comparing((Addic7edMovieSubtitleId sId) -> sId.getScore(title, year)).reversed())
+            .toList();
+        if (sortedMovieProviderIds.isEmpty()) {
+            return Optional.empty();
+        }
+        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && sortedMovieProviderIds.size() == 1) {
+            // If only one releases mapping is found and the user has disabled confirmation for single results,
+            // automatically select this mapping as the desired one.
+            return Optional.of(sortedMovieProviderIds.first());
+        } else {
+            String selectFromListMessage =
+                year == null ? getText("SelectDialog.SelectMovieNameForName", title) :
+                    getText("SelectDialog.SelectMovieNameForNameWithSeason", title, year);
+            // Prompt the user to select the correct provider release id.
+            return userInteractionHandler.selectFromList(
+                sortedMovieProviderIds,
+                selectFromListMessage,
+                provider,
+                Addic7edMovieSubtitleId::getName);
+        }
     }
 
-    @Override
-    public Addic7edSubtitle convertToSubtitle(Addic7edSubtitle sub) {
-        return sub;
-    }
+    // ===== \\
+    // SERIE \\
+    // ===== \\
 
     @Override
     public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
         @Nullable Integer season) throws Addic7edException {
-        return api.getProviderId(serieName)
+        return api.getSerieProviderId(serieName)
             .stream()
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
                 .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
@@ -89,5 +114,20 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     @Override
     public String providerSerieIdToDisplayString(ProviderId providerId) {
         return providerId.name;
+    }
+
+    @Override
+    public Collection<Addic7edSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws Addic7edException {
+        return api.searchSerieSubtitles(serieMapping.providerId, serieMapping.providerName, season, episode, language);
+    }
+
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    @Override
+    public Addic7edSubtitle convertToSubtitle(Addic7edSubtitle sub) {
+        return sub;
     }
 }

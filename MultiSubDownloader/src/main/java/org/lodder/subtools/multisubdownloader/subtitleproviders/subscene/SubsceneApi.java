@@ -27,7 +27,6 @@ import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneMovieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
@@ -81,13 +80,14 @@ public class SubsceneApi implements SubtitleApi {
      */
     public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
         return getProviderIds(title, elem -> {
+            String _title = null;
+            Integer _year = null;
             Matcher matcher = MOVIE_NAME_PATTERN.matcher(elem.text());
             if (matcher.matches()) {
-                String _title = matcher.group("title");
-                int _year = Integer.parseInt(matcher.group("year"));
-                return new SubSceneMovieId(elem.text(), elem.attr("href"), _title, _year);
+                _title = matcher.group("title");
+                _year = Integer.parseInt(matcher.group("year"));
             }
-            return new SubSceneMovieId(elem.text(), elem.attr("href"));
+            return new SubSceneMovieId(elem.text(), elem.attr("href"), _title, _year);
         });
     }
 
@@ -156,11 +156,11 @@ public class SubsceneApi implements SubtitleApi {
 
     /**
      * @param name the release name
-     * @param <S> the type of the {@link SubSceneId} contained in the {@link Map}
+     * @param <S> the type of the {@link SubSceneSerieId} contained in the {@link Map}
      * @return a {@link Map} containing a list of {@link ProviderId provider release ids} per type
      * @throws SubsceneException SubsceneException
      */
-    public <S extends SubSceneId> Map<SearchResultType, List<S>> getProviderIds(String name,
+    public <S extends SubSceneSerieId> Map<SearchResultType, List<S>> getProviderIds(String name,
         Function<Element, S> subsceneIdCreator) throws SubsceneException {
         try {
             if (StringUtils.isBlank(name)) {

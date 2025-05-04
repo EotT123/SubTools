@@ -4,10 +4,10 @@ import java.io.Serial;
 import java.time.YearMonth;
 
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 
-public class SubSceneSerieId extends SubSceneId {
+public class SubSceneSerieId extends ProviderId {
 
     @Serial
     private static final long serialVersionUID = 5858875211782260667L;
@@ -36,9 +36,8 @@ public class SubSceneSerieId extends SubSceneId {
         } else {
             score += 100;
         }
-        int distance = new LevenshteinDistance(100).apply(this.serieName != null ? this.serieName : name, title);
+        int distance = calculateLevenshteinDistance(this.serieName != null ? this.serieName : name, title);
         score += distance == -1 ? 100 : distance;
         return score;
     }
-
 }

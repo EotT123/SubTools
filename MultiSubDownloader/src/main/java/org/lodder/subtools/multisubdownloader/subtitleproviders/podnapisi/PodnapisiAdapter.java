@@ -20,13 +20,9 @@ import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class PodnapisiAdapter
     extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PodnapisiAdapter.class);
 
     private static PodnapisiApi api;
     @val @override SubtitleSource source = SubtitleSource.PODNAPISI;
@@ -38,6 +34,10 @@ public final class PodnapisiAdapter
             api = new PodnapisiApi(manager, "JBierSubDownloader");
         }
     }
+
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
 
     @Override
     public List<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithHash(String hash, Language language) {
@@ -52,15 +52,35 @@ public final class PodnapisiAdapter
     @Override
     public Collection<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws PodnapisiException {
-        return api.getMovieSubtitles(name, year, 0, 0, language);
+        return api.getMovieSubtitles(name, year, language);
+    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
+
+    @Override
+    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+        @Nullable Integer season) throws PodnapisiException {
+        return api.getProviderIdsUsingName(serieName);
+    }
+
+    @Override
+    public String providerSerieIdToDisplayString(ProviderId providerId) {
+        return providerId.name;
     }
 
     @Override
     public Collection<PodnapisiSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
         Language language) throws PodnapisiException {
-        return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
+        return api.getSerieSubtitles(serieMapping.providerName, season, episode, language);
     }
 
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    
     @Override
     public PodnapisiSubtitle convertToSubtitle(PodnapisiSubtitleMetadata metadata) {
         return new PodnapisiSubtitle(
@@ -74,16 +94,5 @@ public final class PodnapisiAdapter
                 StringUtils.endsWith(metadata.releaseString, ".srt")),
             uploader:metadata.uploaderName,
             hearingImpaired:metadata.hearingImpaired);
-    }
-
-    @Override
-    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season) throws PodnapisiException {
-        return api.getProviderId(serieName).stream().toList();
-    }
-
-    @Override
-    public String providerSerieIdToDisplayString(ProviderId providerId) {
-        return providerId.name;
     }
 }

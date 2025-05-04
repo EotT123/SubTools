@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -436,9 +437,9 @@ public class Manager {
             return this;
         }
 
-        public CacheKeyBuilder add(Map<String, Object> params) {
-            params.entrySet().stream().sorted(Map.Entry.comparingByKey())
-                .forEach(entry -> add(entry.getKey(), entry.getValue()));
+        public CacheKeyBuilder add(Map<?, ?> params) {
+            params.entrySet().stream().sorted(Comparator.comparing(e -> String.valueOf(e.getKey())))
+                .forEach(entry -> add(String.valueOf(entry.getKey()), entry.getValue()));
             return this;
         }
 

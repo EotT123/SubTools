@@ -18,8 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edMovieSubtitleId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitle;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
@@ -36,8 +38,9 @@ public class Addic7edApi implements SubtitleApi {
     private static final Time RATE_DURATION = 1 s; // seconds
 
     private static final String DOMAIN = "https://www.addic7ed.com";
+    private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
-    private static final Pattern VERSION_PATTERN = Pattern.compile("Version (.+), Duration: (\\d+).(\\d)+");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("Version (?<info>.+), Duration: \\d+\\.\\d+");
     @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     private final boolean speedy;
@@ -64,21 +67,59 @@ public class Addic7edApi implements SubtitleApi {
         }
     }
 
-    public List<ProviderId> getProviderId(String serieName) throws Addic7edException {
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
+    public List<Addic7edMovieSubtitleId> getMovieProviderIds(String title,
+        @Nullable Integer year=null) throws Addic7edException {
+        return getCache("providerId", b -> b.add("title", title))
+            .getCollection(() -> {
+                try {
+                    return getContent("$DOMAIN/search.php?Submit=Search&search=" + title.urlEncode()).selectAllByCss(
+                            "form[action='/search.php'] ~ table td a").stream()
+                        .map(elem -> {
+                            String text = elem.text();
+                            String providerId = elem.attr("href");
+                            String _title = null;
+                            Integer _year = null;
+                            Matcher matcher = MOVIE_NAME_PATTERN.matcher(text);
+                            if (matcher.matches()) {
+                                _title = matcher.group("title");
+                                _year = Integer.parseInt(matcher.group("year"));
+                            }
+                            return new Addic7edMovieSubtitleId(text, providerId, _title, _year);
+                        }).toList();
+                } catch (Exception e) {
+                    throw new Addic7edException(e);
+                }
+            });
+    }
+
+    public List<Addic7edSubtitle> searchMovieSubtitles(String providerId, Language language) throws Addic7edException {
+        return searchSubtitles(providerId, "$DOMAIN/$providerId", language);
+    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
+
+
+    public List<ProviderId> getSerieProviderId(String serieName) throws Addic7edException {
         if (StringUtils.isBlank(serieName)) {
             return List.of();
         }
         return getCache("providerId", b -> b.add("serieName", serieName)).getCollection(() -> {
             try {
-                List<ProviderId> providerIds =
-                    getContent("$DOMAIN/allshows/" + serieName.split(" ")[0]).selectAllByCss("table.tabel90 td a")
-                        .stream().map(elem -> new ProviderId(elem.text(), elem.attr("href").split("/")[2]))
-                        .toList();
-                String serieNameFormatted = serieName.replaceAll("[^A-Za-z]", "");
+                List<ProviderId> providerIds = getContent("$DOMAIN/allshows/" + serieName.urlEncode()).selectAllByCss(
+                        "#container a[href^='/show/']")
+                    .stream().map(elem -> new ProviderId(elem.text(), elem.attr("href").split("/")[2]))
+                    .toList();
+                String serieNameFormatted = serieName.keepLettersOnly().toLowerCase();
                 List<ProviderId> providerIdsFormatted = providerIds.stream().filter(providerId -> {
-                    String formattedSerieName = providerId.name.replaceAll("[^A-Za-z]", "");
-                    return StringUtils.containsIgnoreCase(serieNameFormatted, formattedSerieName) ||
-                        StringUtils.containsIgnoreCase(formattedSerieName, serieNameFormatted);
+                    String formattedSerieName = providerId.name.keepLettersOnly().toLowerCase();
+                    return serieNameFormatted.contains(formattedSerieName) ||
+                        formattedSerieName.contains(serieNameFormatted);
                 }).toList();
                 return !providerIdsFormatted.isEmpty() ? providerIdsFormatted : providerIds;
             } catch (Exception e) {
@@ -87,18 +128,25 @@ public class Addic7edApi implements SubtitleApi {
         });
     }
 
-    public List<Addic7edSubtitle> getSubtitles(String providerId, String providerName, int season, int episode,
+    public List<Addic7edSubtitle> searchSerieSubtitles(String providerId, String providerName, int season, int episode,
         Language language) throws Addic7edException {
 
-        return getCache("subtitles",
-            b -> b.add("providerId", providerId).add("season", season).add("episode", episode)
-                .add("language", language))
-            .getCollection(() -> {
-                List<LanguageId> languageIds = LanguageId.forLanguage(language);
-                String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
-                    URLEncoder.encode(providerName.replace(" ", "_"), UTF_8), season, episode,
-                    languageIds.size() == 1 ? languageIds.first.id : LanguageId.ALL.id);
+        List<Addic7edLanguage> languages = Addic7edLanguage.of(language);
+        String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
+            URLEncoder.encode(providerName.replace(" ", "_"), UTF_8), season, episode,
+            languages.size() == 1 ? languages.first.id : Addic7edLanguage.ALL.id);
+        return searchSubtitles(providerId, url, language);
+    }
 
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    private List<Addic7edSubtitle> searchSubtitles(String providerId, String url, Language language)
+        throws Addic7edException {
+        return getCache("subtitles",
+            b -> b.add("providerId", providerId).add("url", url).add("language", language))
+            .getCollection(() -> {
                 Document doc = getContent(url);
                 String title = null;
 
@@ -116,7 +164,7 @@ public class Addic7edApi implements SubtitleApi {
                 for (Element block : blocks) {
                     String uploader = "";
                     String version = null;
-                    String lang = null;
+                    Addic7edLanguage lang = null;
                     String download = null;
                     boolean hearingImpaired = false;
 
@@ -127,7 +175,7 @@ public class Addic7edApi implements SubtitleApi {
                         if (!m.matches()) {
                             break;
                         } else {
-                            version = StringUtils.trimToNull(m.group(1).trim());
+                            version = StringUtils.trimToNull(m.group("info").trim());
                             uploader = block.selectFirst("a[href*=user/]").text();
                             hearingImpaired = !block.select("img[title~=Hearing]").isEmpty();
                         }
@@ -138,7 +186,7 @@ public class Addic7edApi implements SubtitleApi {
                         Elements reqTds = tds.select("td").not("td[rowspan=2]");
                         for (Element td : reqTds) {
                             if (td.hasClass("language")) {
-                                lang = td.html().substring(0, td.html().indexOf("<"));
+                                lang = Addic7edLanguage.of(td.html().substring(0, td.html().indexOf("<")));
                             }
 
                             // incomplete not wanted
@@ -156,14 +204,23 @@ public class Addic7edApi implements SubtitleApi {
                                 }
                             }
                             if (lang != null && download != null && title != null) {
+                                String qualityKeyword = ReleaseParser.getQualityKeyword(version);
+                                String releaseGroup =
+                                    String.join(" ", ReleaseParser.removeQualityFromString(version));
+                                releaseGroup = StringUtils.replaceIgnoreCase(releaseGroup, "REPACK.", "");
+                                releaseGroup = StringUtils.replaceIgnoreCase(releaseGroup, "REPACK-", "");
+                                if (releaseGroup.toLowerCase().contains("retail")) {
+                                    releaseGroup = "RETAIL";
+                                }
+
                                 Addic7edSubtitle sub = new Addic7edSubtitle(
                                     url:download,
                                     subtitleSource:source,
                                     fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
-                                    language:Language.fromValueOptional(lang.trim()).orElse(null),
-                                    quality:ReleaseParser.getQualityKeyword(title + " " + version),
+                                    language:lang.language,
+                                    quality:ReleaseParser.getQualityKeyword(version),
                                     subtitleMatchType:SubtitleMatchType.EVERYTHING,
-                                    releaseGroup:ReleaseParser.extractReleaseGroup(title, title.endsWith(".srt")),
+                                    releaseGroup:releaseGroup,
                                     uploader:uploader,
                                     hearingImpaired:hearingImpaired,
                                     version:version);

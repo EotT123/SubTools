@@ -13,8 +13,6 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneId;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneMovieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
@@ -27,8 +25,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 public final class SubsceneAdapter
-    extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneSerieId, SubSceneMovieId, SubSceneId,
-    SubsceneException> {
+    extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneSerieId, SubsceneException> {
 
     private static SubsceneApi api;
     @val @override SubtitleSource source = SubtitleSource.SUBSCENE;
@@ -64,40 +61,9 @@ public final class SubsceneAdapter
         return List.of();
     }
 
-    @Override
-    public List<SubSceneMovieId> getSortedMovieProviderIds(ProviderIds providerIds, String title,
-        @Nullable Integer year) throws SubsceneException {
-        ToIntFunction<SearchResultType> providerTypeFunction = value -> switch (value) {
-            case TV_SERIE -> 1;
-            case EXACT -> 2;
-            case CLOSE -> 3;
-            case null -> 4;
-        };
-        return api.getMovieProviderIds(title)
-            .entrySet()
-            .stream()
-            .sorted(Comparator.comparingInt(entry -> providerTypeFunction.applyAsInt(entry.getKey())))
-            .map(Entry::getValue)
-            .flatMap(values -> values.stream().sorted(Comparator.comparing(s -> s.getScore(title, year))))
-            .distinct()
-            .toList();
-    }
-
-    @Override
-    public String providerMovieIdToDisplayString(SubSceneMovieId providerSerieId) {
-        return providerSerieId.name;
-    }
-
     // ===== \\
     // SERIE \\
     // ===== \\
-
-
-    @Override
-    public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws SubsceneException {
-        return api.getSubtitles(serieMapping.providerId, season, episode, language);
-    }
 
     @Override
     public List<SubSceneSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
@@ -116,6 +82,12 @@ public final class SubsceneAdapter
             .flatMap(values -> values.stream().sorted(Comparator.comparing(s -> s.getScore(serieName, season))))
             .distinct()
             .toList();
+    }
+
+    @Override
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+        Language language) throws SubsceneException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override

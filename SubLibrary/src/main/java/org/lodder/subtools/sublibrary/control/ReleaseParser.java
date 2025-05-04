@@ -433,6 +433,12 @@ public class ReleaseParser {
         return getQualityKeyWordsAlreadyParsed(parserResults);
     }
 
+    public static List<String> removeQualityFromString(String text) {
+        ParserResults parserResults = new ParserResults(text);
+        parseReleaseType(parserResults);
+        return parserResults.parts;
+    }
+
     private static List<String> getQualityKeyWordsAlreadyParsed(ParserResults parserResults) {
         return Stream.of(
                 parserResults.getNamedMatch(QUALITY),

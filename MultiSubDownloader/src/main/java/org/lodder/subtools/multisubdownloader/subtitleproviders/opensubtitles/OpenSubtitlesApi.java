@@ -10,9 +10,11 @@ import java.util.List;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpenSubtilteSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model.OpensubtitleId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.AiTranslatedEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.ForeignPartsOnlyEnum;
@@ -30,6 +32,8 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.control.ReleaseParser;
+import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.opensubtitles.api.AuthenticationApi;
@@ -82,13 +86,52 @@ public class OpenSubtitlesApi implements SubtitleApi {
         }
     }
 
-    public List<org.opensubtitles.model.Subtitle> searchSubtitles(
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
+
+    public List<OpensubtitleId> getProviderSerieIds(String serieName) throws OpenSubtitleException {
+        return getCache("providerSerieIds", b -> b.add("serieName", serieName))
+            .getCollection(() -> {
+                try {
+                    return manager.getAsJsonArray(PageContentParams.params(
+                            url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
+                                + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
+                            cacheType:CacheType.MEMORY,
+                            userAgent:"",
+                            retry:new Retry(
+                                1,
+                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                                5 Second)
+                            ))
+                        .streamJsonObjects()
+                        .filter(show -> "tv".equals(show.getString("kind")))
+                        .map(show -> new OpensubtitleId(show.getString("name"), show.getInt("id"),
+                            show.getString("year")))
+                        .toList();
+                } catch (Exception e) {
+                    throw new OpenSubtitleException(e);
+                }
+            });
+    }
+
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+
+    public List<OpenSubtilteSubtitle> searchSubtitles(
         @Nullable AiTranslatedEnum aiTranslated=null,
         @Nullable Integer episode=null,
         @Nullable ForeignPartsOnlyEnum foreignPartsOnly=null,
         @Nullable HearingImpairedEnum hearingImpaired=null,
         @Nullable Integer id=null,
-        @Nullable Integer imdbId=null,
+        @Nullable String imdbId=null,
         @Nullable Language language=null,
         @Nullable MachineTranslatedEnum machineTranslated=null,
         @Nullable String movieHash=null,
@@ -135,18 +178,43 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .add("year", year))
             .get(() -> {
                 try {
+                    Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) :
+                        null;
                     return execute(
-                        () -> new SubtitlesApi(API_CLIENT).subtitles(id, imdbId, tmdbId, getValue(type), query,
+                        () -> new SubtitlesApi(API_CLIENT).subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
                             language != null ? language.langCode : null, movieHash, userId,
                             getValue(hearingImpaired), getValue(foreignPartsOnly), getValue(trustedSources),
                             getValue(machineTranslated), getValue(aiTranslated),
                             orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
                             parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
-                            getValue(movieHashMatch), page, userAgent)).data;
+                            getValue(movieHashMatch), page, userAgent)).data
+                        .stream().flatMap(sub -> createSubtitles(sub).stream()).toList();
+                    // TODO is this filtering needed?
+                    // String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
+                    // String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName, "[^A-Za-z]", ""));
+                    //     .filter(file -> {
+                    //     String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
+                    //     return subFileName.contains(name) ||
+                    //         (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
+                    // })
                 } catch (Exception e) {
                     throw new OpenSubtitleException(e);
                 }
             });
+    }
+
+
+    private List<OpenSubtilteSubtitle> createSubtitles(org.opensubtitles.model.Subtitle sub) {
+        return sub.attributes.files.stream().map(file ->
+            new OpenSubtilteSubtitle(
+                urlSupplier:() -> getDownloadUrl(file.getFileId().intValue()),
+                fileName:file.getFileName(),
+                language:Language.ofLangCodeOptional(sub.attributes.getLanguage()).orElse(null),
+                releaseGroup:ReleaseParser.extractReleaseGroup(file.fileName, file.fileName.endsWith(".srt")),
+                uploader:sub.attributes.getUploader() != null ? sub.attributes.getUploader().getName() : null,
+                subtitleMatchType:SubtitleMatchType.EVERYTHING,
+                quality:ReleaseParser.getQualityKeyword(file.getFileName()),
+                hearingImpaired:Boolean.TRUE == sub.attributes.isHearingImpaired()));
     }
 
     public String getDownloadUrl(int fileId) throws OpenSubtitleException {
@@ -160,32 +228,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 }
             });
     }
-
-    public List<OpensubtitleId> getProviderSerieIds(String serieName) throws OpenSubtitleException {
-        return getCache("providerSerieIds", b -> b.add("serieName", serieName))
-            .getCollection(() -> {
-                try {
-                    return manager.getAsJsonArray(PageContentParams.params(
-                            url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                                + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
-                            cacheType:CacheType.MEMORY,
-                            userAgent:"",
-                            retry:new Retry(
-                                1,
-                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5 Second)
-                            ))
-                        .streamJsonObjects()
-                        .filter(show -> "tv".equals(show.getString("kind")))
-                        .map(show -> new OpensubtitleId(show.getString("name"), show.getInt("id"),
-                            show.getString("year")))
-                        .toList();
-                } catch (Exception e) {
-                    throw new OpenSubtitleException(e);
-                }
-            });
-    }
-
 
     private <T> T execute(ThrowingSupplier<T, ApiException> callable) throws ApiException {
         try {

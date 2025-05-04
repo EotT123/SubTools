@@ -77,22 +77,19 @@ public enum Language {
     @val Set<String> langCodesOther;
 
     public static Language fromValue(String value) {
-        return Language.values().stream()
-                .filter(lang -> lang.name().equalsIgnoreCase(value))
-                .findAny()
-                .orElseThrow();
+        return Language.values().stream().filter(lang -> lang.name().equalsIgnoreCase(value)).findAny().orElseThrow();
     }
 
     public static Optional<Language> fromValueOptional(String value) {
         return Language.values().stream().filter(lang -> lang.name().equalsIgnoreCase(value)).findAny();
     }
 
-    public static Optional<Language> fromIdOptional(String languageId) {
+    public static Optional<Language> ofLangCodeOptional(String languageId) {
         return Language.values().stream().filter(lang -> lang.langCode.equalsIgnoreCase(languageId)).findAny();
     }
 
-    public static Language fromId(String languageId) {
-        return fromIdOptional(languageId).orElseThrow();
+    public static Language ofLangCode(String languageId) {
+        return ofLangCodeOptional(languageId).orElseThrow();
     }
 
     public String getName() {

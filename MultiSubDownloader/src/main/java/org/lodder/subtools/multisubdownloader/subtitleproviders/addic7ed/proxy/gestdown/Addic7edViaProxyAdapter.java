@@ -16,10 +16,10 @@ import org.gestdown.invoker.ApiException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -28,59 +28,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Getter
-public final class JAddic7edViaProxyAdapter extends
-    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, ProviderId, ApiException> {
+public final class Addic7edViaProxyAdapter extends
+    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, ApiException> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JAddic7edViaProxyAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edViaProxyAdapter.class);
 
-    private final JAddic7edProxyGestdownApi api;
+    private final Addic7edProxyGestdownApi api;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = false;
 
-    public JAddic7edViaProxyAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
+    public Addic7edViaProxyAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
-        this.api = new JAddic7edProxyGestdownApi(manager);
+        this.api = new Addic7edProxyGestdownApi(manager);
     }
+
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
 
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithHash(String hash, Language language)
         throws ApiException {
-        // TODO implement this
         return List.of();
     }
 
     @Override
-    public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds,
-        Language language)
+    public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds,        Language language)
         throws ApiException {
-        // TODO implement this
         return List.of();
     }
 
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language) throws ApiException {
-        // TODO implement this
         return List.of();
     }
 
-    @Override
-    public Set<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language) throws ApiException {
-        return new ExecuteCall<>(
-            () -> api.getSubtitles(serieMapping.providerId, season, episode, language))
-            .message("getSubtitles: [%s]".formatted(TvRelease.formatName(serieMapping.providerName, season, episode)))
-            .retryWhenHttpCode(ReturnCode.REFRESHING)
-            .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-            .execute();
-    }
+    // ===== \\
+    // SERIE \\
+    // ===== \\
 
     @Override
-    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+    public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
         @Nullable Integer season) throws ApiException {
-        List<ProviderId> serieIds = providerIds.getTvdbId()
+        List<Addic7edProxyGestdownSerieId> serieIds = providerIds.getTvdbId()
             .mapToObjThrowing(tvdbId ->
-                new ExecuteCall<>(() -> api.getProviderId(tvdbId))
+                new ExecuteCall<>(() -> api.getProviderSerieIds(tvdbId))
                     .message("getProviderSerieName: [$tvdbId]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
@@ -88,9 +81,8 @@ public final class JAddic7edViaProxyAdapter extends
                         return List.of();
                     })
                     .execute())
-            .orElse(List.of())
-            .elseIfEmptyThrowing(() ->
-                new ExecuteCall<>(() -> api.getProviderId(serieName))
+            .orElseGetThrowing(() ->
+                new ExecuteCall<>(() -> api.getProviderSerieIds(serieName))
                     .message("getProviderSerieName: [$serieName]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
@@ -105,14 +97,30 @@ public final class JAddic7edViaProxyAdapter extends
     }
 
     @Override
+    public String providerSerieIdToDisplayString(Addic7edProxyGestdownSerieId providerId) {
+        return providerId.name;
+    }
+
+    @Override
+    public Set<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws ApiException {
+        return new ExecuteCall<>(
+            () -> api.getSubtitles(serieMapping.providerId, season, episode, language))
+            .message("getSubtitles: [%s]".formatted(TvRelease.formatName(serieMapping.providerName, season, episode)))
+            .retryWhenHttpCode(ReturnCode.REFRESHING)
+            .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
+            .execute();
+    }
+
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    @Override
     public Addic7edProxyGestdownSubtitle convertToSubtitle(Addic7edProxyGestdownSubtitle sub) {
         return sub;
     }
 
-    @Override
-    public String providerSerieIdToDisplayString(ProviderId providerId) {
-        return providerId.name;
-    }
 
     @Getter
     @RequiredArgsConstructor
