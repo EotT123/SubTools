@@ -67,7 +67,7 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
                 message:message,
                 toObjectMapper:Integer::parseInt,
                 objectValidators:objectValidators)
-                .prompt().mapToInt(v -> v);
+                .prompt().mapToIntEx(v -> v);
         }
     }
 

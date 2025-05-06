@@ -60,9 +60,9 @@ public class ImdbAdapter implements AdapterIntf {
             return getCache("imdbId", b -> b.add("title", title).add("year", year))
                 .getOptional(
                     () -> getImdbIdOnImdb(title, year)
-                        .orElseMap(() -> getImdbIdOnGoogle(title, year))
-                        .orElseMap(() -> getImdbIdOnYahoo(title, year))
-                        .orElseMap(() -> promptUserToEnterImdbId(title)),
+                        .orElseMapEx(() -> getImdbIdOnGoogle(title, year))
+                        .orElseMapEx(() -> getImdbIdOnYahoo(title, year))
+                        .orElseMapEx(() -> promptUserToEnterImdbId(title)),
                     storeTempNullValue:true);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(provider, title, e.getMessage()), e);

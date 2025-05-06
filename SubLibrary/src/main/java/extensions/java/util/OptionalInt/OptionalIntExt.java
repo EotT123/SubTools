@@ -46,7 +46,7 @@ public class OptionalIntExt {
             .empty();
     }
 
-    public static <T, X extends Exception> Optional<T> mapToObjThrowing(@This OptionalInt optional,
+    public static <T, X extends Exception> Optional<T> mapToObjEx(@This OptionalInt optional,
         ThrowingIntFunction<T, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsInt())) : Optional.empty();
     }
@@ -61,7 +61,7 @@ public class OptionalIntExt {
         }
     }
 
-    public static <X extends Throwable> void ifNotPresentThrowing(@This OptionalInt optional,
+    public static <X extends Throwable> void ifNotPresentEx(@This OptionalInt optional,
         ThrowingRunnable<X> runnable) throws X {
         if (optional.isEmpty()) {
             runnable.run();

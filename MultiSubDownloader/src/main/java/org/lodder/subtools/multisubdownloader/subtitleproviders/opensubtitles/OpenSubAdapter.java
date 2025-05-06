@@ -53,7 +53,7 @@ public final class OpenSubAdapter
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws OpenSubtitleException {
-        return providerIds.getImdbId().mapThrowing(imdbId -> api.searchSubtitles(imdbId:imdbId, language:language))
+        return providerIds.getImdbId().mapEx(imdbId -> api.searchSubtitles(imdbId:imdbId, language:language))
             .orElse(List.of());
     }
 

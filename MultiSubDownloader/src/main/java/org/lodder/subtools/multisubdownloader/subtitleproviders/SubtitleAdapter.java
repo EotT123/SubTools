@@ -199,7 +199,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public Set<SUB> searchSubtitles(TvRelease tvRelease, Language language) {
         try {
             return getProviderSerieMapping(tvRelease)
-                .mapThrowing(mapping -> tvRelease.episodes.stream()
+                .mapEx(mapping -> tvRelease.episodes.stream()
                     .flatMap(episode -> {
                         try {
                             return searchSubtitles(mapping, tvRelease.season, episode, language).stream();

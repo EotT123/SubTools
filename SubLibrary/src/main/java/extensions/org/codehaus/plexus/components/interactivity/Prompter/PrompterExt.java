@@ -67,7 +67,7 @@ public class PrompterExt {
         Function<String, Integer> toObjectMapper=Integer::parseInt,
         List<Validator<Integer>> objectValidators=new ArrayList<Validator<Integer>>()) {
 
-        return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators).mapToInt(v -> v);
+        return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators).mapToIntEx(v -> v);
     }
 
     public static Optional<Boolean> promptBoolean(@This Prompter prompter, String message,
@@ -230,7 +230,7 @@ public class PrompterExt {
                 .map(tableElement -> columnDisplayers.stream()
                     .map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
                     .toArray())
-                .toTypedArray(Object[][]::new);
+                .toArray(Object[][]::new);
 
             TextTable tt = new TextTable(columnNames, dataTable);
             // this adds the numbering on the left

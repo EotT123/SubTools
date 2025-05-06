@@ -153,7 +153,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
 
         private void rename(Path dir) throws IOException {
-            dir.list().asThrowingStream(IOException.class).forEach(file -> {
+            dir.list().forEachEx(file -> {
                 if (file.isRegularFile()) {
                     if (!file.fileNameContainsIgnoreCase("sample") && extensions.contains(file.getExtension())) {
                         releaseFactory.createRelease(file, userInteractionHandler).ifPresent(release -> {

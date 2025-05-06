@@ -72,7 +72,7 @@ public final class Addic7edViaProxyAdapter extends
     public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
         @Nullable Integer season) throws ApiException {
         List<Addic7edProxyGestdownSerieId> serieIds = providerIds.getTvdbId()
-            .mapToObjThrowing(tvdbId ->
+            .mapToObjEx(tvdbId ->
                 new ExecuteCall<>(() -> api.getProviderSerieIds(tvdbId))
                     .message("getProviderSerieName: [$tvdbId]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
@@ -81,7 +81,7 @@ public final class Addic7edViaProxyAdapter extends
                         return List.of();
                     })
                     .execute())
-            .orElseGetThrowing(() ->
+            .orElseGetEx(() ->
                 new ExecuteCall<>(() -> api.getProviderSerieIds(serieName))
                     .message("getProviderSerieName: [$serieName]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)

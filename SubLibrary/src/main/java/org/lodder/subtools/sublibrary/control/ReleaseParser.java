@@ -61,7 +61,7 @@ public class ReleaseParser {
      */
     public static Optional<Release> parse(Path file, boolean includeParent=false) throws ReleaseParseException {
         Optional<Release> release = includeParent ? parse(file.getParent().fileNameAsString, file) : Optional.empty();
-        return release.orElseMap(() -> parse(StringUtils.substringBeforeLast(file.fileNameAsString, "."), file));
+        return release.orElseMapEx(() -> parse(StringUtils.substringBeforeLast(file.fileNameAsString, "."), file));
     }
 
     /**

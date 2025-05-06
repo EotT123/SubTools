@@ -56,7 +56,7 @@ public class OptionalLongExt {
         }
     }
 
-    public static <X extends Throwable> void ifNotPresentThrowing(@This OptionalLong optional,
+    public static <X extends Throwable> void ifNotPresentEx(@This OptionalLong optional,
         ThrowingRunnable<X> runnable) throws X {
         if (optional.isEmpty()) {
             runnable.run();

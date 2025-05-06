@@ -261,14 +261,14 @@ public class Manager {
         public <C extends Iterable<? extends V>, V extends Serializable, X extends Exception> C getCollection(
             ThrowingSupplier<C, X> supplier, Retry retry=Retry.NONE) throws X {
             Optional<Cache<String, C>> optionalCache = manager.getOptionalCache(cacheType);
-            return optionalCache.mapThrowing(cache -> {
+            return optionalCache.mapEx(cache -> {
                 if (cache.contains(key)) {
                     return cache.get(key).orElseThrow();
                 }
                 C value = executeSupplier(supplier, retry);
                 cache.put(key, value);
                 return value;
-            }).orElseGetThrowing(supplier);
+            }).orElseGetEx(supplier);
         }
 
         public <V> Optional<V> getOptional() {
@@ -308,13 +308,13 @@ public class Manager {
             ThrowingSupplier<OptionalInt, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
             boolean storeTempNullValue=false, boolean storeAsTempValue=false) throws X {
 
-            return manager.getOptionalCache(cacheType).mapThrowing(cache -> {
+            return manager.getOptionalCache(cacheType).mapEx(cache -> {
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
                     store(Value.ofOptionalInt(supplier), retry, storeAsTempValue, storeTempNullValue, timeToLive);
-                    return cache.get(key).mapToInt(t -> (int) t);
+                    return cache.get(key).mapToIntEx(t -> (int) t);
                 } else if (containsKey && !isExpiredTemporary()) {
-                    return cache.get(key).mapToInt(t -> (int) t);
+                    return cache.get(key).mapToIntEx(t -> (int) t);
                 } else {
                     OptionalInt object = executeSupplier(supplier, retry);
                     object.ifPresentOrElse(v -> cache.put(key, v), () -> {
@@ -325,7 +325,7 @@ public class Manager {
                     });
                     return object;
                 }
-            }).orElseGetThrowing(supplier);
+            }).orElseGetEx(supplier);
         }
 
         public <V, X extends Exception> void store(Value<V, X> value,

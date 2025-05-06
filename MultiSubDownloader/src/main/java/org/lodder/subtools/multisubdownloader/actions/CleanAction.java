@@ -30,10 +30,10 @@ public class CleanAction {
             throw new IllegalArgumentException("Destination [%s] is not a folder".formatted(destination));
         }
 
-        release.getPath().list().asThrowingStream(IOException.class)
+        release.getPath().list()
             .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
                 || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
-            .forEach(p -> {
+            .forEachEx(p -> {
                 switch (librarySettings.otherFileAction) {
                     case MOVE -> move(p, destination);
                     case MOVE_AND_RENAME -> moveAndRename(p, destination, videoFileName);

@@ -59,11 +59,12 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     public List<Addic7edSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) {
         return List.of();
     }
+
     @Override
     public Collection<Addic7edSubtitle> searchMovieSubtitlesWithName(String title, @Nullable Integer year,
         Language language) throws Addic7edException {
-        return getMovieProviderId(title, year).mapThrowing(
-            providerId -> api.searchMovieSubtitles(providerId.id, language)).orElse(List.of());
+        return getMovieProviderId(title, year).mapEx(providerId -> api.searchMovieSubtitles(providerId.id, language))
+            .orElse(List.of());
     }
 
     private Optional<Addic7edMovieSubtitleId> getMovieProviderId(String title, @Nullable Integer year)

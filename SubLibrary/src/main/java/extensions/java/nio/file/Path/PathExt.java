@@ -44,7 +44,8 @@ public class PathExt {
         return changeExtension(path, "");
     }
 
-    public record FilenameAndExtension(String filename, String extension) {}
+    public record FilenameAndExtension(String filename, String extension) {
+    }
 
     public static FilenameAndExtension splitExtension(@This Path path) {
         return new FilenameAndExtension(StringUtils.substringBeforeLast(path.getFileName().toString(), "."),
@@ -138,8 +139,8 @@ public class PathExt {
 
     private static Path moveNonEmptyDirectoryRecursively(Path source, Path target, StandardCopyOption... copyOptions)
         throws IOException {
-        foreachSubfile(source, s -> s.asThrowingStream(IOException.class)
-            .forEach(child -> moveNonEmptyDirectory(child, target.resolve(source.getFileName()), copyOptions)));
+        foreachSubfile(source,
+            s -> s.forEachEx(child -> moveNonEmptyDirectory(child, target.resolve(source.getFileName()), copyOptions)));
         Files.delete(source);
         return target;
     }

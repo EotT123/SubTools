@@ -49,7 +49,7 @@ public final class SubdlAdapter extends
     @Override
     public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws SubdlException {
-        return providerIds.getImdbId().mapThrowing(imdbId -> api.getMovieSubtitles(imdbId, language)).orElse(List.of());
+        return providerIds.getImdbId().mapEx(imdbId -> api.getMovieSubtitles(imdbId, language)).orElse(List.of());
     }
 
     @Override
@@ -66,7 +66,7 @@ public final class SubdlAdapter extends
         @Nullable Integer season) throws SubdlException {
 
         List<SubdlSerieId> subdlSerieIds =
-            providerIds.getImdbId().mapThrowing(imdbId -> api.getProviderIdsUsingImdbId(imdbId)).orElse(List.of());
+            providerIds.getImdbId().mapEx(imdbId -> api.getProviderIdsUsingImdbId(imdbId)).orElse(List.of());
         if (subdlSerieIds.isEmpty()) {
             subdlSerieIds = api.getProviderIdsUsingSerieName(serieName);
         }
@@ -92,7 +92,7 @@ public final class SubdlAdapter extends
 
     @Override
     public SubdlSubtitle convertToSubtitle(SubdlSubtitleMetadata sub) {
-        return ReleaseParser.parse(sub.title).orElseMap(() -> ReleaseParser.parse(sub.fileName))
+        return ReleaseParser.parse(sub.title).orElseMapEx(() -> ReleaseParser.parse(sub.fileName))
             .map(release -> new SubdlSubtitle(
                 url:sub.url,
                 title:sub.title,

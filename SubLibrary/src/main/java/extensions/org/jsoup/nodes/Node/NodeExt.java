@@ -68,9 +68,8 @@ public class NodeExt {
         return node != null ? mapper.apply(node) : elseSupplier.get();
     }
 
-    public static <@Nullable T, X extends Exception> @Nullable T mapThrowing(@This @Nullable Node node,
-            ThrowingFunction<Node, T, X> mapper)
-            throws X {
+    public static <T, X extends Exception> @Nullable T mapEx(@This @Nullable Node node,
+        ThrowingFunction<Node, T, X> mapper) throws X {
         return node != null ? mapper.apply(node) : null;
     }
 

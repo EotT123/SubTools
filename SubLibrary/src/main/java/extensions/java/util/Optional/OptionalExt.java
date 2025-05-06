@@ -24,22 +24,23 @@ public class OptionalExt {
      * @param optional input object of the extension method
      * @param function the {@link ThrowingFunction} to apply to the value if present
      * @param <T> The type of value of the input {@code Optional}
-     * @param <S> type of the return value
+     * @param <R> type of the return value
      * @param <X> type of the exception that can be thrown
      * @return the result of the {@link ThrowingFunction} if the value is present, otherwise {@code null}
      * @throws X exception type of the throwing Function
      */
-    public static <T, S, X extends Throwable> Optional<S> mapThrowing(@This Optional<T> optional,
-            ThrowingFunction<T, S, X> function) throws X {
+    public static <T, R, X extends Throwable> Optional<R> mapEx(@This Optional<T> optional,
+        ThrowingFunction<T, R, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.get())) : Optional.empty();
     }
 
-    public static <T, X extends Exception> OptionalInt mapToInt(@This Optional<T> optional,
+
+    public static <T, X extends Exception> OptionalInt mapToIntEx(@This Optional<T> optional,
             ThrowingToIntFunction<T, X> mapper) throws X {
         return optional.isPresent() ? OptionalInt.of(mapper.applyAsInt(optional.get())) : OptionalInt.empty();
     }
 
-    public static <T, X extends Exception> Optional<T> orElseMap(@This Optional<T> optional,
+    public static <T, X extends Exception> Optional<T> orElseMapEx(@This Optional<T> optional,
         ThrowingSupplier<Optional<T>, X> supplier) throws X {
         return optional.isPresent() ? optional : supplier.get();
     }
@@ -52,7 +53,7 @@ public class OptionalExt {
         return optional;
     }
 
-    public static <T, X extends Throwable> T orElseGetThrowing(@This Optional<T> optional,
+    public static <T, X extends Throwable> T orElseGetEx(@This Optional<T> optional,
         ThrowingSupplier<T, X> supplier) throws X {
         return optional.isPresent() ? optional.get() : supplier.get();
     }
@@ -63,7 +64,7 @@ public class OptionalExt {
         }
     }
 
-    public static <T, X extends Throwable> void ifNotPresentThrowing(@This Optional<T> optional,
+    public static <T, X extends Throwable> void ifNotPresentEx(@This Optional<T> optional,
         ThrowingRunnable<X> runnable) throws X {
         if (optional.isEmpty()) {
             runnable.run();
