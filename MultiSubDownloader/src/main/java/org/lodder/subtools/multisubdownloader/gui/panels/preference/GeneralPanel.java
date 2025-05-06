@@ -183,8 +183,8 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         List<PathOrRegex> exclList =
             excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().value)).toList();
         settingsCtrl.settings.language = cbxLanguage.getSelectedValue();
-        settingsCtrl.settings.defaultIncomingFolders = defaultIncomingFolders;
-        settingsCtrl.settings.replaceExcludeList(exclList);
+        settingsCtrl.settings.defaultIncomingFolders.replaceContents(defaultIncomingFolders);
+        settingsCtrl.settings.excludeList.replaceContents(exclList);
         settingsCtrl.settings.updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedValue();
         settingsCtrl.settings.updateType = cbxUpdateType.getSelectedValue();
         settingsCtrl.settings.generalProxyEnabled = chkUseProxy.isSelected();

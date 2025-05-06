@@ -156,7 +156,8 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         settings.loginOpenSubtitlesPassword = new String(txtOpenSubtitlesPassword.getPassword());
         settings.serieSourceSubscene = false; //chkSourceSubscene.isSelected();
         settings.serieSourceLocal = chkSourceLocal.isSelected();
-        settings.localSourcesFolders = localSourcesFoldersList.stream().map(LabelPanel::getObject).toList();
+        settings.localSourcesFolders.replaceContents(
+            localSourcesFoldersList.stream().map(LabelPanel::getObject).toList());
     }
 
     private boolean hasValidSettingsAddic7ed() {

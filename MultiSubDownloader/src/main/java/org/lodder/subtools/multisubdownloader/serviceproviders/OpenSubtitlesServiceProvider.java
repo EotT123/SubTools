@@ -41,10 +41,10 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
 
         Credentials credentials = null;
         if (settings.loginOpenSubtitlesEnabled) {
-            String username = StringUtils.trim(settings.loginOpenSubtitlesUsername);
-            String password = StringUtils.trim(settings.loginOpenSubtitlesPassword);
+            String username = StringUtils.trimToNull(settings.loginOpenSubtitlesUsername);
+            String password = StringUtils.trimToNull(settings.loginOpenSubtitlesPassword);
             /* Protect against empty login */
-            if (!username.isEmpty() && !password.isEmpty()) {
+            if (username != null && password != null) {
                 credentials = new Credentials(username, password);
             }
         }

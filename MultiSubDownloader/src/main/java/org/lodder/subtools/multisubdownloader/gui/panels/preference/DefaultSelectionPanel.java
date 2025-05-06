@@ -185,7 +185,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.settings.optionsDefaultSelectionQualityList = usedPatternsTable.getItems();
+        settingsCtrl.settings.optionsDefaultSelectionQualityList.replaceContents(usedPatternsTable.getItems());
     }
 
     @Override

@@ -46,10 +46,10 @@ public class Addic7edServiceProvider implements ServiceProvider {
         boolean loginEnabled = false;
         Credentials credentials = null;
         if (settings.loginAddic7edEnabled) {
-            String username = StringUtils.trim(settings.loginAddic7edUsername);
-            String password = StringUtils.trim(settings.loginAddic7edPassword);
+            String username = StringUtils.trimToNull(settings.loginAddic7edUsername);
+            String password = StringUtils.trimToNull(settings.loginAddic7edPassword);
             /* Protect against empty login */
-            if (!username.isEmpty() && !password.isEmpty()) {
+            if (username != null && password != null) {
                 credentials = new Credentials(username, password);
             }
         }

@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader;
@@ -41,7 +42,7 @@ public class UpdateAvailableGithub {
     private final Manager manager;
     private final Settings settings;
 
-    public boolean shouldCheckForNewUpdate(UpdateCheckPeriod updateCheckPeriod) {
+    public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
         LocalDate lastUpdateCheck = getLastUpdateCheck();
         try {
             return switch (updateCheckPeriod) {
@@ -49,6 +50,7 @@ public class UpdateAvailableGithub {
                 case WEEKLY -> DAYS.between(lastUpdateCheck, LocalDate.now()) > 6;
                 case MONTHLY -> DAYS.between(lastUpdateCheck, LocalDate.now()) > 30;
                 case MANUAL -> false;
+                case null -> false;
             };
         } catch (Exception e) {
             LOGGER.error("checkProgram", e);
@@ -60,6 +62,7 @@ public class UpdateAvailableGithub {
         return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease();
+            case null -> Optional.empty();
         };
     }
 
@@ -67,6 +70,7 @@ public class UpdateAvailableGithub {
         return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease().isPresent();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease().isPresent();
+            case null -> false;
         };
     }
 
