@@ -26,6 +26,7 @@ public class Info {
                 case PODNAPISI -> settings.serieSourcePodnapisi;
                 case TVSUBTITLES -> settings.serieSourceTvSubtitles;
                 case SUBSCENE -> settings.serieSourceSubscene;
+                case SUBDL -> settings.serieSourceSubdl;
             };
             if (isCli) {
                 System.out.println(" - provider : " + source + " enabled: " + enabled);

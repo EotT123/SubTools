@@ -17,24 +17,11 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReleaseFactory {
+public record ReleaseFactory(Settings settings, Manager manager) {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
-    private final Settings settings;
-    private final Manager manager;
-
-    public ReleaseFactory(Settings settings, Manager manager) {
-        this.settings = settings;
-        this.manager = manager;
-    }
-
-    public Release createRelease(Path file, UserInteractionHandler userInteractionHandler) {
-        return createRelease(file, userInteractionHandler, true);
-    }
-
-    public Release createRelease(Path file, UserInteractionHandler userInteractionHandler,
-        boolean validate) {
+    public Release createRelease(Path file, UserInteractionHandler userInteractionHandler, boolean validate=true) {
         try {
             ReleaseControl releaseControl = switch (ReleaseParser.parse(file)) {
                 case TvRelease tvRelease -> new TvReleaseControl(tvRelease, settings, manager, userInteractionHandler);

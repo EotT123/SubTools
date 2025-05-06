@@ -1,46 +1,38 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
-import manifold.ext.props.rt.api.override;
-import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
-import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class TvReleaseControl extends ReleaseControl {
+public final class TvReleaseControl extends ReleaseControl<TvRelease> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
 
-    private final TvRelease tvRelease;
-    @val @override Release release;
-
-    public TvReleaseControl(TvRelease tvRelease, Settings settings, Manager manager,
+    public TvReleaseControl(Settings settings, Manager manager,
         UserInteractionHandler userInteractionHandler) {
         super(settings, manager, userInteractionHandler);
-        this.tvRelease = tvRelease;
-        this.release = tvRelease;
     }
 
     @Override
-    public void process() throws ReleaseControlException {
-        if (StringUtils.isBlank(tvRelease.name)) {
-            throw new ReleaseControlException("Unable to extract episode details, check file", tvRelease);
+    public TvRelease process(TvRelease release) throws ReleaseControlException {
+        if (StringUtils.isBlank(release.name)) {
+            throw new ReleaseControlException("Unable to extract episode details, check file", release);
         }
-        LOGGER.debug("process: serie [{}], season [{}], episode [{}]", tvRelease.name, tvRelease.season,
-                tvRelease.episodes);
-        setImdbId();
-        setTvdbId();
-        processTvdbInfo();
-        processImdbInfo();
+        LOGGER.debug("process: serie [{}], season [{}], episode [{}]", release.name, release.season, release.episodes);
+        setImdbId(release);
+        setTvdbId(release);
+        processTvdbInfo(release);
+        processImdbInfo(release);
+        return release;
     }
 
-    private void setImdbId() {
+    private void setImdbId(TvRelease release) {
         release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchSerie(release.name)
             .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
         release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
@@ -52,7 +44,7 @@ public final class TvReleaseControl extends ReleaseControl {
         }
     }
 
-    private void setTvdbId() {
+    private void setTvdbId(TvRelease release) {
         release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
             .ifPresent(serie -> release.providerIds.add(ProviderIdType.TVDB, serie.id)));
         // TODO enable this, also use imdbId if present
@@ -63,13 +55,13 @@ public final class TvReleaseControl extends ReleaseControl {
         }
     }
 
-    private void processTvdbInfo() {
+    private void processTvdbInfo(TvRelease release) {
         release.providerIds.getTvdbId().ifPresent(
-            tvdbId -> tvdbAdapter.searchEpisode(tvdbId, tvRelease.season, tvRelease.firstEpisode)
-                .ifPresent(episode -> tvRelease.title = episode.episodeName));
+            tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode)
+                .ifPresent(episode -> release.title = episode.episodeName));
     }
 
-    private void processImdbInfo() {
+    private void processImdbInfo(TvRelease release) {
         // TODO implement this
 //        release.providerIds.getImdbId().ifPresent(
 //            imdbId -> imdbAdapter.getSerieDetails(imdbId)

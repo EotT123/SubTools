@@ -96,12 +96,7 @@ public class CliSearchAction extends SearchAction {
             /* Tell progressListener which file we are processing */
             this.indexingProgressListener.progress(file.getFileNameAsString());
 
-            Release release = this.releaseFactory.createRelease(file, userInteractionHandler);
-            if (release == null) {
-                continue;
-            }
-
-            releases.add(release);
+            this.releaseFactory.createRelease(file, userInteractionHandler).ifPresent(releases::add);
 
             /* Update progressListener */
             this.indexingProgressListener.progress(progress);

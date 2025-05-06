@@ -16,7 +16,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
@@ -66,10 +65,6 @@ public class DownloadAction {
         try {
             result = subtitle.download(manager, subFile);
             LOGGER.debug("download file status [{}] ", result ? "successful" : "unsuccessful");
-        } catch (SubtitlesProviderException e) {
-            LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
-                "for subtitle provider [${e.subtitleProvider}] (${e.getMessage()})", e);
-            throw new RuntimeException(e);
         } catch (IOException | ManagerException e) {
             LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
                 "(${e.getMessage()})", e);

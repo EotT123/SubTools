@@ -60,9 +60,6 @@ import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
-import org.lodder.subtools.sublibrary.OsCheck;
-import org.lodder.subtools.sublibrary.OsCheck.OSType;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.util.function.TriConsumer;
@@ -417,22 +414,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
                     if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
                         final Subtitle subtitle = (Subtitle) model.getValueAt(i,
                             subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
-                        String filename = "";
-                        if (!subtitle.fileName.endsWith(".srt")) {
-                            filename = subtitle.fileName + ".srt";
-                        }
-                        if (OsCheck.operatingSystemType == OSType.WINDOWS) {
-                            filename = filename.removeIllegalWindowsChars();
-                        }
-
                         try {
-                            subtitle.download(manager, path.resolve(filename));
+                            subtitle.download(manager, path);
                         } catch (IOException | ManagerException e) {
                             LOGGER.error("downloadText", e);
-                        } catch (SubtitlesProviderException e) {
-                            LOGGER.error("Error while getting url for [%s] for subtitle provider [%s] (%s)"
-                                .formatted(filename, e.subtitleProvider, e.getMessage()), e);
-                            throw new RuntimeException(e);
                         }
                     }
                 }

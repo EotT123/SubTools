@@ -12,15 +12,13 @@ import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-public abstract sealed class ReleaseControl permits MovieReleaseControl, TvReleaseControl {
+public abstract sealed class ReleaseControl<T extends Release> permits MovieReleaseControl, TvReleaseControl {
 
     @val(Protected) Settings settings;
     @val(Protected) Manager manager;
     @val(Protected) TvdbAdapter tvdbAdapter;
     @val(Protected) ImdbAdapter imdbAdapter;
     @val(Protected) OmdbAdapter omdbAdapter;
-
-    @val(Abstract) Release release;
 
     ReleaseControl(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
         this.settings = settings;
@@ -30,5 +28,5 @@ public abstract sealed class ReleaseControl permits MovieReleaseControl, TvRelea
         this.omdbAdapter = OmdbAdapter.getInstance(manager, userInteractionHandler);
     }
 
-    public abstract void process() throws ReleaseControlException;
+    public abstract T process(T release) throws ReleaseControlException;
 }

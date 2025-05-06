@@ -87,10 +87,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
             /* Tell progressListener which file we are processing */
             this.indexingProgressListener.progress(file.getFileName().toString());
 
-            Release r = releaseFactory.createRelease(file, userInteractionHandler);
-            if (r != null) {
-                releases.add(r);
-            }
+            releaseFactory.createRelease(file, userInteractionHandler).ifPresent(releases::add);
 
             /* Update progressListener */
             this.indexingProgressListener.progress(progress);

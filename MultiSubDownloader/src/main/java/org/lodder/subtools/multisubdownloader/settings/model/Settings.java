@@ -50,6 +50,7 @@ public class Settings implements UserInteractionSettingsIntf {
     @var boolean serieSourceOpensubtitles = true;
     @var boolean serieSourceLocal = true;
     @var boolean serieSourceSubscene = true;
+    @var boolean serieSourceSubdl = true;
     @var SettingsProcessEpisodeSource processEpisodeSource = SettingsProcessEpisodeSource.TVDB;
     @val Map<String, Integer> sortWeights;
     @var Language subtitleLanguage;
@@ -89,6 +90,7 @@ public class Settings implements UserInteractionSettingsIntf {
             case TVSUBTITLES -> serieSourceTvSubtitles;
             case LOCAL -> serieSourceLocal;
             case SUBSCENE -> serieSourceSubscene;
+            case SUBDL -> serieSourceSubdl;
         };
     }
 
