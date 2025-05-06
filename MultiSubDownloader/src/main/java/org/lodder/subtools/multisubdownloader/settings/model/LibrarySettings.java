@@ -18,7 +18,7 @@ public class LibrarySettings {
     @var boolean folderReplaceSpace;
     @var boolean includeLanguageCode;
     @var boolean removeEmptyFolders;
-    @var boolean useTVDBNaming;
+    @var boolean useTvdbNaming;
     @var LibraryActionType action = LibraryActionType.NOTHING;
     @var LibraryOtherFileActionType otherFileAction = LibraryOtherFileActionType.NOTHING;
     @var Character filenameReplacingSpaceChar;

@@ -407,7 +407,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private void downloadText() {
         MemoryFolderChooser.getInstance()
             .selectDirectory(contentPane, getText("MainWindow.SelectFolder"))
-            .ifPresent(path -> {
+            .ifPresent(folder -> {
                 CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
                 final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
                 for (int i = 0; i < model.getRowCount(); i++) {
@@ -415,7 +415,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                         final Subtitle subtitle = (Subtitle) model.getValueAt(i,
                             subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
                         try {
-                            subtitle.download(manager, path);
+                            subtitle.download(manager, folder);
                         } catch (IOException | ManagerException e) {
                             LOGGER.error("downloadText", e);
                         }

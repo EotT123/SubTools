@@ -46,7 +46,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
             includeLanguageCode:libSettings.includeLanguageCode,
             languageTags:libSettings.langCodeMap,
-            tvdbAdapter:libSettings.useTVDBNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
             rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVE_AND_RENAME));
     }
 
@@ -102,7 +102,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     }
 
     public String buildSubtitle(Release release, String filename, Language language, @Nullable Integer version) {
-        final String extension = "." + release.extension;
+        String extension = "." + release.extension;
         String subFileName = filename;
         if (version != null) {
             subFileName = subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version.${release.extension}";

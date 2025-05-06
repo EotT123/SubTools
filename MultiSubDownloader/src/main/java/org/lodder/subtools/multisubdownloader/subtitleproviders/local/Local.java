@@ -25,16 +25,14 @@ import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
-import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+@ExtensionMethod({Files.class})
 public class Local implements SubtitleProvider<LocalSubtitle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
@@ -63,42 +61,25 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         String name = !tvRelease.originalName.isEmpty() ? tvRelease.originalName : tvRelease.name;
         String filter = name.replaceAll("[^A-Za-z]", "").trim();
 
+        TvReleaseControl tvReleaseControl = new TvReleaseControl(settings, manager, userInteractionHandler);
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                Release release = ReleaseParser.parse(fileSub);
-                if ((release.videoType == VideoType.EPISODE)
-                    && (((TvRelease) release).season == tvRelease.season &&
-                    new HashSet<>(((TvRelease) release).episodes).containsAll(tvRelease.episodes))) {
-
-                    TvReleaseControl epCtrl =
-                        new TvReleaseControl((TvRelease) release, settings, manager, userInteractionHandler);
-                    epCtrl.process();
-                    if (release.hasSameId(tvRelease, ProviderIdType.TVDB)) {
-                        Language detectedLang = DetectLanguage.execute(fileSub);
-                        if (detectedLang == language) {
-                            LOGGER.debug("Local Sub found, adding [{}]", fileSub);
-                            listFoundSubtitles.add(ReleaseParser.parse(fileSub.fileNameAsString)
-                                .map(r -> new LocalSubtitle(
-                                    path:fileSub,
-                                    fileName:fileSub.fileNameAsString,
-                                    language:language,
-                                    quality:r.quality,
-                                    releaseGroup:r.releaseGroup))
-                                .orElseGet(() -> new LocalSubtitle(
-                                    path:fileSub,
-                                    fileName:fileSub.fileNameAsString,
-                                    language:language,
-                                    quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
-                                    releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))));
-                        }
-                    }
-                }
+                ReleaseParser.parse(fileSub).stream()
+                    .filterCast(TvRelease.class)
+                    .filter(release -> release.season == tvRelease.season)
+                    .filter(release -> release.episodes.containsAll(tvRelease.episodes))
+                    .mapEx(tvReleaseControl::process)
+                    .filter(release -> release.hasSameId(tvRelease, ProviderIdType.TVDB))
+                    .filter(_ -> DetectLanguage.execute(fileSub) == language)
+                    .peek(_ -> LOGGER.debug("Local Sub found, adding [{}]", fileSub))
+                    .forEachEx(_ -> listFoundSubtitles.add(
+                        ReleaseParser.parse(fileSub)
+                            .map(r -> new LocalSubtitle(fileSub, language, r.quality, r.releaseGroup))
+                            .orElseGet(() -> new LocalSubtitle(fileSub, language,
+                                ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
+                                ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true)))));
             } catch (ReleaseParseException | ReleaseControlException e) {
-                if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
-                    LOGGER.error(e.getMessage(), e);
-                } else {
-                    LOGGER.error(e.getMessage());
-                }
+                LOGGER.error(e.getMessage(), LOGGER.isDebugEnabled() ? e : null);
             }
         }
 
@@ -110,44 +91,26 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
 
         String filter = movieRelease.name;
+        MovieReleaseControl movieCtrl = new MovieReleaseControl(settings, manager, userInteractionHandler);
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
-                switch (ReleaseParser.parse(fileSub)) {
-                    case MovieRelease release -> {
-                        MovieReleaseControl movieCtrl =
-                            new MovieReleaseControl(release, settings, manager, userInteractionHandler);
-                        movieCtrl.process();
-                        if (release.hasSameId(movieRelease, ProviderIdType.IMDB)
-                            && DetectLanguage.execute(fileSub) == language) {
-                            LOGGER.debug("Local Sub found, adding {}", fileSub);
-                            listFoundSubtitles.add(ReleaseParser.parse(fileSub.fileNameAsString)
-                                .map(r -> new LocalSubtitle(
-                                    path:fileSub,
-                                    fileName:fileSub.fileNameAsString,
-                                    language:language,
-                                    quality:r.quality,
-                                    releaseGroup:r.releaseGroup))
-                                .orElseGet(() -> new LocalSubtitle(
-                                    path:fileSub,
-                                    fileName:fileSub.fileNameAsString,
-                                    language:language,
-                                    quality:ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
-                                    releaseGroup:ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true))));
-                        }
-                    }
-                    default -> {
-                    }
-                }
+                ReleaseParser.parse(fileSub).stream()
+                    .filterCast(MovieRelease.class)
+                    .mapEx(movieCtrl::process)
+                    .filter(release -> release.hasSameId(movieRelease, ProviderIdType.IMDB))
+                    .filter(_ -> DetectLanguage.execute(fileSub) == language)
+                    .peek(_ -> LOGGER.debug("Local Sub found, adding [{}]", fileSub))
+                    .forEachEx(_ -> listFoundSubtitles.add(
+                        ReleaseParser.parse(fileSub)
+                            .map(r -> new LocalSubtitle(fileSub, language, r.quality, r.releaseGroup))
+                            .orElseGet(() -> new LocalSubtitle(fileSub, language,
+                                ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
+                                ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true)))));
             } catch (ReleaseParseException | ReleaseControlException e) {
-                if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
-                    LOGGER.error(e.getMessage(), e);
-                } else {
-                    LOGGER.error(e.getMessage());
-                }
+                LOGGER.error(e.getMessage(), LOGGER.isDebugEnabled() ? e : null);
             }
         }
-
         return listFoundSubtitles;
     }
 

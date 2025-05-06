@@ -24,7 +24,6 @@ import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
@@ -132,7 +131,7 @@ public class CLI {
                 System.out.println("Downloading subtitle: " + release.matchingSubs.get(j).fileName);
                 try {
                     downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
-                } catch (IOException | ManagerException e) {
+                } catch (IOException e) {
                     LOGGER.error(
                         "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})", e);
                 }

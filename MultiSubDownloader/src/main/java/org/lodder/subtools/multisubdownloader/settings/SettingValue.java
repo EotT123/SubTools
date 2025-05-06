@@ -213,8 +213,8 @@ public enum SettingValue {
         .defaultValue(LibraryActionType.NOTHING)),
     EPISODE_LIBRARY_USE_T_V_D_B_NAMING(createSettingBoolean()
         .rootElementFunction(sCtr -> sCtr.settings.episodeLibrarySettings)
-        .valueGetter(LibrarySettings::isUseTVDBNaming)
-        .valueSetter(LibrarySettings::setUseTVDBNaming)
+        .valueGetter(LibrarySettings::isUseTvdbNaming)
+        .valueSetter(LibrarySettings::setUseTvdbNaming)
         .defaultValue(false)),
     EPISODE_LIBRARY_OTHER_FILE_ACTION(createSettingEnum(LibraryOtherFileActionType.class)
         .rootElementFunction(sCtr -> sCtr.settings.episodeLibrarySettings)
@@ -297,8 +297,8 @@ public enum SettingValue {
         .defaultValue(LibraryActionType.NOTHING)),
     MOVIE_LIBRARY_USE_T_V_D_B_NAMING(createSettingBoolean()
         .rootElementFunction(sCtr -> sCtr.settings.movieLibrarySettings)
-        .valueGetter(LibrarySettings::isUseTVDBNaming)
-        .valueSetter(LibrarySettings::setUseTVDBNaming)
+        .valueGetter(LibrarySettings::isUseTvdbNaming)
+        .valueSetter(LibrarySettings::setUseTvdbNaming)
         .defaultValue(false)),
     MOVIE_LIBRARY_OTHER_FILE_ACTION(createSettingEnum(LibraryOtherFileActionType.class)
         .rootElementFunction(sCtr -> sCtr.settings.movieLibrarySettings)

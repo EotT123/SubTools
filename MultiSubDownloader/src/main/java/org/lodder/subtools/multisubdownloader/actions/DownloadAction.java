@@ -3,9 +3,13 @@ package org.lodder.subtools.multisubdownloader.actions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
@@ -15,7 +19,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
@@ -32,18 +35,17 @@ public class DownloadAction {
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public void download(Release release, Subtitle subtitle, Integer version=0) throws IOException,
-        ManagerException {
+    public void download(Release release, Subtitle subtitle, @Nullable AtomicInteger counter=null) throws IOException {
         LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
         switch (release.videoType) {
-            case EPISODE -> download(release, subtitle, settings.episodeLibrarySettings, version);
-            case MOVIE -> download(release, subtitle, settings.movieLibrarySettings, version);
+            case EPISODE -> download(release, subtitle, settings.episodeLibrarySettings, counter);
+            case MOVIE -> download(release, subtitle, settings.movieLibrarySettings, counter);
             default -> throw new IllegalArgumentException("Unexpected value: " + release.videoType);
         }
     }
 
     private void download(Release release, Subtitle subtitle, LibrarySettings librarySettings,
-        @Nullable Integer version) throws IOException, ManagerException {
+        @Nullable AtomicInteger counter) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
         Path path = PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
         if (!path.exists()) {
@@ -58,53 +60,65 @@ public class DownloadAction {
         FilenameLibraryBuilder filenameLibraryBuilder =
             FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
         String videoFileName = filenameLibraryBuilder.build(release).toString();
-        String subFileName = filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, version);
-        Path subFile = path.resolve(subFileName);
 
-        boolean result;
+        Supplier<String> fileNameFunction = () ->
+            filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, counter == null ? null :
+                counter.incrementAndGet());
+
+        List<Path> downloadedSubtitles;
         try {
-            result = subtitle.download(manager, subFile);
-            LOGGER.debug("download file status [{}] ", result ? "successful" : "unsuccessful");
-        } catch (IOException | ManagerException e) {
-            LOGGER.error("Error while getting url for [${release.releaseDescription}] " +
-                "(${e.getMessage()})", e);
+            downloadedSubtitles = subtitle.download(manager, path, fileNameFunction);
+            LOGGER.debug("downloaded {} subtitles", downloadedSubtitles.size());
+        } catch (IOException e) {
+            LOGGER.error("Error while getting url for [${release.releaseDescription}] (${e.getMessage()})", e);
             throw e;
         }
+        if (downloadedSubtitles.isEmpty()) {
+            return;
+        }
 
-        if (result) {
-            if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {
-                Path oldLocationFile = release.getPath().resolve(release.fileName);
-                if (oldLocationFile.exists()) {
-                    LOGGER.info("Moving/Renaming [{}] to folder [{}] this might take a while... ", videoFileName, path);
-                    oldLocationFile.moveToDir(path);
-                    if (!librarySettings.hasLibraryOtherFileAction(LibraryOtherFileActionType.NOTHING)) {
-                        CleanAction cleanAction = new CleanAction(librarySettings);
-                        cleanAction.cleanUpFiles(release, path, videoFileName);
-                    }
-                    if (librarySettings.removeEmptyFolders && release.path.isEmptyDir()) {
-                        release.path.deletePath();
-                    }
+        if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {
+            Path oldLocationFile = release.getPath().resolve(release.fileName);
+            if (oldLocationFile.exists()) {
+                LOGGER.info("Moving/Renaming [{}] to folder [{}] this might take a while... ", videoFileName, path);
+                oldLocationFile.moveToDir(path);
+                if (!librarySettings.hasLibraryOtherFileAction(LibraryOtherFileActionType.NOTHING)) {
+                    CleanAction cleanAction = new CleanAction(librarySettings);
+                    cleanAction.cleanUpFiles(release, path, videoFileName);
+                }
+                if (librarySettings.removeEmptyFolders && release.path.isEmptyDir()) {
+                    release.path.deletePath();
                 }
             }
-            if (librarySettings.backupSubtitle) {
-                String langFolder =
-                    subtitle.language == null ? Language.ENGLISH.getName() : subtitle.language.getName();
-                Path backupPath = librarySettings.backupSubtitlePath.resolve(langFolder);
+        }
+        if (librarySettings.backupSubtitle) {
+            String langFolder =
+                subtitle.language == null ? Language.ENGLISH.getName() : subtitle.language.getName();
+            Path backupPath = librarySettings.backupSubtitlePath.resolve(langFolder);
 
-                if (!backupPath.exists()) {
-                    try {
-                        Files.createDirectories(backupPath);
-                    } catch (IOException e) {
-                        throw new IOException("Download unable to create folder: " + backupPath.toAbsolutePath(), e);
-                    }
+            if (!backupPath.exists()) {
+                try {
+                    Files.createDirectories(backupPath);
+                } catch (IOException e) {
+                    throw new IOException("Download unable to create folder: " + backupPath.toAbsolutePath(), e);
                 }
+            }
 
+            AtomicInteger subCounter = counter == null && downloadedSubtitles.size() < 2 ? null : new AtomicInteger(0);
+            downloadedSubtitles.forEachEx(subFile -> {
                 if (librarySettings.backupUseWebsiteFileName) {
-                    subFile.copyToDirAndRename(backupPath, subtitle.fileName);
+                    if (subCounter != null) {
+                        String filename = StringUtils.substringBeforeLast(subtitle.fileName, ".");
+                        String extension = StringUtils.substringAfterLast(subtitle.fileName, ".");
+                        subFile.copyToDirAndRename(backupPath,
+                            filename + "-v" + subCounter.incrementAndGet() + "." + extension);
+                    } else {
+                        subFile.copyToDirAndRename(backupPath, subtitle.fileName);
+                    }
                 } else {
-                    subFile.copyToDirAndRename(backupPath, subFileName);
+                    subFile.copyToDirAndRename(backupPath, subFile.fileNameAsString);
                 }
-            }
+            });
         }
     }
 }

@@ -2,11 +2,12 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
@@ -27,7 +28,10 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
     }
 
     @Override
-    public boolean download(Manager manager, Path destination) throws IOException, ManagerException {
-        return manager.download(url, destination);
+    public List<Path> download(Manager manager, Path destinationFolder, Supplier<String> fileNameFunction)
+        throws IOException {
+        Path subPath = destinationFolder.resolve(fileNameFunction.get());
+        manager.download(url, subPath);
+        return List.of(subPath);
     }
 }

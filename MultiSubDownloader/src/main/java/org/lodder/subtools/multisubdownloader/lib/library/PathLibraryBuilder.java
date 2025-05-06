@@ -39,7 +39,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
             structure:libSettings.folderStructure,
             replaceSpace:libSettings.folderReplaceSpace,
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
-            tvdbAdapter:libSettings.useTVDBNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
             libraryFolder:libSettings.folder,
             move:libSettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVE_AND_RENAME));
     }

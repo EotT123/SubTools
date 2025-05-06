@@ -27,7 +27,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
 
     @val LibrarySettings librarySettings;
     private final JComboBox<LibraryActionType> cbxLibraryAction;
-    private final JCheckBox chkUseTVDBNaming;
+    private final JCheckBox chkuseTvdbNaming;
     private final PartialDisableComboBox<LibraryOtherFileActionType> cbxLibraryOtherFileAction;
     private final SubtitleBackupPanel pnlBackup;
     protected final StructureFolderPanel pnlStructureFolder;
@@ -47,7 +47,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             .addToPanel(this, "span, growx");
         {
 
-            this.chkUseTVDBNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
+            this.chkuseTvdbNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
                 VideoType.EPISODE == videoType).addTo(performActionPanel, "hidemode 3, wrap");
 
             new JLabel(getText("PreferenceDialog.ActionForShowFiles")).addTo(performActionPanel);
@@ -123,7 +123,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
 
     public void loadPreferenceSettings() {
         cbxLibraryAction.setSelectedItem(librarySettings.action);
-        chkUseTVDBNaming.setSelected(librarySettings.useTVDBNaming);
+        chkuseTvdbNaming.setSelected(librarySettings.useTvdbNaming);
         cbxLibraryOtherFileAction.setSelectedItem(librarySettings.otherFileAction);
 
         checkEnableStatusPanel();
@@ -135,7 +135,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             pnlBackup.savePreferenceSettings();
         }
         librarySettings.action = this.cbxLibraryAction.getSelectedValue();
-        librarySettings.useTVDBNaming = this.chkUseTVDBNaming.isSelected();
+        librarySettings.useTvdbNaming = this.chkuseTvdbNaming.isSelected();
         librarySettings.otherFileAction = this.cbxLibraryOtherFileAction.getSelectedValue();
 
         pnlStructureFolder.savePreferenceSettings();

@@ -70,4 +70,10 @@ public class OptionalExt {
         }
     }
 
+    public static <T, X extends Exception> void ifPresentEx(@This Optional<T> optional,
+        ThrowingConsumer<T, X> supplier) throws X {
+        if (optional.isPresent()) {
+            supplier.accept(optional.get());
+        }
+    }
 }

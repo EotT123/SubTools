@@ -7,7 +7,6 @@ import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
 public abstract sealed class Release permits MovieRelease, TvRelease {
@@ -18,17 +17,15 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     @val @Nullable Path filePath;
     @val @Nullable String quality;
     @val @Nullable String releaseGroup;
-    @val @Nullable String extension;
     @val ProviderIds providerIds = new ProviderIds();
 
     protected Release(String name, VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
-        @Nullable String quality, @Nullable String extension) {
+        @Nullable String quality) {
         this.name = name;
         this.videoType = videoType;
         this.filePath = filePath;
         this.releaseGroup = releaseGroup;
         this.quality = quality;
-        this.extension = extension;
     }
 
     public void addMatchingSub(Subtitle sub) {
@@ -52,12 +49,8 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     }
 
     public boolean hasExtension(String extension) {
-        return StringUtils.isNotBlank(extension) && extension.equals(this.extension);
+        return filePath != null && filePath.fileNameAsString.endsWith(extension);
     }
-
-//    public String getImdbIdAsString() {
-//        return "tt%07d".formatted(imdbId);
-//    }
 
     @Override
     public String toString() {

@@ -1,9 +1,9 @@
 package org.lodder.subtools.multisubdownloader.lib;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
-import org.lodder.subtools.multisubdownloader.lib.control.ReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
@@ -21,21 +21,22 @@ public record ReleaseFactory(Settings settings, Manager manager) {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
-    public Release createRelease(Path file, UserInteractionHandler userInteractionHandler, boolean validate=true) {
+    public Optional<Release> createRelease(Path file, UserInteractionHandler userInteractionHandler,
+        boolean validate=true) {
         try {
-            ReleaseControl releaseControl = switch (ReleaseParser.parse(file)) {
-                case TvRelease tvRelease -> new TvReleaseControl(tvRelease, settings, manager, userInteractionHandler);
-                case MovieRelease movieRelease -> new MovieReleaseControl(movieRelease, settings, manager,
-                    userInteractionHandler);
-            };
-            if (validate) {
-                releaseControl.process();
+            Optional<Release> release = ReleaseParser.parse(file);
+            if (validate && release.isPresent()) {
+                switch (release.get()) {
+                    case TvRelease tvRelease ->
+                        new TvReleaseControl(settings, manager, userInteractionHandler).process(tvRelease);
+                    case MovieRelease movieRelease ->
+                        new MovieReleaseControl(settings, manager, userInteractionHandler).process(movieRelease);
+                }
             }
-            return releaseControl.release;
-
+            return release;
         } catch (ReleaseParseException | ReleaseControlException e) {
-            LOGGER.error("createRelease: " + e.getMessage(), e);
-            return null;
+            LOGGER.error("Failed to create a release for $file: " + e.getMessage(), e);
+            return Optional.empty();
         }
     }
 }

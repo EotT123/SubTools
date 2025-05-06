@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.gui.workers;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
@@ -16,7 +17,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.lib.Info;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
@@ -65,14 +65,13 @@ public class DownloadWorker extends SwingWorker<Void, String> implements Cancela
                 setProgress(progress);
                 publish(selectedShow.fileName);
                 List<Subtitle> selection = userInteractionHandlerAction.subtitleSelection(selectedShow, true);
+                AtomicInteger counter = selection.size() == 1 ? null : new AtomicInteger(0);
                 try {
-                    for (int j = 0; j < selection.size(); j++) {
-                        downloadAction.download(selectedShow, selection.get(j), selection.size() == 1 ? null : j + 1);
-                    }
+                    selection.forEachEx(s -> downloadAction.download(selectedShow, s, counter));
                     if (!selection.isEmpty()) {
                         model.removeShow(selectedShow);
                     }
-                } catch (IOException | ManagerException e) {
+                } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     showErrorMessage(e.toString());
                 }
