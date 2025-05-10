@@ -14,10 +14,14 @@ import com.tvdb.model.GetSeriesSeasonEpisodesTranslated200ResponseData;
 import com.tvdb.model.SearchResult;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbException;
+import org.lodder.subtools.sublibrary.util.http.RetrofitService;
+import org.lodder.subtools.sublibrary.util.http.RetrofitService.ExecuteCall;
+import retrofit2.Call;
 import retrofit2.Response;
 
 public class TvdbApi implements ApiIntf {
@@ -136,4 +140,9 @@ public class TvdbApi implements ApiIntf {
 //    private String toString(Object value) {
 //        return value != null ? value.toString() : null;
 //    }
+
+    private static <T> ExecuteCall<T, TvdbException> apiCall(ThrowingSupplier<Call<T>,
+        IOException> supplier) {
+        return RetrofitService.handleExecution(supplier, TvdbException::new);
+    }
 }

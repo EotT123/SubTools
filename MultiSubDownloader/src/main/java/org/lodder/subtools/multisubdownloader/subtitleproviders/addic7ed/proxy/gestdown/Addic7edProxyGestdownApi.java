@@ -1,16 +1,13 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown;
 
 import static manifold.science.measures.TimeUnit.*;
-import static org.lodder.subtools.sublibrary.util.Sleep.*;
-import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
+import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import extensions.java.lang.String.StringExt;
-import jakarta.ws.rs.core.Response.Status.Family;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
@@ -19,6 +16,7 @@ import org.gestdown.api.TvShowsApi;
 import org.gestdown.model.EpisodeDto;
 import org.gestdown.model.ShowDto;
 import org.gestdown.model.SubtitleDto;
+import org.gestdown.model.SubtitleSearchResponse;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edResponseException;
@@ -29,11 +27,11 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpStatus;
+import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.opensubtitles.invoker.ApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
-import retrofit2.Response;
 
 /**
  * Provides access to Addic7ed subtitle data via the Gestdown proxy.
@@ -75,46 +73,44 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
     public List<ShowDto> getProviderSerieIds(String name) throws Addic7edException {
         return getCache("providerId", b -> b.add("name", name))
             .getCollection(() -> {
-                List<ShowDto> shows = executeHandleStatus(() -> TV_SHOWS_API.showsSearchSearchGet(name)).getShows();
+                List<ShowDto> shows = apiCall(
+                    () -> TV_SHOWS_API.showsSearchSearchGet(name))
+                    .addErrorHandler(HttpStatus.NOT_FOUND, retry:false)
+                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second)
+                    .execute().getShows();
                 return shows == null ? List.of() : shows;
-//                return shows.stream().map(showDto -> new Addic7edProxyGestdownSerieId(showDto.name, showDto.id,
-//                    showDto.tvDbId, showDto.tmdbId)).toList();
             });
     }
 
     public List<ShowDto> getProviderSerieIds(int tvdbId) throws Addic7edException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
             .getCollection(() -> {
-                List<ShowDto> shows =
-                    executeHandleStatus(() -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId)).getShows();
+                List<ShowDto> shows = apiCall(
+                    () -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId))
+                    .addErrorHandler(HttpStatus.NOT_FOUND, retry:false)
+                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second)
+                    .execute().getShows();
                 return shows == null ? List.of() : shows;
-//                return shows.stream().map(showDto -> new Addic7edProxyGestdownSerieId(showDto.name, showDto.id,
-//                    showDto.tvDbId, showDto.tmdbId)).toList();
             });
     }
 
-    public List<SubtitleDto> getSubtitles(String providerId, int season, int episode,
+    public List<Addic7edProxyGestdownSubtitle> getSubtitles(String providerId, int season, int episode,
         Language language) throws Addic7edException {
         return getCache("subtitles", b -> b.add("providerId", providerId)
             .add("season", season).add("episode", episode).add("language", language))
             .getCollection(() -> {
-                List<SubtitleDto> subtitles =
-                    executeHandleStatus(
-                        () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.getName(),
-                            UUID.fromString(providerId), season, episode)).getMatchingSubtitles();
-                return subtitles == null ? List.of() : subtitles.stream().filter(SubtitleDto::isCompleted).toList();
-
-//                SubtitleSearchResponse response = SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(
-//                    language.getName(), UUID.fromString(providerId), season, episode);
-//                List<SubtitleDto> subtitles = response.getMatchingSubtitles();
-//                if (subtitles == null || subtitles.isEmpty()) {
-//                    return Set.of();
-//                }
-//                return subtitles
-//                    .stream()
-//                    .filter(SubtitleDto::isCompleted)
-//                    .map(sub -> mapToSubtitle(sub, response.episode, language))
-//                    .toSet();
+                SubtitleSearchResponse response = apiCall(
+                    () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
+                        UUID.fromString(providerId), season, episode))
+                    .addErrorHandler(HttpStatus.BAD_REQUEST, retry:false)
+                    .addErrorHandler(HttpStatus.NOT_FOUND, retry:false)
+                    .addErrorHandler(HttpStatus.LOCKED, 5Second)
+                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second)
+                    .execute();
+                List<SubtitleDto> subtitles = response.getMatchingSubtitles();
+                return subtitles == null ? List.of() :
+                    subtitles.stream().map(subtitleDto -> mapToSubtitle(subtitleDto, response.getEpisode(), language))
+                        .toList();
             });
     }
 
@@ -135,35 +131,8 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             hearingImpaired:false);
     }
 
-    private <T> T executeHandleStatus(ThrowingSupplier<Call<T>, IOException> callable, boolean retry=true)
-        throws Addic7edException {
-        Response<T> response = execute(() -> callable.get().execute());
-        if (response.isSuccessful()) {
-            return response.body();
-        } else {
-            String errorBody = execute(() -> Objects.requireNonNull(response.errorBody()).string());
-            LOGGER.debug("Addic7ed error: " + errorBody);
-            HttpStatus code = fromStatusCode(response.code());
-            if (!retry) {
-                throw new Addic7edResponseException(code);
-            }
-            if (code == TOO_MANY_REQUESTS) {
-                sleep(5Second);
-                return executeHandleStatus(callable, false);
-            } else if (code.family == Family.SERVER_ERROR) {
-                sleep(2Second);
-                return executeHandleStatus(callable, false);
-            } else {
-                throw new Addic7edResponseException(code, errorBody);
-            }
-        }
-    }
-
-    public <T> T execute(ThrowingSupplier<T, IOException> supplier) throws Addic7edException {
-        try {
-            return supplier.get();
-        } catch (IOException e) {
-            throw new Addic7edException(e);
-        }
+    private static <T> ExecuteCall<T, Addic7edResponseException> apiCall(ThrowingSupplier<Call<T>,
+        IOException> supplier) {
+        return RetrofitService.handleExecution(supplier, Addic7edResponseException::new);
     }
 }

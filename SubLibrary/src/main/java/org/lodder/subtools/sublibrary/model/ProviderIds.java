@@ -20,8 +20,8 @@ public class ProviderIds {
         return providerIdMap.get(providerIdType);
     }
     public OptionalInt getTvdbId(){
-        Object imdbId = get(ProviderIdType.TVDB);
-        return imdbId == null ? OptionalInt.empty() : OptionalInt.of((int)imdbId);
+        Object tvdbId = get(ProviderIdType.TVDB);
+        return tvdbId == null ? OptionalInt.empty() : OptionalInt.of((int) tvdbId);
     }
     public Optional<String> getImdbId(){
         return Optional.ofNullable((String) get(ProviderIdType.IMDB));

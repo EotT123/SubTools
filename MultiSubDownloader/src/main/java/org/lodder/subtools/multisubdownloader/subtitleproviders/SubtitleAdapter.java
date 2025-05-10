@@ -1,15 +1,12 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
 import static manifold.ext.props.rt.api.PropOption.*;
-import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
-import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -17,18 +14,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import manifold.ext.rt.api.Self;
 import name.falgout.jeffrey.throwing.ThrowingBiFunction;
-import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
@@ -122,7 +114,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
 
 //    @Override
-//    public Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X {
+//    public Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X_API {
 //        return getProviderMovieMapping(movieRelease.name, movieRelease.name, movieRelease.name, movieRelease.year,
 //            movieRelease.providerIds);
 //    }
@@ -147,12 +139,12 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 //     * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
 //     * @return an {@code Optional<MovieMapping>} containing the mapping information if found, or an empty {@code
 //     * Optional} if none is found.
-//     * @throws X if an error occurs during the retrieval operation
+//     * @throws X_API if an error occurs during the retrieval operation
 //     */
 //    private Optional<MovieMapping> getProviderMovieMapping(String name, String nameToSearchFor, String displayName,
-//        @Nullable Integer year, ProviderIds providerIds) throws X {
+//        @Nullable Integer year, ProviderIds providerIds) throws X_API {
 //
-//        ThrowingBiFunction<ProviderIds, String, List<M_ID>, X> providerReleaseIdsFunction
+//        ThrowingBiFunction<ProviderIds, String, List<M_ID>, X_API> providerReleaseIdsFunction
 //            = (_providerIds, _nameToSearchFor) -> getSortedMovieProviderIds(_providerIds, _nameToSearchFor, year);
 //        TriFunction<String, String, String, MovieMapping> releaseMappingConstructor =
 //            (_name, providerId, providerName) -> new MovieMapping(_name, providerId, providerName, year);
@@ -179,10 +171,10 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 //     * @param serieName the name of the movie
 //     * @param year the year number of the movie
 //     * @return a list of sorted movie provider IDs
-//     * @throws X if an error occurs during the operation
+//     * @throws X_API if an error occurs during the operation
 //     */
 //    public abstract List<M_ID> getSortedMovieProviderIds(ProviderIds providerIds, String serieName,
-//        @Nullable Integer year) throws X;
+//        @Nullable Integer year) throws X_API;
 //
 //    /**
 //     * Converts a provider-specific movie id to a displayable string format.
@@ -451,81 +443,4 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     }
 
     public abstract SUB convertToSubtitle(API_SUB subtitle);
-
-    @RequiredArgsConstructor
-    public static class ExecuteCall<T, X extends Exception> {
-        private final ThrowingSupplier<T, X> supplier;
-        private String message;
-        private int retries = 3;
-        private final List<Predicate<X>> retryPredicates = new ArrayList<>();
-        private final List<HandleException<T, X>> exceptionHandlers = new ArrayList<>();
-
-        private record HandleException<T, X extends Exception>(Predicate<X> predicate,
-                                                               Function<X, T> exceptionFunction) {
-        }
-
-        public @Self ExecuteCall<T, X> retryWhenException(Predicate<X> predicate) {
-            retryPredicates.add(predicate);
-            return this;
-        }
-
-        public @Self ExecuteCall<T, X> handleException(Predicate<X> predicate, Function<X, T> exceptionFunction) {
-            exceptionHandlers.add(new HandleException<>(predicate, exceptionFunction));
-            return this;
-        }
-
-        public @Self ExecuteCall<T, X> handleException(Predicate<X> predicate, Supplier<T> supplier) {
-            return handleException(predicate, _ -> supplier.get());
-        }
-
-        public @Self ExecuteCall<T, X> handleException(Function<X, T> exceptionFunction) {
-            return handleException(_ -> true, exceptionFunction);
-        }
-
-        public @Self ExecuteCall<T, X> handleException(Supplier<T> supplier) {
-            return handleException(_ -> true, _ -> supplier.get());
-        }
-
-        public @Self ExecuteCall<T, X> retries(int retries) {
-            if (retries <= 0) {
-                throw new IllegalStateException("Retries should be greater than 0");
-            }
-            this.retries = retries;
-            return this;
-        }
-
-        public @Self ExecuteCall<T, X> message(String message) {
-            this.message = message;
-            return this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public T execute() throws X {
-            try {
-                return supplier.get();
-            } catch (Exception e) {
-                if (e instanceof RuntimeException) {
-                    throw e;
-                }
-                X exception = (X) e;
-                if (retryPredicates.stream().anyMatch(predicate -> predicate.test(exception))) {
-                    if (retries-- == 0) {
-                        throw new RuntimeException("Max retries reached when calling %s".formatted(message));
-                    }
-                    sleep(5 Second);
-                    return execute();
-                } else {
-                    try {
-                        return exceptionHandlers.stream()
-                            .filter(handleException -> handleException.predicate().test(exception))
-                            .findAny()
-                            .map(handleException -> handleException.exceptionFunction().apply(exception))
-                            .orElseThrow(() -> e);
-                    } catch (Exception e1) {
-                        throw (X) e1;
-                    }
-                }
-            }
-        }
-    }
 }

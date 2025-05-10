@@ -61,7 +61,7 @@ public enum  HttpStatus {
     TOO_EARLY(425, "Too Early: The server is unwilling to risk processing a request that might be replayed."),
     UPGRADE_REQUIRED(426, "Upgrade Required: The client should switch to a different protocol as specified in the Upgrade header."),
     PRECONDITION_REQUIRED(428, "Precondition Required: The origin server requires the request to be conditional."),
-    TOO_MANY_REQUESTS(429, "Too Many Requests: The user has sent too many requests in a given amount of time.", true),
+    TOO_MANY_REQUESTS(429, "Too Many Requests: The user has sent too many requests in a given amount of time."),
     REQUEST_HEADER_FIELDS_TOO_LARGE(431, "Request Header Fields Too Large: The server is unwilling to process the request because its header fields are too large."),
     UNAVAILABLE_FOR_LEGAL_REASONS(451, "Unavailable For Legal Reasons: The requested resource is unavailable due to legal demands such as censorship or government-mandated blocks."),
 
@@ -80,13 +80,11 @@ public enum  HttpStatus {
 
     @var int code;
     @var String description;
-    @var  boolean stopContactingClient;
     @var Family family;
 
-    HttpStatus(int code, String description, boolean stopContactingClient = false) {
+    HttpStatus(int code, String description) {
         this.code = code;
         this.description = description;
-        this.stopContactingClient = stopContactingClient;
         this.family = Response.Status.Family.familyOf(code);
     }
 

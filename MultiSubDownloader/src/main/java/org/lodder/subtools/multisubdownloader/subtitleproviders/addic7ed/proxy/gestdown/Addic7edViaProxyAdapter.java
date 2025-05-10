@@ -3,16 +3,13 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.BiPredicate;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import name.falgout.jeffrey.throwing.ThrowingSupplier;
-import org.gestdown.invoker.ApiException;
+import org.apache.commons.lang3.StringUtils;
+import org.gestdown.model.ShowDto;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -25,6 +22,8 @@ import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.lodder.subtools.sublibrary.util.http.HttpStatus;
+import org.lodder.subtools.sublibrary.util.http.RetrofitService.ExecuteCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +53,8 @@ public final class Addic7edViaProxyAdapter extends
     }
 
     @Override
-    public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds,        Language language)
-        throws Addic7edException {
+    public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds,
+        Language language) throws Addic7edException {
         return List.of();
     }
 
@@ -72,9 +71,9 @@ public final class Addic7edViaProxyAdapter extends
     @Override
     public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
         @Nullable Integer season) throws Addic7edException {
-        List<Addic7edProxyGestdownSerieId> serieIds = providerIds.getTvdbId()
+        List<ShowDto> serieIds = providerIds.getTvdbId()
             .mapToObjEx(tvdbId ->
-                new ExecuteCall<>(() -> api.getProviderSerieIds(tvdbId))
+                new ExecuteCall<>(provider, () -> api.getProviderSerieIds(tvdbId))
                     .message("getProviderSerieName: [$tvdbId]")
                     .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
                     .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
@@ -92,8 +91,9 @@ public final class Addic7edViaProxyAdapter extends
                     })
                     .execute());
         return serieIds.stream()
-            .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")
-                .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", ""))))
+            .sorted(Comparator.comparing(n -> !StringUtils.equalsAnyIgnoreCase(serieName.keepLettersOnly(),
+                n.name.keepLettersOnly())))
+            .map(showDto -> new Addic7edProxyGestdownSerieId(showDto.name, showDto.id, showDto.tvDbId, showDto.tmdbId))
             .toList();
     }
 
@@ -103,14 +103,10 @@ public final class Addic7edViaProxyAdapter extends
     }
 
     @Override
-    public Set<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
+    public List<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws Addic7edException {
-        return new ExecuteCall<>(
-            () -> api.getSubtitles(serieMapping.providerId, season, episode, language))
-            .message("getSubtitles: [%s]".formatted(TvRelease.formatName(serieMapping.providerName, season, episode)))
-            .retryWhenHttpCode(ReturnCode.REFRESHING)
-            .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-            .execute();
+        LOGGER.debug("$provider - getSubtitles: {}", TvRelease.formatName(serieMapping.providerName, season, episode));
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     // ====== \\
@@ -123,43 +119,15 @@ public final class Addic7edViaProxyAdapter extends
     }
 
 
-    @Getter
-    @RequiredArgsConstructor
     private enum ReturnCode {
-        NOT_FOUND(404), RATE_LIMIT_REACHED(429), REFRESHING(423);
+        NOT_FOUND((code, _) -> code == HttpStatus.NOT_FOUND),
+        RATE_LIMIT_REACHED((code, _) -> code == HttpStatus.TOO_MANY_REQUESTS),
+        REFRESHING((code, _) -> code == HttpStatus.LOCKED);
 
-        final int code;
+        @val BiPredicate<HttpStatus, String> predicate;
 
-        public boolean isSameCode(int code) {
-            return this.code == code;
-        }
-    }
-
-    private static class ExecuteCall<T> extends SubtitleAdapter.ExecuteCall<T, Addic7edException> {
-
-        public ExecuteCall(ThrowingSupplier<T, Addic7edException> supplier) {
-            super(supplier);
-        }
-
-        public ExecuteCall<T> retryWhenHttpCode(ReturnCode returnCode) {
-            super.retryWhenException(e -> returnCode.isSameCode(e.getCode()));
-            return this;
-        }
-
-        public ExecuteCall<T> handleHttpCode(ReturnCode returnCode, Function<ApiException, T> function) {
-            super.handleException(e -> returnCode.isSameCode(e.getCode()), function);
-            return this;
-        }
-
-        public ExecuteCall<T> handleHttpCode(ReturnCode returnCode, Supplier<T> supplier) {
-            super.handleException(e -> returnCode.isSameCode(e.getCode()), supplier);
-            return this;
-        }
-
-        @Override
-        public ExecuteCall<T> handleException(Supplier<T> suppliers) {
-            super.handleException(_ -> true, suppliers);
-            return this;
+        ReturnCode(BiPredicate<HttpStatus, String> predicate) {
+            this.predicate = predicate;
         }
     }
 }
