@@ -33,31 +33,6 @@ public class RetrofitService {
         //hide utility class constructor
     }
 
-//    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-//    public static class HttpStatusHandler {
-//        private final @Nullable HttpStatus code;
-//        private final @Nullable Family family;
-//        private final @Nullable Predicate<HttpStatus> predicate;
-//
-//        public static HttpStatusHandler code(HttpStatus code) {
-//            return new HttpStatusHandler(code, null, null);
-//        }
-//
-//        public static HttpStatusHandler family(Family family) {
-//            return new HttpStatusHandler(null, family, null);
-//        }
-//
-//        public static HttpStatusHandler predicate(Predicate<HttpStatus> predicate) {
-//            return new HttpStatusHandler(null, null, predicate);
-//        }
-//
-//        public boolean isApplicable(HttpStatus status) {
-//            return (code != null && code == status) ||
-//                (family != null && family == status.family) ||
-//                (predicate != null && predicate.test(status));
-//        }
-//    }
-
     public record ErrorHandler<X extends Exception>(
         // predicate to test if this handler is applicable
         BiPredicate<HttpStatus, String> predicate,
