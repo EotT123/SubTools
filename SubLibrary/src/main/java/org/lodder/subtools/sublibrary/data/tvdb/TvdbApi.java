@@ -1,102 +1,76 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
-import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import com.tvdb.api.SearchApi;
+import com.tvdb.api.SeriesApi;
+import com.tvdb.invoker.ApiClient;
+import com.tvdb.invoker.ApiException;
+import com.tvdb.model.GetSeriesSeasonEpisodesTranslated200ResponseData;
+import com.tvdb.model.SearchResult;
 import com.uwetrottmann.thetvdb.TheTvdb;
-import com.uwetrottmann.thetvdb.entities.Episode;
-import com.uwetrottmann.thetvdb.entities.EpisodesResponse;
-import com.uwetrottmann.thetvdb.entities.Series;
-import com.uwetrottmann.thetvdb.entities.SeriesResponse;
-import com.uwetrottmann.thetvdb.entities.SeriesResultsResponse;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbException;
-import retrofit2.Response;
 
 public class TvdbApi implements ApiIntf {
 
-    private final TheTvdb api;
+    private static final String APIKEY = "cdda250d-4fb1-4134-9555-1f51ad800590";
+    private static final ApiClient API_CLIENT;
     @val @override Manager manager;
     @val @override String provider = "TVDB";
+    private final TheTvdb api;
 
-    public TvdbApi(Manager manager, String apikey) {
-        this.manager =manager;
-        this.api = new TheTvdb(apikey);
+    static {
+        API_CLIENT = new ApiClient();
+        API_CLIENT.setApiKey(APIKEY);
     }
 
-    public List<Series> searchSeries(String serieName, @Nullable Language language=null) throws TvdbException {
-        return getCache("series", b -> b.add("serieName", serieName).add("language", language))
+    public TvdbApi(Manager manager, String apikey) {
+        this.manager = manager;
+    }
+
+    public List<SearchResult> searchSeries(String serieName) throws TvdbException {
+        return getCache("series", b -> b.add("serieName", serieName))
             .getCollection(() -> {
                 String encodedSerieName = serieName.toLowerCase().replace(" ", "-").urlEncode();
                 try {
-                    Response<SeriesResultsResponse> response =
-                        api.search()
-                            .series(encodedSerieName, null, null, null,
-                                language == null ? null : language.langCode)
-                            .execute();
-                    if (response.isSuccessful() && response.body() != null) {
-                        return response.body().data;
-//                        return response.body().data
-//                        .stream()
-//                            .map(series -> seriesToTVDBSerie(series, language))
-//                            .toList();
-                    }
-                    return List.of();
-                } catch (IOException e) {
+                    return new SearchApi(API_CLIENT).getSearchResults(encodedSerieName, null, "series", null, null,
+                        null, null, null, null, null, null, null, null).getData();
+                } catch (ApiException e) {
                     throw new TvdbException(e);
                 }
             });
     }
 
-    public Optional<Series> searchSerie(int tvdbId, @Nullable Language language=null) throws TvdbException {
-        return getCache("serie", b -> b.add("tvdbId", tvdbId).add("language", language))
+    public Optional<SearchResult> searchSerie(int tvdbId) throws TvdbException {
+        return getCache("serie", b -> b.add("tvdbId", tvdbId))
             .getOptional(() -> {
                 try {
-                    Response<SeriesResponse> response =
-                        api.series()
-                            .series(tvdbId, language == null ? null : language.langCode)
-                            .execute();
-                    if (response.isSuccessful() && response.body() != null) {
-                        return Optional.ofNullable(response.body().data);
-//                return Optional.of(seriesToTVDBSerie(response.body().data, language));
-                    }
-                    return Optional.empty();
-                } catch (IOException e) {
+                    return new SearchApi(API_CLIENT).getSearchResults(null, null, "series", null, null,
+                            null, null, null, null, null, String.valueOf(tvdbId), null, null).getData().stream()
+                        .findFirst();
+                } catch (ApiException e) {
                     throw new TvdbException(e);
                 }
             });
     }
 
-    public Optional<Episode> searchEpisode(int tvdbId, int season, int episode, @Nullable Language language=null)
-        throws TvdbException {
+    public Optional<GetSeriesSeasonEpisodesTranslated200ResponseData> searchEpisode(int tvdbId, int season, int episode,
+        Language language) throws TvdbException {
         return getCache("episode",
             b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode)
                 .add("language", language))
             .getOptional(() -> {
                 try {
-                    Response<EpisodesResponse> response =
-                        api.series()
-                            .episodesQuery(tvdbId, null, season, episode, null, null, null, null, null,
-                                language == null ? null : language.langCode)
-                            .execute();
-                    if (response.isSuccessful() && response.body() != null && response.body().data != null &&
-                        !response.body().data.isEmpty()) {
-                        return Optional.ofNullable(response.body().data.first());
-//                        if (response.body().data == null) {
-//                            return Optional.empty();
-//                        }
-//                        return response.body().data.stream()
-//                            .map(serie -> episodeToTVDBEpisode(serie, language))
-//                            .findFirst();
-                    }
-                    throw new TvdbException(response.errorBody().string());
-                } catch (IOException e) {
+                    return Optional.ofNullable(new SeriesApi(API_CLIENT).getSeriesSeasonEpisodesTranslated(1,
+                        BigDecimal.valueOf(tvdbId), "default", language.iso639Set3).getData());
+                } catch (ApiException e) {
                     throw new TvdbException(e);
                 }
             });

@@ -347,7 +347,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         UnaryOperator<String> selectFromListMessage,
         Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
 
-        CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObj(tvdbId ->
+        CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObjEx(tvdbId ->
                 getCache("releaseMapping", b -> b.add("tvdbId", tvdbId).add(extraParams)))
             .orElse(null);
         if (tvdbIdCache != null && tvdbIdCache.isPresent()) {

@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import com.uwetrottmann.thetvdb.entities.Episode;
+import com.tvdb.model.GetSeriesSeasonEpisodesTranslated200ResponseData;
+import com.tvdb.model.SearchResult;
 import com.uwetrottmann.thetvdb.entities.Series;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
@@ -47,7 +47,7 @@ public class TvdbAdapter implements AdapterIntf {
         return Optional.empty();
     }
 
-    public Optional<Series> searchSerie(String serieName) {
+    public Optional<SearchResult> searchSerie(String serieName) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
 
         CacheKey cache = getCache("series", b -> b.add("name", encodedSerieName));
@@ -56,10 +56,10 @@ public class TvdbAdapter implements AdapterIntf {
             return cache.getOptional();
         }
 
-        Optional<Series> tvdbSerie;
-        List<Series> serieIds;
+        Optional<SearchResult> tvdbSerie;
+        List<SearchResult> serieIds;
         try {
-            serieIds = api.searchSeries(encodedSerieName, null);
+            serieIds = api.searchSeries(encodedSerieName);
         } catch (TvdbException e) {
             serieIds = List.of();
         }
@@ -69,11 +69,10 @@ public class TvdbAdapter implements AdapterIntf {
             tvdbSerie = Optional.of(serieIds.first);
         } else {
             String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");
-            Comparator<Series> comparator = Comparator
-                .comparing((Series s) -> formattedSerieName.equalsIgnoreCase(
-                        StringUtils.replaceAll(s.seriesName, "[^A-Za-z]", "")),
+            Comparator<SearchResult> comparator = Comparator
+                .comparing((SearchResult s) -> formattedSerieName.equalsIgnoreCase(s.name.keepLettersOnly()),
                     Comparator.reverseOrder())
-                .thenComparing(s -> s.firstAired, Comparator.reverseOrder());
+                .thenComparing(s -> s.name, Comparator.reverseOrder());
             try {
                 tvdbSerie = userInteractionHandler.selectFromList(
                     serieIds.stream().sorted(comparator).toList(),
@@ -83,7 +82,7 @@ public class TvdbAdapter implements AdapterIntf {
                 if (tvdbSerie.isEmpty()) {
                     LOGGER.error("Unknown serie name in tvdb: $serieName");
                     tvdbSerie = promptUserToEnterTvdbId(serieName)
-                        .mapToObj(tvdbId -> api.searchSerie(tvdbId, null).orElse(null));
+                        .mapToObjEx(tvdbId -> api.searchSerie(tvdbId).orElse(null));
                 }
             } catch (TvdbException e) {
                 tvdbSerie = Optional.empty();
@@ -97,16 +96,18 @@ public class TvdbAdapter implements AdapterIntf {
                 storeTempNullValue:true);
         } else {
             cache.store(Value.ofOptional(tvdbSerie));
+            Optional<SerieMapping> serieMapping =
+                tvdbSerie.map((SearchResult serie) -> new SerieMapping(serieName, serie.tvdbId, serie.name));
             getCache("serieId", b -> b.add("name", encodedSerieName))
                 .store(
-                    value:Value.ofOptional(tvdbSerie.map(
-                        serie -> new SerieMapping(serieName, String.valueOf(serie.id), serie.seriesName))),
+                    value:Value.ofOptional(serieMapping),
                     storeTempNullValue:true);
         }
         return tvdbSerie;
     }
 
-    public Optional<Episode> searchEpisode(int tvdbId, int season, int episode) {
+    public Optional<GetSeriesSeasonEpisodesTranslated200ResponseData> searchEpisode(int tvdbId, int season,
+        int episode) {
         return getCache("episode", b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode))
             .getOptional(
                 () -> {
@@ -116,7 +117,7 @@ public class TvdbAdapter implements AdapterIntf {
                         LOGGER.error(
                             "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
                                 TvRelease.formatSeasonEpisode(season, episode)), e);
-                        return Optional.ofNullable(null);
+                        return Optional.empty();
                     }
                 },
                 storeTempNullValue:true);
