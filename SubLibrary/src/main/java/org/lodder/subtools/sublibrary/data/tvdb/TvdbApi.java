@@ -15,6 +15,7 @@ import com.tvdb.model.SearchResult;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
@@ -23,6 +24,7 @@ import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.lodder.subtools.sublibrary.util.http.RetrofitService.ExecuteCall;
 import retrofit2.Call;
 
+@NullMarked
 public class TvdbApi implements ApiIntf {
 
     private static final String APIKEY = "cdda250d-4fb1-4134-9555-1f51ad800590";

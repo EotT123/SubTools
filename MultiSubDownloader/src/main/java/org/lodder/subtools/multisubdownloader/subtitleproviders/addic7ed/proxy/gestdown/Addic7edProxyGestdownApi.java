@@ -17,6 +17,7 @@ import org.gestdown.model.EpisodeDto;
 import org.gestdown.model.ShowDto;
 import org.gestdown.model.SubtitleDto;
 import org.gestdown.model.SubtitleSearchResponse;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edResponseException;
@@ -39,6 +40,7 @@ import retrofit2.Call;
  * Note: Only supports TV series search; movie support is not available.
  */
 // see https://www.gestdown.info/Api
+@NullMarked
 public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownApi.class);

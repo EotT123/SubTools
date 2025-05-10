@@ -270,7 +270,7 @@
                             <invokerPackage>com.tvdb.invoker</invokerPackage>
                             <packageName>com.tvdb</packageName>
                             <skipValidateSpec>true</skipValidateSpec>
-                            <!--                            <apisToGenerate>Subtitles,TvShows</apisToGenerate>-->
+                            <apisToGenerate>Series,Search</apisToGenerate>
                             <!--                            <modelsToGenerate>-->
                             <!--                                AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse-->
                             <!--                            </modelsToGenerate>-->
@@ -286,7 +286,6 @@
                                 <!--                                <dateLibrary>java8-localdatetime</dateLibrary>-->
                                 <useJakartaEe>true</useJakartaEe>
                                 <library>retrofit2</library>
-                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
 
                             <!--                            <typeMappings>-->

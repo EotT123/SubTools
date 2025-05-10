@@ -21,12 +21,7 @@ import org.jspecify.annotations.Nullable;
 import retrofit2.Call;
 import retrofit2.Response;
 
-/**
- * @param <API_SUB> type of the subtitle objects returned by the api
- * @param <SUB> type of the converted subtitle objects
- * @param <S_ID> type of the serie provider id
- * @param <X> type of the exception thrown by the api
- */
+@NullMarked
 public class RetrofitService {
 
     private RetrofitService() {
