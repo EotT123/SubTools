@@ -25,13 +25,26 @@ public class Messages {
         }
     }
 
+    public static String getText(String key, Language language, Object... replacements) {
+        try {
+            String text = getMessageBundle(language).getString(key);
+            return replacements == null || replacements.isEmpty() ? text : text.formatted(replacements);
+        } catch (MissingResourceException e) {
+            return "!$key!";
+        }
+    }
+
     public static void setLanguage(Language language) {
         Messages.language = language;
-        Locale locale = language == Language.ENGLISH ? Locale.ROOT : Locale.forLanguageTag(language.langCode);
-        resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        resourceBundle = getMessageBundle(language);
+    }
+
+    private static ResourceBundle getMessageBundle(Language language) {
+        Locale locale = language == Language.ENGLISH ? Locale.ROOT : Locale.forLanguageTag(language.iso639_3);
+        return ResourceBundle.getBundle(BUNDLE_NAME, locale);
     }
 
     public static List<Language> getAvailableLanguages() {
-        return List.of(Language.DUTCH, Language.ENGLISH);
+        return List.of(Language.DUTCH_FLEMISH, Language.ENGLISH);
     }
 }

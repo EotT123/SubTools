@@ -133,7 +133,7 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
         } else if (requireValue) {
             completeValueVerifier = StringUtils::isNotEmpty;
         } else {
-            completeValueVerifier = t -> true;
+            completeValueVerifier = _ -> true;
         }
 
         if (valueVerifier != null || requireValue || valueChangedCallbackListener != null ||

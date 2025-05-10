@@ -116,8 +116,8 @@ public class SubsceneApi implements SubtitleApi {
                         .stream()
                         .map(el -> (Element) el.parent())
                         .map(row -> {
-                            Language lang = Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
-                                .orElse(null);
+                            Language lang =
+                                Language.ofName(row.selectAllByCss(".a1 span.l").text().trim(), Language.ENGLISH);
                             String name = row.selectAllByCss(".a1 span:not(.l)").text().trim();
                             boolean hearingImpaired = row.selectFirstByCss(".a41") != null;
                             String uploader = row.selectFirstByCss(".a5 > a").text().trim();
@@ -217,17 +217,17 @@ public class SubsceneApi implements SubtitleApi {
         return switch (language) {
             case ARABIC -> 2;
             case BENGALI -> 54;
-            // case BRAZILLIAN PORTUGUESE -> 4; // BRAZILLIAN PORTUGUESE
-            case CHINESE_SIMPLIFIED -> 7;
+//             case BRAZILLIAN PORTUGUESE -> 4; // BRAZILLIAN PORTUGUESE
+            case CHINESE -> 7; // CHINESE SIMPLIFIED
             case CZECH -> 9;
             case DANISH -> 10;
-            case DUTCH -> 11;
+            case DUTCH_FLEMISH -> 11;
             case ENGLISH -> 13;
-            // case FARSI / PERSIAN -> 46;
+            case PERSIAN -> 46;
             case FINNISH -> 17;
             case FRENCH -> 18;
             case GERMAN -> 19;
-            case GREEK -> 21;
+            case GREEK_MODERN -> 21;
             case HEBREW -> 22;
             case INDONESIAN -> 44;
             case ITALIAN -> 26;
@@ -236,8 +236,8 @@ public class SubsceneApi implements SubtitleApi {
             case NORWEGIAN -> 30;
             case POLISH -> 31;
             case PORTUGUESE -> 32;
-            case ROMANIAN -> 33;
-            case SPANISH -> 38;
+            case ROMANIAN_MOLDAVIAN_MOLDOVAN -> 33;
+            case SPANISH_CASTILIAN -> 38;
             case SWEDISH -> 39;
             case THAI -> 40;
             case TURKISH -> 41;
@@ -245,53 +245,53 @@ public class SubsceneApi implements SubtitleApi {
             case ALBANIAN -> 1;
             case ARMENIAN -> 73;
             case AZERBAIJANI -> 55;
-            // case BASQUE -> 74;
+            case BASQUE -> 74;
             case BELARUSIAN -> 68;
-            // case CHINESE -> 3; // BIG 5 CODE
+//            case CHINESE -> 3; // BIG 5 CODE
             case BOSNIAN -> 60;
             case BULGARIAN -> 5;
-            // case BULGARIAN / ENGLISH -> 6;
-            // case BURMESE -> 61;
-            // case CAMBODIAN / KHMER -> 79;
-            case CATALAN -> 49;
+//             case BULGARIAN / ENGLISH -> 6;
+            case BURMESE -> 61;
+            case CENTRAL_KHMER -> 79;
+            case CATALAN_VALENCIAN -> 49;
             case CROATIAN -> 8;
             // case DUTCH / ENGLISH -> 12;
             // case ENGLISH / GERMAN -> 15;
-            // case ESPERANTO -> 47;
+            case ESPERANTO -> 47;
             case ESTONIAN -> 16;
-            // case GEORGIAN -> 62;
-            // case GREENLANDIC -> 57;
+            case GEORGIAN -> 62;
+            case KALAALLISUT_GREENLANDIC -> 57;
             case HINDI -> 51;
             case HUNGARIAN -> 23;
-            // case HUNGARIAN / ENGLISH -> 24;
+//             case HUNGARIAN / ENGLISH -> 24;
             case ICELANDIC -> 25;
             case JAPANESE -> 27;
             case KANNADA -> 78;
-            // case KINYARWANDA -> 81;
-            // case KURDISH -> 52;
+            case KINYARWANDA -> 81;
+            case KURDISH -> 52;
             case LATVIAN -> 29;
             case LITHUANIAN -> 43;
             case MACEDONIAN -> 48;
             case MALAYALAM -> 64;
-            // case MANIPURI -> 65;
-            // case MONGOLIAN -> 72;
-            // case NEPALI -> 80;
-            // case PASHTO -> 67;
-            // case PUNJABI -> 66;
+//             case MANIPURI -> 65;
+            case MONGOLIAN -> 72;
+            case NEPALI -> 80;
+            case PASHTO_PUSHTO -> 67;
+            case PUNJABI_PANJABI -> 66;
             case RUSSIAN -> 34;
             case SERBIAN -> 35;
-            case SINHALA -> 58;
+            case SINHALA_SINHALESE -> 58;
             case SLOVAK -> 36;
             case SLOVENIAN -> 37;
-            // case SOMALI -> 70;
-            // case SUNDANESE -> 76;
-            // case SWAHILI -> 75;
+            case SOMALI -> 70;
+            case SUNDANESE -> 76;
+            case SWAHILI -> 75;
             case TAGALOG -> 53;
             case TAMIL -> 59;
             case TELUGU -> 63;
             case UKRAINIAN -> 56;
-            // case URDU -> 42;
-            // case YORUBA -> 71;
+            case URDU -> 42;
+            case YORUBA -> 71;
             default -> null;
         };
     }

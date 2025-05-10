@@ -78,7 +78,7 @@ public class TvdbAdapter implements AdapterIntf {
                     serieIds.stream().sorted(comparator).toList(),
                     getText("Prompter.SelectTvdbMatchForSerie", serieName),
                     provider,
-                    s -> "${s.seriesName} (${s.firstAired})");
+                    s -> "${s.name} (${s.firstAirTime})");
                 if (tvdbSerie.isEmpty()) {
                     LOGGER.error("Unknown serie name in tvdb: $serieName");
                     tvdbSerie = promptUserToEnterTvdbId(serieName)

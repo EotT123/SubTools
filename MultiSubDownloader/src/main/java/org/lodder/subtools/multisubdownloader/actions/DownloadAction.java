@@ -92,8 +92,7 @@ public class DownloadAction {
             }
         }
         if (librarySettings.backupSubtitle) {
-            String langFolder =
-                subtitle.language == null ? Language.ENGLISH.getName() : subtitle.language.getName();
+            String langFolder = subtitle.language == null ? Language.ENGLISH.iso639_3 : subtitle.language.iso639_3;
             Path backupPath = librarySettings.backupSubtitlePath.resolve(langFolder);
 
             if (!backupPath.exists()) {

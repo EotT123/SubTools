@@ -139,7 +139,7 @@ public enum SettingValue {
         .rootElementFunction(SettingsControl::getSettings)
         .valueGetter(Settings::getSubtitleLanguage)
         .valueSetter(Settings::setSubtitleLanguage)
-        .defaultValue(Language.DUTCH)),
+        .defaultValue(Language.DUTCH_FLEMISH)),
 
     // SCREEN SETTINGS
     SCREEN_HIDE_EPISODE(createSettingBoolean()

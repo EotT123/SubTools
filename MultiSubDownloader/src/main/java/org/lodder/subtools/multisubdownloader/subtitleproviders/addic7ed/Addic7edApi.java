@@ -131,11 +131,11 @@ public class Addic7edApi implements SubtitleApi {
     public List<Addic7edSubtitle> searchSerieSubtitles(String providerId, String providerName, int season, int episode,
         Language language) throws Addic7edException {
 
-        List<Addic7edLanguage> languages = Addic7edLanguage.of(language);
-        String url = "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
-            URLEncoder.encode(providerName.replace(" ", "_"), UTF_8), season, episode,
-            languages.size() == 1 ? languages.first.id : Addic7edLanguage.ALL.id);
-        return searchSubtitles(providerId, url, language);
+        return Addic7edLanguage.of(language)
+            .map(lang -> "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
+                URLEncoder.encode(providerName.replace(" ", "_"), UTF_8), season, episode, lang.id))
+            .flatMapEx(url -> searchSubtitles(providerId, url, language).stream())
+            .toList();
     }
 
     // ====== \\

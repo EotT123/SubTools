@@ -119,7 +119,7 @@ public class PodnapisiApi implements SubtitleApi {
 //                    if (PODNAPISI_LANGS.containsKey(language)) {
 //                        url.append(SearchParam.LANGUAGE_OLD.pattern.formatted(PODNAPISI_LANGS.get(language)));
 //                    }
-                    urlBuilder.addParam(SearchParam.LANGUAGE.pattern.formatted(language.langCode));
+                    urlBuilder.addParam(SearchParam.LANGUAGE.pattern.formatted(language.iso639_1));
                     paramMap.forEach((param, value) -> {
                         if (value != null) {
                             urlBuilder.addParam(param.pattern.formatted(value.toString()));
@@ -194,7 +194,7 @@ public class PodnapisiApi implements SubtitleApi {
             subtitleId:elem.selectFirst("id").text(),
             name:elem.selectFirst("title").text(),
             imdb:getText.apply(elem.selectFirst("imdb")),
-            language:Language.ofLangCode(elem.selectFirst("languageName").text()),
+            language:Language.ofIso639_1(elem.selectFirst("languageName").text()),
             uploaderName:elem.selectFirst("uploaderName").text(),
             releaseString:elem.selectFirst("release").text().length() > 10 ? elem.selectFirst("release").text() :
                 elem.selectFirst("title").text().replace(":", "") + " " + elem.selectFirst("release").text(),

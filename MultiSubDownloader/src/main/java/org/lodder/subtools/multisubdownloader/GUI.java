@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Menu;
@@ -59,7 +60,8 @@ import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.ManagerException;
+import org.lodder.subtools.sublibrary.OsCheck;
+import org.lodder.subtools.sublibrary.OsCheck.OSType;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.util.function.TriConsumer;
@@ -243,7 +245,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         SearchTextInputPanel pnlSearchTextInput = new SearchTextInputPanel();
         pnlSearchText = new SearchPanel<>(pnlSearchTextInput, resultPanel);
         pnlSearchTextInput.setSelectedLanguage(
-            settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
+            settings.subtitleLanguage == null ? Language.DUTCH_FLEMISH : settings.subtitleLanguage);
         resultPanel.showSelectFoundSubtitlesButton();
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(_ -> downloadText());
@@ -269,7 +271,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         pnlSearchFileInput = new SearchFileInputPanel();
         pnlSearchFileInput.setRecursiveSelected(settings.optionRecursive);
         pnlSearchFileInput.setSelectedLanguage(
-            settings.subtitleLanguage == null ? Language.DUTCH : settings.subtitleLanguage);
+            settings.subtitleLanguage == null ? Language.DUTCH_FLEMISH : settings.subtitleLanguage);
         pnlSearchFile = new SearchPanel<>(pnlSearchFileInput, resultPanel);
 
         resultPanel.setTable(createVideoTable());
@@ -414,9 +416,19 @@ public class GUI extends JFrame implements PropertyChangeListener {
                     if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
                         final Subtitle subtitle = (Subtitle) model.getValueAt(i,
                             subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
+                        Supplier<String> filenameSupplier = () -> {
+                            String filename = "";
+                            if (!subtitle.fileName.endsWith(".srt")) {
+                                filename = subtitle.fileName + ".srt";
+                            }
+                            if (OsCheck.operatingSystemType == OSType.WINDOWS) {
+                                filename = filename.removeIllegalWindowsChars();
+                            }
+                            return filename;
+                        };
                         try {
-                            subtitle.download(manager, folder);
-                        } catch (IOException | ManagerException e) {
+                            subtitle.download(manager, folder, filenameSupplier);
+                        } catch (IOException e) {
                             LOGGER.error("downloadText", e);
                         }
                     }

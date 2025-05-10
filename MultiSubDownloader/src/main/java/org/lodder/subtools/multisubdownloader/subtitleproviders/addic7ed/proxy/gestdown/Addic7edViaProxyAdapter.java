@@ -16,6 +16,7 @@ import org.gestdown.invoker.ApiException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
 import org.lodder.subtools.sublibrary.Language;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 public final class Addic7edViaProxyAdapter extends
-    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, ApiException> {
+    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edViaProxyAdapter.class);
 
@@ -48,19 +49,19 @@ public final class Addic7edViaProxyAdapter extends
 
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithHash(String hash, Language language)
-        throws ApiException {
+        throws Addic7edException {
         return List.of();
     }
 
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithId(ProviderIds providerIds,        Language language)
-        throws ApiException {
+        throws Addic7edException {
         return List.of();
     }
 
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) throws ApiException {
+        Language language) throws Addic7edException {
         return List.of();
     }
 
@@ -70,7 +71,7 @@ public final class Addic7edViaProxyAdapter extends
 
     @Override
     public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season) throws ApiException {
+        @Nullable Integer season) throws Addic7edException {
         List<Addic7edProxyGestdownSerieId> serieIds = providerIds.getTvdbId()
             .mapToObjEx(tvdbId ->
                 new ExecuteCall<>(() -> api.getProviderSerieIds(tvdbId))
@@ -103,7 +104,7 @@ public final class Addic7edViaProxyAdapter extends
 
     @Override
     public Set<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language) throws ApiException {
+        int episode, Language language) throws Addic7edException {
         return new ExecuteCall<>(
             () -> api.getSubtitles(serieMapping.providerId, season, episode, language))
             .message("getSubtitles: [%s]".formatted(TvRelease.formatName(serieMapping.providerName, season, episode)))
@@ -134,9 +135,9 @@ public final class Addic7edViaProxyAdapter extends
         }
     }
 
-    private static class ExecuteCall<T> extends SubtitleAdapter.ExecuteCall<T, ApiException> {
+    private static class ExecuteCall<T> extends SubtitleAdapter.ExecuteCall<T, Addic7edException> {
 
-        public ExecuteCall(ThrowingSupplier<T, ApiException> supplier) {
+        public ExecuteCall(ThrowingSupplier<T, Addic7edException> supplier) {
             super(supplier);
         }
 

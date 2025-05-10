@@ -29,12 +29,12 @@ public class StreamExt {
         }
     }
 
-    public static <T, R extends Iterable<V>, V, X extends Exception> Stream<V> flatMapEx(@This Stream<T> stream,
+    public static <T, R extends Stream<V>, V, X extends Exception> Stream<V> flatMapEx(@This Stream<T> stream,
         ThrowingFunction<? super T, ? extends R, X> mapper) throws X {
-        return stream.flatMap(sneaky(mapper.andThen(Iterable::stream)));
+        return stream.flatMap(sneaky(mapper));
     }
 
-    public static <T, R extends Iterable<V>, V, X extends Exception> Stream<V> flatMapIgnoreEx(@This Stream<T> stream,
+    public static <T, R extends Stream<V>, V, X extends Exception> Stream<V> flatMapIgnoreEx(@This Stream<T> stream,
         ThrowingFunction<? super T, ? extends R, X> mapper) {
         try {
             return stream.flatMapEx(mapper);

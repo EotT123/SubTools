@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import org.apache.commons.cli.CommandLine;
@@ -127,10 +128,12 @@ public class CLI {
         if (selection.isEmpty()) {
             System.out.println("No subtitles found for: ${release.fileName}");
         } else {
+            AtomicInteger counter = new AtomicInteger(1);
             IntStream.range(0, selection.size()).forEach(j -> {
                 System.out.println("Downloading subtitle: " + release.matchingSubs.get(j).fileName);
                 try {
-                    downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null : j + 1);
+                    downloadAction.download(release, release.matchingSubs.get(j), selection.size() == 1 ? null :
+                        counter);
                 } catch (IOException e) {
                     LOGGER.error(
                         "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})", e);

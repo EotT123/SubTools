@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,7 +12,6 @@ import extensions.java.nio.file.Path.PathExt;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
-import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
@@ -121,13 +119,7 @@ public class FileListAction {
         } else {
             String subtitleExtensionWithDot = "." + SUBTITLE_EXTENSION;
 
-            Set<String> langCodes = new HashSet<>();
-            langCodes.add(language.langCode);
-            langCodes.addAll(language.langCodesOther);
-            String customLangCode = settings.episodeLibrarySettings.langCodeMap.get(language);
-            if (!StringUtils.isBlank(customLangCode)) {
-                langCodes.add(customLangCode);
-            }
+            Set<String> langCodes = Set.of(language.iso639_3, language.iso639_1);
             List<String> filters = langCodes.stream().map(word -> word + "." + SUBTITLE_EXTENSION).toList();
             String subtitleNameWithoutExtension = subtitleName.replace(subtitleExtensionWithDot, "");
             return file.getParent()

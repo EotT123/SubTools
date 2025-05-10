@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,14 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
     public abstract Path build(Release release);
 
     protected String getShowName(String name) {
-        return tvdbAdapter != null ? tvdbAdapter.searchSerie(name).map(s -> s.seriesName).orElse(name) : name;
+        return tvdbAdapter != null ? tvdbAdapter.searchSerie(name).map(s -> s.name).orElse(name) : name;
     }
 
     protected String replace(String structure, StructureTag tag, String value) {
         return structure.replace(tag.label, value);
     }
 
-    protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers,
+    protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, Set<Integer> episodeNumbers,
         boolean leadingZero) {
         if (structure.contains(tag.label)) {
             String afterLabel = StringUtils.substringAfter(structure, tag.label);

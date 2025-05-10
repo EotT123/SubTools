@@ -71,7 +71,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, SerieStructureTag.RELEASE_GROUP, release.releaseGroup);
 
-                    fName += "." + release.extension;
+                    fName += "." + StringUtils.substringAfterLast(release.fileName, ".");
                     yield fName;
                 }
                 case MovieRelease movieRelease -> {
@@ -82,7 +82,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     fName = replace(fName, MovieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, MovieStructureTag.RELEASE_GROUP, release.releaseGroup);
 
-                    fName += "." + release.extension;
+                    fName += "." + StringUtils.substringAfterLast(release.fileName, ".");
                     yield fName;
                 }
             };
@@ -102,13 +102,15 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     }
 
     public String buildSubtitle(Release release, String filename, Language language, @Nullable Integer version) {
-        String extension = "." + release.extension;
+        String extension = "." + StringUtils.substringAfterLast(release.fileName, ".");
         String subFileName = filename;
         if (version != null) {
-            subFileName = subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version.${release.extension}";
+            subFileName =
+                subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version." +
+                    StringUtils.substringAfterLast(release.fileName, ".");
         }
         if (includeLanguageCode) {
-            String langCode = language == null ? "" : languageTags.getOrDefault(language, language.langCode);
+            String langCode = language == null ? "" : languageTags.getOrDefault(language, language.iso639_3);
             subFileName = changeExtension(subFileName, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
         } else {
             subFileName = changeExtension(subFileName, ".srt");

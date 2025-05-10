@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.optimaize.langdetect.LanguageDetector;
@@ -46,7 +47,7 @@ public class DetectLanguage {
                 .filter(lang -> lang.getProbability() >= MIN_PROBABILITY)
                 .findFirst()
                 .map(lang -> lang.getLocale().getLanguage())
-                .flatMap(Language::fromValueOptional);
+                .map(Language::ofIso639_3).filter(Objects::nonNull);
         } catch (IOException e) {
             LOGGER.error("Could not detect language of file {} ", file);
             return Optional.empty();

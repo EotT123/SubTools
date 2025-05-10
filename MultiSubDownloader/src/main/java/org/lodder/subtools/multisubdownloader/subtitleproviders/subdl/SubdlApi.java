@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import manifold.ext.props.rt.api.override;
@@ -163,7 +164,8 @@ public class SubdlApi implements SubtitleApi {
      */
     private List<SubdlSubtitleMetadata> getSubtitles(Language language,
         Map<SearchParam, Object> extraParams) throws SubdlException {
-        extraParams.put(SearchParam.LANGUAGES, SubdlLanguage.of(language).langCode);
+        extraParams.put(SearchParam.LANGUAGES,
+            SubdlLanguage.of(language).map(SubdlLanguage::getLangCode).collect(Collectors.joining(",")));
         return getSerie(extraParams).subtitles.stream().map(this::convertToSubtitleMetadata).toList();
 
 //        return getCache("serieSubtitles", b -> b.add("language", language).add(extraParams))
