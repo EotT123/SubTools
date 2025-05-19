@@ -8,10 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @UtilityClass
+@NullMarked
 public class VideoPatterns {
 
+    @NullMarked
     public interface RegexPattern {
         @val Pattern pattern;
         @val String value;
@@ -21,6 +25,7 @@ public class VideoPatterns {
         }
     }
 
+    @NullMarked
     public enum Quality implements RegexPattern {
         Q8K("8k", "8k"),
         Q4K("4k", "4k"),
@@ -38,7 +43,7 @@ public class VideoPatterns {
             this.pattern = Pattern.compile(quality, Pattern.CASE_INSENSITIVE);
         }
 
-        public static Quality fromValue(String value) {
+        public static @Nullable Quality fromValue(@Nullable String value) {
             return value == null ? null : Quality.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -47,6 +52,7 @@ public class VideoPatterns {
     }
 
     @AllArgsConstructor
+    @NullMarked
     public enum VideoEncoding implements RegexPattern {
         X264("x264", "[xh]264"),
         X265("x265", "[xh]265|hevc");
@@ -59,7 +65,7 @@ public class VideoPatterns {
             pattern = Pattern.compile(quality, Pattern.CASE_INSENSITIVE);
         }
 
-        public static VideoEncoding fromValue(String value) {
+        public static @Nullable VideoEncoding fromValue(@Nullable String value) {
             return value == null ? null : VideoEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -68,6 +74,7 @@ public class VideoPatterns {
     }
 
     @AllArgsConstructor
+    @NullMarked
     public enum AudioEncoding implements RegexPattern {
         DD5_1("dd5.1", "dd5[-.]1");
 
@@ -79,7 +86,7 @@ public class VideoPatterns {
             pattern = Pattern.compile(quality, Pattern.CASE_INSENSITIVE);
         }
 
-        public static AudioEncoding fromValue(String value) {
+        public static @Nullable AudioEncoding fromValue(@Nullable String value) {
             return value == null ? null : AudioEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -88,6 +95,7 @@ public class VideoPatterns {
     }
 
     @AllArgsConstructor
+    @NullMarked
     public enum Source implements RegexPattern {
         HDTV("hdtv", "hdtv", true, false),
         DVDRIP("dvdrip", "dvdrip", false, false),
@@ -118,7 +126,7 @@ public class VideoPatterns {
             this.likelyMovieRelease = likelyMovieRelease;
         }
 
-        public static Source fromValue(String value) {
+        public static @Nullable Source fromValue(@Nullable String value) {
             return value == null ? null : Source.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -136,6 +144,7 @@ public class VideoPatterns {
     }
 
     @AllArgsConstructor
+    @NullMarked
     public enum VideoExtensions {
         MKV("mkv"),
         MP4("mp4"),

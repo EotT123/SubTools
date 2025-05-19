@@ -9,7 +9,7 @@ public class Emitter {
     private final Map<String, List<Handler>> eventListeners = new HashMap<>();
 
     public void fire(Event event) {
-        List<Handler> handlers = this.eventListeners.get(event.getEventName());
+        List<Handler> handlers = this.eventListeners.get(event.eventName);
         if (handlers != null) {
             handlers.forEach(handler -> handler.handle(event));
         }

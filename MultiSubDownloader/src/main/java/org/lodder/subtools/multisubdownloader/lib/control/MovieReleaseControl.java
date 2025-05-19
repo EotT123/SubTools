@@ -55,7 +55,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
 
     private void processInfo(MovieRelease release) {
         release.providerIds.getImdbId().ifPresentOrElse(
-            imdbId -> imdbAdapter.getMovieDetails(imdbId).ifPresent(details -> {
+            imdbId -> imdbAdapter.getDetails(imdbId).ifPresent(details -> {
                 release.year = details.year;
                 release.name = details.name;
             }),

@@ -112,18 +112,17 @@ public class SubsceneApi implements SubtitleApi {
                 setLanguageWithCookie(language);
                 try {
                     return getJsoupDocument(DOMAIN + providerId)
-                        .selectAllByCss("td.a1")
+                        .select("td.a1")
                         .stream()
                         .map(el -> (Element) el.parent())
                         .map(row -> {
-                            Language lang =
-                                Language.ofName(row.selectAllByCss(".a1 span.l").text().trim(), Language.ENGLISH);
-                            String name = row.selectAllByCss(".a1 span:not(.l)").text().trim();
+                            Language lang = Language.ofName(row.select(".a1 span.l").text().trim(), Language.ENGLISH);
+                            String name = row.select(".a1 span:not(.l)").text().trim();
                             boolean hearingImpaired = row.selectFirstByCss(".a41") != null;
                             String uploader = row.selectFirstByCss(".a5 > a").text().trim();
                             String comment = row.selectFirstByCss(".a6 > div").text().trim();
                             ThrowingSupplier<String, SubsceneException> urlSupplier = () -> getDownloadUrl(
-                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim());
+                                DOMAIN + row.select(".a1 > a").attr("href").trim());
                             return new SubsceneSubtitleMetadata(lang, name, hearingImpaired, uploader, comment,
                                 urlSupplier);
                         })

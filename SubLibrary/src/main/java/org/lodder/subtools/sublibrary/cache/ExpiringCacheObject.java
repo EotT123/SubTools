@@ -17,9 +17,11 @@ import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import manifold.science.measures.Time;
- 
+import org.jspecify.annotations.NullMarked;
+
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NullMarked
 sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSerializableCacheObject {
 
     @Serial

@@ -5,7 +5,9 @@ import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public sealed interface CacheObject<T> extends Serializable permits ExpiringCacheObject, TemporaryCacheObject {
 
     @val Time created;

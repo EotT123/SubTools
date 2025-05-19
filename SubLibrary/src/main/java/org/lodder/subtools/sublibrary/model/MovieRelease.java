@@ -3,8 +3,10 @@ package org.lodder.subtools.sublibrary.model;
 import java.nio.file.Path;
 
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class MovieRelease extends Release {
 
     @var @Nullable Integer year;

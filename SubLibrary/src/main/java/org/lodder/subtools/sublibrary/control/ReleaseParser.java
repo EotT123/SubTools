@@ -22,6 +22,7 @@ import com.google.common.collect.MultimapBuilder;
 import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.Roman.RomanNumeral;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.AudioEncoding;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * This class parses a file's name and its metadata to determine the release type (movie or TV series), creating a
  * {@link Release} object containing the metadata
  */
+@NullMarked
 public class ReleaseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
@@ -76,7 +78,7 @@ public class ReleaseParser {
      * @return an {@link Optional} containing the {@link Release} if parsing was successful; otherwise
      * {@link Optional#empty()}
      */
-    public static Optional<Release> parse(String text, Path file=null) {
+    public static Optional<Release> parse(String text, @Nullable Path file=null) {
         ParserResults parserResults = new ParserResults(StringUtils.endsWithAny(text, ".zip", ".srt") ?
             StringUtils.substringBeforeLast(text, ".") : text);
 
@@ -129,7 +131,7 @@ public class ReleaseParser {
 
         // the file is considered a tv show at this point.
 
-        Integer season;
+        int season;
         List<Integer> episodes = new ArrayList<>();
         if (!parserResults.contains(SEASON) || (parserResults.containsNone(EPISODE, EPISODES_TEXT))) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
@@ -140,15 +142,16 @@ public class ReleaseParser {
             parserResults.parse(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
             // When using the part numbers, assume only one season exists for the TV show
             season = 1;
-            episodes.add(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER));
+            episodes.add(Objects.requireNonNull(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER)));
         } else {
-            season = parserResults.getNamedMatchValue(SEASON);
+            season = Objects.requireNonNull(parserResults.getNamedMatchValue(SEASON));
             episodes.addAll(Objects.requireNonNull(parserResults.getNamedMatchValue(EPISODE, EPISODES_TEXT)));
         }
 
         // if no serie name was yet found, use the first remaining part as the serie name
         String name =
-            parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
+            parserResults.containsNone(NAME) ? parserResults.parts.first :
+                Objects.requireNonNull(parserResults.getNamedMatchValue(NAME));
         // create a new parser to parse a potential year in the title (only at the end of the name)
         parserResults.createWithNewText(name)
             .parse(Regex.builder()
@@ -162,7 +165,7 @@ public class ReleaseParser {
                 .endOfText());
         name = parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
 
-        if (StringUtils.equals(name, text) || season == null) {
+        if (StringUtils.equals(name, text)) {
             return Optional.empty();
         }
         return Optional.of(new TvRelease(
@@ -177,6 +180,7 @@ public class ReleaseParser {
     }
 
     @AllArgsConstructor
+    @NullMarked
     enum SeasonEpisodeType {
         SXXEXX(Regex.builder()
             .regex("s")
@@ -196,6 +200,7 @@ public class ReleaseParser {
     }
 
     @AllArgsConstructor
+    @NullMarked
     enum NumberType {
         ARABIC(Regex.builder()
             .tag(ARABIC_NUMBER).regex("\\d{1,2}")),
@@ -274,6 +279,7 @@ public class ReleaseParser {
         parseResults.parse(Regex.builder().tag(VIDEO_ENCODING).regex(VideoEncoding.class, VideoEncoding::getRegex));
     }
 
+    @NullMarked
     static class ParserResults {
         @val List<String> parts = new ArrayList<>();
         private final NamedMatches namedMatches;
@@ -353,8 +359,7 @@ public class ReleaseParser {
         }
 
         public boolean contains(Tag<?> tag) {
-            List<?> namedMatch = getNamedMatch(tag);
-            return namedMatch != null && !namedMatch.isEmpty();
+            return !getNamedMatch(tag).isEmpty();
         }
 
         public boolean containsNone(Tag<?>... tags) {
@@ -389,9 +394,9 @@ public class ReleaseParser {
      * @param text The input text to clean.
      * @return The cleaned text.
      */
-    private static String cleanUnwantedChars(String text) {
+    private static String cleanUnwantedChars(@Nullable String text) {
         if (text == null) {
-            return null;
+            return "";
         }
         String newText = text;
         newText = newText.replace("cd1", " ").replace("cd2", " ");
@@ -455,7 +460,7 @@ public class ReleaseParser {
             return String.join(" ", getQualityKeyWordsAlreadyParsed(parserResults));
         }
 
-        public String getReleaseGroupBestEffort() {
+        public @Nullable String getReleaseGroupBestEffort() {
             if (parserResults.parts.isEmpty()) {
                 return null;
             }
@@ -517,7 +522,7 @@ public class ReleaseParser {
             map.put(key, values.stream().distinct().toList());
         }
 
-        public List<String> get(Tag<?> tag) {
+        public @Nullable List<String> get(Tag<?> tag) {
             return map.get(tag.value);
         }
     }

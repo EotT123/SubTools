@@ -4,11 +4,13 @@ import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Intercept;
 import manifold.ext.rt.api.This;
 import org.jsoup.helper.Validate;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 @Extension
+@NullMarked
 public class DocumentExt {
 
     // ----------------- \\

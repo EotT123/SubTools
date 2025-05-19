@@ -87,7 +87,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                         .stream()
                         .filter(episodeRow -> StringUtils.isNotBlank(episodeRow.selectFirstByTag("td").text()))
                         .map(episodeRow -> {
-                            Elements tds = episodeRow.selectAllByTag("td");
+                            Elements tds = episodeRow.select("td");
                             String[] seasonEpisode = tds.get(0).text().split("x");
                             List<String> urls =
                                 tds.get(3).select("a").stream().map(elem -> DOMAIN + "/" + elem.attr("href")).toList();

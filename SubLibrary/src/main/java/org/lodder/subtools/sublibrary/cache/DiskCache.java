@@ -24,17 +24,19 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.lazy.LazyQuadFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class DiskCache<K extends Serializable, V extends Serializable> extends Cache<K, V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskCache.class);
     private static final Object LOCK = new Object();
 
-    private final Time timeToLive;
+    private final @Nullable Time timeToLive;
     private final Set<K> doublesToRemove = new HashSet<>();
     private final Map<K, CacheObject<V>> removedToAdd = new HashMap<>();
     private final Class<K> dbKeyType;
@@ -116,6 +118,7 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
         });
     private final String tableName;
 
+    @NullMarked
     public DiskCache(
         Class<K> dbKeyType,
         Class<V> dbValueType,
@@ -145,7 +148,7 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     }
 
     @Override
-    public void cleanup(Predicate<K> keyFilter) {
+    public void cleanup(@Nullable Predicate<K> keyFilter) {
         synchronized (cacheMap) {
             Iterator<Entry<K, CacheObject<V>>> itr = cacheMap.entrySet().iterator();
             while (itr.hasNext()) {

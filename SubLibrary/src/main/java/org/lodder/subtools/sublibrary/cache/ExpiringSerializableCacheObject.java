@@ -4,8 +4,10 @@ import java.io.Serial;
 import java.io.Serializable;
 
 import lombok.ToString;
+import org.jspecify.annotations.NullMarked;
 
 @ToString
+@NullMarked
 final class ExpiringSerializableCacheObject<T extends Serializable> extends ExpiringCacheObject<T> {
 
     @Serial

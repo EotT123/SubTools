@@ -37,19 +37,13 @@ public class ImdbAdapter implements AdapterIntf {
         this.imdbSearchIdApi = new ImdbSearchIdApi(manager);
     }
 
-    // TODO implement this
-    public Optional<ImdbDetails> getSerieDetails(String imdbId) {
-        return Optional.empty();
-    }
-
-    public Optional<ImdbDetails> getMovieDetails(String imdbId) {
-        return getCache("MovieDetails", b -> b.add("imdbId", imdbId))
+    public Optional<ImdbDetails> getDetails(String imdbId) {
+        return getCache("details", b -> b.add("imdbId", imdbId))
             .getOptional(() -> {
                 try {
-                    return imdbApi.getMovieDetails(imdbId);
+                    return imdbApi.getDetails(imdbId);
                 } catch (ImdbException e) {
-                    LOGGER.error("API %s getMovieDetails for id [%s] (%s)".formatted(provider, imdbId,
-                        e.getMessage()), e);
+                    LOGGER.error("$provider: error while fetching details for id [$imdbId]", e);
                     return Optional.empty();
                 }
             });
@@ -60,9 +54,9 @@ public class ImdbAdapter implements AdapterIntf {
             return getCache("imdbId", b -> b.add("title", title).add("year", year))
                 .getOptional(
                     () -> getImdbIdOnImdb(title, year)
-                        .orElseMapEx(() -> getImdbIdOnGoogle(title, year))
-                        .orElseMapEx(() -> getImdbIdOnYahoo(title, year))
-                        .orElseMapEx(() -> promptUserToEnterImdbId(title)),
+                        .orElseMap(() -> getImdbIdOnGoogle(title, year))
+                        .orElseMap(() -> getImdbIdOnYahoo(title, year))
+                        .orElseMap(() -> promptUserToEnterImdbId(title)),
                     storeTempNullValue:true);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(provider, title, e.getMessage()), e);

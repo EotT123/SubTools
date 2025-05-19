@@ -2,6 +2,7 @@ package extensions.java.util.Optional;
 
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
@@ -43,6 +44,18 @@ public class OptionalExt {
     public static <T, R, X extends Exception> Optional<R> mapEx(@This Optional<T> optional,
         ThrowingFunction<? super T, ? extends R, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.get())) : Optional.empty();
+    }
+
+    /**
+     * Returns the current optional if a value is present, otherwise returns the result of the supplier.
+     *
+     * @param optional the input {@code Optional}
+     * @param supplier a supplier that provides an {@code Optional} if the current one is empty
+     * @param <T> the type of the value
+     * @return the current value or the result of the supplier
+     */
+    public static <T> Optional<T> orElseMap(@This Optional<T> optional, Supplier<Optional<T>> supplier) {
+        return optional.isPresent() ? optional : supplier.get();
     }
 
     /**

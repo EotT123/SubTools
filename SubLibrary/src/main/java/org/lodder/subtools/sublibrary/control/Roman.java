@@ -3,11 +3,13 @@ package org.lodder.subtools.sublibrary.control;
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * <a href="http://rosettacode.org/wiki/Roman_numerals/Decode#Java_2">Source</a>
  */
 @UtilityClass
+@NullMarked
 public class Roman {
 
     @AllArgsConstructor

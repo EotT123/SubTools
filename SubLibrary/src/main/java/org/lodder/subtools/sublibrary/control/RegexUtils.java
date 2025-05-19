@@ -9,26 +9,32 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.Tags.Tag;
 
 /**
  * <a href="http://rosettacode.org/wiki/Roman_numerals/Decode#Java_2">Source</a>
  */
 @UtilityClass
+@NullMarked
 public class RegexUtils {
 
     public static final List<Character> DELIMITERS = List.of('.', ' ', '-');
     public static final String DELIMITER =
         "[" + Pattern.quote(DELIMITERS.stream().map(String::valueOf).collect(Collectors.joining(""))) + "]";
 
+    @NullMarked
     interface RegexStart extends RegexTag {
         RegexTag startOfText();
     }
 
+    @NullMarked
     interface RegexTag extends RegexRegex {
         RegexRegex tag(Tag tag);
     }
 
+    @NullMarked
     interface RegexRegex {
         RegexNext regex(String regex);
 
@@ -37,13 +43,16 @@ public class RegexUtils {
         <E extends Enum<E>> RegexNext regex(Class<E> enumClass, Function<? super E, String> toStringMapper);
     }
 
+    @NullMarked
     interface RegexNext extends RegexTag, RegexEnd {
     }
 
+    @NullMarked
     interface RegexEnd extends RegexBuilderBuild {
         RegexBuilderBuild endOfText();
     }
 
+    @NullMarked
     interface RegexBuilderBuild {
         String create();
 
@@ -51,9 +60,10 @@ public class RegexUtils {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NullMarked
     public static class Regex implements RegexStart, RegexTag, RegexRegex, RegexNext, RegexEnd, RegexBuilderBuild {
-        private Tag tag;
-        private String regex;
+        private @Nullable Tag tag;
+        private @Nullable String regex;
         private String result = "";
         private boolean finalized = false;
 

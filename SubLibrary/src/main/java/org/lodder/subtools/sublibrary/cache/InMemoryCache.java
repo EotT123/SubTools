@@ -7,13 +7,16 @@ import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class InMemoryCache<K, V> extends Cache<K, V> {
 
     @val(Protected) Time timeToLive;
 
-    public InMemoryCache(Class<K> keyType, Class<V> valueType, Time timeToLive=null,
-        Time timerInterval=null, Integer maxItems=null) {
+    public InMemoryCache(Class<K> keyType, Class<V> valueType, @Nullable Time timeToLive=null,
+        @Nullable Time timerInterval=null, @Nullable Integer maxItems=null) {
         super(maxItems);
         if (maxItems != null && maxItems < 1) {
             throw new IllegalStateException("maxItems should be a positive number");
@@ -23,8 +26,7 @@ public final class InMemoryCache<K, V> extends Cache<K, V> {
             throw new IllegalStateException("timeToLive should be a positive number");
         } else if (timeToLive == null && timerInterval != null) {
             throw new IllegalStateException("timeToLive should be specified when timerInterval is used");
-        } else if (timeToLive != null && timerInterval != null &&
-            timeToLive < timerInterval) {
+        } else if (timeToLive != null && timerInterval != null && timeToLive < timerInterval) {
             throw new IllegalStateException("timerInterval should be greater than timeToLive");
         }
         if (timerInterval != null) {
@@ -46,7 +48,7 @@ public final class InMemoryCache<K, V> extends Cache<K, V> {
     }
 
     @Override
-    public void cleanup(Predicate<K> keyFilter) {
+    public void cleanup(@Nullable Predicate<K> keyFilter) {
         synchronized (cacheMap) {
             cacheMap.entrySet()
                 .removeIf(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) &&

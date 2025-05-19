@@ -5,8 +5,10 @@ import java.io.Serializable;
 
 import lombok.ToString;
 import manifold.science.measures.Time;
+import org.jspecify.annotations.NullMarked;
 
 @ToString
+@NullMarked
 final class TemporarySerializableCacheObject<T extends Serializable> extends TemporaryCacheObject<T> {
 
     @Serial

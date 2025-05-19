@@ -12,8 +12,10 @@ import lombok.ToString;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import org.jspecify.annotations.NullMarked;
 
 @ToString
+@NullMarked
 sealed class TemporaryCacheObject<T> implements CacheObject<T> permits TemporarySerializableCacheObject {
 
     @Serial

@@ -5,8 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NullMarked;
 
 @RequiredArgsConstructor
+@NullMarked
 public class LRUMap<K, V> extends LinkedHashMap<K, V> {
     @Serial
     private static final long serialVersionUID = 1L;

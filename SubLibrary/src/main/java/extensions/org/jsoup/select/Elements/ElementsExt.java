@@ -6,10 +6,12 @@ import manifold.ext.rt.api.Intercept;
 import manifold.ext.rt.api.This;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @Extension
 @UtilityClass
+@NullMarked
 public class ElementsExt {
 
     @Intercept

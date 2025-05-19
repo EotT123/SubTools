@@ -37,8 +37,8 @@ record ImdbSearchIdApi(Manager manager) {
                 }
                 String url = sb.toString();
                 try {
-                    Elements searchResults = manager.getAsJsoupDocument(url(url))
-                        .selectAllByCss("#main .findList .findResult .result_text");
+                    Elements searchResults =
+                        manager.getAsJsoupDocument(url(url)).select("#main .findList .findResult .result_text");
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirstByTag("a").text() + " " + e.text(),
                         e -> e.selectFirst("a").attr("href"));
@@ -64,8 +64,8 @@ record ImdbSearchIdApi(Manager manager) {
 
                 try {
                     Elements searchResults = manager.getAsJsoupDocument(url(url))
-                        .selectAllByCss("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
-                    Function<Element, String> toStringMapper = e -> Optional.ofNullable(e.selectFirst("h3"))
+                        .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
+                    Function<Element, String> toStringMapper = e -> Optional.ofNullable((Element) e.selectFirst("h3"))
                         .map(e2 -> e2.text().replace(" - IMDb", ""))
                         .orElse(null);
                     Function<Element, String> toHrefMapper =
@@ -89,8 +89,8 @@ record ImdbSearchIdApi(Manager manager) {
                 sb.append("+site%3Awww.imdb.com&meta=");
                 String url = sb.toString();
                 try {
-                    Elements searchResults = manager.getAsJsoupDocument(url(url))
-                        .selectAllByCss("a[href*='https://www.imdb.com/title/tt']");
+                    Elements searchResults =
+                        manager.getAsJsoupDocument(url(url)).select("a[href*='https://www.imdb.com/title/tt']");
                     Function<Element, String> toStringMapper =
                         e -> e.selectFirstByTag("span").text().replace(" - IMDb", "");
                     Function<Element, String> toHrefMapper = e -> e.attr("href");

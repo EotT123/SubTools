@@ -8,7 +8,9 @@ import java.util.function.UnaryOperator;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class UnmodifiableElements extends Elements {
 
     public static UnmodifiableElements EMPTY = new UnmodifiableElements();

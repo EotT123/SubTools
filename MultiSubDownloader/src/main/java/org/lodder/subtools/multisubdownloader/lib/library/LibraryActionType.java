@@ -1,10 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum LibraryActionType {
     NOTHING("PreferenceDialog.Action.Nothing"),
     RENAME("PreferenceDialog.Action.Rename"),
@@ -12,4 +9,8 @@ public enum LibraryActionType {
     MOVE_AND_RENAME("PreferenceDialog.Action.MoveAndRename");
 
     @val String msgCode;
+
+    LibraryActionType(String msgCode) {
+        this.msgCode = msgCode;
+    }
 }

@@ -111,8 +111,8 @@ public class Addic7edApi implements SubtitleApi {
         }
         return getCache("providerId", b -> b.add("serieName", serieName)).getCollection(() -> {
             try {
-                List<ProviderId> providerIds = getContent("$DOMAIN/allshows/" + serieName.urlEncode()).selectAllByCss(
-                        "#container a[href^='/show/']")
+                List<ProviderId> providerIds =
+                    getContent("$DOMAIN/allshows/" + serieName.urlEncode()).select("#container a[href^='/show/']")
                     .stream().map(elem -> new ProviderId(elem.text(), elem.attr("href").split("/")[2]))
                     .toList();
                 String serieNameFormatted = serieName.keepLettersOnly().toLowerCase();

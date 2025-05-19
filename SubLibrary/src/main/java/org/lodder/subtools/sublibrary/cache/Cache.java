@@ -14,8 +14,10 @@ import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
 
     @val(Protected) final Map<K, CacheObject<V>> cacheMap;
@@ -77,7 +79,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
         }
     }
 
-    public <X extends Exception> V getOrPut(K key, ThrowingSupplier<V, X> supplier) throws X {
+    public <X extends Exception> @Nullable V getOrPut(K key, ThrowingSupplier<V, X> supplier) throws X {
         boolean containsKey = false;
         CacheObject<V> obj = null;
         synchronized (cacheMap) {
@@ -114,13 +116,13 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
         }
     }
 
-    public List<Pair<K, V>> getEntries(Predicate<K> keyFilter=null) {
+    public List<Pair<K, V>> getEntries(@Nullable Predicate<K> keyFilter=null) {
         synchronized (cacheMap) {
             return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), entry.getValue().value)).toList();
         }
     }
 
-    public Stream<Entry<K, CacheObject<V>>> getEntryStream(Predicate<K> keyFilter=null) {
+    public Stream<Entry<K, CacheObject<V>>> getEntryStream(@Nullable Predicate<K> keyFilter=null) {
         synchronized (cacheMap) {
             return cacheMap.entrySet().stream().filter(entry -> keyFilter == null || keyFilter.test(entry.getKey()));
         }
@@ -136,6 +138,6 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
         cleanup(null);
     }
 
-    public abstract void cleanup(Predicate<K> keyFilter);
+    public abstract void cleanup(@Nullable Predicate<K> keyFilter);
 
 }

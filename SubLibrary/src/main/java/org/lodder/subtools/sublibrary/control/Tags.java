@@ -9,18 +9,22 @@ import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.AudioEncoding;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Quality;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoEncoding;
 
 @UtilityClass
+@NullMarked
 public class Tags {
 
     @AllArgsConstructor
+    @NullMarked
     public static class Tag<T> {
         @val String value;
-        @val Function<String, T> mapper;
+        @val Function<String, @Nullable T> mapper;
     }
 
     public static Tag<String> NAME = new Tag<>("name", Function.identity());
