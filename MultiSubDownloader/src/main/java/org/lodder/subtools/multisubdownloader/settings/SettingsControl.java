@@ -71,7 +71,7 @@ public class SettingsControl {
     public void load() {
         migrateSettings();
         migrateDatabase();
-        SettingValue.loadAll(this, preferences);
+        SettingValue.loadAll(settings, preferences);
         updateProxySettings();
     }
 
@@ -105,7 +105,7 @@ public class SettingsControl {
      * Migrate settings layout for backward incompatibility changes.
      */
     private void migrateSettings() {
-        SettingValue.loadAll(this, preferences);
+        SettingValue.loadAll(settings, preferences);
 //        int version = settings.settingsVersion;
     }
 
