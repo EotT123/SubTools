@@ -9,7 +9,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class ProviderId implements Serializable {
 
-    @Serial private static final long serialVersionUID = -120703658294502220L;
+    @Serial private static final long serialVersionUID = 1L;
     @val String name;
     @val String id;
 

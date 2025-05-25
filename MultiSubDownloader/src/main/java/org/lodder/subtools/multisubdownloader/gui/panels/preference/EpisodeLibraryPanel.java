@@ -10,7 +10,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 public final class EpisodeLibraryPanel extends VideoLibraryPanel {
 
     @Serial
-    private static final long serialVersionUID = -9175813173306481849L;
+    private static final long serialVersionUID = 1L;
 
     public EpisodeLibraryPanel(LibrarySettings libSettings, Manager manager, boolean renameMode,
             UserInteractionHandler userInteractionHandler) {

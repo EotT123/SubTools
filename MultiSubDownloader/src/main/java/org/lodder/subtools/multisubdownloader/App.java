@@ -79,22 +79,21 @@ public class App {
 
         if (line.hasCliOption(CliOption.NO_GUI)) {
             bootstrapper.initialize(new UserInteractionHandlerCLI(prefCtrl.settings));
-            CLI cmd = new CLI(prefCtrl, app);
 
             /* Defined here so there is output on console */
             importPreferences(line);
 
             try {
-                cmd.setUp(line);
+                CLI cmd = new CLI(prefCtrl, app, line);
                 if (line.hasCliOption(CliOption.HELP)) {
                     formatter.printHelp(ConfigProperties.getProperty(Property.NAME), getCLIOptions());
                     return;
                 }
+                cmd.run();
             } catch (CliException e) {
                 System.out.println("Error: " + e.getMessage());
                 return;
             }
-            cmd.run();
         } else {
             /* Defined here so there is output in the splash */
             importPreferences(line);

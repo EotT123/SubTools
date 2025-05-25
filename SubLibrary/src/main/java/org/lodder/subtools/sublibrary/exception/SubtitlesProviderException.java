@@ -7,7 +7,7 @@ import manifold.ext.props.rt.api.val;
 public abstract class SubtitlesProviderException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = -2959483164333075297L;
+    private static final long serialVersionUID = 1L;
 
     @val abstract String subtitleProvider;
 

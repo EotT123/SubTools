@@ -9,7 +9,7 @@ import java.io.Serial;
 public class Menu extends JMenuBar {
 
     @Serial
-    private static final long serialVersionUID = -7384297314593169280L;
+    private static final long serialVersionUID = 1L;
 
     private JMenu mnFile;
     private JMenuItem mntmQuit;

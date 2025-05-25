@@ -31,7 +31,7 @@ import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 public class PodnapisiApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.podnapisi.net";
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.PODNAPISI;
     private final String userAgent;
 
@@ -217,7 +217,7 @@ public class PodnapisiApi implements SubtitleApi {
 
 //    private static final Map<Language, String> PODNAPISI_LANGS =
 //        Collections.unmodifiableMap(new EnumMap<>(Language.class) {
-//            @Serial private static final long serialVersionUID = 2950169212654074275L;
+//            @Serial private static final long serialVersionUID = 1L;
 //
 //            {
 //                put(Language.SLOVENIAN, "1");

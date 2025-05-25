@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 public class CustomTable extends ZebraJTable {
 
     @Serial
-    private static final long serialVersionUID = -3889524906608098585L;
+    private static final long serialVersionUID = 1L;
     private static final int MAX_WIDTH = 2147483647;
     private static final int MIN_WIDTH = 15;
     private static final int PREFERRED_WIDTH = 75;

@@ -18,7 +18,7 @@ import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 public class MyPasswordField extends JPasswordField implements MyPasswordFieldOthersIntf {
 
     @Serial
-    private static final long serialVersionUID = -3002009544577141751L;
+    private static final long serialVersionUID = 1L;
     private static final String DEFAULT_BORDER_PROPERTY = "DefaultBorder";
     private static final Border ERROR_BORDER = new LineBorder(Color.RED, 1);
 

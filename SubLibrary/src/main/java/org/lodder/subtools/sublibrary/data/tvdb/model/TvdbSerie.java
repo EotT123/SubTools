@@ -11,7 +11,7 @@ import org.lodder.subtools.sublibrary.Language;
 
 public class TvdbSerie implements Serializable {
     @Serial
-    private static final long serialVersionUID = -4036836377513152443L;
+    private static final long serialVersionUID = 1L;
     @var int id;
     //@var String serieId;
     @var @Nullable Language language;

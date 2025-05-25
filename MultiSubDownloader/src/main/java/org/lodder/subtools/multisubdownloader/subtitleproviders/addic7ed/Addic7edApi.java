@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 
 import static java.nio.charset.StandardCharsets.*;
-import static manifold.science.util.UnitConstants.*;
+import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
 import java.net.URLEncoder;
@@ -35,13 +35,13 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 public class Addic7edApi implements SubtitleApi {
 
-    private static final Time RATE_DURATION = 1 s; // seconds
+    private static final Time RATE_DURATION = 1Second; // seconds
 
     private static final String DOMAIN = "https://www.addic7ed.com";
     private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (?<info>.+), Duration: \\d+\\.\\d+");
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     private final boolean speedy;
     private Time lastRequest = Time.now();
@@ -209,10 +209,10 @@ public class Addic7edApi implements SubtitleApi {
                                     url:download,
                                     fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
                                     language:lang.language,
-                                    quality:extraInfoParser.getQualityKeyword(),
                                     releaseGroup:extraInfoParser.getReleaseGroupBestEffort(),
                                     uploader:uploader,
                                     hearingImpaired:hearingImpaired,
+                                    quality:extraInfoParser.getQualityKeyword(),
                                     version:version);
                                 if (language == sub.language && !isDuplicate(lSubtitles, sub)) {
                                     lSubtitles.add(sub);

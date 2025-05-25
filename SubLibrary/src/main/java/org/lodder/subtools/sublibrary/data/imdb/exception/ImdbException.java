@@ -5,7 +5,7 @@ import java.io.Serial;
 public class ImdbException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = 8887410537703318009L;
+    private static final long serialVersionUID = 1L;
 
     public ImdbException(String s, Exception e) {
         super(s, e);

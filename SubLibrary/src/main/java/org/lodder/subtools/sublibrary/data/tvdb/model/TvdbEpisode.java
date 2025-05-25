@@ -13,7 +13,7 @@ import org.lodder.subtools.sublibrary.Language;
 @NullMarked
 public class TvdbEpisode implements Serializable {
     @Serial
-    private static final long serialVersionUID = 913790243120597542L;
+    private static final long serialVersionUID = 1L;
     @var @Nullable String id;
     @var @Nullable String combinedEpisodeNumber;
     @var @Nullable String combinedSeason;

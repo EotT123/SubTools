@@ -36,35 +36,25 @@ public class CLI {
 
     private final Container app;
     private final Settings settings;
-    private boolean recursive = false;
-    private Language language;
-    private boolean force = false;
-    private List<Path> folders = new ArrayList<>();
-    private boolean downloadAll = false;
-    private boolean subtitleSelection = false;
-    private boolean verboseProgress = false;
+    private final boolean recursive;
+    private final Language language;
+    private final boolean force;
+    private final List<Path> folders;
+    private final boolean downloadAll;
+    private final boolean subtitleSelection;
+    private final boolean verboseProgress;
     private final DownloadAction downloadAction;
     private final UserInteractionHandlerAction userInteractionHandlerAction;
-    private boolean dryRun = false;
+    private final boolean dryRun;
 
-    public CLI(SettingsControl settingControl, Container app) {
+    public CLI(SettingsControl settingControl, Container app, CommandLine line) throws CliException {
         this.app = app;
-        this.settings = settingControl.getSettings();
+        this.settings = settingControl.settings;
         Manager manager = app.makeManager();
         checkUpdate(manager);
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(settings, userInteractionHandler);
         downloadAction = new DownloadAction(settings, manager, userInteractionHandler);
-    }
-
-    private void checkUpdate(Manager manager) {
-        UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
-        if (u.shouldCheckForNewUpdate(settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
-            System.out.println(Messages.getText("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
-        }
-    }
-
-    public void setUp(CommandLine line) throws CliException {
         this.folders = getFolders(line);
         this.language = getLanguage(line);
         this.force = line.hasCliOption(CliOption.FORCE);
@@ -74,6 +64,13 @@ public class CLI {
         this.verboseProgress = line.hasCliOption(CliOption.VERBOSE_PROGRESS);
         this.dryRun = line.hasCliOption(CliOption.DRY_RUN);
         Messages.language = language;
+    }
+
+    private void checkUpdate(Manager manager) {
+        UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
+        if (u.shouldCheckForNewUpdate(settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
+            System.out.println(Messages.getText("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
+        }
     }
 
     public void run() {
@@ -96,18 +93,18 @@ public class CLI {
 
     public void search() {
         try {
-            new CliSearchAction(settings:settings,
-                subtitleProviderStore:app.makeSubtitleProviderStore(),
-                indexingProgressListener:new CLIFileIndexerProgress().verbose(verboseProgress),
-                searchProgressListener:new CLISearchProgress().verbose(verboseProgress),
-                cli:this,
-                fileListAction:new FileListAction(this.settings),
-                language:language,
-                releaseFactory:new ReleaseFactory(this.settings, app.makeManager()),
-                filtering:new SubtitleFiltering(this.settings),
-                folders:folders,
-                recursive:recursive,
-                overwriteSubtitles:force)
+            new CliSearchAction(settings,
+                app.makeSubtitleProviderStore(),
+                new CLIFileIndexerProgress().verbose(verboseProgress),
+                new CLISearchProgress().verbose(verboseProgress),
+                this,
+                new FileListAction(this.settings),
+                language,
+                new ReleaseFactory(this.settings, app.makeManager()),
+                new SubtitleFiltering(this.settings),
+                folders,
+                recursive,
+                force)
                 /* CLI has no benefit of running this in a separate Thread */
                 .run();
         } catch (SearchSetupException e) {
@@ -150,7 +147,7 @@ public class CLI {
         }
     }
 
-    private Language getLanguage(CommandLine line) throws CliException {
+    private static Language getLanguage(CommandLine line) throws CliException {
         if (line.hasCliOption(CliOption.LANGUAGE)) {
             String languageString = line.getCliOptionValue(CliOption.LANGUAGE);
             return Language.values().stream()

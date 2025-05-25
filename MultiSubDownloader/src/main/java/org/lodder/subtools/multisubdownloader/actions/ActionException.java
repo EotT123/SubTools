@@ -5,7 +5,7 @@ import java.io.Serial;
 public class ActionException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = -7453153452045851404L;
+    private static final long serialVersionUID = 1L;
 
     public ActionException(String message) {
         super(message);

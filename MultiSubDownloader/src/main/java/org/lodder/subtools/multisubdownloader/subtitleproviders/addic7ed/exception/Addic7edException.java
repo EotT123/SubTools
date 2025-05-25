@@ -10,7 +10,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class Addic7edException extends SubtitlesProviderException {
 
     @Serial
-    private static final long serialVersionUID = -9050358290926245586L;
+    private static final long serialVersionUID = 1L;
 
     @val @override String subtitleProvider = SubtitleSource.ADDIC7ED.name;
 

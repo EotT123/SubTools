@@ -23,7 +23,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
     permits EpisodeLibraryPanel, MovieLibraryPanel {
 
-    @Serial private static final long serialVersionUID = -9175813173306481849L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @val LibrarySettings librarySettings;
     private final JComboBox<LibraryActionType> cbxLibraryAction;

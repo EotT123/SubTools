@@ -28,7 +28,7 @@ public class SubdlApi implements SubtitleApi {
     private static final String DOMAIN = "https://dl.subdl.com";
     private static final String API_DOMAIN = "https://api.subdl.com/api/v1";
     private static final String API_KEY = "waSZhdBr08sBm3jXNOU0rJ6UWp4lPQvi";
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.SUBDL;
 
     public SubdlApi(Manager manager) {

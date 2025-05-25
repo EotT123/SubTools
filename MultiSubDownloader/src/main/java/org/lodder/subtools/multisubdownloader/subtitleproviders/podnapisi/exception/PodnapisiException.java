@@ -10,7 +10,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class PodnapisiException extends SubtitlesProviderException {
 
     @Serial
-    private static final long serialVersionUID = -2390367212064062005L;
+    private static final long serialVersionUID = 1L;
 
     @val @override String subtitleProvider = SubtitleSource.PODNAPISI.name;
 

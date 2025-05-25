@@ -47,7 +47,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://api.gestdown.info";
 
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     private static final TvShowsApi TV_SHOWS_API;
     private static final SubtitlesApi SUBTITLES_API;

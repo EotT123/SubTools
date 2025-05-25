@@ -9,7 +9,7 @@ import manifold.ext.props.rt.api.var;
 public class MyPopupMenu extends JPopupMenu {
 
     @Serial
-    private static final long serialVersionUID = 1084650376633196066L;
+    private static final long serialVersionUID = 1L;
     @var Point clickLocation;
 
     @Override

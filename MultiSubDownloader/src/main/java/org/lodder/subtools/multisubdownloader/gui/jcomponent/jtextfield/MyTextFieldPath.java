@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class MyTextFieldPath extends MyTextFieldCommon<Path, MyTextFieldPath> {
     @Serial
-    private static final long serialVersionUID = -8526638589445703452L;
+    private static final long serialVersionUID = 1L;
 
     private static final Function<Path, String> TO_STRING_MAPPER =
         path -> path == null ? null : path.toAbsolutePath().toString();

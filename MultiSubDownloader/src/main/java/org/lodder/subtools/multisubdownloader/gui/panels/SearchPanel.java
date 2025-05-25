@@ -9,7 +9,7 @@ import net.miginfocom.swing.MigLayout;
 public class SearchPanel<I extends InputPanel> extends JPanel {
 
     @Serial
-    private static final long serialVersionUID = -7602822323779710089L;
+    private static final long serialVersionUID = 1L;
 
     @val ResultPanel resultPanel;
     @val I inputPanel;

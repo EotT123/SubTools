@@ -10,7 +10,7 @@ import java.util.Map;
 public class SearchProgressTableModel extends DefaultTableModel {
 
     @Serial
-    private static final long serialVersionUID = -8366722569174216456L;
+    private static final long serialVersionUID = 1L;
     private final Map<String, Integer> rowMap = new HashMap<>();
 
     public SearchProgressTableModel() {

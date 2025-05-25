@@ -11,7 +11,7 @@ import subdl.Serie.ReleaseType;
 public class SubdlSerieId extends ProviderId {
 
     @Serial
-    private static final long serialVersionUID = 5858875211782260667L;
+    private static final long serialVersionUID = 1L;
 
     @val @Nullable Integer year;
     @val ReleaseType releaseType;

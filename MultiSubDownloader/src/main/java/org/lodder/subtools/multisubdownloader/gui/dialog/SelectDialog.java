@@ -22,7 +22,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 
 public class SelectDialog extends MultiSubDialog {
 
-    @Serial private static final long serialVersionUID = -4092909537478305235L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final List<Subtitle> subtitles;
     private final CustomTable customTable;

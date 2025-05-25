@@ -13,7 +13,7 @@ import org.lodder.subtools.sublibrary.Language;
 public abstract sealed class InputPanel extends JPanel permits SearchFileInputPanel, SearchTextInputPanel {
 
     @Serial
-    private static final long serialVersionUID = 7753220002440733463L;
+    private static final long serialVersionUID = 1L;
     @val JButton searchButton = new JButton(getText("InputPanel.SearchForSubtitles"));
     @val(Protected) JComboBox<Language> languageCbx =
         new JComboBox<>(Language.values()).toMessageStringRenderer(Language::getMsgCode);

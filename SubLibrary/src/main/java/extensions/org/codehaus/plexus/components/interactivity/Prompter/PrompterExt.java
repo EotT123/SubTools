@@ -265,8 +265,6 @@ public class PrompterExt {
             tt.setAddRowNumbering(true);
             tt.printTable(printStream, 0);
         }
-
-
     }
 
     private static class LineReadingOutputStream extends OutputStream {

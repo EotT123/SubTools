@@ -20,7 +20,7 @@ import org.jspecify.annotations.NullMarked;
 sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSerializableCacheObject {
 
     @Serial
-    private static final long serialVersionUID = 3852086993086134232L;
+    private static final long serialVersionUID = 1L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|lastAccessed:(.*?)|value:(.*)");
 
     @override @val Time created;

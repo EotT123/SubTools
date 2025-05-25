@@ -23,7 +23,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.Op
 public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
-    private static final long serialVersionUID = -5458593307643063563L;
+    private static final long serialVersionUID = 1L;
 
     private final SettingsControl settingsCtrl;
     private final JCheckBox chkSourceAddic7ed;

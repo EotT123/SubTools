@@ -11,7 +11,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 public class Addic7edProxyGestdownSerieId extends ProviderId {
 
     @Serial
-    private static final long serialVersionUID = 5858875211782260667L;
+    private static final long serialVersionUID = 1L;
 
     @val OptionalInt tvdbId;
     @val OptionalInt tmdbId;

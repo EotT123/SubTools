@@ -5,7 +5,7 @@ import java.io.Serial;
 public class TvdbException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = 230737234160207201L;
+    private static final long serialVersionUID = 1L;
 
     public TvdbException(String message) {
         super(message);

@@ -7,7 +7,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 
 public class OpensubtitleId extends ProviderId {
 
-    @Serial private static final long serialVersionUID = 5858875211782260667L;
+    @Serial private static final long serialVersionUID = 1L;
     @val String year;
 
     public OpensubtitleId(String name, int id, String year) {

@@ -48,7 +48,7 @@ public class SubsceneApi implements SubtitleApi {
         default -> false;
     };
 
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.SUBSCENE;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;

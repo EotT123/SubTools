@@ -15,7 +15,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 public class ResultPanel extends JPanel {
 
     @Serial
-    private static final long serialVersionUID = 2368028332402129899L;
+    private static final long serialVersionUID = 1L;
 
     private JButton btnMove;
     private JButton btnSelectAll;

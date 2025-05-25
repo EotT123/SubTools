@@ -10,7 +10,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 public class SubSceneSerieId extends ProviderId {
 
     @Serial
-    private static final long serialVersionUID = 5858875211782260667L;
+    private static final long serialVersionUID = 1L;
 
     @val @Nullable String serieName;
     @val @Nullable Integer season;

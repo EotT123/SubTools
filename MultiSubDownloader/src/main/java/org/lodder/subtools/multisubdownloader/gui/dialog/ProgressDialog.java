@@ -15,7 +15,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger
 public class ProgressDialog extends MultiSubDialog implements Messenger {
 
     @Serial
-    private static final long serialVersionUID = -2320149791421648965L;
+    private static final long serialVersionUID = 1L;
 
     private JProgressBar progressBar;
     private JLabel label;

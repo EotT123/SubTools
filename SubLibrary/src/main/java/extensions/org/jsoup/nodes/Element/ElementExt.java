@@ -240,7 +240,7 @@ public class ElementExt {
 //        if (element == null) {
 //            return null;
 //        }
-//        return amount > 1 ? element.parent(--amount) : ElementExt.parent(element);
+//        return amount > 1 ? element.parent(amount - 1) : ElementExt.parent(element);
 //    }
 
     @Intercept

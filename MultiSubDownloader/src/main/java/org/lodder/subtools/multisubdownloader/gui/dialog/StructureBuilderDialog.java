@@ -31,7 +31,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class StructureBuilderDialog extends MultiSubDialog implements DocumentListener {
 
-    @Serial private static final long serialVersionUID = -5174968778375028124L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final VideoType videoType;
     private final StructureType structureType;

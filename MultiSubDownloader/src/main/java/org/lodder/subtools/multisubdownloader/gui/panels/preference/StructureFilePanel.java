@@ -33,7 +33,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class StructureFilePanel extends JPanel {
 
-    @Serial private static final long serialVersionUID = -5458593307643063563L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final LibrarySettings librarySettings;
     private final MyTextFieldString txtFileStructure;

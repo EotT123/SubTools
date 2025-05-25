@@ -29,7 +29,7 @@ import org.lodder.subtools.sublibrary.Language;
 
 public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
-    @Serial private static final long serialVersionUID = -5458593307643063563L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final GUI gui;
     private final SettingsControl settingsCtrl;

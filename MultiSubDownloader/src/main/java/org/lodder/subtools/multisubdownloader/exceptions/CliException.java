@@ -5,7 +5,7 @@ import java.io.Serial;
 public class CliException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = -9050358290926245586L;
+    private static final long serialVersionUID = 1L;
 
     public CliException(String message) {
         super(message);

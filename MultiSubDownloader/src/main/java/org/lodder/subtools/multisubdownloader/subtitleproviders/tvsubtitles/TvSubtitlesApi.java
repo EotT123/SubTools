@@ -32,7 +32,7 @@ import org.lodder.subtools.sublibrary.util.http.CookieManager;
 public class TvSubtitlesApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.TVSUBTITLES;
 
     public TvSubtitlesApi(Manager manager) {

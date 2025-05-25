@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 public final class MyTextFieldString extends MyTextFieldCommon<String, MyTextFieldString> {
     @Serial
-    private static final long serialVersionUID = -8526638589445703452L;
+    private static final long serialVersionUID = 1L;
 
     private static final Function<String, String> TO_STRING_MAPPER = Function.identity();
     private static final Function<String, String> TO_OBJECT_MAPPER = Function.identity();

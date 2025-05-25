@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.lodder.subtools.sublibrary.util.Validator;
 
 public class InputPane<T> extends JDialog implements ActionListener, PropertyChangeListener {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private final String message;
     private final List<Validator<String>> inputValidators;

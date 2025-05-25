@@ -35,7 +35,7 @@ public class NodeExt {
         if (node == null) {
             return null;
         }
-        return amount > 1 ? node.parent(--amount) : node.parentNode();
+        return amount > 1 ? node.parent(amount - 1) : node.parentNode();
     }
 
     @Intercept

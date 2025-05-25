@@ -1,7 +1,5 @@
 package org.lodder.subtools.multisubdownloader.settings;
 
-import static manifold.ext.props.rt.api.PropOption.*;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +11,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 import lombok.experimental.ExtensionMethod;
-import manifold.ext.props.rt.api.get;
-import manifold.ext.props.rt.api.set;
+import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.State;
 import org.lodder.subtools.sublibrary.Manager;
@@ -30,8 +27,8 @@ public class SettingsControl {
 
     private final Manager manager;
     private final Preferences preferences;
-    @get @set(Private) Settings settings;
-    @get @set(Private) State state;
+    @val Settings settings;
+    @val State state;
 
     public SettingsControl(Manager manager) {
         if (!backingStoreAvailable()) {
@@ -61,7 +58,7 @@ public class SettingsControl {
         try {
             // clean up
             preferences.clear();
-            SettingValue.values().forEach(sv -> sv.store(this, preferences));
+            SettingValue.values().forEach(sv -> sv.store(settings, preferences));
             updateProxySettings();
         } catch (BackingStoreException e) {
             LOGGER.error(e.getMessage(), e);

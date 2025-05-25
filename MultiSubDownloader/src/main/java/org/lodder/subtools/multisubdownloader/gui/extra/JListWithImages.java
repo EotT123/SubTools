@@ -15,7 +15,7 @@ import manifold.ext.props.rt.api.val;
 public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     @Serial
-    private static final long serialVersionUID = 342783165266555869L;
+    private static final long serialVersionUID = 1L;
 
     private final Function<T, String> toStringMapper;
     private final boolean distinctValues;

@@ -9,7 +9,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 
 public class Addic7edMovieSubtitleId extends ProviderId {
 
-    @Serial private static final long serialVersionUID = 5858875211782260667L;
+    @Serial private static final long serialVersionUID = 1L;
     @val @Nullable String title;
     @val @Nullable Integer year;
 

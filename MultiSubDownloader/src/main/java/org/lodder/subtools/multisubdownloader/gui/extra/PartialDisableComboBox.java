@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
  */
 public class PartialDisableComboBox<T> extends JComboBox<T> {
     @Serial
-    private static final long serialVersionUID = -1690671707274328126L;
+    private static final long serialVersionUID = 1L;
 
     private final List<Boolean> itemsState = new ArrayList<>();
 
@@ -23,7 +23,7 @@ public class PartialDisableComboBox<T> extends JComboBox<T> {
         Arrays.stream(items).forEach(this::addItem);
         this.setRenderer(new BasicComboBoxRenderer() {
             @Serial
-            private static final long serialVersionUID = -2774241371293899669L;
+            private static final long serialVersionUID = 1L;
 
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,

@@ -11,7 +11,7 @@ import net.miginfocom.swing.MigLayout;
 public final class SearchFileInputPanel extends InputPanel {
 
     @Serial
-    private static final long serialVersionUID = 6522020963519514345L;
+    private static final long serialVersionUID = 1L;
     private JTextField txtIncomingPath;
     private JCheckBox chkRecursive;
     private JCheckBox chkForceSubtitleOverwrite;

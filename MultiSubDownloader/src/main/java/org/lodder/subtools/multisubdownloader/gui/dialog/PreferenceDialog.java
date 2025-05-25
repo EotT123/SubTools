@@ -23,7 +23,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class PreferenceDialog extends MultiSubDialog {
 
-    @Serial private static final long serialVersionUID = -4910124272966075979L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final SettingsControl settingsCtrl;
     private final Emitter eventEmitter;

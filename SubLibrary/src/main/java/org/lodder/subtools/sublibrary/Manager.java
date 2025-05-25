@@ -83,7 +83,7 @@ public class Manager {
         @val HttpClient httpClient;
         @val String url;
         @val @Nullable String userAgent;
-        private Map<String, String> data = new HashMap<>();
+        private final Map<String, String> data = new HashMap<>();
 
         public PostBuilder(HttpClient httpClient, String url, @Nullable String userAgent=null) {
             this.httpClient = httpClient;

@@ -26,7 +26,6 @@ public enum CliOption {
     @get String msgCode;
 
     CliOption(String value, String longValue, boolean hasArg, String msgCode) {
-        this.description = description;
         this.value = value;
         this.longValue = longValue;
         this.hasArg = hasArg;

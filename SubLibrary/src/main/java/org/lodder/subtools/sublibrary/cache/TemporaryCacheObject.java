@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
 sealed class TemporaryCacheObject<T> implements CacheObject<T> permits TemporarySerializableCacheObject {
 
     @Serial
-    private static final long serialVersionUID = -152474119228350222L;
+    private static final long serialVersionUID = 1L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
     @override @val Time created;
     @val Time timeToLive;

@@ -11,6 +11,6 @@ public class ReleaseControlException extends Exception {
     }
 
     @Serial
-    private static final long serialVersionUID = 1958337660409078923L;
+    private static final long serialVersionUID = 1L;
 
 }

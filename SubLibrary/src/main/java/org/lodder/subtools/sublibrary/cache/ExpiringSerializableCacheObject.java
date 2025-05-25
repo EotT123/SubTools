@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 final class ExpiringSerializableCacheObject<T extends Serializable> extends ExpiringCacheObject<T> {
 
     @Serial
-    private static final long serialVersionUID = 8773462650510864103L;
+    private static final long serialVersionUID = 1L;
 
     ExpiringSerializableCacheObject(T value) {
         super(value);

@@ -66,7 +66,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private static final LazySupplier<DownloadApi> DOWNLOAD_API =
         new LazySupplier<>(() -> API_CLIENT.createService(DownloadApi.class));
     private static final String USER_AGENT = "SubTools v1.0";
-    @val @override Manager manager;
+    @val Manager manager;
     @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
 
     static {
@@ -233,7 +233,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     .addErrorHandler(FORBIDDEN, retry:false)
                     .addErrorHandler(NOT_ACCEPTABLE, retry:false)
                     .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second)
-                    .execute().link;
+                    .execute().link
             );
     }
 
@@ -249,7 +249,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private ErrorHandler<OpenSubtitleResponseException> createQuotaErrorHandler() {
         return new ErrorHandler<>(
-            (code, errorBody) -> code == NOT_ACCEPTABLE && errorBody.contains("quota")),
+            (HttpStatus code, String errorBody) -> code == NOT_ACCEPTABLE && errorBody.contains("quota"),
             retry:false,
             exception:(HttpStatus code, String errorBody) -> {
                 try {

@@ -204,7 +204,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     }
 
     private static class Row extends Vector<String> {
-        @Serial private static final long serialVersionUID = 8620670431074648999L;
+        @Serial private static final long serialVersionUID = 1L;
         @val String key;
         @val SelectionForKeyPrefix selectionForKeyPrefix;
         @var SerieMapping serieMapping;
@@ -221,7 +221,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     }
 
     private static class MappingTableModel extends DefaultTableModel {
-        @Serial private static final long serialVersionUID = 7860605766969472980L;
+        @Serial private static final long serialVersionUID = 1L;
         @val Manager manager;
 
         public MappingTableModel(Manager manager) {

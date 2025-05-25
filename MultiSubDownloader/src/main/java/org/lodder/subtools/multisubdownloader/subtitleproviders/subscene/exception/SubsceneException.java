@@ -10,7 +10,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class SubsceneException extends SubtitlesProviderException {
 
     @Serial
-    private static final long serialVersionUID = -9050358290926245586L;
+    private static final long serialVersionUID = 1L;
     
     @val @override String subtitleProvider = SubtitleSource.SUBSCENE.name;
 

@@ -23,7 +23,7 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
     permits MyTextFieldInteger, MyTextFieldPath, MyTextFieldString {
 
     @Serial
-    private static final long serialVersionUID = -393882042554264226L;
+    private static final long serialVersionUID = 1L;
     private static final String DEFAULT_BORDER_PROPERTY = "DefaultBorder";
     private static final Border ERROR_BORDER = new LineBorder(Color.RED, 1);
 
