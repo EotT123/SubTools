@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-import lombok.Getter;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +26,6 @@ import org.lodder.subtools.sublibrary.util.http.RetrofitService.ExecuteCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Getter
 public final class Addic7edViaProxyAdapter extends
     SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, Addic7edException> {
 

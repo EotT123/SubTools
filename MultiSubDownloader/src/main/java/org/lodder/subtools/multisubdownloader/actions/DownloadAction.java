@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ExtensionMethod({Files.class})
-@RequiredArgsConstructor
 public class DownloadAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadAction.class);
@@ -34,6 +32,12 @@ public class DownloadAction {
     private final Settings settings;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
+
+    public DownloadAction(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
+        this.settings = settings;
+        this.manager = manager;
+        this.userInteractionHandler = userInteractionHandler;
+    }
 
     public void download(Release release, Subtitle subtitle, @Nullable AtomicInteger counter=null) throws IOException {
         LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);

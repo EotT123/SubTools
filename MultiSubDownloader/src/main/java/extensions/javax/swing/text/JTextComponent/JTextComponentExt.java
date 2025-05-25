@@ -1,16 +1,18 @@
 package extensions.javax.swing.text.JTextComponent;
 
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 
-@UtilityClass
 @Extension
 public class JTextComponentExt {
+
+    private JTextComponentExt() {
+        // hide utility class constructor
+    }
 
     public static @Self JTextComponent editable(@This JTextComponent textComponent, boolean editable) {
         textComponent.setEditable(editable);

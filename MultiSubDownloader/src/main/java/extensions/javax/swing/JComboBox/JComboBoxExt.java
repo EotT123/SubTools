@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.google.common.collect.Iterables;
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
@@ -15,9 +14,12 @@ import manifold.ext.rt.api.ThisClass;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.ToStringListCellRenderer;
 
-@UtilityClass
 @Extension
 public class JComboBoxExt {
+    
+    private JComboBoxExt() {
+        // hide utility class constructor
+    }
 
     public static <E> JComboBox<E> create(@ThisClass Class<JComboBox<E>> thisClass, E... values) {
         return new JComboBox<>(values);

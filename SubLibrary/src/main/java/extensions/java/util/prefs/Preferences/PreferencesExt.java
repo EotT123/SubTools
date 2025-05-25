@@ -1,0 +1,22 @@
+package extensions.java.util.prefs.Preferences;
+
+import java.util.function.Function;
+import java.util.prefs.Preferences;
+
+import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.This;
+
+@Extension
+public class PreferencesExt {
+
+    private PreferencesExt() {
+        // hide utility class constructor
+    }
+
+    public static <R> R computeIfPresent(@This Preferences preferences, String key, Function<String, R> mapper,
+        R defaultValue) {
+        String value = preferences.get(key, null);
+        return value == null ? defaultValue : mapper.apply(value);
+    }
+}
+

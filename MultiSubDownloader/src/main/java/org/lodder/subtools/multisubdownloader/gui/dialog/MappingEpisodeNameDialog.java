@@ -17,7 +17,6 @@ import java.util.Vector;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
@@ -221,10 +220,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         }
     }
 
-    @AllArgsConstructor
     private static class MappingTableModel extends DefaultTableModel {
         @Serial private static final long serialVersionUID = 7860605766969472980L;
         @val Manager manager;
+
+        public MappingTableModel(Manager manager) {
+            this.manager = manager;
+        }
 
         void setMappingType(MappingType mappingType) {
             setDataVector(null,

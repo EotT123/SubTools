@@ -1,6 +1,5 @@
 package extensions.org.w3c.dom.Node;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.jspecify.annotations.NullMarked;
@@ -8,10 +7,13 @@ import org.jspecify.annotations.Nullable;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-@UtilityClass
 @Extension
 @NullMarked
 public class NodeExt {
+
+    private NodeExt() {
+        // hide utility class constructor
+    }
 
     public static @Nullable String getAttribute(@This @Nullable Node node, String attribute) {
         if (node == null) {

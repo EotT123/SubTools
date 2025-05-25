@@ -18,9 +18,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import dnl.utils.text.table.TextTable;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.UtilityClass;
-import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
@@ -29,9 +26,12 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
 
-@Extension
-@UtilityClass
+//@Extension
 public class PrompterExt {
+
+    private PrompterExt() {
+        // hide utility class constructor
+    }
 
     public static Validator<String> NON_BLANK_VALIDATOR =
         new Validator<>(StringUtils::isNotBlank, getText("Prompter.ValueNonBlank"));
@@ -218,10 +218,13 @@ public class PrompterExt {
         }
     }
 
-    @RequiredArgsConstructor
     public static class TableDisplayer<T> {
 
         private final List<ColumnDisplayer<T>> columnDisplayers;
+
+        public TableDisplayer(List<ColumnDisplayer<T>> columnDisplayers) {
+            this.columnDisplayers = columnDisplayers;
+        }
 
         @SafeVarargs
         public final void display(T... tableElements) {

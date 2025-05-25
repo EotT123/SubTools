@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import lombok.Getter;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.Nullable;
@@ -22,7 +21,6 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import subdl.Serie.ReleaseType;
 
-@Getter
 public final class SubdlAdapter extends
     SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId, SubdlException> {
 

@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NonNull;
@@ -15,12 +14,16 @@ import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.gui.InputPane;
 import org.lodder.subtools.sublibrary.util.Validator;
 
-@AllArgsConstructor
 public class UserInteractionHandlerGUI implements UserInteractionHandler {
 
     private static final Object LOCK = new Object();
     @val @override UserInteractionSettingsIntf settings;
     @val JFrame frame;
+
+    public UserInteractionHandlerGUI(UserInteractionSettingsIntf settings, JFrame frame) {
+        this.settings = settings;
+        this.frame = frame;
+    }
 
     @Override
     public <T> Optional<T> selectFromList(Iterable<T> options, String message,

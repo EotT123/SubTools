@@ -1,10 +1,8 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import lombok.RequiredArgsConstructor;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 
-@RequiredArgsConstructor
 public class LazyThrowingSupplier<T, X extends Exception> {
 
     private final ThrowingSupplier<T, X> supplier;
@@ -14,6 +12,10 @@ public class LazyThrowingSupplier<T, X extends Exception> {
     private final Object lock = new Object();
 
     private volatile boolean initialized = false;
+
+    public LazyThrowingSupplier(ThrowingSupplier<T, X> supplier) {
+        this.supplier = supplier;
+    }
 
     public LazyThrowingSupplier(T value) {
         supplier = null;

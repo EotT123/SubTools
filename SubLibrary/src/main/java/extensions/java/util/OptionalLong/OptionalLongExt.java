@@ -5,7 +5,6 @@ import java.util.OptionalLong;
 import java.util.function.LongFunction;
 import java.util.function.LongUnaryOperator;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingLongFunction;
@@ -14,9 +13,12 @@ import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 
 @Extension
-@UtilityClass
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalLongExt {
+
+    private OptionalLongExt() {
+        // hide utility class constructor
+    }
 
     /**
      * Applies the given function to the value if present.

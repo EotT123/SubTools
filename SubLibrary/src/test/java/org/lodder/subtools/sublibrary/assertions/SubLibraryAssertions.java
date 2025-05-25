@@ -1,12 +1,14 @@
 package org.lodder.subtools.sublibrary.assertions;
 
-import lombok.experimental.UtilityClass;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 
-@UtilityClass
 public class SubLibraryAssertions {
+
+    private SubLibraryAssertions() {
+        // hide utility class constructor
+    }
 
     public static TvReleaseAssert assertThat(TvRelease actual) {
         return new TvReleaseAssert(actual);

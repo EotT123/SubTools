@@ -5,6 +5,7 @@ import manifold.ext.rt.api.Intercept;
 import manifold.ext.rt.api.This;
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Collector;
 import org.jsoup.select.Elements;
 import org.jsoup.select.Evaluator;
@@ -228,10 +229,9 @@ public class ElementExt {
 //        return element == null ? "" : element.text();
 //    }
 
-//    @Intercept
-//    public static @Nullable Element parent(@This @Nullable Element element) {
-//        return element == null ? null : element.parent();
-//    }
+    public static @Nullable Element parentElement(@This @Nullable Element element) {
+        return element == null ? null : (Element) ((Node) element).parent();
+    }
 
 //    public static @Nullable Element parent(@This @Nullable Element element, int amount) {
 //        if (amount < 1) {

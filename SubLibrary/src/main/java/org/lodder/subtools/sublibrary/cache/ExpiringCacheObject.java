@@ -9,9 +9,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
@@ -19,8 +16,6 @@ import manifold.ext.props.rt.api.var;
 import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
 
-@ToString
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NullMarked
 sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSerializableCacheObject {
 
@@ -31,6 +26,12 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
     @override @val Time created;
     @var @set(Private) Time lastAccessed = Time.now();
     @override @var T value;
+
+    public ExpiringCacheObject(Time created, Time lastAccessed, T value) {
+        this.created = created;
+        this.lastAccessed = lastAccessed;
+        this.value = value;
+    }
 
     protected ExpiringCacheObject(T value) {
         this.created = Time.now();

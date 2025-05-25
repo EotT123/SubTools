@@ -5,9 +5,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -16,13 +13,16 @@ import org.lodder.subtools.sublibrary.control.Tags.Tag;
 /**
  * <a href="http://rosettacode.org/wiki/Roman_numerals/Decode#Java_2">Source</a>
  */
-@UtilityClass
 @NullMarked
 public class RegexUtils {
 
     public static final List<Character> DELIMITERS = List.of('.', ' ', '-');
     public static final String DELIMITER =
         "[" + Pattern.quote(DELIMITERS.stream().map(String::valueOf).collect(Collectors.joining(""))) + "]";
+
+    private RegexUtils() {
+        // hide utility class constructor
+    }
 
     @NullMarked
     interface RegexStart extends RegexTag {
@@ -59,13 +59,16 @@ public class RegexUtils {
         List<String> createWithDelimiter();
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @NullMarked
     public static class Regex implements RegexStart, RegexTag, RegexRegex, RegexNext, RegexEnd, RegexBuilderBuild {
         private @Nullable Tag tag;
         private @Nullable String regex;
         private String result = "";
         private boolean finalized = false;
+
+        private Regex() {
+
+        }
 
         public static RegexStart builder() {
             return new Regex();

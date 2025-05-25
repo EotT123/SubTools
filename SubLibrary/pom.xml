@@ -107,11 +107,6 @@
             <groupId>systems.manifold</groupId>
             <artifactId>manifold-yaml-rt</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!-- prompter -->
         <dependency>
             <groupId>org.codehaus.plexus</groupId>

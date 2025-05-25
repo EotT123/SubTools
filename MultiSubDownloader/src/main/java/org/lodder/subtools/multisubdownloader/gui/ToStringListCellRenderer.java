@@ -6,14 +6,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Function;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ToStringListCellRenderer<T> implements ListCellRenderer<T> {
 
     private final ListCellRenderer originalRenderer;
     private final Function<T, String> toStringMapper;
+
+    private ToStringListCellRenderer(ListCellRenderer originalRenderer, Function<T, String> toStringMapper) {
+        this.originalRenderer = originalRenderer;
+        this.toStringMapper = toStringMapper;
+    }
 
     public static <T> ToStringListCellRenderer<T> of(ListCellRenderer originalRenderer,
             Function<T, String> toStringMapper) {

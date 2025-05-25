@@ -6,7 +6,6 @@ import java.util.OptionalInt;
 import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingIntFunction;
@@ -16,9 +15,12 @@ import name.falgout.jeffrey.throwing.ThrowingSupplier;
 
 
 @Extension
-@UtilityClass
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalIntExt {
+
+    private OptionalIntExt() {
+        // hide utility class constructor
+    }
 
     /**
      * If a value is present, applies the {@link IntUnaryOperator} to it and returns the result wrapped in an {@link OptionalInt}.

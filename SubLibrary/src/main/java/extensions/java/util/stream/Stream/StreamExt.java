@@ -5,15 +5,17 @@ import static util.SneakyThrowUtil.*;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 
-@UtilityClass
 @Extension
 public class StreamExt {
+
+    private StreamExt() {
+        // hide utility class constructor
+    }
 
     public static <T, R, X extends Exception> Stream<R> mapEx(@This Stream<T> stream,
         ThrowingFunction<? super T, ? extends R, X> mapper) throws X {

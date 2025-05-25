@@ -1,9 +1,7 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import lombok.RequiredArgsConstructor;
 import name.falgout.jeffrey.throwing.ThrowingBiFunction;
 
-@RequiredArgsConstructor
 public class LazyThrowingBiFunction<T, U, R, X extends Exception> {
 
     private final Object lock = new Object();
@@ -13,6 +11,10 @@ public class LazyThrowingBiFunction<T, U, R, X extends Exception> {
     private R object;
 
     private volatile boolean initialized = false;
+
+    public LazyThrowingBiFunction(ThrowingBiFunction<T, U, R, X> function) {
+        this.function = function;
+    }
 
     public R apply(T arg1, U arg2) throws X {
         if (!initialized) {

@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -30,7 +29,6 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 public class UpdateAvailableGithub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
@@ -41,6 +39,11 @@ public class UpdateAvailableGithub {
 
     private final Manager manager;
     private final Settings settings;
+
+    public UpdateAvailableGithub(Manager manager, Settings settings) {
+        this.manager = manager;
+        this.settings = settings;
+    }
 
     public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
         LocalDate lastUpdateCheck = getLastUpdateCheck();
@@ -86,7 +89,7 @@ public class UpdateAvailableGithub {
                                 userAgent:null))
                         .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
                     Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
-                    String versionText = element.parent().selectFirstByTag("a").text();
+                    String versionText = element.parentElement().selectFirst("a").text();
                     Matcher matcher = versionPattern.matcher(versionText);
                     matcher.find();
                     String version = matcher.group();

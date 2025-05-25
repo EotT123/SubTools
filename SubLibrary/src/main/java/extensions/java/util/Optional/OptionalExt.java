@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
@@ -14,10 +13,13 @@ import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import name.falgout.jeffrey.throwing.ThrowingToIntFunction;
 
-@UtilityClass
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Extension
 public class OptionalExt {
+
+    private OptionalExt() {
+        // hide utility class constructor
+    }
 
 //    /**
 //     * Applies the given function to the value if present.

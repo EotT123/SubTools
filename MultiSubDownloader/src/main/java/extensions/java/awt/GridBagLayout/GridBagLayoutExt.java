@@ -2,14 +2,17 @@ package extensions.java.awt.GridBagLayout;
 
 import java.awt.*;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 
 @Extension
-@UtilityClass
 public class GridBagLayoutExt {
+
+    private GridBagLayoutExt() {
+        // hide utility class constructor
+    }
+
 
     public static @Self GridBagLayout columnWidths(@This GridBagLayout gridBagLayout, int[] columnWidths) {
         gridBagLayout.columnWidths = columnWidths;

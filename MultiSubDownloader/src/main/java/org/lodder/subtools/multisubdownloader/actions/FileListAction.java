@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import extensions.java.nio.file.Path.PathExt;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
@@ -19,7 +18,6 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 @ExtensionMethod({ Files.class })
 public class FileListAction {
 
@@ -29,6 +27,9 @@ public class FileListAction {
     private final Settings settings;
     @set IndexingProgressListener indexingProgressListener;
 
+    public FileListAction(Settings settings) {
+        this.settings = settings;
+    }
 
     public List<Path> getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
         LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]",

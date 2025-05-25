@@ -5,12 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.ToString;
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 
-@ToString
 public class TvdbSerie implements Serializable {
     @Serial
     private static final long serialVersionUID = -4036836377513152443L;

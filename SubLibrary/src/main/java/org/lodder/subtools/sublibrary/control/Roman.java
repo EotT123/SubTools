@@ -1,18 +1,14 @@
 package org.lodder.subtools.sublibrary.control;
 
-import lombok.AllArgsConstructor;
-import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * <a href="http://rosettacode.org/wiki/Roman_numerals/Decode#Java_2">Source</a>
  */
-@UtilityClass
 @NullMarked
 public class Roman {
 
-    @AllArgsConstructor
     public enum RomanNumeral {
         I(1),
         V(5),
@@ -23,6 +19,14 @@ public class Roman {
         M(1000);
 
         @val int value;
+
+        RomanNumeral(int value) {
+            this.value = value;
+        }
+    }
+
+    private Roman() {
+        // hide utility class constructor
     }
 
     private static int decodeSingle(char letter) {

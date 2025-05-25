@@ -9,8 +9,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <manifold.version>2025.1.14</manifold.version>
-        <lombok.version>1.18.38</lombok.version>
+        <manifold.version>2025.1.16</manifold.version>
         <maven.compiler.target>24</maven.compiler.target>
         <maven.compiler.source>24</maven.compiler.source>
     </properties>
@@ -45,13 +44,6 @@
                         <compilerArgs combine.children="append">
                             <arg>-verbose</arg>
                         </compilerArgs>
-                        <annotationProcessorPaths combine.children="append">
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
-                            </path>
-                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -170,12 +162,6 @@
                 <groupId>systems.manifold</groupId>
                 <artifactId>manifold-science</artifactId>
                 <version>${manifold.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>

@@ -1,15 +1,16 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum AiTranslatedEnum implements ParamIntf {
     EXCLUDE("exclude"), INCLUDE("include");
 
     @val @override String value;
+
+    AiTranslatedEnum(String value) {
+        this.value = value;
+    }
 
     @Override
     public String toString() {

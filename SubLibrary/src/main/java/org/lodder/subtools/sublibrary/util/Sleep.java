@@ -2,11 +2,13 @@ package org.lodder.subtools.sublibrary.util;
 
 import static java.time.temporal.ChronoUnit.*;
 
-import lombok.experimental.UtilityClass;
 import manifold.science.measures.Time;
 
-@UtilityClass
 public class Sleep {
+
+    private Sleep() {
+        // hide utility class constructor
+    }
 
     public static void sleep(Time time) {
         try {

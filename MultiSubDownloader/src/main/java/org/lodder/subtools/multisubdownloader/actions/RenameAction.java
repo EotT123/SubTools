@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
@@ -20,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ExtensionMethod({ Files.class })
-@RequiredArgsConstructor
 public class RenameAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RenameAction.class);
@@ -28,6 +26,13 @@ public class RenameAction {
     private final LibrarySettings librarySettings;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
+
+    public RenameAction(LibrarySettings librarySettings, Manager manager,
+        UserInteractionHandler userInteractionHandler) {
+        this.librarySettings = librarySettings;
+        this.manager = manager;
+        this.userInteractionHandler = userInteractionHandler;
+    }
 
     public void rename(Path f, Release release) {
         String filename = switch (librarySettings.action) {

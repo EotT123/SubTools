@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +27,14 @@ public final class ConfigProperties {
         return instance.prop.getProperty(property.value);
     }
 
-    @AllArgsConstructor
     public enum Property {
         NAME("name"),
         VERSION("version");
 
         @val String value;
+
+        Property(String value) {
+            this.value = value;
+        }
     }
 }

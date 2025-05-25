@@ -4,16 +4,17 @@ package org.lodder.subtools.sublibrary.control;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import lombok.AllArgsConstructor;
-import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-@UtilityClass
 @NullMarked
 public class VideoPatterns {
+
+    private VideoPatterns() {
+        // hide utility class constructor
+    }
 
     @NullMarked
     public interface RegexPattern {
@@ -51,7 +52,6 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
     @NullMarked
     public enum VideoEncoding implements RegexPattern {
         X264("x264", "[xh]264"),
@@ -73,7 +73,6 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
     @NullMarked
     public enum AudioEncoding implements RegexPattern {
         DD5_1("dd5.1", "dd5[-.]1");
@@ -94,7 +93,6 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
     @NullMarked
     public enum Source implements RegexPattern {
         HDTV("hdtv", "hdtv", true, false),
@@ -143,7 +141,6 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
     @NullMarked
     public enum VideoExtensions {
         MKV("mkv"),
@@ -154,6 +151,10 @@ public class VideoPatterns {
         M4V("m4v");
 
         @val String value;
+
+        VideoExtensions(String value) {
+            this.value = value;
+        }
     }
 
     public static final Set<String> EXTENSIONS =

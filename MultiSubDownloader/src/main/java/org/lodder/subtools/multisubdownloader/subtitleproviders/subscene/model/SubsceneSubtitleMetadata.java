@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
 
 import java.io.Serializable;
 
-import lombok.EqualsAndHashCode;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.Nullable;
@@ -10,7 +9,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.excepti
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.SeasonEpisode;
 
-@EqualsAndHashCode
 public class SubsceneSubtitleMetadata implements Serializable {
 
     @val @Nullable Language language;
@@ -19,7 +17,7 @@ public class SubsceneSubtitleMetadata implements Serializable {
     @val @Nullable String uploader;
     @val @Nullable String comment;
     @val @Nullable SeasonEpisode seasonEpisode;
-    @EqualsAndHashCode.Exclude @val ThrowingSupplier<String, SubsceneException> urlSupplier;
+    @val ThrowingSupplier<String, SubsceneException> urlSupplier;
 
     public SubsceneSubtitleMetadata(@Nullable Language language,
         @Nullable String name, boolean hearingImpaired,@Nullable String uploader, @Nullable String comment,

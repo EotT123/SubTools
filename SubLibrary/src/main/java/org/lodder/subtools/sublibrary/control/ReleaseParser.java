@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
@@ -179,7 +178,6 @@ public class ReleaseParser {
             quality:StringUtils.toRootLowerCase(quality)));
     }
 
-    @AllArgsConstructor
     @NullMarked
     enum SeasonEpisodeType {
         SXXEXX(Regex.builder()
@@ -197,9 +195,12 @@ public class ReleaseParser {
             .regex("\\)"));
 
         @val RegexNext regex;
+
+        SeasonEpisodeType(RegexNext regex) {
+            this.regex = regex;
+        }
     }
 
-    @AllArgsConstructor
     @NullMarked
     enum NumberType {
         ARABIC(Regex.builder()
@@ -209,6 +210,10 @@ public class ReleaseParser {
             .regex("[" + RomanNumeral.values().stream().map(RomanNumeral::name).collect(Collectors.joining()) + "]+"));
 
         @val RegexNext regex;
+
+        NumberType(RegexNext regex) {
+            this.regex = regex;
+        }
     }
 
     /**

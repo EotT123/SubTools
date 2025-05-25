@@ -2,16 +2,20 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.m
 
 import java.util.Objects;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 
-@AllArgsConstructor
 public class OpenSubtitlesMovieMetadata {
 
     @var String name;
     @val int year;
     @val int imdbId;
+
+    public OpenSubtitlesMovieMetadata(String name, int year, int imdbId) {
+        this.name = name;
+        this.year = year;
+        this.imdbId = imdbId;
+    }
 
     public OpenSubtitlesMovieMetadata(String name, int imdbId) {
         this(name, -1, imdbId);

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProviderComparator;
@@ -17,7 +16,6 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 public class Bootstrapper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
@@ -26,6 +24,13 @@ public class Bootstrapper {
     private final Settings settings;
     private final Preferences preferences;
     private final Manager manager;
+
+    public Bootstrapper(Container app, Settings settings, Preferences preferences, Manager manager) {
+        this.app = app;
+        this.settings = settings;
+        this.preferences = preferences;
+        this.manager = manager;
+    }
 
     public void initialize(UserInteractionHandler userInteractionHandler) {
         /* Bind Settings to IoC Container */

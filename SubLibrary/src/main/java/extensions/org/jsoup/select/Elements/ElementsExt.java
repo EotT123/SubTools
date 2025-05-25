@@ -1,6 +1,5 @@
 package extensions.org.jsoup.select.Elements;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Intercept;
 import manifold.ext.rt.api.This;
@@ -10,9 +9,12 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @Extension
-@UtilityClass
 @NullMarked
 public class ElementsExt {
+
+    private ElementsExt() {
+        // hide utility class constructor
+    }
 
     @Intercept
     public static String text(@This @Nullable Elements elements) {

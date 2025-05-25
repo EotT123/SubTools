@@ -19,6 +19,11 @@ public class NodeExt {
     // ------------ \\
 
     @Intercept
+    public static @Nullable @Self Node parentNode(@This @Nullable Node node) {
+        return node == null ? null : node.parentNode();
+    }
+
+    @Intercept
     public static @Nullable @Self Node parent(@This @Nullable Node node) {
         return node == null ? null : node.parent();
     }
@@ -30,12 +35,12 @@ public class NodeExt {
         if (node == null) {
             return null;
         }
-        return amount > 1 ? node.parent(--amount) : node.parent();
+        return amount > 1 ? node.parent(--amount) : node.parentNode();
     }
 
     @Intercept
     public static String attr(@This @Nullable Node node, String attribute) {
-        return node.attrOrElse(attribute, "");
+        return node == null || !node.hasAttr(attribute) ? "" : node.attr(attribute);
     }
 
     public static <X extends Exception> String attrOrElse(@This @Nullable Node node, String attribute,

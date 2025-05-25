@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
@@ -47,12 +46,18 @@ import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.xml.XMLHelper;
 import org.w3c.dom.Document;
 
-@AllArgsConstructor
 public class Manager {
 
     @val HttpClient httpClient;
     @val InMemoryCache<String, String> inMemoryCache;
     @val DiskCache<String, Serializable> diskCache;
+
+    public Manager(HttpClient httpClient, InMemoryCache<String, String> inMemoryCache,
+        DiskCache<String, Serializable> diskCache) {
+        this.httpClient = httpClient;
+        this.inMemoryCache = inMemoryCache;
+        this.diskCache = diskCache;
+    }
 
     public boolean download(String downloadLink, Path file) throws IOException {
         try {

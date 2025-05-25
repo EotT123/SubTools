@@ -2,14 +2,16 @@ package extensions.javax.swing.JSlider;
 
 import javax.swing.*;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 
-@UtilityClass
 @Extension
 public class JSliderExt {
+
+    private JSliderExt() {
+        // hide utility class constructor
+    }
 
     public static @Self JSlider minimum(@This JSlider slider, int minimum) {
         slider.setMinimum(minimum);

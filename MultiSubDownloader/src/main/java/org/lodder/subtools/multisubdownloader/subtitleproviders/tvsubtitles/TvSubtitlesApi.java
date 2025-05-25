@@ -3,19 +3,20 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Gatherers;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleMetadata;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleMetadata.TVSubtitlesSubtitleMetadataBuilder;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.ManagerException;
@@ -79,7 +80,7 @@ public class TvSubtitlesApi implements SubtitleApi {
             .getCollection(() -> {
                 try {
                     CookieManager cookieManager = providerLang == null ? null :
-                            new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
+                        new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
                     return manager.getAsJsoupDocument(PageContentParams.params(
                             DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
                             cookieManager:cookieManager))
@@ -108,23 +109,18 @@ public class TvSubtitlesApi implements SubtitleApi {
                     return manager.getAsJsoupDocument(PageContentParams.url(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")
                         .stream().map(subtitleElement -> {
-                            TVSubtitlesSubtitleMetadataBuilder subtitleBuilder = TVSubtitlesSubtitleMetadata.builder()
-                                .language(providerLang != null ? providerLang.language : null);
-                            for (Element titleElement : subtitleElement.select(".subtitle_grid > div > img[title]")) {
-                                String value =
-                                    ((Element) titleElement.parent()).nextElementSibling().nextElementSibling().text();
-                                switch (titleElement.attr("title")) {
-                                    case "episode title" -> subtitleBuilder.title(value);
-                                    case "rip" -> subtitleBuilder.source(Source.fromValue(value));
-                                    case "release" -> subtitleBuilder.releaseGroup(value);
-                                    case "filename" -> subtitleBuilder.filename(value);
-                                    default -> {
-                                    }
-                                }
-                            }
-                            subtitleBuilder.url(DOMAIN + "/" + subtitleElement.select("a[href^='download-']")
-                                .attr("href"));
-                            return subtitleBuilder.build();
+                            Map<MetadataType, String> metadataMap =
+                                subtitleElement.select(".subtitle_grid > div").stream().gather(Gatherers.windowFixed(3))
+                                    .map(values -> new Metadata(MetadataType.of(values.get(1).text()),
+                                        values.get(2).text())).filter(metadata -> metadata.metadataType != null)
+                                    .toMap(Metadata::metadataType, Metadata::value);
+                            return new TVSubtitlesSubtitleMetadata(
+                                metadataMap.get(MetadataType.TITLE),
+                                metadataMap.get(MetadataType.FILE_NAME),
+                                DOMAIN + "/" + subtitleElement.select("a[href^='download-']").attr("href"),
+                                Source.fromValue(metadataMap.get(MetadataType.SOURCE)),
+                                metadataMap.get(MetadataType.RELEASE),
+                                providerLang != null ? providerLang.language : null);
                         }).toList();
                 } catch (ManagerException e) {
                     throw new TvSubtitleException(e);
@@ -132,6 +128,29 @@ public class TvSubtitlesApi implements SubtitleApi {
             });
     }
 
+    private record Metadata(@Nullable MetadataType metadataType, String value) {
+    }
+
+    @NullMarked
+    private enum MetadataType {
+        TITLE("episode title"),
+        SOURCE("rip"),
+        RELEASE("release"),
+        FILE_NAME("filename");
+
+        @val String value;
+
+        MetadataType(String value) {
+            this.value = value;
+        }
+
+        public static @Nullable MetadataType of(String value) {
+            return MetadataType.values().stream().filter(metadataType -> metadataType.value.equals(value)).findAny()
+                .orElse(null);
+        }
+    }
+
+    @NullMarked
     private record EpisodeRow(int season, int episode, List<String> urls) implements Serializable {
         public boolean isSameEpisode(int season, int episode) {
             return this.season == season && this.episode == episode;

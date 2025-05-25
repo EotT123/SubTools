@@ -6,12 +6,9 @@ import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 public class Addic7edResponseException extends Addic7edException {
 
     @val HttpStatus errorCode;
-    @val boolean skipProvider;
 
-    public Addic7edResponseException(HttpStatus errorCode, String message=errorCode.description,
-        boolean skipProvider=errorCode.stopContactingServer) {
+    public Addic7edResponseException(HttpStatus errorCode, String message=errorCode.description) {
         super("Addic7ed: " + message);
         this.errorCode = errorCode;
-        this.skipProvider = skipProvider;
     }
 }

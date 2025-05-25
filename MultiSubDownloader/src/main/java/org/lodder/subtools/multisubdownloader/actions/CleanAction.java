@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
 
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
@@ -14,7 +13,6 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 @ExtensionMethod({ Files.class })
 public class CleanAction {
 
@@ -23,6 +21,10 @@ public class CleanAction {
     private static final Set<String> FILE_FILTERS = Set.of("nfo", "jpg", "sfv", "srr", "srs", "nzb", "torrent", "txt");
 
     private final LibrarySettings librarySettings;
+
+    public CleanAction(LibrarySettings librarySettings) {
+        this.librarySettings = librarySettings;
+    }
 
     public void cleanUpFiles(Release release, Path destination, String videoFileName) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryOtherFileAction {}", librarySettings.otherFileAction);

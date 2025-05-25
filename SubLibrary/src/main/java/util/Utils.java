@@ -8,10 +8,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import lombok.experimental.UtilityClass;
-
-@UtilityClass
 public class Utils {
+
+    private Utils() {
+        // hide utility class constructor
+    }
 
     public static <T, K, V> Collector<T, Map<K, V>, Map<K, V>> mapCollector(
             BiConsumer<Map<K, V>, T> accumulator) {

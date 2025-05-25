@@ -15,7 +15,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
@@ -24,9 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
 import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
 
-@UtilityClass
 @Extension
+//@ExtensionSource(source = Files.class)
 public class PathExt {
+
+    private PathExt() {
+        // hide utility class constructor
+    }
 
     public static String getExtension(@This Path path) {
         return StringUtils.substringAfterLast(path.getFileName().toString(), ".");

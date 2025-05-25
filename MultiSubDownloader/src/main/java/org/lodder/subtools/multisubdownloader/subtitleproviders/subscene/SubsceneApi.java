@@ -114,7 +114,7 @@ public class SubsceneApi implements SubtitleApi {
                     return getJsoupDocument(DOMAIN + providerId)
                         .select("td.a1")
                         .stream()
-                        .map(el -> (Element) el.parent())
+                        .map(Element::parentElement)
                         .map(row -> {
                             Language lang = Language.ofName(row.select(".a1 span.l").text().trim(), Language.ENGLISH);
                             String name = row.select(".a1 span:not(.l)").text().trim();
