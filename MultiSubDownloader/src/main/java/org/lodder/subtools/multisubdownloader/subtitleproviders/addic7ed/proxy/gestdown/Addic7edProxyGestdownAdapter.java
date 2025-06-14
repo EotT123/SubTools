@@ -25,16 +25,16 @@ import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class Addic7edViaProxyAdapter extends
+public final class Addic7edProxyGestdownAdapter extends
     SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, Addic7edException> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edViaProxyAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownAdapter.class);
 
     private final Addic7edProxyGestdownApi api;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = false;
 
-    public Addic7edViaProxyAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
+    public Addic7edProxyGestdownAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         this.api = new Addic7edProxyGestdownApi(manager);
     }

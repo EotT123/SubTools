@@ -11,7 +11,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.Addic7edAdapter;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.Addic7edViaProxyAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.Addic7edProxyGestdownAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Manager;
 
@@ -55,7 +55,7 @@ public class Addic7edServiceProvider implements ServiceProvider {
         }
 
         if (settings.serieSourceAddic7edProxy) {
-            return new Addic7edViaProxyAdapter(manager, userInteractionHandler);
+            return new Addic7edProxyGestdownAdapter(manager, userInteractionHandler);
         } else {
             boolean speedy = app.makePreferences().getBoolean(CliOption.SPEEDY.value, false);
             return new Addic7edAdapter(manager, speedy, credentials, userInteractionHandler);
