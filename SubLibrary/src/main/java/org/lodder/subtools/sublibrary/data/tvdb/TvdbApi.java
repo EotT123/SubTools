@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
 import static manifold.science.util.UnitConstants.*;
+import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class TvdbApi implements ApiIntf {
                     null, "series", null, null, null, null, null,
                     null, null, null, null, null))
                     .addErrorHandler(BAD_REQUEST, retry:false)
-                    .addErrorHandler(UNAUTHORIZED, retry:false)
+                    .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
                     .execute().getData());
     }
 
@@ -87,7 +88,7 @@ public class TvdbApi implements ApiIntf {
                         null, null, null, null, null, null,
                         null, String.valueOf(tvdbId), null, null))
                         .addErrorHandler(BAD_REQUEST, retry:false)
-                        .addErrorHandler(UNAUTHORIZED, retry:false)
+                        .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
                         .execute().getData())
                     .flatMap(s -> s.stream().findFirst()));
     }
@@ -102,8 +103,8 @@ public class TvdbApi implements ApiIntf {
                     () -> seriesApi.get().getSeriesSeasonEpisodesTranslated(BigDecimal.valueOf(tvdbId), "default",
                         language.iso639_3, 1))
                     .addErrorHandler(BAD_REQUEST, retry:false)
-                    .addErrorHandler(UNAUTHORIZED, retry:false)
-                    .addErrorHandler(NOT_FOUND, retry:false)
+                    .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
+                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
                     .execute().getData().getSeries()));
     }
 

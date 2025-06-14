@@ -1,6 +1,8 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown;
 
 import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.LogLevel.*;
+import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
 import java.util.List;
@@ -76,8 +78,8 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             .getCollection(() -> {
                 List<ShowDto> shows = apiCall(
                     () -> TV_SHOWS_API.showsSearchSearchGet(name))
-                    .addErrorHandler(HttpStatus.NOT_FOUND, retry:false)
-                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second)
+                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
+                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second, logLevel:WARN)
                     .execute().getShows();
                 return shows == null ? List.of() : shows;
             });
@@ -88,8 +90,8 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             .getCollection(() -> {
                 List<ShowDto> shows = apiCall(
                     () -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId))
-                    .addErrorHandler(HttpStatus.NOT_FOUND, retry:false)
-                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second)
+                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
+                    .addErrorHandler(TOO_MANY_REQUESTS, 5Second, logLevel:WARN)
                     .execute().getShows();
                 return shows == null ? List.of() : shows;
             });
@@ -103,10 +105,10 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
                 SubtitleSearchResponse response = apiCall(
                     () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
                         UUID.fromString(providerId), season, episode))
-                    .addErrorHandler(HttpStatus.BAD_REQUEST, retry:false)
-                    .addErrorHandler(HttpStatus.NOT_FOUND, retry:false)
-                    .addErrorHandler(HttpStatus.LOCKED, 5Second)
-                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second)
+                    .addErrorHandler(BAD_REQUEST, retry:false)
+                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
+                    .addErrorHandler(LOCKED, 5Second, logLevel:INFO)
+                    .addErrorHandler(TOO_MANY_REQUESTS, 5Second, logLevel:WARN)
                     .execute();
                 List<SubtitleDto> subtitles = response.getMatchingSubtitles();
                 return subtitles == null ? List.of() :

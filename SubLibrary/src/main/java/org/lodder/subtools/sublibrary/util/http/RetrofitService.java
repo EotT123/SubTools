@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.util.http;
 
 import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 
@@ -16,8 +17,10 @@ import java.util.function.Predicate;
 import manifold.ext.rt.api.Self;
 import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.LogLevel;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -35,9 +38,10 @@ public class RetrofitService {
         Time sleepTimeBeforeRetry=1Second,
         // should retries be done?
         boolean retry=true,
+        LogLevel logLevel=LogLevel.ERROR,
         // Custom exception creator to use instead of the default one. If non is supplied, the default one is used.
-        // Parameters: http status code, error body
-        @Nullable BiFunction<HttpStatus, String, X> exception=null) {
+        // Parameters: http status code, error body, loglevel
+        @Nullable TriFunction<HttpStatus, String, LogLevel, X> exception=null) {
 
         public boolean isApplicable(HttpStatus status, String message) {
             return predicate.test(status, message);
@@ -45,7 +49,7 @@ public class RetrofitService {
     }
 
     public static <T, X extends Exception> ExecuteCall<T, X> handleExecution(ThrowingSupplier<Call<T>, X> supplier,
-        Function<HttpStatus, X> defaultExceptionCreator) {
+        BiFunction<HttpStatus, LogLevel, X> defaultExceptionCreator) {
         return new ExecuteCall<>(supplier, defaultExceptionCreator);
     }
 
@@ -53,11 +57,12 @@ public class RetrofitService {
     public static class ExecuteCall<T, X extends Exception> {
 
         private final ThrowingSupplier<Call<T>, X> supplier;
-        private final Function<HttpStatus, X> defaultExceptionCreator;
+        private final BiFunction<HttpStatus, LogLevel, X> defaultExceptionCreator;
         private int retries = 1;
         private final List<ErrorHandler<X>> errorHandlers = new ArrayList<>();
 
-        public ExecuteCall(ThrowingSupplier<Call<T>, X> supplier, Function<HttpStatus, X> defaultExceptionCreator) {
+        public ExecuteCall(ThrowingSupplier<Call<T>, X> supplier,
+            BiFunction<HttpStatus, LogLevel, X> defaultExceptionCreator) {
             this.supplier = supplier;
             this.defaultExceptionCreator = defaultExceptionCreator;
         }
@@ -67,8 +72,8 @@ public class RetrofitService {
         }
 
         public @Self ExecuteCall<T, X> addErrorHandler(HttpStatus code, Time sleepTimeBeforeRetry=1Second,
-            boolean retry=true) {
-            return addErrorHandler(new ErrorHandler<>((c, _) -> c == code, sleepTimeBeforeRetry, retry));
+            boolean retry=true, LogLevel logLevel=LogLevel.ERROR) {
+            return addErrorHandler(new ErrorHandler<>((c, _) -> c == code, sleepTimeBeforeRetry, retry, logLevel));
         }
 
         public @Self ExecuteCall<T, X> addErrorHandler(ErrorHandler<X> errorHandle) {
@@ -90,7 +95,7 @@ public class RetrofitService {
             addErrorHandler(UNAUTHORIZED, retry:false);
             addErrorHandler(PAYMENT_REQUIRED, retry:false);
             addErrorHandler(FORBIDDEN, retry:false);
-            addErrorHandler(NOT_FOUND, retry:false);
+            addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO);
             addErrorHandler(METHOD_NOT_ALLOWED, retry:false);
             addErrorHandler(NOT_ACCEPTABLE, retry:false);
             addErrorHandler(PROXY_AUTHENTICATION_REQUIRED, retry:false);
@@ -112,7 +117,7 @@ public class RetrofitService {
             addErrorHandler(TOO_EARLY, sleepTimeBeforeRetry:1Second);
             addErrorHandler(UPGRADE_REQUIRED, retry:false);
             addErrorHandler(PRECONDITION_REQUIRED, retry:false);
-            addErrorHandler(TOO_MANY_REQUESTS, sleepTimeBeforeRetry:5Second);
+            addErrorHandler(TOO_MANY_REQUESTS, sleepTimeBeforeRetry:5Second, logLevel:WARN);
             addErrorHandler(REQUEST_HEADER_FIELDS_TOO_LARGE, retry:false);
             addErrorHandler(UNAVAILABLE_FOR_LEGAL_REASONS, retry:false);
 
@@ -137,7 +142,7 @@ public class RetrofitService {
             try {
                 response = supplier.get().execute();
             } catch (IOException e) {
-                throw defaultExceptionCreator.apply(BAD_GATEWAY);
+                throw defaultExceptionCreator.apply(BAD_GATEWAY, ERROR);
             }
             if (response.isSuccessful()) {
                 return Objects.requireNonNull(response.body());
@@ -150,28 +155,30 @@ public class RetrofitService {
                 }
                 HttpStatus code = fromStatusCode(response.code());
                 if (retries <= 0) {
-                    throw defaultExceptionCreator.apply(code);
+                    throw defaultExceptionCreator.apply(code, ERROR);
                 }
                 for (ErrorHandler<X> errorHandler : errorHandlers) {
                     if (errorHandler.isApplicable(code, errorBody)) {
                         if (!errorHandler.retry) {
-                            throw createException(errorHandler, code, errorBody);
+                            throw createException(errorHandler, code, errorBody, errorHandler.logLevel);
                         }
                         sleep(errorHandler.sleepTimeBeforeRetry);
                         retries--;
                         executePrivate();
+                        break;
                     }
                 }
                 // unhandled exception
-                throw defaultExceptionCreator.apply(code);
+                throw defaultExceptionCreator.apply(code, ERROR);
             }
         }
 
-        private X createException(ErrorHandler<X> errorHandler, HttpStatus httpStatus, String errorBody) {
+        private X createException(ErrorHandler<X> errorHandler, HttpStatus httpStatus, String errorBody,
+            LogLevel logLevel) {
             if (errorHandler.exception == null) {
-                return defaultExceptionCreator.apply(httpStatus);
+                return defaultExceptionCreator.apply(httpStatus, logLevel);
             } else {
-                return errorHandler.exception.apply(httpStatus, errorBody);
+                return errorHandler.exception.apply(httpStatus, errorBody, logLevel);
             }
         }
     }

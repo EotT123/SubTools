@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
+import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
@@ -235,10 +236,10 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     getValue(aiTranslated), orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
                     parentFeatureId, parentImdbId, parentTmdbId, season, episode, year, getValue(movieHashMatch), page,
                     USER_AGENT))
-                .addErrorHandler(UNAUTHORIZED, retry:false)
+                .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
                 .addErrorHandler(FORBIDDEN, retry:false)
                 .addErrorHandler(NOT_ACCEPTABLE, retry:false)
-                .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second)
+                .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second, logLevel:WARN)
                 .execute().getData();
 
 
@@ -260,10 +261,11 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 apiCall(() -> downloadApi.get().download(USER_AGENT,
                     new DownloadRequest().fileId(fileId)))
                     .addErrorHandler(createQuotaErrorHandler())
-                    .addErrorHandler(UNAUTHORIZED, retry:false)
+                    .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
                     .addErrorHandler(FORBIDDEN, retry:false)
                     .addErrorHandler(NOT_ACCEPTABLE, retry:false)
-                    .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second).execute().getLink()
+                    .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second, logLevel:WARN)
+                    .execute().getLink()
             );
     }
 
