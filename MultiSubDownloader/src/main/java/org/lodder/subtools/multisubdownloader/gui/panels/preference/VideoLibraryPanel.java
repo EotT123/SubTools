@@ -4,9 +4,7 @@ import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
 import java.io.Serial;
-import java.nio.file.Files;
 
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
@@ -19,7 +17,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-@ExtensionMethod({ Files.class })
+//@ExtensionMethod({ Files.class })
 public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
     permits EpisodeLibraryPanel, MovieLibraryPanel {
 

@@ -16,6 +16,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbException;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
+import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +78,8 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     private Optional<String> getImdbIdCommon(String title, @Nullable Integer year,
-        ThrowingBiFunction<String, Integer, Collection<ProviderId>, ImdbSearchIdException> providerSerieIdSupplier) {
-        Collection<ProviderId> providerIds;
+        ThrowingBiFunction<String, Integer, Collection<ImdbId>, ImdbSearchIdException> providerSerieIdSupplier) {
+        Collection<ImdbId> providerIds;
         try {
             providerIds = providerSerieIdSupplier.apply(title, year);
         } catch (ImdbSearchIdException e) {
@@ -86,19 +87,15 @@ public class ImdbAdapter implements AdapterIntf {
                 e.getMessage()), e);
             return Optional.empty();
         }
-        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerIds.size() == 1) {
+        if (! userInteractionHandler.settings.optionsConfirmProviderMapping && providerIds.size() == 1) {
             // found single exact match
             return Optional.of(providerIds.iterator().next().id);
         }
         String formattedTitle = title.replaceAll("[^A-Za-z]", "");
         return userInteractionHandler
             .selectFromList(
-                providerIds.stream().sorted(Comparator
-                        .comparing((ProviderId providerId) -> providerId.name.replaceAll(
-                                "[^A-Za-z]", "")
-                            .equalsIgnoreCase(formattedTitle), Comparator.reverseOrder())
-                        .thenComparing(ProviderId::getName))
-                    .toList(),
+                providerIds.stream()
+                    .sorted(Comparator.comparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title))).toList(),
                 getText("Prompter.SelectImdbMatchForSerie", title),
                 provider,
                 ProviderId::getName)

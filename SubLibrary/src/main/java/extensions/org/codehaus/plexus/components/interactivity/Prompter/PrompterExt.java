@@ -26,6 +26,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
 
+// see #692
 //@Extension
 public class PrompterExt {
 

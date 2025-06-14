@@ -84,7 +84,7 @@ public class ReleaseParser {
         parseReleaseType(parserResults);
         String quality = String.join(" ", getQualityKeyWordsAlreadyParsed(parserResults));
 
-        // When quality parts are found, the filename is split into multiple parts. Consider the last part as the
+        // When quality parts are found, the filename is split into multiple parts. Consider the last part the
         // release group
         String releaseGroup = parserResults.parts.size() > 1 ? parserResults.parts.last : "";
         if (StringUtils.isNotBlank(releaseGroup)) {

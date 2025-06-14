@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.NotImplementedException;
@@ -32,7 +31,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({Files.class})
+//@ExtensionMethod({Files.class})
 public class Local implements SubtitleProvider<LocalSubtitle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);

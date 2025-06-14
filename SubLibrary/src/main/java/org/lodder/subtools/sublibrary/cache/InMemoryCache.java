@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public final class InMemoryCache<K, V> extends Cache<K, V> {
 
-    @val(Protected) Time timeToLive;
+    @val(Protected) @Nullable Time timeToLive;
 
     public InMemoryCache(Class<K> keyType, Class<V> valueType, @Nullable Time timeToLive=null,
         @Nullable Time timerInterval=null, @Nullable Integer maxItems=null) {

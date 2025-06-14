@@ -13,9 +13,12 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.SubdlException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
+import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import subdl.Serie;
 import subdl.Serie.ReleaseType;
 
@@ -25,10 +28,12 @@ import subdl.Serie.ReleaseType;
  */
 public class SubdlApi implements SubtitleApi {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
+
     private static final String DOMAIN = "https://dl.subdl.com";
     private static final String API_DOMAIN = "https://api.subdl.com/api/v1";
     private static final String API_KEY = "waSZhdBr08sBm3jXNOU0rJ6UWp4lPQvi";
-    @val Manager manager;
+    @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.SUBDL;
 
     public SubdlApi(Manager manager) {
@@ -51,7 +56,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language) throws SubdlException {
-        Map<SearchParam, Object> params = Map.of(
+        Map<SearchParam, Object> params = MapUtil.create(
             SearchParam.FILM_NAME, title,
             SearchParam.YEAR, year,
             SearchParam.TYPE, ReleaseType.movie);
@@ -68,7 +73,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlException if the API call fails
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String imdbId, Language language) throws SubdlException {
-        Map<SearchParam, Object> params = Map.of(
+        Map<SearchParam, Object> params = MapUtil.create(
             SearchParam.IMDB_ID, imdbId,
             SearchParam.TYPE, ReleaseType.movie);
         return getSubtitles(language, params);
@@ -87,7 +92,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlException if the API call fails
      */
     public List<SubdlSerieId> getProviderIdsUsingImdbId(String imdbId) throws SubdlException {
-        return getSerie(Map.of(SearchParam.IMDB_ID, imdbId))
+        return getSerie(MapUtil.create(SearchParam.IMDB_ID, imdbId))
             .results.stream().map(SubdlSerieId::new).toList();
 
 //        return getCache("providerId", b -> b.add("imdbId", imdbId))
@@ -112,7 +117,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlException if the API call fails
      */
     public List<SubdlSerieId> getProviderIdsUsingSerieName(String serieName) throws SubdlException {
-        return getSerie(Map.of(SearchParam.FILM_NAME, serieName))
+        return getSerie(MapUtil.create(SearchParam.FILM_NAME, serieName))
             .results.stream().map(SubdlSerieId::new).toList();
 
 //        return getCache("providerId", b -> b.add("name", serieName))
@@ -141,7 +146,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode,
         Language language) throws SubdlException {
-        Map<SearchParam, Object> params = Map.of(
+        Map<SearchParam, Object> params = MapUtil.create(
             SearchParam.SUBDL_ID, providerId,
             SearchParam.SEASON, season,
             SearchParam.TYPE, ReleaseType.tv);
@@ -194,7 +199,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlException if the API call fails
      */
     private Serie getSerie(Map<SearchParam, Object> params) throws SubdlException {
-        return getCache("serieSubtitles", b -> b.add(params))
+        Serie serie = getCache("serieSubtitles", b -> b.add(params))
             .get(() -> {
                 try {
                     Requester<Serie> request = Serie.request(API_DOMAIN);
@@ -207,6 +212,10 @@ public class SubdlApi implements SubtitleApi {
                     throw new SubdlException(e);
                 }
             });
+        if (serie.status) {
+            return serie;
+        }
+        throw new SubdlException(String.valueOf(serie.get("error")));
     }
 
     private enum SearchParam {

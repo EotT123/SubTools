@@ -118,7 +118,6 @@ class SubtitleFilteringTest {
         Release release = mock(TvRelease.class);
 
         when(release.fileName).thenReturn(filename);
-        when(release.extension).thenReturn("mkv");
         when(release.releaseGroup).thenReturn(releasegroup);
 
         return release;

@@ -5,13 +5,11 @@ import static manifold.science.util.UnitConstants.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.prefs.Preferences;
 
 import ch.qos.logback.classic.Level;
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -34,7 +32,7 @@ import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({Files.class})
+//@ExtensionMethod({Files.class})
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -157,7 +155,7 @@ public class App {
                 String.class,
                 Serializable.class,
                 500 day,
-                2500);
+                5000);
 
         InMemoryCache<String, String> inMemoryCache =
             new InMemoryCache<>(
@@ -165,7 +163,7 @@ public class App {
                 String.class,
                 10 min,
                 100 ms,
-                500);
+                2500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }

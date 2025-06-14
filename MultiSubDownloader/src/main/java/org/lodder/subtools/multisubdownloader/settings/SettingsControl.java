@@ -4,13 +4,11 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.State;
@@ -18,7 +16,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({Files.class})
+//@ExtensionMethod({Files.class})
 public class SettingsControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);

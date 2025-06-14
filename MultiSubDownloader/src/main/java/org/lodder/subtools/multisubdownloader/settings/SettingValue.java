@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Objects;
+import extensions.java.nio.file.Path.PathExt;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
@@ -393,6 +394,11 @@ public enum SettingValue {
         Settings::setSerieSourceTvSubtitles,
         true)),
 
+    SERIE_SOURCE_SUBDL(createSetting(Mappers.BOOLEAN,
+        Settings::isSerieSourceSubdl,
+        Settings::setSerieSourceSubdl,
+        true)),
+
     SERIE_SOURCE_SUBSCENE(createSetting(Mappers.BOOLEAN,
         Settings::isSerieSourceSubscene,
         Settings::setSerieSourceSubscene,
@@ -432,7 +438,7 @@ public enum SettingValue {
     private interface Mappers {
         Mapper<String> STRING = new Mapper<>(Function.identity(), Function.identity());
         Mapper<Character> CHAR = new Mapper<>(String::valueOf, s -> s.charAt(0));
-        Mapper<Path> PATH = new Mapper<>(Path::toAbsolutePathAsString, Path::of);
+        Mapper<Path> PATH = new Mapper<>(PathExt::toAbsolutePathAsString, Path::of);
         Mapper<Integer> INT = new Mapper<>(Object::toString, Integer::parseInt);
         Mapper<Boolean> BOOLEAN = new Mapper<>(Object::toString, Boolean::valueOf);
         Mapper<PathOrRegex> PATH_OR_REGEX = new Mapper<>(PathOrRegex::getValue, PathOrRegex::new);

@@ -1,19 +1,17 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
 
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+//@ExtensionMethod({ Files.class })
 public class CleanAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanAction.class);

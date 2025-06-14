@@ -265,7 +265,7 @@
                             <invokerPackage>com.tvdb.invoker</invokerPackage>
                             <packageName>com.tvdb</packageName>
                             <skipValidateSpec>true</skipValidateSpec>
-                            <apisToGenerate>Series,Search</apisToGenerate>
+                            <apisToGenerate>Series,Search,Login</apisToGenerate>
                             <!--                            <modelsToGenerate>-->
                             <!--                                AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse-->
                             <!--                            </modelsToGenerate>-->

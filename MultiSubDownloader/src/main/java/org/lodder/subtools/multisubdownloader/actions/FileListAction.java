@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import extensions.java.nio.file.Path.PathExt;
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -18,7 +16,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({ Files.class })
+//@ExtensionMethod({ Files.class })
 public class FileListAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);

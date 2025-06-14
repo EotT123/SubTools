@@ -35,6 +35,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     private final JCheckBox chkSourcePodnapisi;
     private final JCheckBox chkSourceOpenSubtitles;
     private final JCheckBox chkUserOpenSubtitlesLogin;
+    private final JCheckBox chkSourceSubdl;
     private final MyTextFieldString txtOpenSubtitlesUsername;
     private final MyPasswordField txtOpenSubtitlesPassword;
     //    private final JCheckBox chkSourceSubscene;
@@ -92,6 +93,9 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     .addComponent(txtOpenSubtitlesPassword =
                         MyPasswordField.builder().requireValue().build().columns(20)));
 
+            // SUBDL
+            this.chkSourceSubdl = new JCheckBox("SubDL").addTo(titlePanel, "wrap");
+
             // SUBSCENE
 //            this.chkSourceSubscene = new JCheckBox("Subscene").addTo(titlePanel, "wrap");
 
@@ -136,6 +140,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         chkUserOpenSubtitlesLogin.setSelected(settings.loginOpenSubtitlesEnabled);
         txtOpenSubtitlesUsername.setText(settings.loginOpenSubtitlesUsername);
         txtOpenSubtitlesPassword.setText(settings.loginOpenSubtitlesPassword);
+        chkSourceSubdl.setSelected(settings.serieSourceSubdl);
 //        chkSourceSubscene.setSelected(settings.serieSourceSubscene);
         chkSourceLocal.setSelected(settings.serieSourceLocal);
         settings.localSourcesFolders.forEach(path -> localSourcesFoldersList.addItem(PathMatchType.FOLDER.image, path));
@@ -154,6 +159,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
         settings.loginOpenSubtitlesEnabled = chkUserOpenSubtitlesLogin.isSelected();
         settings.loginOpenSubtitlesUsername = txtOpenSubtitlesUsername.getText();
         settings.loginOpenSubtitlesPassword = new String(txtOpenSubtitlesPassword.getPassword());
+        settings.serieSourceSubdl = chkSourceSubdl.isSelected();
         settings.serieSourceSubscene = false; //chkSourceSubscene.isSelected();
         settings.serieSourceLocal = chkSourceLocal.isSelected();
         settings.localSourcesFolders.replaceContents(

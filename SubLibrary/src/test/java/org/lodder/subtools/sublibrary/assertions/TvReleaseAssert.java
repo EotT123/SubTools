@@ -38,7 +38,7 @@ public class TvReleaseAssert extends ReleaseAssert<TvRelease> {
 
     public @Self TvReleaseAssert withoutTitle() {
         isNotNull();
-        assertThat(actual.title).isNull();
+        assertThat(actual.title).isEmpty();
         return this;
     }
 

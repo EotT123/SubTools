@@ -19,6 +19,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleMetadata;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSerieId;
+import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
@@ -31,7 +32,7 @@ import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 public class PodnapisiApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.podnapisi.net";
-    @val Manager manager;
+    @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.PODNAPISI;
     private final String userAgent;
 
@@ -56,7 +57,7 @@ public class PodnapisiApi implements SubtitleApi {
      */
     public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language) throws PodnapisiException {
-        return getSubtitles(title, language, Map.of(SearchParam.YEAR, year));
+        return getSubtitles(title, language, MapUtil.create(SearchParam.YEAR, year));
     }
 
     // ===== \\
@@ -88,7 +89,8 @@ public class PodnapisiApi implements SubtitleApi {
      */
     public List<PodnapisiSubtitleMetadata> getSerieSubtitles(String serieName, int season, int episode,
         Language language) throws PodnapisiException {
-        return getSubtitles(serieName, language, Map.of(SearchParam.SEASON, season, SearchParam.EPISODE, episode));
+        return getSubtitles(serieName, language,
+            MapUtil.create(SearchParam.SEASON, season, SearchParam.EPISODE, episode));
     }
 
 
@@ -127,7 +129,7 @@ public class PodnapisiApi implements SubtitleApi {
                     });
                     urlBuilder.addParam(SearchParam.XML.pattern);
 
-                    return getXml(urlBuilder.build()).selectAllByTag("subtitle")
+                    return getXml(urlBuilder.build()).select("subtitle")
                         .stream()
                         .map(this::parsePodnapisiSubtitle)
                         .filter(metadata -> StringUtils.isNotBlank(metadata.releaseString))
@@ -194,7 +196,7 @@ public class PodnapisiApi implements SubtitleApi {
             subtitleId:elem.selectFirst("id").text(),
             name:elem.selectFirst("title").text(),
             imdb:getText.apply(elem.selectFirst("imdb")),
-            language:Language.ofIso639_1(elem.selectFirst("languageName").text()),
+            language:Language.ofIso639_1(elem.selectFirst("language").text()),
             uploaderName:elem.selectFirst("uploaderName").text(),
             releaseString:elem.selectFirst("release").text().length() > 10 ? elem.selectFirst("release").text() :
                 elem.selectFirst("title").text().replace(":", "") + " " + elem.selectFirst("release").text(),

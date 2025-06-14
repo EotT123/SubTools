@@ -41,7 +41,7 @@ public class Addic7edApi implements SubtitleApi {
     private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (?<info>.+), Duration: \\d+\\.\\d+");
-    @val Manager manager;
+    @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     private final boolean speedy;
     private Time lastRequest = Time.now();
@@ -76,7 +76,7 @@ public class Addic7edApi implements SubtitleApi {
         return getCache("providerId", b -> b.add("title", title))
             .getCollection(() -> {
                 try {
-                    return getContent("$DOMAIN/search.php?Submit=Search&search=" + title.urlEncode()).selectAllByCss(
+                    return getContent("$DOMAIN/search.php?Submit=Search&search=" + title.urlEncode()).select(
                             "form[action='/search.php'] ~ table td a").stream()
                         .map(elem -> {
                             String text = elem.text();

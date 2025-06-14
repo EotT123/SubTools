@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
 import static manifold.science.measures.TimeUnit.*;
+import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
@@ -8,10 +9,15 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import okhttp3.Interceptor.Chain;
+import okhttp3.OkHttpClient;
+import okhttp3.Request.Builder;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +40,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.pa
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -59,52 +66,76 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenSubtitlesApi.class);
 
-    private static final String APIKEY = "3IlyaP0KNv6QmJ1gOBX8IXwzD1P9b8c0";//"lNNp0yv0ah8gytkmYPbHwuaATJqr4rS9";
-    private static final ApiClient API_CLIENT;
-    private static final LazySupplier<SubtitlesApi> SUBTITLES_API =
-        new LazySupplier<>(() -> API_CLIENT.createService(SubtitlesApi.class));
-    private static final LazySupplier<DownloadApi> DOWNLOAD_API =
-        new LazySupplier<>(() -> API_CLIENT.createService(DownloadApi.class));
     private static final String USER_AGENT = "SubTools v1.0";
-    @val Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
+    private static final String CONTENT_TYPE = "application/json";
+    private static final String APIKEY = "YrrY0zddovN1rY55tCWQbMxcNR68wnN3";
 
-    static {
-        API_CLIENT = new ApiClient();
-        API_CLIENT.setApiKey(APIKEY);
-    }
+    @val @override Manager manager;
+    @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
+    @Nullable Credentials credentials;
+
+    private static final Function<Chain, Builder> DEFAULT_BUILDER =
+        chain -> chain.request().newBuilder()
+            .header("Api-Key", APIKEY)
+            .header("Content-Type", CONTENT_TYPE)
+            .header("User-Agent", USER_AGENT);
+
+    private final LazySupplier<ApiClient> apiClient = new LazySupplier<>(() -> {
+//        ApiKeyAuth apiKeyAuth = new ApiKeyAuth("header", "Api-Key");
+//        apiKeyAuth.setApiKey(APIKEY);
+        return new ApiClient(new OkHttpClient.Builder()
+            .addInterceptor(chain -> {
+                Builder builder = DEFAULT_BUILDER.apply(chain);
+                if (credentials != null) {
+                    try {
+                        String bearerToken = getBearerToken(credentials.username, credentials.password);
+                        builder.header("Authorization", "Bearer " + bearerToken);
+                    } catch (OpenSubtitleException e) {
+                        LOGGER.error(e.getMessage(), e.getCause());
+                    }
+                }
+                return chain.proceed(builder.build());
+            })
+            .build());
+    });
+    private final LazySupplier<SubtitlesApi> subtitlesApi =
+        new LazySupplier<>(() -> apiClient.get().createService(SubtitlesApi.class));
+    private final LazySupplier<DownloadApi> downloadApi =
+        new LazySupplier<>(() -> apiClient.get().createService(DownloadApi.class));
 
     public OpenSubtitlesApi(Manager manager, @Nullable Credentials credentials=null) throws OpenSubtitleException {
         this.manager = manager;
-        if (credentials != null) {
-            login(credentials);
-        } else {
-            API_CLIENT.setBearerToken(null);
-        }
-        SUBTITLES_API.reset();
-        DOWNLOAD_API.reset();
-    }
-
-    public void login(Credentials credentials) throws OpenSubtitleException {
-        Login200Response response = login(credentials.username, credentials.password);
-        API_CLIENT.setBearerToken(response.getToken());
+        this.credentials = credentials;
     }
 
     public static boolean isValidCredentials(String userName, String password) {
         try {
-            login(userName, password);
+            getBearerTokenWithoutCache(userName, password);
             return true;
         } catch (OpenSubtitleException e) {
             return false;
         }
     }
 
-    private static Login200Response login(String userName, String password)
+    private String getBearerToken(String username, String password) throws OpenSubtitleException {
+        return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
+            .get(supplier:() -> getBearerTokenWithoutCache(username, password)
+                .orElseThrow(() -> new OpenSubtitleException("Invalid username/password combination")),
+                timeToLive:23.5hr);
+    }
+
+    private static Optional<String> getBearerTokenWithoutCache(String username, String password)
         throws OpenSubtitleException {
-        return apiCall(
-            () -> API_CLIENT.createService(AuthenticationApi.class).login("application/json",
-                USER_AGENT, new LoginRequest().username(userName).password(password)))
-            .execute();
+        try {
+            return Optional.ofNullable(
+                new ApiClient(new OkHttpClient.Builder()
+                    .addInterceptor(chain -> chain.proceed(DEFAULT_BUILDER.apply(chain).build()))
+                    .build()).createService(AuthenticationApi.class)
+                    .login(CONTENT_TYPE, USER_AGENT, new LoginRequest().username(username).password(password))
+                    .execute().body()).map(Login200Response::getToken);
+        } catch (IOException e) {
+            throw new OpenSubtitleException("Could not acquire a bearer token", e);
+        }
     }
 
     // ===== \\
@@ -198,7 +229,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .add("year", year)).getCollection(() -> {
             Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) : null;
             return apiCall(
-                () -> SUBTITLES_API.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
+                () -> subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
                     language != null ? language.iso639_1 : null, movieHash, userId, getValue(hearingImpaired),
                     getValue(foreignPartsOnly), getValue(trustedSources), getValue(machineTranslated),
                     getValue(aiTranslated), orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
@@ -226,19 +257,18 @@ public class OpenSubtitlesApi implements SubtitleApi {
     public String getDownloadUrl(int fileId) throws OpenSubtitleException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
             .get(() ->
-                apiCall(() -> DOWNLOAD_API.get().download(USER_AGENT,
+                apiCall(() -> downloadApi.get().download(USER_AGENT,
                     new DownloadRequest().fileId(fileId)))
                     .addErrorHandler(createQuotaErrorHandler())
                     .addErrorHandler(UNAUTHORIZED, retry:false)
                     .addErrorHandler(FORBIDDEN, retry:false)
                     .addErrorHandler(NOT_ACCEPTABLE, retry:false)
-                    .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second)
-                    .execute().link
+                    .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second).execute().getLink()
             );
     }
 
-    private static <T> ExecuteCall<T, OpenSubtitleResponseException> apiCall(ThrowingSupplier<Call<T>,
-        IOException> supplier) {
+    private static <T> ExecuteCall<T, OpenSubtitleResponseException> apiCall(
+        ThrowingSupplier<Call<T>, OpenSubtitleResponseException> supplier) {
         return RetrofitService.handleExecution(supplier, OpenSubtitleResponseException::new);
     }
 
@@ -256,7 +286,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     return new OpenSubtitleResponseException(code, new JSONObject(errorBody).getString("message"),
                         true);
                 } catch (JSONException e) {
-                    return new OpenSubtitleResponseException(code, "Quota exceeded. Please try again later.", true);
+                    return new OpenSubtitleResponseException(code, "Quota exceeded. Please " + "try again later.",
+                        true);
                 }
             });
     }

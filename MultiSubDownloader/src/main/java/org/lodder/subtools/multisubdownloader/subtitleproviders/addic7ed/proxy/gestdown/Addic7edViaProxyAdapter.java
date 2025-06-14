@@ -22,7 +22,6 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpStatus;
-import org.lodder.subtools.sublibrary.util.http.RetrofitService.ExecuteCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,24 +69,8 @@ public final class Addic7edViaProxyAdapter extends
     public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
         @Nullable Integer season) throws Addic7edException {
         List<ShowDto> serieIds = providerIds.getTvdbId()
-            .mapToObjEx(tvdbId ->
-                new ExecuteCall<>(provider, () -> api.getProviderSerieIds(tvdbId))
-                    .message("getProviderSerieName: [$tvdbId]")
-                    .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                    .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                        LOGGER.info("API $name - Could not find tvdbId [%s]".formatted(tvdbId));
-                        return List.of();
-                    })
-                    .execute())
-            .orElseGetEx(() ->
-                new ExecuteCall<>(() -> api.getProviderSerieIds(serieName))
-                    .message("getProviderSerieName: [$serieName]")
-                    .retryWhenHttpCode(ReturnCode.RATE_LIMIT_REACHED)
-                    .handleHttpCode(ReturnCode.NOT_FOUND, () -> {
-                        LOGGER.info("API $provider - Could not find serie name [$serieName]");
-                        return List.of();
-                    })
-                    .execute());
+            .mapToObjEx(api::getProviderSerieIds)
+            .orElseGetEx(() -> api.getProviderSerieIds(serieName));
         return serieIds.stream()
             .sorted(Comparator.comparing(n -> !StringUtils.equalsAnyIgnoreCase(serieName.keepLettersOnly(),
                 n.name.keepLettersOnly())))

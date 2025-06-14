@@ -138,7 +138,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
             .stream()
-            .filter(subtitleProvider -> subtitleProvider.name.equals(mappingType.providerName))
+            .filter(subtitleProvider -> subtitleProvider.source.name().equals(mappingType.providerName))
             .findAny();
         btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
         mappingTableModel.mappingType = mappingType;
@@ -147,22 +147,23 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     public enum MappingType {
         TVDB("TVDB", "TVDB",
-            new SelectionForKeyPrefix("", "TVDB-serieId-", k -> k.replace("-serieId-", "-tvdbSerie-"))),
-        ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, new SelectionForKeyPrefix("", "ADDIC7ED-serieName-name:"),
-            new SelectionForKeyPrefix("", "ADDIC7ED-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "tvdb-serieid-", k -> k.replace("-serieid-", "-tvdbserie-"))),
+        ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, new SelectionForKeyPrefix("", "addic7ed-releasemapping-name:"),
+            new SelectionForKeyPrefix("", "addic7ed-releasemapping-tvdbid:")),
         ADDIC7ED_PROXY("Addic7ed (Proxy)", SubtitleSource.ADDIC7ED.name() + "-GESTDOWN",
-            new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-name:"),
-            new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-tvdbId:")),
-        SUBSCENE("Subscene", SubtitleSource.SUBSCENE, new SelectionForKeyPrefix("", "SUBSCENE-serieName-name:"),
-            new SelectionForKeyPrefix("", "SUBSCENE-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "addic7ed-releasemapping-name:"),
+            new SelectionForKeyPrefix("", "addic7ed-releasemapping-tvdbid:")),
+        SUBSCENE("Subscene", SubtitleSource.SUBSCENE, new SelectionForKeyPrefix("", "subscene-releasemapping-name:"),
+            new SelectionForKeyPrefix("", "subscene-releasemapping-tvdbid:")),
         TV_SUBTITLES("TVSubtitles", SubtitleSource.TVSUBTITLES,
-            new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-name:"),
-            new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-tvdbId:")),
+            new SelectionForKeyPrefix("", "tvsubtitles-releasemapping-name:"),
+            new SelectionForKeyPrefix("", "tvsubtitles-releasemapping-tvdbid:")),
         OPEN_SUBTITLES("OpenSubtitles", SubtitleSource.OPENSUBTITLES,
-            new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-name:"),
-            new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-tvdbId:")),
-        PODNAPISI("Podnapisi", SubtitleSource.PODNAPISI, new SelectionForKeyPrefix("", "PODNAPISI-serieName-name:"),
-            new SelectionForKeyPrefix("", "PODNAPISI-serieName-tvdbId:"));
+            new SelectionForKeyPrefix("", "opensubtitles-releasemapping-name:"),
+            new SelectionForKeyPrefix("", "opensubtitles-releasemapping-tvdbid:")),
+        PODNAPISI("Podnapisi", SubtitleSource.PODNAPISI,
+            new SelectionForKeyPrefix("", "podnapisi-releasemapping-name:"),
+            new SelectionForKeyPrefix("", "podnapisi-releasemapping-tvdbid:"));
 
         public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<String, SerieMapping>>>
             MAPPING_SUPPLIER;

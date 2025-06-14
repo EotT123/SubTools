@@ -25,17 +25,17 @@ public class RegexUtils {
     }
 
     @NullMarked
-    interface RegexStart extends RegexTag {
+    public interface RegexStart extends RegexTag {
         RegexTag startOfText();
     }
 
     @NullMarked
-    interface RegexTag extends RegexRegex {
+    public interface RegexTag extends RegexRegex {
         RegexRegex tag(Tag tag);
     }
 
     @NullMarked
-    interface RegexRegex {
+    public interface RegexRegex {
         RegexNext regex(String regex);
 
         RegexNext regexOptional(String regex);
@@ -44,16 +44,16 @@ public class RegexUtils {
     }
 
     @NullMarked
-    interface RegexNext extends RegexTag, RegexEnd {
+    public interface RegexNext extends RegexTag, RegexEnd {
     }
 
     @NullMarked
-    interface RegexEnd extends RegexBuilderBuild {
+    public interface RegexEnd extends RegexBuilderBuild {
         RegexBuilderBuild endOfText();
     }
 
     @NullMarked
-    interface RegexBuilderBuild {
+    public interface RegexBuilderBuild {
         String create();
 
         List<String> createWithDelimiter();

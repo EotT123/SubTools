@@ -208,7 +208,7 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
         }
     }
 
-    public void putWithoutPersist(K key, V value) {
+    public void putWithoutPersist(K key, @Nullable V value) {
         super.put(key, value);
     }
 }

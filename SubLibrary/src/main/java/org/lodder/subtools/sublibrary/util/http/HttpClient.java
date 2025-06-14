@@ -37,6 +37,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
+            conn.setInstanceFollowRedirects(true);
             getCookieManager(cookieManager).setCookies(conn);
             if (StringUtils.isNotBlank(userAgent)) {
                 conn.setRequestProperty(HttpHeaders.USER_AGENT, userAgent);

@@ -15,6 +15,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSerializableCacheObject {
@@ -25,7 +26,7 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
 
     @override @val Time created;
     @var @set(Private) Time lastAccessed = Time.now();
-    @override @var T value;
+    @override @var @Nullable T value;
 
     public ExpiringCacheObject(Time created, Time lastAccessed, T value) {
         this.created = created;
@@ -33,7 +34,7 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
         this.value = value;
     }
 
-    protected ExpiringCacheObject(T value) {
+    protected ExpiringCacheObject(@Nullable T value) {
         this.created = Time.now();
         this.value = value;
     }
@@ -49,7 +50,7 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
     }
 
     @Override
-    public String toString(Function<T, String> valueToStringMapper) {
+    public String toString(Function<@Nullable T, String> valueToStringMapper) {
         return "created:$created|lastAccessed:$lastAccessed|value:${valueToStringMapper.apply(value)}";
     }
 

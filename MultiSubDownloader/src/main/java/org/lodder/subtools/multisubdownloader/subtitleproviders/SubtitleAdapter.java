@@ -5,7 +5,6 @@ import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +16,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingBiFunction;
@@ -25,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
+import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @param <S_ID> type of the serie provider id
  * @param <X> type of the exception thrown by the api
  */
-@ExtensionMethod({Files.class})
+//@ExtensionMethod({Files.class})
 public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception>
     implements SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
@@ -266,7 +265,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
         return getProviderReleaseMapping(name,
             nameToSearchFor, displayName,
-            Map.of("season", season),
+            MapUtil.create("season", season),
             providerIds,
             providerReleaseIdsFunction,
             releaseMappingConstructor,
@@ -360,7 +359,12 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         if (StringUtils.equals(nameToSearchFor, name) && releaseNameCache.isPresent()) {
             if (releaseNameCache.isTemporaryObject()) {
                 if (!releaseNameCache.isExpiredTemporary()) {
-                    return releaseNameCache.getOptional();
+                    Optional<M> releaseMapping = releaseNameCache.getOptional();
+                    if (releaseMapping.isPresent() && releaseMapping.get().providerId == null) {
+                        return Optional.empty();
+                    } else {
+                        return releaseMapping;
+                    }
                 }
             } else {
                 Optional<M> releaseMapping = releaseNameCache.getOptional();
@@ -379,11 +383,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             // If no release provider ids are found, store a temporary null value in the cache with a 1-day expiration,
             // to avoid repeatedly querying the provider on each method call.
             // If a previously cached null value has expired, store it again with double the previous expiration time.
-            releaseNameCache.store(
-                value:Value.of(releaseMappingConstructor.apply(name, null, null)),
-                timeToLive:releaseNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
-                storeAsTempValue:true,
-                storeTempNullValue:true);
+//            releaseNameCache.storeTempValue(Value.of((M) null));
+            releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
             return Optional.empty();
         }
 
@@ -420,8 +421,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     // If a temporary null value already exists, update it with double the previous expiration time.
                     releaseNameCache.store(
                         value:Value.of(releaseMappingConstructor.apply(nameToSearchFor, null, null)),
-                        timeToLive:releaseNameCache.getTemporaryTimeToLive().map(v -> v * 2).orElse(1 day),
-                        storeAsTempValue:true,
+                        timeToLive:1 day,
                         storeTempNullValue:true);
                     previousResultsCache.store(Value.ofCollection(providerReleaseIds));
                 }

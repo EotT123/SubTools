@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +12,7 @@ import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.gestdown.api.SubtitlesApi;
 import org.gestdown.api.TvShowsApi;
+import org.gestdown.invoker.ApiClient;
 import org.gestdown.model.EpisodeDto;
 import org.gestdown.model.ShowDto;
 import org.gestdown.model.SubtitleDto;
@@ -29,7 +29,6 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraIn
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 import org.lodder.subtools.sublibrary.util.http.RetrofitService;
-import org.opensubtitles.invoker.ApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -47,7 +46,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://api.gestdown.info";
 
-    @val Manager manager;
+    @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
     private static final TvShowsApi TV_SHOWS_API;
     private static final SubtitlesApi SUBTITLES_API;
@@ -111,7 +110,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
                     .execute();
                 List<SubtitleDto> subtitles = response.getMatchingSubtitles();
                 return subtitles == null ? List.of() :
-                    subtitles.stream().map(subtitleDto -> mapToSubtitle(subtitleDto, response.getEpisode(), language))
+                    subtitles.stream().map(subtitleDto -> mapToSubtitle(subtitleDto, response.episode, language))
                         .toList();
             });
     }
@@ -133,8 +132,8 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             hearingImpaired:false);
     }
 
-    private static <T> ExecuteCall<T, Addic7edResponseException> apiCall(ThrowingSupplier<Call<T>,
-        IOException> supplier) {
+    private static <T> ExecuteCall<T, Addic7edResponseException> apiCall(
+        ThrowingSupplier<Call<T>, Addic7edResponseException> supplier) {
         return RetrofitService.handleExecution(supplier, Addic7edResponseException::new);
     }
 }

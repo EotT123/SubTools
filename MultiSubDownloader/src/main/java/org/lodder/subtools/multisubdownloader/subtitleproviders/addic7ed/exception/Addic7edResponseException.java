@@ -7,8 +7,8 @@ public class Addic7edResponseException extends Addic7edException {
 
     @val HttpStatus errorCode;
 
-    public Addic7edResponseException(HttpStatus errorCode, String message=errorCode.description) {
-        super("Addic7ed: " + message);
+    public Addic7edResponseException(HttpStatus errorCode) {
+        super("Addic7ed: " + errorCode.description);
         this.errorCode = errorCode;
     }
 }

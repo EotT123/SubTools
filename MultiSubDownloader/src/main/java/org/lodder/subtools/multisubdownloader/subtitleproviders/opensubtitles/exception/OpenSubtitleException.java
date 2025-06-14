@@ -20,6 +20,14 @@ public class OpenSubtitleException extends SubtitlesProviderException {
         super(message);
     }
 
+    public OpenSubtitleException(Throwable e) {
+        super(e);
+    }
+
+    public OpenSubtitleException(String message, Throwable e) {
+        super(message, e);
+    }
+
 //    public OpenSubtitleException(int errorCode, String message=null, boolean skipProvider=true) {
 //        super(message);
 //        this.errorCode = errorCode;

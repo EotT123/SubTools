@@ -12,6 +12,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 sealed class TemporaryCacheObject<T> implements CacheObject<T> permits TemporarySerializableCacheObject {
@@ -21,13 +22,13 @@ sealed class TemporaryCacheObject<T> implements CacheObject<T> permits Temporary
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
     @override @val Time created;
     @val Time timeToLive;
-    @override @val T value;
+    @override @val @Nullable T value;
 
-    protected TemporaryCacheObject(Time timeToLive, T value) {
+    protected TemporaryCacheObject(Time timeToLive, @Nullable T value) {
         this(Time.now(), timeToLive, value);
     }
 
-    private TemporaryCacheObject(Time created, Time timeToLive, T value) {
+    private TemporaryCacheObject(Time created, Time timeToLive, @Nullable T value) {
         this.created = created;
         this.timeToLive = timeToLive;
         this.value = value;
@@ -49,12 +50,12 @@ sealed class TemporaryCacheObject<T> implements CacheObject<T> permits Temporary
     }
 
     @Override
-    public String toString(Function<T, String> valueToStringMapper) {
+    public String toString(Function<@Nullable T, String> valueToStringMapper) {
         return "created:%s|expire:%s|value:%s".formatted(created, timeToLive, valueToStringMapper.apply(value));
     }
 
     public static <T> Optional<TemporaryCacheObject<T>> fromString(String string,
-            Function<String, T> valueToObjectMapper) {
+        Function<@Nullable String, T> valueToObjectMapper) {
         Matcher matcher = PATTERN.matcher(string);
         if (matcher.matches()) {
             Time created = Time.create(Long.parseLong(matcher.group(1)), ms);

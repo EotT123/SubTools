@@ -32,7 +32,7 @@ import org.lodder.subtools.sublibrary.util.http.CookieManager;
 public class TvSubtitlesApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
-    @val Manager manager;
+    @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.TVSUBTITLES;
 
     public TvSubtitlesApi(Manager manager) {
@@ -86,7 +86,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                             cookieManager:cookieManager))
                         .select("#table5 tr[bgcolor]")
                         .stream()
-                        .filter(episodeRow -> StringUtils.isNotBlank(episodeRow.selectFirstByTag("td").text()))
+                        .filter(episodeRow -> StringUtils.isNotBlank(episodeRow.selectFirst("td").text()))
                         .map(episodeRow -> {
                             Elements tds = episodeRow.select("td");
                             String[] seasonEpisode = tds.get(0).text().split("x");

@@ -8,8 +8,13 @@ public class OpenSubtitleResponseException extends OpenSubtitleException {
     @val HttpStatus errorCode;
     @val boolean stopContactingClient;
 
-    public OpenSubtitleResponseException(HttpStatus errorCode, String message=errorCode.description,
-        boolean stopContactingClient=false) {
+
+    public OpenSubtitleResponseException(HttpStatus errorCode) {
+        this(errorCode, errorCode.description, false);
+    }
+
+    public OpenSubtitleResponseException(HttpStatus errorCode, String message,
+        boolean stopContactingClient) {
         super("OpenSubtitle: " + message);
         this.errorCode = errorCode;
         this.stopContactingClient = stopContactingClient;

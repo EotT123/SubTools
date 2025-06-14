@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
-import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.sublibrary.Manager.*;
 
@@ -11,14 +10,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import com.tvdb.model.GetSeriesSeasonEpisodesTranslated200ResponseData;
 import com.tvdb.model.SearchResult;
+import com.tvdb.model.SeriesBaseRecord;
 import com.uwetrottmann.thetvdb.entities.Series;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
+import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbException;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -68,11 +68,8 @@ public class TvdbAdapter implements AdapterIntf {
         } else if (!userInteractionHandler.settings.optionsConfirmProviderMapping && serieIds.size() == 1) {
             tvdbSerie = Optional.of(serieIds.first);
         } else {
-            String formattedSerieName = serieName.replaceAll("[^A-Za-z]", "");
-            Comparator<SearchResult> comparator = Comparator
-                .comparing((SearchResult s) -> formattedSerieName.equalsIgnoreCase(s.name.keepLettersOnly()),
-                    Comparator.reverseOrder())
-                .thenComparing(s -> s.name, Comparator.reverseOrder());
+            Comparator<SearchResult> comparator =
+                Comparator.comparing((SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, s.name));
             try {
                 tvdbSerie = userInteractionHandler.selectFromList(
                     serieIds.stream().sorted(comparator).toList(),
@@ -89,11 +86,7 @@ public class TvdbAdapter implements AdapterIntf {
             }
         }
         if (tvdbSerie.isEmpty()) {
-            cache.store(
-                value:Value.ofOptional(tvdbSerie),
-                timeToLive:cache.getTemporaryTimeToLive().map(v -> v * 2).orElseGet(() -> 1 day),
-                storeAsTempValue:true,
-                storeTempNullValue:true);
+            cache.storeTempValue(Value.ofOptional(tvdbSerie));
         } else {
             cache.store(Value.ofOptional(tvdbSerie));
             Optional<SerieMapping> serieMapping =
@@ -106,8 +99,7 @@ public class TvdbAdapter implements AdapterIntf {
         return tvdbSerie;
     }
 
-    public Optional<GetSeriesSeasonEpisodesTranslated200ResponseData> searchEpisode(int tvdbId, int season,
-        int episode) {
+    public Optional<SeriesBaseRecord> searchEpisode(int tvdbId, int season, int episode) {
         return getCache("episode", b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode))
             .getOptional(
                 () -> {

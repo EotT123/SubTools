@@ -18,37 +18,37 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
+import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
 import util.Utils;
 
 record ImdbSearchIdApi(Manager manager) {
 
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
-    public Set<ProviderId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ImdbId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-imdb").add("title", title).add("year", year))
             .getCollection(() -> {
-                StringBuilder sb = new StringBuilder("https://www.imdb.com/find?q=");
+                StringBuilder sb = new StringBuilder("https://www.imdb.com/find/?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {
                     sb.append("+%28").append(year).append("%29");
                 }
-                String url = sb.toString();
+                String url = sb.toString().replace("+", "%20");
                 try {
-                    Elements searchResults =
-                        manager.getAsJsoupDocument(url(url)).select("#main .findList .findResult .result_text");
+                    Elements searchResults = manager.getAsJsoupDocument(url(url)).select(".find-result-item");
                     return getImdbIdCommon(searchResults,
-                        e -> e.selectFirstByTag("a").text() + " " + e.text(),
-                        e -> e.selectFirst("a").attr("href"));
+                        e -> e.selectFirst("a").text(),
+                        e -> e.selectFirst("a").attr("href"),
+                        e -> e.selectFirst("span").text());
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
                 }
             });
     }
 
-    public Set<ProviderId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ImdbId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-yahoo").add("title", title).add("year", year))
             .getCollection(() -> {
@@ -77,7 +77,7 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ProviderId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ImdbId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
             .getCollection(() -> {
@@ -92,7 +92,7 @@ record ImdbSearchIdApi(Manager manager) {
                     Elements searchResults =
                         manager.getAsJsoupDocument(url(url)).select("a[href*='https://www.imdb.com/title/tt']");
                     Function<Element, String> toStringMapper =
-                        e -> e.selectFirstByTag("span").text().replace(" - IMDb", "");
+                        e -> e.selectFirst("span").text().replace(" - IMDb", "");
                     Function<Element, String> toHrefMapper = e -> e.attr("href");
                     return getImdbIdCommon(searchResults, toStringMapper, toHrefMapper);
                 } catch (Exception e) {
@@ -101,8 +101,8 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    private Set<ProviderId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,
-        Function<Element, String> toHrefMapper) {
+    private Set<ImdbId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,
+        Function<Element, String> toHrefMapper, Function<Element, String> toYearMapper=e -> null) {
         return searchResults.stream().collect(Utils.setCollector(
             (set, element) -> {
                 String name = toStringMapper.apply(element);
@@ -112,7 +112,7 @@ record ImdbSearchIdApi(Manager manager) {
                 String href = toHrefMapper.apply(element);
                 Matcher matcher = IMDB_URL_ID_PATTERN.matcher(href);
                 if (matcher.find()) {
-                    set.add(new ProviderId(name, matcher.group().replace("/title/tt", "tt")));
+                    set.add(new ImdbId(name, matcher.group().replace("/title/tt", "tt"), toYearMapper.apply(element)));
                 }
             }));
     }

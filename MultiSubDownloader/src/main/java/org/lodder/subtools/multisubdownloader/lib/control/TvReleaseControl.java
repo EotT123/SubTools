@@ -37,8 +37,8 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
             .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
         release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
             .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
-        release.providerIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
-            .ifPresent(serie -> release.providerIds.add(ProviderIdType.IMDB, serie.imdbId)));
+//        release.providerIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
+//            .ifPresent(serie -> release.providerIds.add(ProviderIdType.IMDB, serie.imdbId)));
         if (release.providerIds.getImdbId().isEmpty()) {
             throw new IllegalStateException("Unable to find IMDB id for movie: " + release.name);
         }
@@ -46,7 +46,8 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
 
     private void setTvdbId(TvRelease release) {
         release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
-            .ifPresent(serie -> release.providerIds.add(ProviderIdType.TVDB, serie.id)));
+            .map(serie -> serie.tvdbId)
+            .ifPresent(tvdbId -> release.providerIds.add(ProviderIdType.TVDB, Integer.parseInt(tvdbId))));
         // TODO enable this, also use imdbId if present
 //        release.providerIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
 //            .ifPresent(imdbDetails -> release.providerIds.add(ProviderIdType.TVDB, imdbDetails.tvdbId)));
@@ -56,9 +57,9 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
     }
 
     private void processTvdbInfo(TvRelease release) {
-        release.providerIds.getTvdbId().ifPresent(
-            tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode)
-                .ifPresent(episode -> release.title = episode.episodeName));
+        release.providerIds.getTvdbId()
+            .flatMap(tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode))
+            .ifPresent(episode -> release.title = episode.name);
     }
 
     private void processImdbInfo(TvRelease release) {

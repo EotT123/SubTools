@@ -48,7 +48,7 @@ public class SubsceneApi implements SubtitleApi {
         default -> false;
     };
 
-    @val Manager manager;
+    @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.SUBSCENE;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
@@ -114,7 +114,7 @@ public class SubsceneApi implements SubtitleApi {
                     return getJsoupDocument(DOMAIN + providerId)
                         .select("td.a1")
                         .stream()
-                        .map(Element::parentElement)
+                        .map((Element e) -> e.parentElement())
                         .map(row -> {
                             Language lang = Language.ofName(row.select(".a1 span.l").text().trim(), Language.ENGLISH);
                             String name = row.select(".a1 span:not(.l)").text().trim();
@@ -156,10 +156,10 @@ public class SubsceneApi implements SubtitleApi {
                 return Map.of();
             }
             String url = "$DOMAIN/subtitles/searchbytitle?query=" + name.urlEncode();
-            return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
+            return getJsoupDocument(url).selectFirstByClass("search-result").select("h2")
                 .stream()
                 .collect(Utils.mapCollector((map, titleElement) -> map.put(SearchResultType.of(titleElement.text()),
-                    titleElement.nextElementSibling().selectAllByTag("a").stream().map(subsceneIdCreator).toList())));
+                    titleElement.nextElementSibling().select("a").stream().map(subsceneIdCreator).toList())));
         } catch (Exception e) {
             throw new SubsceneException(e);
         }

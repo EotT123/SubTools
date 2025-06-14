@@ -14,7 +14,7 @@ import org.lodder.subtools.sublibrary.Language;
 public class Messages {
     private static final String BUNDLE_NAME = "resourcebundle.Message";
     private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.ROOT);
-    static @var Language language;
+    static @var Language language = Language.ENGLISH;
 
     private Messages() {
     }
@@ -22,7 +22,7 @@ public class Messages {
     public static String getText(String key, @Nullable Object... replacements) {
         try {
             String text = resourceBundle.getString(key);
-            return replacements == null || replacements.isEmpty() ? text : text.formatted(replacements);
+            return replacements.isEmpty() ? text : text.formatted(replacements);
         } catch (MissingResourceException e) {
             return "!$key!";
         }
@@ -31,7 +31,7 @@ public class Messages {
     public static String getText(String key, Language language, @Nullable Object... replacements) {
         try {
             String text = getMessageBundle(language).getString(key);
-            return replacements == null || replacements.isEmpty() ? text : text.formatted(replacements);
+            return replacements.isEmpty() ? text : text.formatted(replacements);
         } catch (MissingResourceException e) {
             return "!$key!";
         }

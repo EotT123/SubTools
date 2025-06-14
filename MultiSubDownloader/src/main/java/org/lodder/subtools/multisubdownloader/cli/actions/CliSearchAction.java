@@ -2,12 +2,10 @@ package org.lodder.subtools.multisubdownloader.cli.actions;
 
 import static manifold.ext.props.rt.api.PropOption.*;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
 import org.lodder.subtools.multisubdownloader.CLI;
@@ -29,7 +27,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({Files.class})
+//@ExtensionMethod({Files.class})
 public class CliSearchAction extends SearchAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);

@@ -8,7 +8,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serial;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Streams;
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.Nullable;
@@ -124,7 +122,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
-    @ExtensionMethod({ Files.class })
+    //    @ExtensionMethod({ Files.class })
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;

@@ -26,7 +26,7 @@ public abstract sealed class Cache<K, V> permits DiskCache, InMemoryCache {
         this.cacheMap = maxItems != null ? new LRUMap<>(maxItems) : new HashMap<>();
     }
 
-    public void put(K key, V value, @Nullable Time timeToLive=null) {
+    public void put(K key, @Nullable V value, @Nullable Time timeToLive=null) {
         if (timeToLive == null) {
             put(key, new ExpiringCacheObject<>(value));
         } else {

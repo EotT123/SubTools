@@ -6,6 +6,7 @@ import static org.lodder.subtools.sublibrary.assertions.SubLibraryAssertions.*;
 import static org.lodder.subtools.sublibrary.assertions.SubLibraryAssertions.assertThat;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -235,11 +236,11 @@ class ReleaseParserTest {
     }
 
     @Test
-    void testReleaseParseExceptionMessage() {
+    void testReleaseParseExceptionMessage() throws ReleaseParseException {
         Path file = Path.of("exceptiontesting.mkv");
 
-        assertThatExceptionOfType(ReleaseParseException.class).isThrownBy(() -> ReleaseParser.parse(file))
-            .withMessage("Unknown format, can't be parsed: " + file.toAbsolutePath());
+        Optional<Release> release = ReleaseParser.parse(file);
+        assertThat(release).isEmpty();
     }
 
     @Nested

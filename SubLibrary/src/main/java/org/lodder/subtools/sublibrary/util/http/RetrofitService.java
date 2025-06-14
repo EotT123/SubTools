@@ -44,21 +44,20 @@ public class RetrofitService {
         }
     }
 
-    public static <T, X extends Exception> ExecuteCall<T, X> handleExecution(
-        ThrowingSupplier<Call<T>, IOException> supplier, Function<HttpStatus, ? extends X> defaultExceptionCreator) {
+    public static <T, X extends Exception> ExecuteCall<T, X> handleExecution(ThrowingSupplier<Call<T>, X> supplier,
+        Function<HttpStatus, X> defaultExceptionCreator) {
         return new ExecuteCall<>(supplier, defaultExceptionCreator);
     }
 
     @NullMarked
     public static class ExecuteCall<T, X extends Exception> {
 
-        private final ThrowingSupplier<Call<T>, IOException> supplier;
-        private final Function<HttpStatus, ? extends X> defaultExceptionCreator;
+        private final ThrowingSupplier<Call<T>, X> supplier;
+        private final Function<HttpStatus, X> defaultExceptionCreator;
         private int retries = 1;
         private final List<ErrorHandler<X>> errorHandlers = new ArrayList<>();
 
-        public ExecuteCall(ThrowingSupplier<Call<T>, IOException> supplier,
-            Function<HttpStatus, ? extends X> defaultExceptionCreator) {
+        public ExecuteCall(ThrowingSupplier<Call<T>, X> supplier, Function<HttpStatus, X> defaultExceptionCreator) {
             this.supplier = supplier;
             this.defaultExceptionCreator = defaultExceptionCreator;
         }

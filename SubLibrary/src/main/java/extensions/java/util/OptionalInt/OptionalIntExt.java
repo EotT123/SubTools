@@ -90,6 +90,12 @@ public class OptionalIntExt {
         return optionalInt.isPresent() ? optionalInt : intSupplier.get();
     }
 
+
+    public static <R, X extends Exception> Optional<R> flatMap(@This OptionalInt optionalInt,
+        IntFunction<Optional<R>> mapper) throws X {
+        return optionalInt.isPresent() ? mapper.apply(optionalInt.getAsInt()) : Optional.empty();
+    }
+
     /**
      * Executes the given {@link Runnable} if the {@code OptionalInt} is empty.
      *

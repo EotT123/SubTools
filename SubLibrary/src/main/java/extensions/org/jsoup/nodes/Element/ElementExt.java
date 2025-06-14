@@ -224,10 +224,10 @@ public class ElementExt {
     // Element methods \\
     // --------------- \\
 
-//    @Intercept
-//    public static String text(@This @Nullable Element element) {
-//        return element == null ? "" : element.text();
-//    }
+    @Intercept
+    public static String text(@This @Nullable Element element) {
+        return element == null ? "" : element.text();
+    }
 
     public static @Nullable Element parentElement(@This @Nullable Element element) {
         return element == null ? null : (Element) ((Node) element).parent();

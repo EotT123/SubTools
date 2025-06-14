@@ -18,4 +18,8 @@ public abstract class SubtitlesProviderException extends Exception {
     protected SubtitlesProviderException(Throwable cause) {
         super(cause);
     }
+
+    protected SubtitlesProviderException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

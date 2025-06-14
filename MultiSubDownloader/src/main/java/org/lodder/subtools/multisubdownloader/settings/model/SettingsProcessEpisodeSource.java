@@ -1,6 +1,6 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
-@Deprecated(forRemoval = true)
+@Deprecated//(forRemoval = true)
 public enum SettingsProcessEpisodeSource {
     TVDB
 }

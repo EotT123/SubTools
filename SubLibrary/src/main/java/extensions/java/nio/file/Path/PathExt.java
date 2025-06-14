@@ -16,6 +16,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.ExtensionSource;
+import manifold.ext.rt.api.MethodSignature;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
@@ -24,7 +26,7 @@ import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
 import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
 
 @Extension
-//@ExtensionSource(source = Files.class)
+@ExtensionSource(source = Files.class, methods = {@MethodSignature(name = "size", paramTypes = {Path.class})})
 public class PathExt {
 
     private PathExt() {
