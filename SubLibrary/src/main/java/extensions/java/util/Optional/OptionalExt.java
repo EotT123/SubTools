@@ -49,6 +49,21 @@ public class OptionalExt {
     }
 
     /**
+     * Applies the given {@link ThrowingFunction} to the value if present.
+     *
+     * @param optional the input {@code Optional} for the extension method
+     * @param function the function to apply
+     * @param <T> the type of the input value
+     * @param <X> the type of exception the function may throw
+     * @return an {@code Optional} describing the result of the function, or empty if not present
+     * @throws X if the function throws an exception
+     */
+    public static <T, R, X extends Exception> Optional<R> flatMapEx(@This Optional<T> optional,
+        ThrowingFunction<? super T, ? extends Optional<R>, X> function) throws X {
+        return optional.isPresent() ? function.apply(optional.get()) : Optional.empty();
+    }
+
+    /**
      * Returns the current optional if a value is present, otherwise returns the result of the supplier.
      *
      * @param optional the input {@code Optional}

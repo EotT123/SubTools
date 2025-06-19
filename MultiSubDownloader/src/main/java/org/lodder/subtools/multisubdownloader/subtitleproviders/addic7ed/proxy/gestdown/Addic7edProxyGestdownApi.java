@@ -4,6 +4,7 @@ import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import extensions.java.lang.String.StringExt;
@@ -86,18 +87,19 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             );
     }
 
-    public List<ShowDto> getProviderSerieIds(int tvdbId) throws Addic7edApiException {
+    public Optional<ShowDto> getProviderSerieIds(int tvdbId) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
-            .getCollection(() -> {
+            .getOptional(() -> {
                 List<ShowDto> shows =
                     apiCall(() -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId)).execute().getShows();
 //                    .addErrorHandler(ERR_NOT_FOUND)
 //                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
 //                    .execute().getShows();
                 if (shows == null) {
-                    throw Addic7edApiException.noResult("Serie with tvdb id [$tvdbId] not found");
+//                    throw Addic7edApiException.noResult("Serie with tvdb id [$tvdbId] not found");
+                    return Optional.empty();
                 }
-                return shows;
+                return shows.stream().findFirst();
             });
     }
 

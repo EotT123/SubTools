@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import manifold.ext.props.rt.api.override;
@@ -65,17 +66,25 @@ public final class Addic7edProxyGestdownAdapter extends
     // SERIE \\
     // ===== \\
 
+
     @Override
-    public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
+    public Optional<Addic7edProxyGestdownSerieId> getSerieProviderIdById(ProviderIds providerIds)
+        throws Addic7edException {
+        return providerIds.getTvdbId().flatMapToObjEx(api::getProviderSerieIds).map(this::toSerieId);
+    }
+
+    @Override
+    public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(String serieName,
         @Nullable Integer season) throws Addic7edException {
-        List<ShowDto> serieIds = providerIds.getTvdbId()
-            .mapToObjEx(api::getProviderSerieIds)
-            .orElseGetEx(() -> api.getProviderSerieIds(serieName));
-        return serieIds.stream()
+        return api.getProviderSerieIds(serieName).stream()
             .sorted(Comparator.comparing(n -> !StringUtils.equalsAnyIgnoreCase(serieName.keepLettersOnly(),
                 n.name.keepLettersOnly())))
-            .map(showDto -> new Addic7edProxyGestdownSerieId(showDto.name, showDto.id, showDto.tvDbId, showDto.tmdbId))
+            .map(this::toSerieId)
             .toList();
+    }
+
+    private Addic7edProxyGestdownSerieId toSerieId(ShowDto showDto) {
+        return new Addic7edProxyGestdownSerieId(showDto.name, showDto.id, showDto.tvDbId, showDto.tmdbId);
     }
 
     @Override

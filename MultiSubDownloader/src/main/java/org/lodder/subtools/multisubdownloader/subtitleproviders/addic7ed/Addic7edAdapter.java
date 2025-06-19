@@ -96,8 +96,13 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     // ===== \\
 
     @Override
-    public List<ProviderId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season) throws Addic7edException {
+    public Optional<ProviderId> getSerieProviderIdById(ProviderIds providerIds) throws Addic7edException {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<ProviderId> getSortedSerieProviderIds(String serieName, @Nullable Integer season)
+        throws Addic7edException {
         return api.getSerieProviderId(serieName)
             .stream()
             .sorted(Comparator.comparing(n -> !serieName.replaceAll("[^A-Za-z]", "")

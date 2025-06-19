@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.ToIntFunction;
 
 import manifold.ext.props.rt.api.override;
@@ -65,8 +66,13 @@ public final class SubsceneAdapter
     // ===== \\
 
     @Override
-    public List<SubSceneSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season) throws SubsceneException {
+    public Optional<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds) throws SubsceneException {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<SubSceneSerieId> getSortedSerieProviderIds(String serieName, @Nullable Integer season)
+        throws SubsceneException {
         ToIntFunction<SearchResultType> providerTypeFunction = value -> switch (value) {
             case EXACT -> 1;
             case TV_SERIE -> 2;

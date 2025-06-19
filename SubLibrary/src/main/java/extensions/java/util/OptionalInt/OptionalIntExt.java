@@ -77,6 +77,21 @@ public class OptionalIntExt {
     }
 
     /**
+     * If a value is present, applies the {@link ThrowingIntFunction} to it and returns the result wrapped in an {@link Optional}.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param function the function to apply if a value is present
+     * @param <R> the type of the result
+     * @param <X> the type of exception that the function may throw
+     * @return an {@code Optional} describing the result of applying the function, or an empty {@code Optional} if no value is present
+     * @throws X if the function throws an exception
+     */
+    public static <R, X extends Exception> Optional<R> flatMapToObjEx(@This OptionalInt optional,
+        ThrowingIntFunction<Optional<R>, X> function) throws X {
+        return optional.isPresent() ? function.apply(optional.getAsInt()) : Optional.empty();
+    }
+
+    /**
      * Returns the value if present, otherwise returns the result of the provided {@link ThrowingSupplier}.
      *
      * @param optionalInt the input {@code OptionalInt} for the extension method

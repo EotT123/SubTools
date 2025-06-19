@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -60,15 +61,16 @@ public final class SubdlAdapter extends
     // SERIE \\
     // ===== \\
 
-    public List<SubdlSerieId> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season) throws SubdlException {
+    @Override
+    public Optional<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds) throws SubdlException {
+        return providerIds.getImdbId().flatMapEx(imdbId -> api.getProviderIdUsingImdbId(imdbId));
+    }
 
-        List<SubdlSerieId> subdlSerieIds =
-            providerIds.getImdbId().mapEx(imdbId -> api.getProviderIdsUsingImdbId(imdbId)).orElse(List.of());
-        if (subdlSerieIds.isEmpty()) {
-            subdlSerieIds = api.getProviderIdsUsingSerieName(serieName);
-        }
-        return subdlSerieIds.stream().filter(serieId -> serieId.releaseType == ReleaseType.tv)
+    @Override
+    public List<SubdlSerieId> getSortedSerieProviderIds(String serieName, @Nullable Integer season)
+        throws SubdlException {
+        return api.getProviderIdsUsingSerieName(serieName).stream()
+            .filter(serieId -> serieId.releaseType == ReleaseType.tv)
             .sorted(Comparator.comparing((SubdlSerieId serieId) -> serieId.calculateLevenshteinDistance(serieName))
                 .thenComparing(SubdlSerieId::getYear, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
     }

@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import name.falgout.jeffrey.throwing.ThrowingBiFunction;
+import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
@@ -255,8 +255,9 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     private Optional<SerieMapping> getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
         @Nullable Integer season, ProviderIds providerIds) throws X {
 
-        ThrowingBiFunction<ProviderIds, String, List<S_ID>, X> providerReleaseIdsFunction
-            = (_providerIds, _nameToSearchFor) -> getSortedSerieProviderIds(_providerIds, _nameToSearchFor, season);
+        ThrowingFunction<ProviderIds, Optional<S_ID>, X> providerReleaseIdByIdFunction = this::getSerieProviderIdById;
+        ThrowingFunction<String, List<S_ID>, X> providerReleaseIdsByNameFunction
+            = _nameToSearchFor -> getSortedSerieProviderIds(_nameToSearchFor, season);
         TriFunction<String, String, String, SerieMapping> releaseMappingConstructor =
             (_name, providerId, providerName) -> new SerieMapping(_name, providerId, providerName, season);
         UnaryOperator<String> selectFromListMessage =
@@ -268,24 +269,33 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             nameToSearchFor, displayName,
             MapUtil.create("season", season),
             providerIds,
-            providerReleaseIdsFunction,
+            providerReleaseIdByIdFunction,
+            providerReleaseIdsByNameFunction,
             releaseMappingConstructor,
             selectFromListMessage,
             providerReleaseIdToDisplayStringFunction);
     }
 
     /**
-     * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
+     * Get a matching provider serie id for the given provider ids. Results are already cached and
      * should not be cached in the implementing classes.
      *
      * @param providerIds the provider IDs containing various IDs for providers
+     * @return an Optional containing the serie provider ID if one was found
+     * @throws X if an error occurs during the operation
+     */
+    public abstract Optional<S_ID> getSerieProviderIdById(ProviderIds providerIds) throws X;
+
+    /**
+     * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
+     * should not be cached in the implementing classes.
+     *
      * @param serieName the name of the serie
      * @param season the season number of the serie
      * @return a list of sorted serie provider IDs
      * @throws X if an error occurs during the operation
      */
-    public abstract List<S_ID> getSortedSerieProviderIds(ProviderIds providerIds, String serieName,
-        @Nullable Integer season) throws X;
+    public abstract List<S_ID> getSortedSerieProviderIds(String serieName, @Nullable Integer season) throws X;
 
     /**
      * Converts a provider-specific serie id to a displayable string format.
@@ -318,7 +328,9 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @param displayName the name to display in the UI
      * @param extraParams extra search params to narrow down the search results
      * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
-     * @param providerReleaseIdsFunction a function that returns a list of provider-specific release IDs for the
+     * @param providerReleaseIdByIdFunction a function that returns an optional provider-specific release IDs for
+     * the provided provider ids
+     * @param providerReleaseIdsByNameFunction a function that returns a list of provider-specific release IDs for the
      * release name specified by {@code nameToSearchFor}
      * @param releaseMappingConstructor a function that constructs a {@link ReleaseMapping} from the specified name,
      * providerId and providerName.
@@ -334,7 +346,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public <M extends ReleaseMapping, P extends ProviderId> Optional<M> getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
         Map<String, Object> extraParams, ProviderIds providerIds,
-        ThrowingBiFunction<ProviderIds, String, List<P>, X> providerReleaseIdsFunction,
+        ThrowingFunction<ProviderIds, Optional<P>, X> providerReleaseIdByIdFunction,
+        ThrowingFunction<String, List<P>, X> providerReleaseIdsByNameFunction,
         TriFunction<String, String, String, M> releaseMappingConstructor,
         UnaryOperator<String> selectFromListMessage,
         Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
@@ -351,103 +364,102 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         if (imdbIdCache != null && imdbIdCache.isPresent()) {
             return imdbIdCache.getOptional();
         }
+
         if (StringUtils.isBlank(nameToSearchFor)) {
             return Optional.empty();
         }
 
         CacheKey releaseNameCache = getCache("releaseMapping",
             b -> b.add("name", name).add(extraParams));
-        if (StringUtils.equals(nameToSearchFor, name) && releaseNameCache.isPresent()) {
-            if (releaseNameCache.isTemporaryObject()) {
-                if (!releaseNameCache.isExpiredTemporary()) {
-                    Optional<M> releaseMapping = releaseNameCache.getOptional();
-                    if (releaseMapping.isPresent() && releaseMapping.get().providerId == null) {
-                        return Optional.empty();
+        M releaseMapping = providerReleaseIdByIdFunction.apply(providerIds)
+            .map(providerId -> releaseMappingConstructor.apply(name, providerId.id, providerId.name))
+            .orElseGetEx(() -> {
+                // Did not find a result when searching by id, or no id's where present.
+                if (StringUtils.equals(nameToSearchFor, name) && releaseNameCache.isPresent()) {
+                    if (releaseNameCache.isTemporaryObject()) {
+                        if (!releaseNameCache.isExpiredTemporary()) {
+                            Optional<M> mapping = releaseNameCache.getOptional();
+                            return mapping.filter(rm -> rm.providerId != null).orElse(null);
+                        }
                     } else {
-                        return releaseMapping;
+                        Optional<M> mapping = releaseNameCache.getOptional();
+                        return mapping.orElse(null);
                     }
                 }
-            } else {
-                return releaseNameCache.getOptional();
-//                Optional<M> releaseMapping = releaseNameCache.getOptional();
-//                if (tvdbIdCache != null) {
-//                    tvdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
-//                }
-//                if (imdbIdCache != null) {
-//                    imdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
-//                }
-//                return releaseMapping;
-            }
-        }
+                List<P> providerReleaseIds;
+                try {
+                    providerReleaseIds = providerReleaseIdsByNameFunction.apply(nameToSearchFor);
+                } catch (Exception exc) {
+                    if (exc instanceof ApiExceptionIntf e) {
+                        switch (e.cacheStrategy) {
+                            case CACHE_DISABLED -> {
+                            }
+                            case CACHE_TEMPORARY -> releaseNameCache.storeTempValue(
+                                Value.of(releaseMappingConstructor.apply(name, null, null)));
+                            case CACHE_PERMANENT ->
+                                releaseNameCache.store(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                        }
+                    }
+                    throw (X) exc;
+                }
+                if (providerReleaseIds.isEmpty()) {
+                    // If no release provider ids are found, store a temporary null value in the cache with a 1-day
+                    // expiration, to avoid repeatedly querying the provider on each method call.
+                    // If a previously cached null value has expired, store it again with double the previous
+                    // expiration time.
+                    releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                    return null;
+                }
 
-        List<P> providerReleaseIds;
-        try {
-            providerReleaseIds = providerReleaseIdsFunction.apply(providerIds, nameToSearchFor);
-        } catch (Exception exc) {
-            if (exc instanceof ApiExceptionIntf e) {
-                switch (e.cacheStrategy) {
-                    case CACHE_DISABLED -> {
+                M mapping;
+                // If only one releases mapping is found and the user has disabled confirmation for single results,
+                // automatically select this mapping as the desired one.
+                if (providerReleaseIds.size() == 1 && !userInteractionHandler.settings.optionsConfirmProviderMapping) {
+                    mapping = releaseMappingConstructor.apply(name, providerReleaseIds.first.id,
+                        providerReleaseIds.first.name);
+                } else {
+                    // If the user didn’t select a release provider ID (likely because the correct one wasn’t listed),
+                    // store it temporarily in the memory cache to avoid prompting the user repeatedly during the same
+                    // session.
+                    CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
+                        "name-prev-results").add("name", nameToSearchFor).add(extraParams));
+
+                    Optional<P> uriForRelease;
+                    // Skip prompting the user if the previous results for this service were identical.
+                    if (previousResultsCache.isPresent() &&
+                        providerReleaseIds.equals(previousResultsCache.getCollection(null))) {
+                        uriForRelease = Optional.empty();
+                    } else {
+                        // Prompt the user to select the correct provider release id.
+                        uriForRelease = userInteractionHandler.selectFromList(
+                            providerReleaseIds,
+                            selectFromListMessage.apply(displayName),
+                            provider,
+                            providerReleaseIdToDisplayStringFunction);
                     }
-                    case CACHE_TEMPORARY ->
-                        releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
-                    case CACHE_PERMANENT ->
-                        releaseNameCache.store(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                    if (uriForRelease.isEmpty()) {
+                        // If the names differ, the user is manually searching using a custom name.
+                        // If no result is found, avoid caching it, since the same query is unlikely to be reused.
+                        if (nameToSearchFor.equals(name)) {
+                            // If no release provider id was selected, cache a temporary null value with a 1-day
+                            // expiration. If a temporary null value already exists, update it with double the previous
+                            // expiration time.
+                            releaseNameCache.store(
+                                value:Value.of(releaseMappingConstructor.apply(nameToSearchFor, null, null)),
+                                timeToLive:1 day,
+                                storeTempNullValue:true);
+                            previousResultsCache.store(Value.ofCollection(providerReleaseIds));
+                        }
+                        return null;
+                    }
+                    // create a releaseMapping for the selected value
+                    mapping = releaseMappingConstructor.apply(name, uriForRelease.get().id, uriForRelease.get().name);
                 }
-            }
-            throw exc;
-        }
-        if (providerReleaseIds.isEmpty()) {
-            // If no release provider ids are found, store a temporary null value in the cache with a 1-day expiration,
-            // to avoid repeatedly querying the provider on each method call.
-            // If a previously cached null value has expired, store it again with double the previous expiration time.
-            releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
-//            releaseNameCache.storeTempValue(Value.of((M) null));
+                return mapping;
+            });
+
+        if (releaseMapping == null) {
             return Optional.empty();
-        }
-
-        M releaseMapping;
-        if (providerReleaseIds.size() == 1 && (!userInteractionHandler.settings.optionsConfirmProviderMapping ||
-            providerReleaseIds.first().autoSelectable)) {
-            // If only one releases mapping is found and the user has disabled confirmation for single results,
-            // or the result is found using an id, rather than a name, automatically select this mapping as
-            // the desired one.
-            releaseMapping =
-                releaseMappingConstructor.apply(name, providerReleaseIds.first.id, providerReleaseIds.first.name);
-        } else {
-            // If the user didn’t select a release provider ID (likely because the correct one wasn’t listed),
-            // store it temporarily in the memory cache to avoid prompting the user repeatedly during the same session.
-            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
-                "name-prev-results").add("name", nameToSearchFor).add(extraParams));
-
-            Optional<P> uriForRelease;
-            // Skip prompting the user if the previous results for this service were identical.
-            if (previousResultsCache.isPresent() &&
-                providerReleaseIds.equals(previousResultsCache.getCollection(null))) {
-                uriForRelease = Optional.empty();
-            } else {
-                // Prompt the user to select the correct provider release id.
-                uriForRelease = userInteractionHandler.selectFromList(
-                    providerReleaseIds,
-                    selectFromListMessage.apply(displayName),
-                    provider,
-                    providerReleaseIdToDisplayStringFunction);
-            }
-            if (uriForRelease.isEmpty()) {
-                // If the names differ, the user is manually searching using a custom name.
-                // If no result is found, avoid caching it, since the same query is unlikely to be reused.
-                if (nameToSearchFor.equals(name)) {
-                    // If no release provider id was selected, cache a temporary null value with a 1-day expiration.
-                    // If a temporary null value already exists, update it with double the previous expiration time.
-                    releaseNameCache.store(
-                        value:Value.of(releaseMappingConstructor.apply(nameToSearchFor, null, null)),
-                        timeToLive:1 day,
-                        storeTempNullValue:true);
-                    previousResultsCache.store(Value.ofCollection(providerReleaseIds));
-                }
-                return Optional.empty();
-            }
-            // create a releaseMapping for the selected value
-            releaseMapping = releaseMappingConstructor.apply(name, uriForRelease.get().id, uriForRelease.get().name);
         }
         // cache the result
         if (tvdbIdCache != null) {
@@ -459,6 +471,115 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         releaseNameCache.store(Value.of(releaseMapping));
 
         return Optional.of(releaseMapping);
+
+//        if (StringUtils.isBlank(nameToSearchFor)) {
+//            return Optional.empty();
+//        }
+//
+//        CacheKey releaseNameCache = getCache("releaseMapping",
+//            b -> b.add("name", name).add(extraParams));
+//        if (StringUtils.equals(nameToSearchFor, name) && releaseNameCache.isPresent()) {
+//            if (releaseNameCache.isTemporaryObject()) {
+//                if (!releaseNameCache.isExpiredTemporary()) {
+//                    Optional<M> releaseMapping = releaseNameCache.getOptional();
+//                    if (releaseMapping.isPresent() && releaseMapping.get().providerId == null) {
+//                        return Optional.empty();
+//                    } else {
+//                        return releaseMapping;
+//                    }
+//                }
+//            } else {
+//                return releaseNameCache.getOptional();
+////                Optional<M> releaseMapping = releaseNameCache.getOptional();
+////                if (tvdbIdCache != null) {
+////                    tvdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
+////                }
+////                if (imdbIdCache != null) {
+////                    imdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
+////                }
+////                return releaseMapping;
+//            }
+//        }
+//
+//        List<P> providerReleaseIds;
+//        try {
+//            providerReleaseIds = providerReleaseIdsFunction.apply(providerIds, nameToSearchFor);
+//        } catch (Exception exc) {
+//            if (exc instanceof ApiExceptionIntf e) {
+//                switch (e.cacheStrategy) {
+//                    case CACHE_DISABLED -> {
+//                    }
+//                    case CACHE_TEMPORARY ->
+//                        releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
+//                    case CACHE_PERMANENT ->
+//                        releaseNameCache.store(Value.of(releaseMappingConstructor.apply(name, null, null)));
+//                }
+//            }
+//            throw exc;
+//        }
+//        if (providerReleaseIds.isEmpty()) {
+//            // If no release provider ids are found, store a temporary null value in the cache with a 1-day expiration,
+//            // to avoid repeatedly querying the provider on each method call.
+//            // If a previously cached null value has expired, store it again with double the previous expiration time.
+//            releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
+////            releaseNameCache.storeTempValue(Value.of((M) null));
+//            return Optional.empty();
+//        }
+//
+//        M releaseMapping;
+//        if (providerReleaseIds.size() == 1 && (!userInteractionHandler.settings.optionsConfirmProviderMapping ||
+//            providerReleaseIds.first().autoSelectable)) {
+//            // If only one releases mapping is found and the user has disabled confirmation for single results,
+//            // or the result is found using an id, rather than a name, automatically select this mapping as
+//            // the desired one.
+//            releaseMapping =
+//                releaseMappingConstructor.apply(name, providerReleaseIds.first.id, providerReleaseIds.first.name);
+//        } else {
+//            // If the user didn’t select a release provider ID (likely because the correct one wasn’t listed),
+//            // store it temporarily in the memory cache to avoid prompting the user repeatedly during the same session.
+//            CacheKey previousResultsCache = manager.getCache(CacheType.MEMORY, new CacheKeyBuilder(provider,
+//                "name-prev-results").add("name", nameToSearchFor).add(extraParams));
+//
+//            Optional<P> uriForRelease;
+//            // Skip prompting the user if the previous results for this service were identical.
+//            if (previousResultsCache.isPresent() &&
+//                providerReleaseIds.equals(previousResultsCache.getCollection(null))) {
+//                uriForRelease = Optional.empty();
+//            } else {
+//                // Prompt the user to select the correct provider release id.
+//                uriForRelease = userInteractionHandler.selectFromList(
+//                    providerReleaseIds,
+//                    selectFromListMessage.apply(displayName),
+//                    provider,
+//                    providerReleaseIdToDisplayStringFunction);
+//            }
+//            if (uriForRelease.isEmpty()) {
+//                // If the names differ, the user is manually searching using a custom name.
+//                // If no result is found, avoid caching it, since the same query is unlikely to be reused.
+//                if (nameToSearchFor.equals(name)) {
+//                    // If no release provider id was selected, cache a temporary null value with a 1-day expiration.
+//                    // If a temporary null value already exists, update it with double the previous expiration time.
+//                    releaseNameCache.store(
+//                        value:Value.of(releaseMappingConstructor.apply(nameToSearchFor, null, null)),
+//                        timeToLive:1day,
+//                        storeTempNullValue:true);
+//                    previousResultsCache.store(Value.ofCollection(providerReleaseIds));
+//                }
+//                return Optional.empty();
+//            }
+//            // create a releaseMapping for the selected value
+//            releaseMapping = releaseMappingConstructor.apply(name, uriForRelease.get().id, uriForRelease.get().name);
+//        }
+//        // cache the result
+//        if (tvdbIdCache != null) {
+//            tvdbIdCache.store(Value.of(releaseMapping));
+//        }
+//        if (imdbIdCache != null) {
+//            imdbIdCache.store(Value.of(releaseMapping));
+//        }
+//        releaseNameCache.store(Value.of(releaseMapping));
+//
+//        return Optional.of(releaseMapping);
     }
 
     public abstract SUB convertToSubtitle(API_SUB subtitle);

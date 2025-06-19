@@ -16,8 +16,8 @@ public class SubdlSerieId extends ProviderId {
     @val @Nullable Integer year;
     @val ReleaseType releaseType;
 
-    public SubdlSerieId(Serie.ResultItem resultItem, boolean autoSelectable=false) {
-        super(resultItem.name, String.valueOf(resultItem.sd_id), autoSelectable);
+    public SubdlSerieId(Serie.ResultItem resultItem) {
+        super(resultItem.name, String.valueOf(resultItem.sd_id));
         this.year = resultItem.year == null ? null : Integer.parseInt(resultItem.year);
         this.releaseType = resultItem.type;
     }

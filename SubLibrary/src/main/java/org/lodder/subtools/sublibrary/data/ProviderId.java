@@ -12,12 +12,10 @@ public class ProviderId implements Serializable {
     @Serial private static final long serialVersionUID = 1L;
     @val String name;
     @val String id;
-    @val boolean autoSelectable;
 
-    public ProviderId(String name, String id, boolean autoSelectable=false) {
+    public ProviderId(String name, String id) {
         this.name = name;
         this.id = id;
-        this.autoSelectable = autoSelectable;
     }
 
     public static int calculateLevenshteinDistance(String name, String otherName) {
