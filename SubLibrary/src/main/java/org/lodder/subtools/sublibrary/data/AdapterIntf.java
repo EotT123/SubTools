@@ -12,11 +12,7 @@ public interface AdapterIntf {
     @val String provider;
     @val Manager manager;
 
-    default CacheKey getCache(String operation) {
-        return getCache(operation, b->b);
-    }
-
-    default CacheKey getCache(String operation, UnaryOperator<CacheKeyBuilder> CacheKeyBuilderFunction) {
+    default CacheKey getCache(String operation, UnaryOperator<CacheKeyBuilder> CacheKeyBuilderFunction=b -> b) {
         return manager.getCache(CacheType.DISK,
             CacheKeyBuilderFunction.apply(new CacheKeyBuilder(provider, operation)));
     }
