@@ -21,4 +21,8 @@ public class Addic7edException extends SubtitlesProviderException {
     public Addic7edException(Throwable cause) {
         super(cause);
     }
+
+    public Addic7edException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

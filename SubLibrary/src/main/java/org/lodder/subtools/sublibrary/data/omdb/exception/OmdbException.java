@@ -7,7 +7,15 @@ public class OmdbException extends Exception {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    public OmdbException(String message) {
+        super(message);
+    }
+
     public OmdbException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public OmdbException(Throwable cause) {
+        super(cause);
     }
 }

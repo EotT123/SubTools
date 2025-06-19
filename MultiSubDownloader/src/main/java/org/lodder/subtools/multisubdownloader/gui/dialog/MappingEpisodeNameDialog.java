@@ -147,7 +147,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     public enum MappingType {
         TVDB("TVDB", "TVDB",
-            new SelectionForKeyPrefix("", "tvdb-serieid-", k -> k.replace("-serieid-", "-tvdbserie-"))),
+            new SelectionForKeyPrefix("", "tvdb-seriemapping-", k -> k.replace("-providerid-", "-serie-"))),
+        IMDB("IMDB", "IMDB",
+            new SelectionForKeyPrefix("", "imdb-releasemapping-")),
         ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, new SelectionForKeyPrefix("", "addic7ed-releasemapping-name:"),
             new SelectionForKeyPrefix("", "addic7ed-releasemapping-tvdbid:")),
         ADDIC7ED_PROXY("Addic7ed (Proxy)", SubtitleSource.ADDIC7ED.name() + "-GESTDOWN",

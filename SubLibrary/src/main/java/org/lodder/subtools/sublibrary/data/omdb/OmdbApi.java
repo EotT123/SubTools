@@ -9,7 +9,7 @@ import manifold.ext.props.rt.api.val;
 import manifold.json.rt.api.Requester;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
-import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
+import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbApiException;
 
 class OmdbApi implements ApiIntf {
 
@@ -22,29 +22,29 @@ class OmdbApi implements ApiIntf {
         this.manager = manager;
     }
 
-    public Optional<Release> searchRelease(String imdbId) throws OmdbException {
+    public Optional<Release> searchRelease(String imdbId) throws OmdbApiException {
         return getCache("release", b -> b.add("imdbId", imdbId))
             .getOptional(() -> search(req -> req.withParam("i", imdbId)));
     }
 
-    public Optional<Release> searchMovie(String title, Integer year=null) throws OmdbException {
+    public Optional<Release> searchMovie(String title, Integer year=null) throws OmdbApiException {
         return getCache("movie", b -> b.add("title", title).add("year", year))
             .getOptional(() -> search(req -> req.withParam("t", title).withParam("type", "movie")));
     }
 
-    public Optional<Release> searchSerie(String name) throws OmdbException {
+    public Optional<Release> searchSerie(String name) throws OmdbApiException {
         return getCache("serie", b -> b.add("name", name))
             .getOptional(() -> search(req -> req.withParam("t", name).withParam("type", "series")));
     }
 
-    private static Optional<Release> search(Consumer<Requester<Release>> extraParamConsumer) throws OmdbException {
+    private static Optional<Release> search(Consumer<Requester<Release>> extraParamConsumer) throws OmdbApiException {
         try {
             Requester<Release> request = Release.request(API_DOMAIN).withParam("apikey", API_KEY);
             extraParamConsumer.accept(request);
             Release release = request.getOne();
             return release.response ? Optional.of(release) : Optional.empty();
         } catch (Exception e) {
-            throw new OmdbException("Error OMDB API", e);
+            throw OmdbApiException.error(null, e.getMessage().replace("apikey=" + API_KEY, ""));
         }
     }
 }

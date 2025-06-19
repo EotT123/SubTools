@@ -283,7 +283,6 @@
                                 <dateLibrary>java8-localdatetime</dateLibrary>
                                 <useJakartaEe>true</useJakartaEe>
                                 <library>retrofit2</library>
-                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
 
                             <!--                            <typeMappings>-->
@@ -322,7 +321,6 @@
                                 <!--<sourceFolder>src/gen/java</sourceFolder>-->
                                 <useJakartaEe>true</useJakartaEe>
                                 <library>retrofit2</library>
-                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
                         </configuration>
                     </execution>

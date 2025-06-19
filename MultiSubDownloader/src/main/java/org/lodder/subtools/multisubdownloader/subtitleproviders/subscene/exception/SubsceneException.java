@@ -21,4 +21,8 @@ public class SubsceneException extends SubtitlesProviderException {
     public SubsceneException(Throwable cause) {
         super(cause);
     }
+
+    public SubsceneException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

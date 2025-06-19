@@ -75,10 +75,10 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.uwetrottmann.thetvdb-java</groupId>
-            <artifactId>thetvdb-java</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.uwetrottmann.thetvdb-java</groupId>-->
+        <!--            <artifactId>thetvdb-java</artifactId>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>systems.manifold</groupId>
             <artifactId>manifold-ext-rt</artifactId>
@@ -150,6 +150,10 @@
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>converter-scalars</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
         </dependency>
         
         <dependency>
@@ -264,18 +268,27 @@
                             <apiPackage>com.tvdb.api</apiPackage>
                             <invokerPackage>com.tvdb.invoker</invokerPackage>
                             <packageName>com.tvdb</packageName>
-                            <skipValidateSpec>true</skipValidateSpec>
-                            <apisToGenerate>Series,Search,Login</apisToGenerate>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <apisToGenerate>Series,Movies,Search,Login</apisToGenerate>
+                            <!-- Allows models to deserialize unknown fields without failing -->
+                            <additionalProperties>true</additionalProperties>
                             <!--                            <modelsToGenerate>-->
                             <!--                                AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse-->
                             <!--                            </modelsToGenerate>-->
                             <generateModelTests>false</generateModelTests>
+
+                            <!--                            <instantiationTypes>number=int</instantiationTypes>-->
+                            <typeMappings>integer=int,number=int</typeMappings>
                             <configOptions>
-                                <typeMappings>integer=int,int=int</typeMappings>
+                                <!--                                <typeMappings>integer=int,number=Integer</typeMappings>-->
                                 <!--                                <useSwaggerAnnotations>false</useSwaggerAnnotations>-->
                                 <serializableModel>true</serializableModel>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <!-- Allows models to deserialize unknown fields without failing -->
+                                <additionalProperties>true</additionalProperties>
+                                <!-- Prevents OpenAPI generator from enforcing strict property matching -->
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+                                <serializationLibrary>gson</serializationLibrary>
                                 <!--<sourceFolder>src/gen/java</sourceFolder>-->
                                 <!--<java8>true</java8>-->
                                 <!--                                <dateLibrary>java8-localdatetime</dateLibrary>-->

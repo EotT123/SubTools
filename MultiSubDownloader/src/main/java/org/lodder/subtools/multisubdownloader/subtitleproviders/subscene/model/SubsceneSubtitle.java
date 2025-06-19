@@ -15,9 +15,9 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 public class SubsceneSubtitle extends Subtitle {
 
-    private final ThrowingSupplier<String, SubsceneException> urlSupplier;
+    private final ThrowingSupplier<String, ? extends SubsceneException> urlSupplier;
 
-    public SubsceneSubtitle(ThrowingSupplier<String, SubsceneException> urlSupplier,
+    public SubsceneSubtitle(ThrowingSupplier<String, ? extends SubsceneException> urlSupplier,
         @Nullable String fileName=null,
         @Nullable Language language=null,
         @Nullable String releaseGroup=null,

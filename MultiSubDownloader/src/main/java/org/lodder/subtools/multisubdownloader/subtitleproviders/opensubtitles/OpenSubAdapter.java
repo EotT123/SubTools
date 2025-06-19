@@ -25,8 +25,8 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.SubtitleAttributes;
 
 public final class OpenSubAdapter
-    extends SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId,
-    OpenSubtitleException> {
+    extends
+    SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId, OpenSubtitleException> {
 
     private static OpenSubtitlesApi api;
     @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;

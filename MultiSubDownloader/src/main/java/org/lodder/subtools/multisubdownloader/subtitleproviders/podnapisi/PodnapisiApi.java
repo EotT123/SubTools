@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
 import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.net.URLEncoder;
@@ -16,7 +17,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleMetadata;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSerieId;
 import org.lodder.subtools.multisubdownloader.util.MapUtil;
@@ -53,10 +54,10 @@ public class PodnapisiApi implements SubtitleApi {
      * @param year the year of the movie (nullable)
      * @param language the subtitle language
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
-     * @throws PodnapisiException if the API call fails
+     * @throws PodnapisiApiException if the API call fails
      */
     public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
-        Language language) throws PodnapisiException {
+        Language language) throws PodnapisiApiException {
         return getSubtitles(title, language, MapUtil.create(SearchParam.YEAR, year));
     }
 
@@ -70,9 +71,9 @@ public class PodnapisiApi implements SubtitleApi {
      *
      * @param name the name of the serie
      * @return a list of matching {@link SubdlSerieId} objects
-     * @throws PodnapisiException if the API call fails
+     * @throws PodnapisiApiException if the API call fails
      */
-    public List<ProviderId> getProviderIdsUsingName(String name) throws PodnapisiException {
+    public List<ProviderId> getProviderIdsUsingName(String name) throws PodnapisiApiException {
         return List.of(new ProviderId(name, name));
     }
 
@@ -85,10 +86,10 @@ public class PodnapisiApi implements SubtitleApi {
      * @param episode the episode number
      * @param language the subtitle language
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
-     * @throws PodnapisiException if the API call fails
+     * @throws PodnapisiApiException if the API call fails
      */
     public List<PodnapisiSubtitleMetadata> getSerieSubtitles(String serieName, int season, int episode,
-        Language language) throws PodnapisiException {
+        Language language) throws PodnapisiApiException {
         return getSubtitles(serieName, language,
             MapUtil.create(SearchParam.SEASON, season, SearchParam.EPISODE, episode));
     }
@@ -106,11 +107,11 @@ public class PodnapisiApi implements SubtitleApi {
      * @param language the subtitle language
      * @param paramMap extra search parameters
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
-     * @throws PodnapisiException if the API call fails
+     * @throws PodnapisiApiException if the API call fails
      */
 
     private List<PodnapisiSubtitleMetadata> getSubtitles(String name, Language language,
-        Map<SearchParam, Object> paramMap) throws PodnapisiException {
+        Map<SearchParam, Object> paramMap) throws PodnapisiApiException {
         return getCache("subtitles", b -> b.add("name", name).add("language", language).add(paramMap))
             .getCollection(() -> {
                 try {
@@ -135,7 +136,7 @@ public class PodnapisiApi implements SubtitleApi {
                         .filter(metadata -> StringUtils.isNotBlank(metadata.releaseString))
                         .toList();
                 } catch (Exception e) {
-                    throw new PodnapisiException(e);
+                    throw PodnapisiApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
             }, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1 Second));
     }
@@ -164,7 +165,7 @@ public class PodnapisiApi implements SubtitleApi {
         }
     }
 
-    protected @Nullable Document getXml(String url) throws PodnapisiException {
+    protected @Nullable Document getXml(String url) throws PodnapisiApiException {
         try {
             return manager.getAsJsoupDocument(params(url, CacheType.MEMORY, userAgent,
                 new Retry(
@@ -173,11 +174,11 @@ public class PodnapisiApi implements SubtitleApi {
                         e.responseCode < 600,
                     5 Second)));
         } catch (Exception e) {
-            throw new PodnapisiException(e);
+            throw PodnapisiApiException.error(e);
         }
     }
 
-//    protected @Nullable String get(String url) throws PodnapisiException {
+//    protected @Nullable String get(String url) throws PodnapisiApiException {
 //        try {
 //            return manager.get(params(url, CacheType.MEMORY, userAgent,
 //                new Retry(
@@ -186,7 +187,7 @@ public class PodnapisiApi implements SubtitleApi {
 //                        e.responseCode < 600,
 //                    5 Second)));
 //        } catch (Exception e) {
-//            throw new PodnapisiException(e);
+//            throw PodnapisiApiException.error(e);
 //        }
 //    }
 

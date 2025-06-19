@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 
 import static java.nio.charset.StandardCharsets.*;
 import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
 import java.net.URLEncoder;
@@ -20,7 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edMovieSubtitleId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitle;
 import org.lodder.subtools.sublibrary.Credentials;
@@ -46,7 +47,7 @@ public class Addic7edApi implements SubtitleApi {
     private final boolean speedy;
     private Time lastRequest = Time.now();
 
-    public Addic7edApi(Manager manager, boolean speedy, Credentials credentials=null) throws Addic7edException {
+    public Addic7edApi(Manager manager, boolean speedy, Credentials credentials=null) throws Addic7edApiException {
 //        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
         this.manager = manager;
         this.speedy = speedy;
@@ -55,7 +56,7 @@ public class Addic7edApi implements SubtitleApi {
         }
     }
 
-    public void login(Credentials credentials) throws Addic7edException {
+    public void login(Credentials credentials) throws Addic7edApiException {
         try {
             manager.postBuilder("$DOMAIN/dologin.php")
                 .addData("username", credentials.username)
@@ -63,7 +64,7 @@ public class Addic7edApi implements SubtitleApi {
                 .addData("remember", "false")
                 .post();
         } catch (ManagerException e) {
-            throw new Addic7edException(e);
+            throw Addic7edApiException.error(e, cacheStrategy:CACHE_DISABLED);
         }
     }
 
@@ -72,7 +73,7 @@ public class Addic7edApi implements SubtitleApi {
     // ===== \\
 
     public List<Addic7edMovieSubtitleId> getMovieProviderIds(String title,
-        @Nullable Integer year=null) throws Addic7edException {
+        @Nullable Integer year=null) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("title", title))
             .getCollection(() -> {
                 try {
@@ -91,12 +92,13 @@ public class Addic7edApi implements SubtitleApi {
                             return new Addic7edMovieSubtitleId(text, providerId, _title, _year);
                         }).toList();
                 } catch (Exception e) {
-                    throw new Addic7edException(e);
+                    throw Addic7edApiException.error(e);
                 }
             });
     }
 
-    public List<Addic7edSubtitle> searchMovieSubtitles(String providerId, Language language) throws Addic7edException {
+    public List<Addic7edSubtitle> searchMovieSubtitles(String providerId, Language language)
+        throws Addic7edApiException {
         return searchSubtitles(providerId, "$DOMAIN/$providerId", language);
     }
 
@@ -105,7 +107,7 @@ public class Addic7edApi implements SubtitleApi {
     // ===== \\
 
 
-    public List<ProviderId> getSerieProviderId(String serieName) throws Addic7edException {
+    public List<ProviderId> getSerieProviderId(String serieName) throws Addic7edApiException {
         if (StringUtils.isBlank(serieName)) {
             return List.of();
         }
@@ -123,13 +125,13 @@ public class Addic7edApi implements SubtitleApi {
                 }).toList();
                 return !providerIdsFormatted.isEmpty() ? providerIdsFormatted : providerIds;
             } catch (Exception e) {
-                throw new Addic7edException(e);
+                throw Addic7edApiException.error(e, cacheStrategy:CACHE_DISABLED);
             }
         });
     }
 
     public List<Addic7edSubtitle> searchSerieSubtitles(String providerId, String providerName, int season, int episode,
-        Language language) throws Addic7edException {
+        Language language) throws Addic7edApiException {
 
         return Addic7edLanguage.of(language)
             .map(lang -> "%s/serie/%s/%s/%s/%s".formatted(DOMAIN,
@@ -143,87 +145,91 @@ public class Addic7edApi implements SubtitleApi {
     // ====== \\
 
     private List<Addic7edSubtitle> searchSubtitles(String providerId, String url, Language language)
-        throws Addic7edException {
+        throws Addic7edApiException {
         return getCache("subtitles",
             b -> b.add("providerId", providerId).add("url", url).add("language", language))
             .getCollection(() -> {
-                Document doc = getContent(url);
-                String title = null;
+                try {
+                    Document doc = getContent(url);
+                    String title = null;
 
-                Elements elTitle = doc.getElementsByClass("titulo");
-                if (elTitle.size() == 1) {
-                    Matcher matcher = TITLE_PATTERN.matcher(elTitle.first.html());
-                    if (matcher.matches()) {
-                        title = StringUtils.trimToNull(matcher.group(1));
-                    }
-                }
-
-                Elements blocks = doc.select(".tabel95[width='100%']");
-
-                List<Addic7edSubtitle> lSubtitles = new ArrayList<>();
-                for (Element block : blocks) {
-                    String uploader = "";
-                    String version = null;
-                    Addic7edLanguage lang = null;
-                    String download = null;
-                    boolean hearingImpaired = false;
-
-                    Elements classesNewsTitle = block.getElementsByClass("NewsTitle");
-                    Elements classesNewsDate = block.getElementsByClass("newsDate").select("td[colspan=3]");
-                    if (classesNewsTitle.size() == 1 && classesNewsDate.size() == 1) {
-                        Matcher m = VERSION_PATTERN.matcher(classesNewsTitle.first.text().trim());
-                        if (!m.matches()) {
-                            break;
-                        } else {
-                            version = StringUtils.trimToNull(m.group("info").trim());
-                            uploader = block.selectFirst("a[href*=user/]").text();
-                            hearingImpaired = !block.select("img[title~=Hearing]").isEmpty();
+                    Elements elTitle = doc.getElementsByClass("titulo");
+                    if (elTitle.size() == 1) {
+                        Matcher matcher = TITLE_PATTERN.matcher(elTitle.first.html());
+                        if (matcher.matches()) {
+                            title = StringUtils.trimToNull(matcher.group(1));
                         }
                     }
 
-                    if (version != null) {
-                        Elements tds = block.select("tr:contains(Completed)");
-                        Elements reqTds = tds.select("td").not("td[rowspan=2]");
-                        for (Element td : reqTds) {
-                            if (td.hasClass("language")) {
-                                lang = Addic7edLanguage.of(td.html().substring(0, td.html().indexOf("<")));
-                            }
+                    Elements blocks = doc.select(".tabel95[width='100%']");
 
-                            // incomplete not wanted
-                            if ((lang != null && td.toString().toLowerCase().contains("completed")) &&
-                                td.html().toLowerCase().contains("% completed")) {
-                                lang = null;
-                            }
+                    List<Addic7edSubtitle> lSubtitles = new ArrayList<>();
+                    for (Element block : blocks) {
+                        String uploader = "";
+                        String version = null;
+                        Addic7edLanguage lang = null;
+                        String download = null;
+                        boolean hearingImpaired = false;
 
-                            Elements downloadElements = td.getElementsByClass("buttonDownload");
-                            if (lang != null && !downloadElements.isEmpty()) {
-                                if (downloadElements.size() == 1) {
-                                    download = DOMAIN + downloadElements.first.attr("href");
-                                } else if (downloadElements.size() == 2) {
-                                    download = DOMAIN + downloadElements.get(1).attr("href");
-                                }
+                        Elements classesNewsTitle = block.getElementsByClass("NewsTitle");
+                        Elements classesNewsDate = block.getElementsByClass("newsDate").select("td[colspan=3]");
+                        if (classesNewsTitle.size() == 1 && classesNewsDate.size() == 1) {
+                            Matcher m = VERSION_PATTERN.matcher(classesNewsTitle.first.text().trim());
+                            if (!m.matches()) {
+                                break;
+                            } else {
+                                version = StringUtils.trimToNull(m.group("info").trim());
+                                uploader = block.selectFirst("a[href*=user/]").text();
+                                hearingImpaired = !block.select("img[title~=Hearing]").isEmpty();
                             }
-                            if (lang != null && download != null && title != null) {
-                                ReleaseParserExtraInfo extraInfoParser = ReleaseParser.parseExtraInfo(version);
-                                Addic7edSubtitle sub = new Addic7edSubtitle(
-                                    url:download,
-                                    fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
-                                    language:lang.language,
-                                    releaseGroup:extraInfoParser.getReleaseGroupBestEffort(),
-                                    uploader:uploader,
-                                    hearingImpaired:hearingImpaired,
-                                    quality:extraInfoParser.getQualityKeyword(),
-                                    version:version);
-                                if (language == sub.language && !isDuplicate(lSubtitles, sub)) {
-                                    lSubtitles.add(sub);
+                        }
+
+                        if (version != null) {
+                            Elements tds = block.select("tr:contains(Completed)");
+                            Elements reqTds = tds.select("td").not("td[rowspan=2]");
+                            for (Element td : reqTds) {
+                                if (td.hasClass("language")) {
+                                    lang = Addic7edLanguage.of(td.html().substring(0, td.html().indexOf("<")));
                                 }
-                                lang = null;
-                                download = null;
+
+                                // incomplete not wanted
+                                if ((lang != null && td.toString().toLowerCase().contains("completed")) &&
+                                    td.html().toLowerCase().contains("% completed")) {
+                                    lang = null;
+                                }
+
+                                Elements downloadElements = td.getElementsByClass("buttonDownload");
+                                if (lang != null && !downloadElements.isEmpty()) {
+                                    if (downloadElements.size() == 1) {
+                                        download = DOMAIN + downloadElements.first.attr("href");
+                                    } else if (downloadElements.size() == 2) {
+                                        download = DOMAIN + downloadElements.get(1).attr("href");
+                                    }
+                                }
+                                if (lang != null && download != null && title != null) {
+                                    ReleaseParserExtraInfo extraInfoParser = ReleaseParser.parseExtraInfo(version);
+                                    Addic7edSubtitle sub = new Addic7edSubtitle(
+                                        url:download,
+                                        fileName:StringExt.removeIllegalFilenameChars(title + " " + version),
+                                        language:lang.language,
+                                        releaseGroup:extraInfoParser.getReleaseGroupBestEffort(),
+                                        uploader:uploader,
+                                        hearingImpaired:hearingImpaired,
+                                        quality:extraInfoParser.getQualityKeyword(),
+                                        version:version);
+                                    if (language == sub.language && !isDuplicate(lSubtitles, sub)) {
+                                        lSubtitles.add(sub);
+                                    }
+                                    lang = null;
+                                    download = null;
+                                }
                             }
                         }
                     }
+                    return lSubtitles;
+                } catch (Exception e) {
+                    throw Addic7edApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
-                return lSubtitles;
             });
     }
 
@@ -232,7 +238,7 @@ public class Addic7edApi implements SubtitleApi {
             StringUtils.equals(s.version, sub.version));
     }
 
-    private Document getContent(String url) throws Addic7edException {
+    private Document getContent(String url) throws Addic7edApiException {
         try {
             if (!speedy && getCache("content", b -> b.add("url", url)).isNotPresent()) {
                 // if (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION) {
@@ -246,7 +252,7 @@ public class Addic7edApi implements SubtitleApi {
             }
             return manager.getAsJsoupDocument(PageContentParams.params(url:url, userAgent:""));
         } catch (Exception e) {
-            throw new Addic7edException(e);
+            throw Addic7edApiException.error(e);
         }
     }
 }

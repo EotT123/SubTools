@@ -17,4 +17,12 @@ public class PodnapisiException extends SubtitlesProviderException {
     public PodnapisiException(Throwable cause) {
         super(cause);
     }
+
+    public PodnapisiException(String message) {
+        super(message);
+    }
+
+    public PodnapisiException(String message, Throwable cause) {
+        super(message);
+    }
 }

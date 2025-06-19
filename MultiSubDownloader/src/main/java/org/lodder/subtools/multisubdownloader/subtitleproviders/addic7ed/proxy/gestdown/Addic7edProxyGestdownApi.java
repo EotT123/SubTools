@@ -1,8 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown;
 
-import static manifold.science.measures.TimeUnit.*;
-import static org.lodder.subtools.sublibrary.LogLevel.*;
-import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
 import java.util.List;
@@ -21,15 +19,13 @@ import org.gestdown.model.SubtitleDto;
 import org.gestdown.model.SubtitleSearchResponse;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edException;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edResponseException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,47 +69,58 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
     // SERIE \\
     // ===== \\
 
-    public List<ShowDto> getProviderSerieIds(String name) throws Addic7edException {
+    public List<ShowDto> getProviderSerieIds(String name) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("name", name))
-            .getCollection(() -> {
-                List<ShowDto> shows = apiCall(
-                    () -> TV_SHOWS_API.showsSearchSearchGet(name))
-                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
-                    .addErrorHandler(HttpStatus.TOO_MANY_REQUESTS, 5Second, logLevel:WARN)
-                    .execute().getShows();
-                return shows == null ? List.of() : shows;
-            });
+            .getCollection(
+                () -> {
+                    List<ShowDto> shows = apiCall(() -> TV_SHOWS_API.showsSearchSearchGet(name)).execute().getShows();
+                    if (shows == null) {
+                        throw Addic7edApiException.noResult("Serie [$name] not found");
+                    }
+                    return shows;
+                }
+//                    .addErrorHandler(ERR_NOT_FOUND)
+//                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
+//                    .execute().getShows();
+
+            );
     }
 
-    public List<ShowDto> getProviderSerieIds(int tvdbId) throws Addic7edException {
+    public List<ShowDto> getProviderSerieIds(int tvdbId) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
             .getCollection(() -> {
-                List<ShowDto> shows = apiCall(
-                    () -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId))
-                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
-                    .addErrorHandler(TOO_MANY_REQUESTS, 5Second, logLevel:WARN)
-                    .execute().getShows();
-                return shows == null ? List.of() : shows;
+                List<ShowDto> shows =
+                    apiCall(() -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId)).execute().getShows();
+//                    .addErrorHandler(ERR_NOT_FOUND)
+//                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
+//                    .execute().getShows();
+                if (shows == null) {
+                    throw Addic7edApiException.noResult("Serie with tvdb id [$tvdbId] not found");
+                }
+                return shows;
             });
     }
 
     public List<Addic7edProxyGestdownSubtitle> getSubtitles(String providerId, int season, int episode,
-        Language language) throws Addic7edException {
+        Language language) throws Addic7edApiException {
         return getCache("subtitles", b -> b.add("providerId", providerId)
             .add("season", season).add("episode", episode).add("language", language))
             .getCollection(() -> {
                 SubtitleSearchResponse response = apiCall(
                     () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
-                        UUID.fromString(providerId), season, episode))
-                    .addErrorHandler(BAD_REQUEST, retry:false)
-                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)
-                    .addErrorHandler(LOCKED, 5Second, logLevel:INFO)
-                    .addErrorHandler(TOO_MANY_REQUESTS, 5Second, logLevel:WARN)
-                    .execute();
+                        UUID.fromString(providerId), season, episode)).execute();
+//                    .addErrorHandler(ERR_BAD_REQUEST)
+//                    .addErrorHandler(ERR_NOT_FOUND)
+//                    .addErrorHandler(ERR_LOCKED)
+//                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
+//                    .execute();
                 List<SubtitleDto> subtitles = response.getMatchingSubtitles();
-                return subtitles == null ? List.of() :
-                    subtitles.stream().map(subtitleDto -> mapToSubtitle(subtitleDto, response.episode, language))
-                        .toList();
+                if (subtitles == null) {
+                    throw Addic7edApiException.noResult("Could not find subtitles for [$providerId], season[$season]," +
+                        " episode [$episode], language [$language]", CACHE_DISABLED);
+                }
+                return subtitles.stream().map(subtitleDto -> mapToSubtitle(subtitleDto, response.episode, language))
+                    .toList();
             });
     }
 
@@ -134,8 +141,8 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             hearingImpaired:false);
     }
 
-    private static <T> ExecuteCall<T, Addic7edResponseException> apiCall(
-        ThrowingSupplier<Call<T>, Addic7edResponseException> supplier) {
-        return RetrofitService.handleExecution(supplier, Addic7edResponseException::new);
+    private static <T> ExecuteCall<T, Addic7edApiException> apiCall(
+        ThrowingSupplier<Call<T>, Addic7edApiException> supplier) {
+        return RetrofitService.handleExecution(supplier, Addic7edApiException::new);
     }
 }

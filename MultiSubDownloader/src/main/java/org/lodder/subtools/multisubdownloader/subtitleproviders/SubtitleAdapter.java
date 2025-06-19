@@ -38,6 +38,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +49,8 @@ import org.slf4j.LoggerFactory;
  * @param <X> type of the exception thrown by the api
  */
 //@ExtensionMethod({Files.class})
-public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception>
-    implements SubtitleProvider<SUB>, AdapterIntf {
+public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception> implements
+    SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
 
     @val @override Manager manager;
@@ -367,31 +368,49 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     }
                 }
             } else {
-                Optional<M> releaseMapping = releaseNameCache.getOptional();
-                if (tvdbIdCache != null) {
-                    tvdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
-                }
-                if (imdbIdCache != null) {
-                    imdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
-                }
-                return releaseMapping;
+                return releaseNameCache.getOptional();
+//                Optional<M> releaseMapping = releaseNameCache.getOptional();
+//                if (tvdbIdCache != null) {
+//                    tvdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
+//                }
+//                if (imdbIdCache != null) {
+//                    imdbIdCache.store(Value.of(releaseMapping.orElseThrow()));
+//                }
+//                return releaseMapping;
             }
         }
 
-        List<P> providerReleaseIds = providerReleaseIdsFunction.apply(providerIds, nameToSearchFor);
+        List<P> providerReleaseIds;
+        try {
+            providerReleaseIds = providerReleaseIdsFunction.apply(providerIds, nameToSearchFor);
+        } catch (Exception exc) {
+            if (exc instanceof ApiExceptionIntf e) {
+                switch (e.cacheStrategy) {
+                    case CACHE_DISABLED -> {
+                    }
+                    case CACHE_TEMPORARY ->
+                        releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                    case CACHE_PERMANENT ->
+                        releaseNameCache.store(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                }
+            }
+            throw exc;
+        }
         if (providerReleaseIds.isEmpty()) {
             // If no release provider ids are found, store a temporary null value in the cache with a 1-day expiration,
             // to avoid repeatedly querying the provider on each method call.
             // If a previously cached null value has expired, store it again with double the previous expiration time.
-//            releaseNameCache.storeTempValue(Value.of((M) null));
             releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
+//            releaseNameCache.storeTempValue(Value.of((M) null));
             return Optional.empty();
         }
 
         M releaseMapping;
-        if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerReleaseIds.size() == 1) {
+        if (providerReleaseIds.size() == 1 && (!userInteractionHandler.settings.optionsConfirmProviderMapping ||
+            providerReleaseIds.first().autoSelectable)) {
             // If only one releases mapping is found and the user has disabled confirmation for single results,
-            // automatically select this mapping as the desired one.
+            // or the result is found using an id, rather than a name, automatically select this mapping as
+            // the desired one.
             releaseMapping =
                 releaseMappingConstructor.apply(name, providerReleaseIds.first.id, providerReleaseIds.first.name);
         } else {

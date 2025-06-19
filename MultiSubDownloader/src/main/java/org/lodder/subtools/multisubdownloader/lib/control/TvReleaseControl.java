@@ -6,6 +6,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +34,10 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
     }
 
     private void setImdbId(TvRelease release) {
+        release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name, VideoType.EPISODE)
+            .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
         release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchSerie(release.name)
             .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
-        release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name)
-            .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
 //        release.providerIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
 //            .ifPresent(serie -> release.providerIds.add(ProviderIdType.IMDB, serie.imdbId)));
         if (release.providerIds.getImdbId().isEmpty()) {

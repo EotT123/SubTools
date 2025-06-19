@@ -1,6 +1,8 @@
 package org.lodder.subtools.sublibrary.util.http;
 
 import static manifold.science.measures.TimeUnit.*;
+import static manifold.science.util.UnitConstants.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
@@ -11,16 +13,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
+import manifold.ext.props.rt.api.val;
 import manifold.ext.rt.api.Self;
 import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
-import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.CacheStrategy;
 import org.lodder.subtools.sublibrary.LogLevel;
+import org.lodder.subtools.sublibrary.util.function.QuadFunction;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -31,17 +33,15 @@ public class RetrofitService {
         //hide utility class constructor
     }
 
+    @NullMarked
     public record ErrorHandler<X extends Exception>(
         // predicate to test if this handler is applicable
         BiPredicate<HttpStatus, String> predicate,
-        // Time to sleep before a retry
-        Time sleepTimeBeforeRetry=1Second,
-        // should retries be done?
-        boolean retry=true,
-        LogLevel logLevel=LogLevel.ERROR,
+        // Time to sleep before a retry. Null means no retry
+        @Nullable Time sleepTimeBeforeRetry,
         // Custom exception creator to use instead of the default one. If non is supplied, the default one is used.
-        // Parameters: http status code, error body, loglevel
-        @Nullable TriFunction<HttpStatus, String, LogLevel, X> exception=null) {
+        // Parameters: http status code, error body
+        BiFunction<HttpStatus, String, X> exception) {
 
         public boolean isApplicable(HttpStatus status, String message) {
             return predicate.test(status, message);
@@ -49,7 +49,7 @@ public class RetrofitService {
     }
 
     public static <T, X extends Exception> ExecuteCall<T, X> handleExecution(ThrowingSupplier<Call<T>, X> supplier,
-        BiFunction<HttpStatus, LogLevel, X> defaultExceptionCreator) {
+        QuadFunction<HttpStatus, String, CacheStrategy, LogLevel, X> defaultExceptionCreator) {
         return new ExecuteCall<>(supplier, defaultExceptionCreator);
     }
 
@@ -57,92 +57,105 @@ public class RetrofitService {
     public static class ExecuteCall<T, X extends Exception> {
 
         private final ThrowingSupplier<Call<T>, X> supplier;
-        private final BiFunction<HttpStatus, LogLevel, X> defaultExceptionCreator;
-        private int retries = 1;
+        private final QuadFunction<HttpStatus, String, CacheStrategy, LogLevel, X> defaultExceptionCreator;
         private final List<ErrorHandler<X>> errorHandlers = new ArrayList<>();
 
         public ExecuteCall(ThrowingSupplier<Call<T>, X> supplier,
-            BiFunction<HttpStatus, LogLevel, X> defaultExceptionCreator) {
+            QuadFunction<HttpStatus, String, CacheStrategy, LogLevel, X> defaultExceptionCreator) {
             this.supplier = supplier;
             this.defaultExceptionCreator = defaultExceptionCreator;
         }
 
-        private record HandleException<T, X extends Exception>(Predicate<X> predicate,
-            Function<X, T> exceptionFunction) {
+        public @Self ExecuteCall<T, X> addErrorHandler(HttpStatus code, CacheStrategy cacheStrategy=CACHE_TEMPORARY,
+            LogLevel logLevel=ERROR, @Nullable Time sleepTimeBeforeRetry=null) {
+            return addErrorHandler(new ErrorHandler<>((c, _) -> c == code, sleepTimeBeforeRetry,
+                (httpStatus, error) -> defaultExceptionCreator.apply(httpStatus, error, cacheStrategy, logLevel)));
         }
 
-        public @Self ExecuteCall<T, X> addErrorHandler(HttpStatus code, Time sleepTimeBeforeRetry=1Second,
-            boolean retry=true, LogLevel logLevel=LogLevel.ERROR) {
-            return addErrorHandler(new ErrorHandler<>((c, _) -> c == code, sleepTimeBeforeRetry, retry, logLevel));
-        }
+//        public @Self ExecuteCall<T, X> addErrorHandler(ErrorHandlerType errorHandlerType,
+//            @Nullable CacheStrategy cacheStrategy=null, @Nullable LogLevel logLevel=null,
+//            @Nullable Time sleepTimeBeforeRetry=null) {
+//            return addErrorHandler(errorHandlerType.code, cacheStrategy != null ? cacheStrategy :
+//                    errorHandlerType.cacheStrategy, logLevel != null ? logLevel : errorHandlerType.logLevel,
+//                sleepTimeBeforeRetry != null ? sleepTimeBeforeRetry : errorHandlerType.sleepTimeBeforeRetry);
+//        }
 
         public @Self ExecuteCall<T, X> addErrorHandler(ErrorHandler<X> errorHandle) {
             errorHandlers.add(errorHandle);
             return this;
         }
 
-        public @Self ExecuteCall<T, X> retries(int retries) {
-            if (retries <= 0) {
-                throw new IllegalStateException("Retries should be greater than 0");
+        @NullMarked
+        public enum ErrorHandlerType {
+            ERR_BAD_REQUEST(BAD_REQUEST),
+            ERR_UNAUTHORIZED(UNAUTHORIZED, CACHE_DISABLED),
+            ERR_PAYMENT_REQUIRED(PAYMENT_REQUIRED, CACHE_DISABLED),
+            ERR_FORBIDDEN(FORBIDDEN),
+            ERR_NOT_FOUND(NOT_FOUND, logLevel:INFO),
+            ERR_METHOD_NOT_ALLOWED(METHOD_NOT_ALLOWED),
+            ERR_NOT_ACCEPTABLE(NOT_ACCEPTABLE),
+            ERR_PROXY_AUTHENTICATION_REQUIRED(PROXY_AUTHENTICATION_REQUIRED, CACHE_DISABLED),
+            ERR_REQUEST_TIMEOUT(REQUEST_TIMEOUT, CACHE_DISABLED, sleepTimeBeforeRetry:5s),
+            ERR_CONFLICT(CONFLICT),
+            ERR_GONE(GONE),
+            ERR_LENGTH_REQUIRED(LENGTH_REQUIRED),
+            ERR_PRECONDITION_FAILED(PRECONDITION_FAILED),
+            ERR_REQUEST_TOO_LONG(REQUEST_TOO_LONG),
+            ERR_REQUEST_URI_TOO_LONG(REQUEST_URI_TOO_LONG),
+            ERR_UNSUPPORTED_MEDIA_TYPE(UNSUPPORTED_MEDIA_TYPE),
+            ERR_REQUESTED_RANGE_NOT_SATISFIABLE(REQUESTED_RANGE_NOT_SATISFIABLE),
+            ERR_EXPECTATION_FAILED(EXPECTATION_FAILED),
+            ERR_INSUFFICIENT_SPACE_ON_RESOURCE(INSUFFICIENT_SPACE_ON_RESOURCE),
+            ERR_METHOD_FAILURE(METHOD_FAILURE, sleepTimeBeforeRetry:2Second),
+            ERR_MISDIRECTED_REQUEST(MISDIRECTED_REQUEST),
+            ERR_UNPROCESSABLE_ENTITY(UNPROCESSABLE_ENTITY),
+            ERR_LOCKED(LOCKED, logLevel:INFO, sleepTimeBeforeRetry:5Second),
+            ERR_TOO_EARLY(TOO_EARLY, sleepTimeBeforeRetry:1Second),
+            ERR_UPGRADE_REQUIRED(UPGRADE_REQUIRED),
+            ERR_PRECONDITION_REQUIRED(PRECONDITION_REQUIRED),
+            ERR_TOO_MANY_REQUESTS(TOO_MANY_REQUESTS, CACHE_DISABLED, WARN, 5Second),
+            ERR_REQUEST_HEADER_FIELDS_TOO_LARGE(REQUEST_HEADER_FIELDS_TOO_LARGE),
+            ERR_UNAVAILABLE_FOR_LEGAL_REASONS(UNAVAILABLE_FOR_LEGAL_REASONS),
+
+            // 5xx Server Error
+            ERR_SERVER_ERROR(SERVER_ERROR, sleepTimeBeforeRetry:2Second),
+            ERR_NOT_IMPLEMENTED(NOT_IMPLEMENTED),
+            ERR_BAD_GATEWAY(BAD_GATEWAY, sleepTimeBeforeRetry:2Second),
+            ERR_SERVICE_UNAVAILABLE(SERVICE_UNAVAILABLE, sleepTimeBeforeRetry:5Second),
+            ERR_GATEWAY_TIMEOUT(GATEWAY_TIMEOUT, sleepTimeBeforeRetry:2Second),
+            ERR_HTTP_VERSION_NOT_SUPPORTED(HTTP_VERSION_NOT_SUPPORTED),
+            ERR_VARIANT_ALSO_NEGOTIATES(VARIANT_ALSO_NEGOTIATES),
+            ERR_INSUFFICIENT_STORAGE(INSUFFICIENT_STORAGE),
+            ERR_LOOP_DETECTED(LOOP_DETECTED),
+            ERR_NOT_EXTENDED(NOT_EXTENDED),
+            ERR_NETWORK_AUTHENTICATION_REQUIRED(NETWORK_AUTHENTICATION_REQUIRED);
+
+            @val HttpStatus code;
+            @val CacheStrategy cacheStrategy;
+            @val LogLevel logLevel;
+            @val @Nullable Time sleepTimeBeforeRetry;
+
+            ErrorHandlerType(HttpStatus code, CacheStrategy cacheStrategy=CACHE_TEMPORARY, LogLevel logLevel=ERROR,
+                @Nullable Time sleepTimeBeforeRetry=null) {
+                this.code = code;
+                this.cacheStrategy = cacheStrategy;
+                this.logLevel = logLevel;
+                this.sleepTimeBeforeRetry = sleepTimeBeforeRetry;
             }
-            this.retries = retries;
-            return this;
         }
 
         public T execute() throws X {
-            // 4xx Client Error
-            addErrorHandler(BAD_REQUEST, retry:false);
-            addErrorHandler(UNAUTHORIZED, retry:false);
-            addErrorHandler(PAYMENT_REQUIRED, retry:false);
-            addErrorHandler(FORBIDDEN, retry:false);
-            addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO);
-            addErrorHandler(METHOD_NOT_ALLOWED, retry:false);
-            addErrorHandler(NOT_ACCEPTABLE, retry:false);
-            addErrorHandler(PROXY_AUTHENTICATION_REQUIRED, retry:false);
-            addErrorHandler(REQUEST_TIMEOUT, sleepTimeBeforeRetry:2Second);
-            addErrorHandler(CONFLICT, retry:false);
-            addErrorHandler(GONE, retry:false);
-            addErrorHandler(LENGTH_REQUIRED, retry:false);
-            addErrorHandler(PRECONDITION_FAILED, retry:false);
-            addErrorHandler(REQUEST_TOO_LONG, retry:false);
-            addErrorHandler(REQUEST_URI_TOO_LONG, retry:false);
-            addErrorHandler(UNSUPPORTED_MEDIA_TYPE, retry:false);
-            addErrorHandler(REQUESTED_RANGE_NOT_SATISFIABLE, retry:false);
-            addErrorHandler(EXPECTATION_FAILED, retry:false);
-            addErrorHandler(INSUFFICIENT_SPACE_ON_RESOURCE, retry:false);
-            addErrorHandler(METHOD_FAILURE, sleepTimeBeforeRetry:2Second);
-            addErrorHandler(MISDIRECTED_REQUEST, retry:false);
-            addErrorHandler(UNPROCESSABLE_ENTITY, retry:false);
-            addErrorHandler(LOCKED, sleepTimeBeforeRetry:2Second);
-            addErrorHandler(TOO_EARLY, sleepTimeBeforeRetry:1Second);
-            addErrorHandler(UPGRADE_REQUIRED, retry:false);
-            addErrorHandler(PRECONDITION_REQUIRED, retry:false);
-            addErrorHandler(TOO_MANY_REQUESTS, sleepTimeBeforeRetry:5Second, logLevel:WARN);
-            addErrorHandler(REQUEST_HEADER_FIELDS_TOO_LARGE, retry:false);
-            addErrorHandler(UNAVAILABLE_FOR_LEGAL_REASONS, retry:false);
-
-            // 5xx Server Error
-            addErrorHandler(SERVER_ERROR, sleepTimeBeforeRetry:2Second);
-            addErrorHandler(NOT_IMPLEMENTED, retry:false);
-            addErrorHandler(BAD_GATEWAY, sleepTimeBeforeRetry:2Second);
-            addErrorHandler(SERVICE_UNAVAILABLE, sleepTimeBeforeRetry:5Second);
-            addErrorHandler(GATEWAY_TIMEOUT, sleepTimeBeforeRetry:2Second);
-            addErrorHandler(HTTP_VERSION_NOT_SUPPORTED, retry:false);
-            addErrorHandler(VARIANT_ALSO_NEGOTIATES, retry:false);
-            addErrorHandler(INSUFFICIENT_STORAGE, retry:false);
-            addErrorHandler(LOOP_DETECTED, retry:false);
-            addErrorHandler(NOT_EXTENDED, retry:false);
-            addErrorHandler(NETWORK_AUTHENTICATION_REQUIRED, retry:false);
-
-            return executePrivate();
+            ErrorHandlerType.values().forEach(errorHandlerType -> addErrorHandler(errorHandlerType.code,
+                errorHandlerType.cacheStrategy, errorHandlerType.logLevel, errorHandlerType.sleepTimeBeforeRetry));
+            return executePrivate(true);
         }
 
-        private T executePrivate() throws X {
+        private T executePrivate(boolean canRetry) throws X {
             Response<T> response;
             try {
                 response = supplier.get().execute();
             } catch (IOException e) {
-                throw defaultExceptionCreator.apply(BAD_GATEWAY, ERROR);
+                throw defaultExceptionCreator.apply(BAD_GATEWAY, e.getMessage(), CACHE_TEMPORARY, ERROR);
             }
             if (response.isSuccessful()) {
                 return Objects.requireNonNull(response.body());
@@ -154,34 +167,19 @@ public class RetrofitService {
                     errorBody = "";
                 }
                 HttpStatus code = fromStatusCode(response.code());
-                if (retries <= 0) {
-                    throw defaultExceptionCreator.apply(code, ERROR);
-                }
-                for (ErrorHandler<X> errorHandler : errorHandlers) {
-                    if (errorHandler.isApplicable(code, errorBody)) {
-                        if (!errorHandler.retry) {
-                            throw createException(errorHandler, code, errorBody, errorHandler.logLevel);
+                if (canRetry) {
+                    for (ErrorHandler<X> errorHandler : errorHandlers) {
+                        if (errorHandler.isApplicable(code, errorBody)) {
+                            if (errorHandler.sleepTimeBeforeRetry == null) {
+                                throw errorHandler.exception.apply(code, errorBody);
+                            }
+                            sleep(errorHandler.sleepTimeBeforeRetry);
+                            return executePrivate(false);
                         }
-                        sleep(errorHandler.sleepTimeBeforeRetry);
-                        retries--;
-                        executePrivate();
-                        break;
                     }
                 }
-                // unhandled exception
-                throw defaultExceptionCreator.apply(code, ERROR);
-            }
-        }
-
-        private X createException(ErrorHandler<X> errorHandler, HttpStatus httpStatus, String errorBody,
-            LogLevel logLevel) {
-            if (errorHandler.exception == null) {
-                return defaultExceptionCreator.apply(httpStatus, logLevel);
-            } else {
-                return errorHandler.exception.apply(httpStatus, errorBody, logLevel);
+                throw defaultExceptionCreator.apply(SERVER_ERROR, errorBody, CACHE_TEMPORARY, ERROR);
             }
         }
     }
-
-
 }

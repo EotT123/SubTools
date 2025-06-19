@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +17,7 @@ import org.jsoup.select.Elements;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.exception.TvSubtitleApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.model.TVSubtitlesSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -25,11 +27,15 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.CookieManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Api for retrieving serie information from tvsubtitles.net
  */
 public class TvSubtitlesApi implements SubtitleApi {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
     @val @override Manager manager;
@@ -39,7 +45,7 @@ public class TvSubtitlesApi implements SubtitleApi {
         this.manager = manager;
     }
 
-    public List<ProviderId> getProviderIds(String serieName) throws TvSubtitleException {
+    public List<ProviderId> getProviderIds(String serieName) throws TvSubtitleApiException {
         return getCache("providerIds", b -> b.add("name", serieName))
             .getCollection(() -> {
                 try {
@@ -52,13 +58,14 @@ public class TvSubtitlesApi implements SubtitleApi {
                             StringUtils.substringAfterLast(element.attr("href"), "/")))
                         .toList();
                 } catch (Exception e) {
-                    throw new TvSubtitleException(e);
+                    LOGGER.error(e.getMessage(), e);
+                    throw TvSubtitleApiException.error(e);
                 }
             });
     }
 
     public Set<TVSubtitlesSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
-        Language language) throws TvSubtitleException {
+        Language language) throws TvSubtitleApiException {
         Set<TVSubtitlesSubtitleMetadata> results = new HashSet<>();
         TVSubtitlesLanguage providerLang = TVSubtitlesLanguage.of(language).orElse(null);
 
@@ -74,7 +81,7 @@ public class TvSubtitlesApi implements SubtitleApi {
     }
 
     private List<EpisodeRow> getSeasonSubtitleInfo(String providerId, int season,
-        @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleException {
+        @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleApiException {
         return getCache("seasonSubtitleInfo",
             b -> b.add("providerId", providerId).add("season", season).add("language", providerLang))
             .getCollection(() -> {
@@ -96,13 +103,14 @@ public class TvSubtitlesApi implements SubtitleApi {
                                 Integer.parseInt(seasonEpisode[1]), urls);
                         }).filter(episodeRow -> !episodeRow.urls.isEmpty()).toList();
                 } catch (Exception e) {
-                    throw new TvSubtitleException(e);
+                    LOGGER.error(e.getMessage(), e);
+                    throw TvSubtitleApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
             });
     }
 
     private List<TVSubtitlesSubtitleMetadata> getSubtitles(String episodeUrl,
-        @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleException {
+        @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleApiException {
         return getCache("subtitles", b -> b.add("url", episodeUrl))
             .getCollection(() -> {
                 try {
@@ -123,7 +131,8 @@ public class TvSubtitlesApi implements SubtitleApi {
                                 providerLang != null ? providerLang.language : null);
                         }).toList();
                 } catch (ManagerException e) {
-                    throw new TvSubtitleException(e);
+                    LOGGER.error(e.getMessage(), e);
+                    throw TvSubtitleApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
             });
     }

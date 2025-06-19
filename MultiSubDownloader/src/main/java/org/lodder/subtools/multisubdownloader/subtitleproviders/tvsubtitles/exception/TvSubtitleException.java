@@ -14,7 +14,15 @@ public class TvSubtitleException extends SubtitlesProviderException {
 
     @val @override String subtitleProvider = SubtitleSource.TVSUBTITLES.name;
 
+    public TvSubtitleException(String message) {
+        super(message);
+    }
+
     public TvSubtitleException(Throwable cause) {
         super(cause);
+    }
+
+    public TvSubtitleException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

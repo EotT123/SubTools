@@ -11,6 +11,14 @@ public class TvdbException extends Exception {
         super(message);
     }
 
+    public TvdbException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public TvdbException(Throwable cause) {
+        super(cause);
+    }
+
     public TvdbException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

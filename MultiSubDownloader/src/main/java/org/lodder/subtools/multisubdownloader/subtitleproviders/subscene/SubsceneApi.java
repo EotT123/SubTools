@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
 import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
@@ -30,9 +31,13 @@ import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.Utils;
 
 public class SubsceneApi implements SubtitleApi {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
 
     private static final Time RATE_DURATION_SHORT = 1Second;
     private static final Time RATE_DURATION_LONG = 5Second;
@@ -68,9 +73,9 @@ public class SubsceneApi implements SubtitleApi {
 //    /**
 //     * @param title the movie title
 //     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
-//     * @throws SubsceneException SubsceneException
+//     * @throws SubsceneApiException SubsceneApiException
 //     */
-//    public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneException {
+//    public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneApiException {
 //        return getProviderIds(title, elem -> {
 //            String _title = null;
 //            Integer _year = null;
@@ -90,9 +95,10 @@ public class SubsceneApi implements SubtitleApi {
     /**
      * @param serieName the name of the serie
      * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
-     * @throws SubsceneException SubsceneException
+     * @throws SubsceneApiException SubsceneApiException
      */
-    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(String serieName) throws SubsceneException {
+    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(String serieName)
+        throws SubsceneApiException {
         return getProviderIds(serieName, elem -> {
             Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
             if (matcher.matches()) {
@@ -105,7 +111,7 @@ public class SubsceneApi implements SubtitleApi {
     }
 
     public List<SubsceneSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
-        Language language) throws SubsceneException {
+        Language language) throws SubsceneApiException {
         return getCache("subtitles",
             b -> b.add("providerId", providerId).add("season", season).add("episode", episode))
             .getCollection(() -> {
@@ -121,7 +127,7 @@ public class SubsceneApi implements SubtitleApi {
                             boolean hearingImpaired = row.selectFirstByCss(".a41") != null;
                             String uploader = row.selectFirstByCss(".a5 > a").text().trim();
                             String comment = row.selectFirstByCss(".a6 > div").text().trim();
-                            ThrowingSupplier<String, SubsceneException> urlSupplier = () -> getDownloadUrl(
+                            ThrowingSupplier<String, SubsceneApiException> urlSupplier = () -> getDownloadUrl(
                                 DOMAIN + row.select(".a1 > a").attr("href").trim());
                             return new SubsceneSubtitleMetadata(lang, name, hearingImpaired, uploader, comment,
                                 urlSupplier);
@@ -134,7 +140,8 @@ public class SubsceneApi implements SubtitleApi {
                         .filter(sub -> sub.name.contains("S%02dE%02d".formatted(season, episode)))
                         .toList();
                 } catch (Exception e) {
-                    throw new SubsceneException(e);
+                    LOGGER.error(e.getMessage(), e);
+                    throw SubsceneApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
             });
     }
@@ -147,10 +154,10 @@ public class SubsceneApi implements SubtitleApi {
      * @param name the release name
      * @param <S> the type of the {@link SubSceneSerieId} contained in the {@link Map}
      * @return a {@link Map} containing a list of {@link ProviderId provider release ids} per type
-     * @throws SubsceneException SubsceneException
+     * @throws SubsceneApiException SubsceneApiException
      */
     public <S extends SubSceneSerieId> Map<SearchResultType, List<S>> getProviderIds(String name,
-        Function<Element, S> subsceneIdCreator) throws SubsceneException {
+        Function<Element, S> subsceneIdCreator) throws SubsceneApiException {
         try {
             if (StringUtils.isBlank(name)) {
                 return Map.of();
@@ -161,19 +168,21 @@ public class SubsceneApi implements SubtitleApi {
                 .collect(Utils.mapCollector((map, titleElement) -> map.put(SearchResultType.of(titleElement.text()),
                     titleElement.nextElementSibling().select("a").stream().map(subsceneIdCreator).toList())));
         } catch (Exception e) {
-            throw new SubsceneException(e);
+            LOGGER.error(e.getMessage(), e);
+            throw SubsceneApiException.error(e);
         }
     }
 
-    private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
+    private String getDownloadUrl(String seriePageUrl) throws SubsceneApiException {
         try {
             String href = getJsoupDocument(seriePageUrl).selectFirstById("downloadButton").attr("href");
             if (StringUtils.isBlank(href)) {
-                throw new SubsceneException("href for $seriePageUrl is blank");
+                throw SubsceneApiException.error(message:"href for $seriePageUrl is blank");
             }
             return DOMAIN + href;
         } catch (ManagerException e) {
-            throw new SubsceneException(e);
+            LOGGER.error(e.getMessage(), e);
+            throw SubsceneApiException.error(e, cacheStrategy:CACHE_DISABLED);
         }
     }
 

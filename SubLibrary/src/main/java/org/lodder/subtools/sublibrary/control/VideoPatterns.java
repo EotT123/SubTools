@@ -54,8 +54,8 @@ public class VideoPatterns {
 
     @NullMarked
     public enum VideoEncoding implements RegexPattern {
-        X264("x264", "[xh]264"),
-        X265("x265", "[xh]265|hevc");
+        X264("x264", "[xh][_|-|\\.]?264"),
+        X265("x265", "[xh][_|-|\\.]?265|hevc");
 
         @val @override Pattern pattern;
         @val @override String value;
@@ -75,7 +75,14 @@ public class VideoPatterns {
 
     @NullMarked
     public enum AudioEncoding implements RegexPattern {
-        DD5_1("dd5.1", "dd5[-.]1");
+        FORMAT_DD5_1("dd5.1", "dd5[_|-|\\.]?1"),
+        FORMAT_DDP5_1("ddp5.1", "ddp5[_|-|\\.]?1"),
+        CHANNEL_2("2ch", "2[_|-|\\.]?ch"),
+        CHANNEL_6("6ch", "6[_|-|\\.]?ch"),
+        BIT_DEPTH_8("8bit", "8[_|-|\\.]?bit"),
+        BIT_DEPTH_10("10bit", "10[_|-|\\.]?bit"),
+        BIT_DEPTH_UNKNOWN("", "\\d{1,2}[_|-|\\.]?bit"),
+        ATMOS("atmos", "atmos");
 
         @val @override Pattern pattern;
         @val @override String value;

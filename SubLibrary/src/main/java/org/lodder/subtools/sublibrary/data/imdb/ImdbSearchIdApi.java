@@ -11,6 +11,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -20,6 +22,7 @@ import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
+import org.lodder.subtools.sublibrary.model.VideoType;
 import util.Utils;
 
 record ImdbSearchIdApi(Manager manager) {
@@ -40,8 +43,33 @@ record ImdbSearchIdApi(Manager manager) {
                     Elements searchResults = manager.getAsJsoupDocument(url(url)).select(".find-result-item");
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirst("a").text(),
-                        e -> e.selectFirst("a").attr("href"),
-                        e -> e.selectFirst("span").text());
+                        e -> e.selectFirst("a").attr("href"), e -> e.selectFirst("span").text(),
+                        e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text()).findFirst().orElse(""),
+                        e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text().contains("TV Series") ?
+                            VideoType.EPISODE : VideoType.MOVIE).findFirst().orElse(null));
+                } catch (Exception e) {
+                    throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
+                }
+            });
+    }
+
+    public ImdbId getImdbIdOnImdb(String title, String imdbId) throws ImdbSearchIdException {
+        return manager.getCache(CacheType.MEMORY,
+                new CacheKeyBuilder("IMDB", "imdbid-imdb_user-provided").add("title", title).add("imdbId", imdbId))
+            .get(() -> {
+                String url = "https://www.imdb.com/title/" + imdbId;
+                try {
+                    String json = manager.getAsJsoupDocument(url(url))
+                        .selectFirst("html > head > script[type=\"application/ld+json\"]").data();
+                    JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+                    String name = jsonObject.get("name").getAsString();
+                    String year = jsonObject.get("datePublished").getAsString();
+                    VideoType videoType = switch (jsonObject.get("@type").getAsString()) {
+                        case "Movie" -> VideoType.MOVIE;
+                        case "TVSeries" -> VideoType.EPISODE;
+                        default -> null;
+                    };
+                    return new ImdbId(name, imdbId, year, null, videoType);
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
                 }
@@ -101,18 +129,21 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    private Set<ImdbId> getImdbIdCommon(Elements searchResults, Function<Element, String> toStringMapper,
-        Function<Element, String> toHrefMapper, Function<Element, String> toYearMapper=e -> null) {
+    private Set<ImdbId> getImdbIdCommon(Elements searchResults, Function<Element, String> toNameMapper,
+        Function<Element, String> toHrefMapper, Function<Element, String> toYearMapper=e -> null,
+        Function<Element, String> toOtherInfoMapper=e -> null,
+        Function<Element, VideoType> toVideoTypeMapper=e -> null) {
         return searchResults.stream().collect(Utils.setCollector(
             (set, element) -> {
-                String name = toStringMapper.apply(element);
+                String name = toNameMapper.apply(element);
                 if (StringUtils.isBlank(name)) {
                     return;
                 }
                 String href = toHrefMapper.apply(element);
                 Matcher matcher = IMDB_URL_ID_PATTERN.matcher(href);
                 if (matcher.find()) {
-                    set.add(new ImdbId(name, matcher.group().replace("/title/tt", "tt"), toYearMapper.apply(element)));
+                    set.add(new ImdbId(name, matcher.group().replace("/title/tt", "tt"), toYearMapper.apply(element),
+                        toOtherInfoMapper.apply(element), toVideoTypeMapper.apply(element)));
                 }
             }));
     }

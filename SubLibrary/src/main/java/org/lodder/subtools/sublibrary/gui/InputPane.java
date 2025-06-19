@@ -19,9 +19,11 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
 
+@NullMarked
 public class InputPane<T> extends JDialog implements ActionListener, PropertyChangeListener {
 
     @Serial
@@ -41,18 +43,18 @@ public class InputPane<T> extends JDialog implements ActionListener, PropertyCha
     public InputPane(@Nullable Frame owner=null,
         String title,
         String message,
-        List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
+        @Nullable List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
         Function<String, T> toObjectMapper,
-        List<Validator<T>> objectValidators=new ArrayList<Validator<T>>(),
+        @Nullable List<Validator<T>> objectValidators=new ArrayList<Validator<T>>(),
         String okText=getText("App.OK"),
         String cancelText=getText("App.Cancel")) {
 
         super(owner, true);
         setTitle(title);
         this.message = message;
-        this.inputValidators = inputValidators;
+        this.inputValidators = inputValidators == null ? List.of() : List.copyOf(inputValidators);
         this.toObjectMapper = toObjectMapper;
-        this.objectValidators = objectValidators;
+        this.objectValidators = objectValidators == null ? List.of() : List.copyOf(objectValidators);
         this.okText = okText;
         this.cancelText = cancelText;
     }

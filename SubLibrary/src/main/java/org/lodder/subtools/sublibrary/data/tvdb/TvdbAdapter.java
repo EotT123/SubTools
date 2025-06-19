@@ -10,15 +10,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import com.tvdb.model.MovieBaseRecord;
 import com.tvdb.model.SearchResult;
 import com.tvdb.model.SeriesBaseRecord;
-import com.uwetrottmann.thetvdb.entities.Series;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
+import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbException;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -42,7 +43,7 @@ public class TvdbAdapter implements AdapterIntf {
         this.api = new TvdbApi(manager, API_KEY);
     }
 
-    public Optional<Series> searchMovie(String title) {
+    public Optional<MovieBaseRecord> searchMovie(String title) {
         //TODO implement this
         return Optional.empty();
     }
@@ -50,7 +51,7 @@ public class TvdbAdapter implements AdapterIntf {
     public Optional<SearchResult> searchSerie(String serieName) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
 
-        CacheKey cache = getCache("series", b -> b.add("name", encodedSerieName));
+        CacheKey cache = getCache("serie", b -> b.add("name", serieName));
 
         if (cache.isPresent() && (!cache.isTemporaryObject() || !cache.isExpiredTemporary())) {
             return cache.getOptional();
@@ -78,11 +79,10 @@ public class TvdbAdapter implements AdapterIntf {
                     s -> "${s.name} (${s.firstAirTime})");
                 if (tvdbSerie.isEmpty()) {
                     LOGGER.error("Unknown serie name in tvdb: $serieName");
-                    tvdbSerie = promptUserToEnterTvdbId(serieName)
-                        .mapToObjEx(tvdbId -> api.searchSerie(tvdbId).orElse(null));
+                    tvdbSerie = promptUserToEnterTvdbId(serieName).mapToObjEx(api::searchSerie);
                 }
-            } catch (TvdbException e) {
-                tvdbSerie = Optional.empty();
+            } catch (TvdbApiException e) {
+                return Optional.empty();
             }
         }
         if (tvdbSerie.isEmpty()) {
@@ -91,10 +91,8 @@ public class TvdbAdapter implements AdapterIntf {
             cache.store(Value.ofOptional(tvdbSerie));
             Optional<SerieMapping> serieMapping =
                 tvdbSerie.map((SearchResult serie) -> new SerieMapping(serieName, serie.tvdbId, serie.name));
-            getCache("serieId", b -> b.add("name", encodedSerieName))
-                .store(
-                    value:Value.ofOptional(serieMapping),
-                    storeTempNullValue:true);
+            getCache("seriemapping", b -> b.add("name", encodedSerieName))
+                .store(Value.ofOptional(serieMapping));
         }
         return tvdbSerie;
     }
@@ -104,8 +102,8 @@ public class TvdbAdapter implements AdapterIntf {
             .getOptional(
                 () -> {
                     try {
-                        return api.searchEpisode(tvdbId, season, episode, Language.ENGLISH);
-                    } catch (TvdbException e) {
+                        return Optional.of(api.searchEpisode(tvdbId, season, episode, Language.ENGLISH));
+                    } catch (TvdbApiException e) {
                         LOGGER.error(
                             "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
                                 TvRelease.formatSeasonEpisode(season, episode)), e);

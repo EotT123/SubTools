@@ -21,4 +21,8 @@ public class SubdlException extends SubtitlesProviderException {
     public SubdlException(String message) {
         super(message);
     }
+
+    public SubdlException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

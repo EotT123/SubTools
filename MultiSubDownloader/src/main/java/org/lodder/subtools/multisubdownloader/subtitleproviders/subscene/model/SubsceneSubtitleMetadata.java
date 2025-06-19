@@ -17,11 +17,11 @@ public class SubsceneSubtitleMetadata implements Serializable {
     @val @Nullable String uploader;
     @val @Nullable String comment;
     @val @Nullable SeasonEpisode seasonEpisode;
-    @val ThrowingSupplier<String, SubsceneException> urlSupplier;
+    @val ThrowingSupplier<String, ? extends SubsceneException> urlSupplier;
 
     public SubsceneSubtitleMetadata(@Nullable Language language,
         @Nullable String name, boolean hearingImpaired,@Nullable String uploader, @Nullable String comment,
-        ThrowingSupplier<String, SubsceneException> urlSupplier) {
+        ThrowingSupplier<String, ? extends SubsceneException> urlSupplier) {
         this.language = language;
         this.name = name;
         this.hearingImpaired = hearingImpaired;
