@@ -28,6 +28,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -173,7 +174,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 //            new SelectionForKeyPrefix("", "subdl-releasemapping-"),
 //            k -> List.of(k.replace("-providerid-", "-serie-")) );
 
-        public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<String, SerieMapping>>>
+        public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<ProviderCacheKey, SerieMapping>>>
             MAPPING_SUPPLIER;
         @val String name;
         @val String providerName;
@@ -189,7 +190,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
         static {
             MAPPING_SUPPLIER = (manager, selectionForKeyPrefix) ->
-                manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix)).getEntries();
+                manager.getCache(CacheType.DISK, k -> k.toString().startsWith(selectionForKeyPrefix.keyPrefix))
+                    .getEntries();
         }
 
         MappingType(String name, SubtitleSource subtitleSource, SelectionForKeyPrefix... selectionForKeyPrefixList) {
@@ -215,11 +217,11 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     private static class Row extends Vector<String> {
         @Serial private static final long serialVersionUID = 1L;
-        @val String key;
+        @val ProviderCacheKey key;
         @val SelectionForKeyPrefix selectionForKeyPrefix;
         @var SerieMapping serieMapping;
 
-        public Row(String key, String name, String providerId, String providerName, SerieMapping serieMapping,
+        public Row(ProviderCacheKey key, String name, String providerId, String providerName, SerieMapping serieMapping,
             SelectionForKeyPrefix selectionForKeyPrefix) {
             this.key = key;
             this.serieMapping = serieMapping;

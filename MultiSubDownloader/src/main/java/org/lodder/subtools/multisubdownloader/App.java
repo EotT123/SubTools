@@ -112,7 +112,7 @@ public class App {
                 app.makeSubtitleProviderStore().getAllProviders().stream().map(provider -> provider.name)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
-            manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key::startsWith))
+            manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key.provider::equals))
                 .clearExpiredCache();
         }).start();
 
@@ -149,15 +149,10 @@ public class App {
         if (splash != null) {
             splash.progressMsg = Messages.getText("App.Starting");
         }
-        ProviderCacheDisk diskCache =
-            new ProviderCacheDisk(
-                500 day,
+        ProviderCacheDisk diskCache = new ProviderCacheDisk(500day,
                 5000);
 
-        ProviderCacheMemory inMemoryCache =
-            new ProviderCacheMemory(
-                10 min,
-                100 ms,
+        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10min, 100ms,
                 2500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);

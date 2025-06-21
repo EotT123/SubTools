@@ -13,11 +13,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -30,15 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public final class ProviderCacheDisk extends ProviderCache {
+public final class ProviderCacheDisk<V> extends ProviderCache<V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProviderCacheDisk.class);
     private static final Object LOCK = new Object();
 
     private final @Nullable Time timeToLive;
     private final Set<ProviderCacheKey> doublesToRemove = new HashSet<>();
-    private final Map<ProviderCacheKey, CacheObject> removedToAdd = new HashMap<>();
-    private final LazyBiFunction<ProviderCacheDisk, String, Connection>
+    private final Map<ProviderCacheKey, CacheObject<V>> removedToAdd = new HashMap<>();
+    private final LazyBiFunction<ProviderCacheDisk<V>, String, Connection>
         connection =
         new LazyBiFunction<>((cache, tableName) -> {
             try {
@@ -64,20 +61,20 @@ public final class ProviderCacheDisk extends ProviderCache {
                     boolean errorWhileReadingCacheFile = false;
                     try (Statement stmt = connection.createStatement();
                          ResultSet rs = stmt.executeQuery("SELECT key, cacheobject FROM $tableName;")) {
-                        Multimap<ProviderCacheKey, CacheObject> tempCache = MultimapBuilder.hashKeys()
-                            .treeSetValues(Comparator.comparing((CacheObject value) -> value.age).reversed())
+                        Multimap<ProviderCacheKey, CacheObject<V>> tempCache = MultimapBuilder.hashKeys()
+                            .treeSetValues(Comparator.comparing((CacheObject<V> value) -> value.age).reversed())
                             .build();
                         synchronized (cache.cacheMap) {
                             while (rs.next()) {
                                 try {
                                     tempCache.put((ProviderCacheKey) rs.getObject("key"),
-                                        (CacheObject) rs.getObject("cacheobject"));
+                                        (CacheObject<V>) rs.getObject("cacheobject"));
                                 } catch (SQLException e2) {
                                     LOGGER.error("Unable to insert object in disk cache. (${e2.getMessage()})", e2);
                                     errorWhileReadingCacheFile = true;
                                 }
                             }
-                            Map<ProviderCacheKey, Collection<CacheObject>> map = tempCache.asMap();
+                            Map<ProviderCacheKey, Collection<CacheObject<V>>> map = tempCache.asMap();
                             map.entrySet().stream()
                                 .filter(entry -> entry.getValue().size() > 1)
                                 .forEach(entry -> {
@@ -140,22 +137,8 @@ public final class ProviderCacheDisk extends ProviderCache {
         return connection.apply(this, tableName);
     }
 
-    @Override
-    public void cleanup(@Nullable Predicate<ProviderCacheKey> keyFilter) {
-        synchronized (cacheMap) {
-            if (timeToLive != null) {
-                Iterator<Entry<ProviderCacheKey, CacheObject>> itr = cacheMap.entrySet().iterator();
-                while (itr.hasNext()) {
-                    Entry<ProviderCacheKey, CacheObject> entry = itr.next();
-                    if ((keyFilter == null || keyFilter.test(entry.getKey())) &&
-                        entry.getValue().isExpired(timeToLive)) {
-                        itr.remove();
-                        removeFromDisk(entry.getKey());
-                    }
-                }
-            }
-            Thread.yield();
-        }
+    protected void removeFromCache(ProviderCacheKey key) {
+        removeFromDisk(key);
     }
 
     @Override
@@ -178,7 +161,7 @@ public final class ProviderCacheDisk extends ProviderCache {
     }
 
     @Override
-    public void put(ProviderCacheKey key, @Nullable Object value, @Nullable Time timeToLive) {
+    public void put(ProviderCacheKey key, @Nullable V value, @Nullable Time timeToLive) {
         synchronized (LOCK) {
             super.put(key, value, timeToLive);
             putFromMemoryCache(key);
@@ -192,7 +175,7 @@ public final class ProviderCacheDisk extends ProviderCache {
                 prep.clearParameters();
                 prep.setObject(1, key);
                 synchronized (cacheMap) {
-                    CacheObject cacheObject = cacheMap.get(key);
+                    CacheObject<V> cacheObject = cacheMap.get(key);
                     prep.setObject(2, cacheObject);
                     prep.execute();
                 }
@@ -203,7 +186,7 @@ public final class ProviderCacheDisk extends ProviderCache {
         }
     }
 
-    public void putWithoutPersist(ProviderCacheKey key, @Nullable Object value) {
+    public void putWithoutPersist(ProviderCacheKey key, @Nullable V value) {
         super.put(key, value);
     }
 }

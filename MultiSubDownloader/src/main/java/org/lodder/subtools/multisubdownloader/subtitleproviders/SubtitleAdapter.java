@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -23,13 +22,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
@@ -267,7 +266,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
         return getProviderReleaseMapping(name,
             nameToSearchFor, displayName,
-            MapUtil.create("season", season),
+            List.of(new ProviderCacheKeyParam("season", season)),
             providerIds,
             providerReleaseIdByIdFunction,
             providerReleaseIdsByNameFunction,
@@ -345,7 +344,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      */
     public <M extends ReleaseMapping, P extends ProviderId> Optional<M> getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
-        Map<String, Object> extraParams, ProviderIds providerIds,
+        List<ProviderCacheKeyParam> extraParams, ProviderIds providerIds,
         ThrowingFunction<ProviderIds, Optional<P>, X> providerReleaseIdByIdFunction,
         ThrowingFunction<String, List<P>, X> providerReleaseIdsByNameFunction,
         TriFunction<String, String, String, M> releaseMappingConstructor,

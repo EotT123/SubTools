@@ -3,15 +3,13 @@ package org.lodder.subtools.sublibrary.cache;
 import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
-import java.util.function.Predicate;
-
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class ProviderCacheMemory extends ProviderCache {
+public final class ProviderCacheMemory<V> extends ProviderCache<V> {
 
     @val(Protected) @Nullable Time timeToLive;
 
@@ -26,20 +24,20 @@ public final class ProviderCacheMemory extends ProviderCache {
             throw new IllegalStateException("timeToLive should be a positive number");
         } else if (timeToLive == null && timerInterval != null) {
             throw new IllegalStateException("timeToLive should be specified when timerInterval is used");
-        } else if (timeToLive != null && timerInterval != null && timeToLive < timerInterval) {
-            throw new IllegalStateException("timerInterval should be greater than timeToLive");
+//        } else if (timeToLive != null && timerInterval != null && timeToLive < timerInterval) {
+//            throw new IllegalStateException("timerInterval should be greater than timeToLive");
         }
         if (timerInterval != null) {
-            createCleanUpThread(timerInterval);
+            createCleanUpThread(timerInterval, timeToLive);
         }
         this.timeToLive = timeToLive;
     }
 
-    private void createCleanUpThread(Time timerInterval) {
+    private void createCleanUpThread(Time timerInterval, Time timeToLive) {
         Thread t = new Thread(() -> {
             while (true) {
                 sleep(timerInterval);
-                cleanup();
+                cleanup((k, v) -> v.isExpired(timeToLive));
             }
         });
 
@@ -47,15 +45,7 @@ public final class ProviderCacheMemory extends ProviderCache {
         t.start();
     }
 
-    @Override
-    public void cleanup(@Nullable Predicate<ProviderCacheKey> keyFilter) {
-        synchronized (cacheMap) {
-            if (timeToLive != null) {
-                cacheMap.entrySet()
-                    .filter(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) &&
-                        entry.getValue().isExpired(timeToLive)).forEach(e -> remove(e.key));
-            }
-            Thread.yield();
-        }
+    protected void removeFromCache(ProviderCacheKey key) {
+        remove(key);
     }
 }

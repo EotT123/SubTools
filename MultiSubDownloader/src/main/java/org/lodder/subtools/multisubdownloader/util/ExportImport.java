@@ -23,6 +23,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler.MessageSeverity;
 import org.lodder.subtools.sublibrary.util.filefilter.ExtensionFileFilter;
@@ -139,7 +140,7 @@ public class ExportImport {
                 .map(MappingType::getSelectionForKeyPrefixList)
                 .flatMap(Arrays::stream)
                 .flatMap(selectionForKeyPrefix -> manager.getCache(CacheType.DISK,
-                        k -> k.startsWith(selectionForKeyPrefix.keyPrefix())).getEntries(SerieMapping.class)
+                        k -> k.toString().startsWith(selectionForKeyPrefix.keyPrefix())).getEntries(SerieMapping.class)
                     .stream()
                     .map(pair -> new SerieMappingWithKey(pair.getKey(), pair.getValue())))
                 .toList();
@@ -162,8 +163,8 @@ public class ExportImport {
                         .map(MappingType::getSelectionForKeyPrefixList)
                         .flatMap(Arrays::stream)
                         .forEach(selectionForKeyPrefix ->
-                            manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
-                                .clearExpiredCache());
+                            manager.getCache(CacheType.DISK,
+                                k -> k.toString().startsWith(selectionForKeyPrefix.keyPrefix)).clearExpiredCache());
                 }
                 serieMappings.forEach(serieMapping ->
                     new CacheKey(manager, CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
@@ -180,7 +181,7 @@ public class ExportImport {
                 });
         }
 
-        private record SerieMappingWithKey(String key, SerieMapping serieMapping) {
+        private record SerieMappingWithKey(ProviderCacheKey key, SerieMapping serieMapping) {
         }
     }
 

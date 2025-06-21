@@ -4,6 +4,7 @@ import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
+import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.UrlBuilder;
@@ -111,8 +113,10 @@ public class PodnapisiApi implements SubtitleApi {
      */
 
     private List<PodnapisiSubtitleMetadata> getSubtitles(String name, Language language,
-        Map<SearchParam, Object> paramMap) throws PodnapisiApiException {
-        return getCache("subtitles", b -> b.add("name", name).add("language", language).add(paramMap))
+        Map<SearchParam, Serializable> paramMap) throws PodnapisiApiException {
+        List<ProviderCacheKeyParam> params = paramMap.entrySet().stream()
+            .map(entry -> new ProviderCacheKeyParam(entry.getKey().name(), entry.getValue())).toList();
+        return getCache("subtitles", b -> b.add("name", name).add("language", language).add(params))
             .getCollection(() -> {
                 try {
                     UrlBuilder urlBuilder = new UrlBuilder(DOMAIN, "/sl/ppodnapisi/search");
@@ -138,7 +142,7 @@ public class PodnapisiApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw PodnapisiApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
-            }, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1 Second));
+            }, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1Second));
     }
 
     // see https://www.podnapisi.net/forum/viewtopic.php?f=62&t=26164#p212652
@@ -172,7 +176,7 @@ public class PodnapisiApi implements SubtitleApi {
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&
                         e.responseCode < 600,
-                    5 Second)));
+                    5Second)));
         } catch (Exception e) {
             throw PodnapisiApiException.error(e);
         }

@@ -4,11 +4,13 @@ import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -22,9 +24,9 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public abstract sealed class ProviderCache permits ProviderCacheMemory, ProviderCacheDisk {
+public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, ProviderCacheDisk {
 
-    @val(Protected) final Map<ProviderCacheKey, CacheObject> cacheMap;
+    @val(Protected) final Map<ProviderCacheKey, CacheObject<V>> cacheMap;
     @val(Protected) final Map<ProviderCacheKeySub, ProviderCacheKey> keyMapperCache = new HashMap<>();
     @val(Protected) final Multimap<ProviderCacheKey, ProviderCacheKeySub> keyMapperCacheInverse =
         MultimapBuilder.hashKeys().arrayListValues().build();
@@ -34,15 +36,15 @@ public abstract sealed class ProviderCache permits ProviderCacheMemory, Provider
         this.cacheMap = maxItems != null ? new LRUMap<>(maxItems) : new HashMap<>();
     }
 
-    public void put(ProviderCacheKey key, @Nullable Object value, @Nullable Time timeToLive=null) {
+    public void put(ProviderCacheKey key, @Nullable V value, @Nullable Time timeToLive=null) {
         if (timeToLive == null) {
-            put(key, new ExpiringCacheObject(value));
+            put(key, new ExpiringCacheObject<>(value));
         } else {
-            put(key, new TemporaryCacheObject(timeToLive, value));
+            put(key, new TemporaryCacheObject<>(timeToLive, value));
         }
     }
 
-    protected void put(ProviderCacheKey key, CacheObject value) {
+    protected void put(ProviderCacheKey key, CacheObject<V> value) {
         synchronized (cacheMap) {
             cacheMap.put(key, value);
             key.getSubKeyStream().forEach(subkey -> {
@@ -65,9 +67,9 @@ public abstract sealed class ProviderCache permits ProviderCacheMemory, Provider
         }
     }
 
-    public Optional<Object> get(ProviderCacheKeyCommon key) {
+    public Optional<V> get(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            CacheObject cacheObject = switch (key) {
+            CacheObject<V> cacheObject = switch (key) {
                 case ProviderCacheKey k -> cacheMap.get(k);
                 case ProviderCacheKeySub k -> invalidKeys.contains(k) ? null :
                     Optional.ofNullable(keyMapperCache.get(k)).map(cacheMap::get).orElse(null);
@@ -88,25 +90,25 @@ public abstract sealed class ProviderCache permits ProviderCacheMemory, Provider
 
     public boolean isTemporaryExpired(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).map(v -> v instanceof TemporaryCacheObject tempCacheObject && tempCacheObject.isExpired())
+            return get(key).map(
+                    v -> v instanceof TemporaryCacheObject<?> tempCacheObject && tempCacheObject.isExpired())
                 .orElse(false);
         }
     }
 
     public Optional<Time> getTemporaryTimeToLive(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).map(v -> v instanceof TemporaryCacheObject t ? t.timeToLive : null);
+            return get(key).map(v -> v instanceof TemporaryCacheObject<?> t ? t.timeToLive : null);
         }
     }
 
-    public <X extends Exception> @Nullable Object getOrPut(ProviderCacheKey key,
-        ThrowingSupplier<Object, X> supplier) throws X {
+    public <X extends Exception> @Nullable V getOrPut(ProviderCacheKey key, ThrowingSupplier<V, X> supplier) throws X {
         synchronized (cacheMap) {
             if (contains(key)) {
-                return get(key);
+                return get(key).orElseThrow();
             } else {
-                Object value = supplier.get();
-                ExpiringCacheObject obj = new ExpiringCacheObject(value);
+                V value = supplier.get();
+                ExpiringCacheObject<V> obj = new ExpiringCacheObject<>(value);
                 put(key, obj);
                 return value;
             }
@@ -131,13 +133,13 @@ public abstract sealed class ProviderCache permits ProviderCacheMemory, Provider
         }
     }
 
-    public List<Pair<ProviderCacheKey, Object>> getEntries(@Nullable Predicate<ProviderCacheKey> keyFilter=null) {
+    public List<Pair<ProviderCacheKey, V>> getEntries(@Nullable Predicate<ProviderCacheKey> keyFilter=null) {
         synchronized (cacheMap) {
             return getEntryStream(keyFilter).map(entry -> Pair.of(entry.getKey(), entry.getValue().value)).toList();
         }
     }
 
-    public Stream<Entry<ProviderCacheKey, CacheObject>> getEntryStream(
+    public Stream<Entry<ProviderCacheKey, CacheObject<V>>> getEntryStream(
         @Nullable Predicate<ProviderCacheKey> keyFilter=null) {
         synchronized (cacheMap) {
             return cacheMap.entrySet().stream().filter(entry -> keyFilter == null || keyFilter.test(entry.getKey()));
@@ -154,6 +156,20 @@ public abstract sealed class ProviderCache permits ProviderCacheMemory, Provider
         cleanup(null);
     }
 
-    public abstract void cleanup(@Nullable Predicate<ProviderCacheKey> keyFilter);
+    public void cleanup(@Nullable BiPredicate<ProviderCacheKey, CacheObject<V>> keyFilter) {
+        synchronized (cacheMap) {
+            Iterator<Entry<ProviderCacheKey, CacheObject<V>>> itr = cacheMap.entrySet().iterator();
+            while (itr.hasNext()) {
+                Entry<ProviderCacheKey, CacheObject<V>> entry = itr.next();
+                if ((keyFilter == null || keyFilter.test(entry.getKey(), entry.getValue()))) {
+                    itr.remove();
+                    removeFromCache(entry.getKey());
+                }
+            }
+            Thread.yield();
+        }
+    }
+
+    protected abstract void removeFromCache(ProviderCacheKey key);
 
 }

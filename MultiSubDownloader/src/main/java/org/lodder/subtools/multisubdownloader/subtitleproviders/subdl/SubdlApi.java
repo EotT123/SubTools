@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.Subd
 import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +61,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language) throws SubdlApiException {
-        Map<SearchParam, Object> params = MapUtil.create(
+        Map<SearchParam, Serializable> params = MapUtil.create(
             SearchParam.FILM_NAME, title,
             SearchParam.YEAR, year,
             SearchParam.TYPE, ReleaseType.movie);
@@ -76,7 +78,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlApiException if the API call fails
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String imdbId, Language language) throws SubdlApiException {
-        Map<SearchParam, Object> params = MapUtil.create(
+        Map<SearchParam, Serializable> params = MapUtil.create(
             SearchParam.IMDB_ID, imdbId,
             SearchParam.TYPE, ReleaseType.movie);
         return getSubtitles(language, params);
@@ -149,7 +151,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode,
         Language language) throws SubdlApiException {
-        Map<SearchParam, Object> params = MapUtil.create(
+        Map<SearchParam, Serializable> params = MapUtil.create(
             SearchParam.SUBDL_ID, providerId,
             SearchParam.SEASON, season,
             SearchParam.TYPE, ReleaseType.tv);
@@ -171,7 +173,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlApiException if the API call fails
      */
     private List<SubdlSubtitleMetadata> getSubtitles(Language language,
-        Map<SearchParam, Object> extraParams) throws SubdlApiException {
+        Map<SearchParam, Serializable> extraParams) throws SubdlApiException {
         extraParams.put(SearchParam.LANGUAGES,
             SubdlLanguage.of(language).map(SubdlLanguage::getLangCode).collect(Collectors.joining(",")));
         return getSerie(extraParams).subtitles.stream().map(this::convertToSubtitleMetadata).toList();
@@ -197,17 +199,19 @@ public class SubdlApi implements SubtitleApi {
      * Fetches the serie for the given search parameters.
      * Results are cached in memory.
      *
-     * @param params search parameters
+     * @param paramMap search parameters
      * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws SubdlApiException if the API call fails
      */
-    private Serie getSerie(Map<SearchParam, Object> params) throws SubdlApiException {
+    private Serie getSerie(Map<SearchParam, Serializable> paramMap) throws SubdlApiException {
+        List<ProviderCacheKeyParam> params = paramMap.entrySet().stream()
+            .map(entry -> new ProviderCacheKeyParam(entry.getKey().name(), entry.getValue())).toList();
         return getCache("serieSubtitles", b -> b.add(params))
             .get(() -> {
                 try {
                     Requester<Serie> request = Serie.request(API_DOMAIN);
                     request.withParam(SearchParam.API_KEY.paramName, API_KEY);
-                    params.entrySet().stream().filter(entry -> entry.value != null)
+                    paramMap.entrySet().stream().filter(entry -> entry.value != null)
                         .forEach(entry -> request.withParam(entry.key.paramName,
                             String.valueOf(entry.value)));
                     Serie serie = request.getOne("/subtitles");
