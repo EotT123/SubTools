@@ -12,10 +12,8 @@ class InMemoryCacheTest {
 
     @Test
     void testAddRemoveObjects() {
-        InMemoryCache<String, String> cache =
-            new InMemoryCache<>(
-                keyType:String.class,
-                valueType:String.class,
+        ProviderCacheMemory cache =
+            new ProviderCacheMemory(
                 timeToLive:200 ms,
                 timerInterval:100 ms,
                 maxItems:6);
@@ -40,8 +38,8 @@ class InMemoryCacheTest {
     @Test
     void testExpiredCacheObjects() {
 
-        InMemoryCache<String, String> cache =
-            new InMemoryCache<>(
+        ProviderCacheMemory cache =
+            new ProviderCacheMemory<>(
                 keyType:String.class,
                 valueType:String.class,
                 timeToLive:1 ms,
@@ -62,8 +60,8 @@ class InMemoryCacheTest {
     void testObjectsCleanupTime() {
         int size = 500;
 
-        InMemoryCache<String, String> cache =
-            new InMemoryCache<>(
+        ProviderCacheMemory cache =
+            new ProviderCacheMemory<>(
                 keyType:String.class,
                 valueType:String.class,
                 timeToLive:100 ms,

@@ -1,7 +1,6 @@
 package org.lodder.subtools.sublibrary.cache;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -26,23 +25,22 @@ import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.util.lazy.LazyQuadFunction;
+import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public final class DiskCache<K extends Serializable, V extends Serializable> extends Cache<K, V> {
+public final class ProviderCacheDisk extends ProviderCache {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DiskCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProviderCacheDisk.class);
     private static final Object LOCK = new Object();
 
     private final @Nullable Time timeToLive;
-    private final Set<K> doublesToRemove = new HashSet<>();
-    private final Map<K, CacheObject<V>> removedToAdd = new HashMap<>();
-    private final Class<K> dbKeyType;
-    private final Class<V> dbValueType;
-    private final LazyQuadFunction<DiskCache<K, V>, String, Class<K>, Class<V>, Connection> connection =
-        new LazyQuadFunction<>((cache, tableName, dbKeyType, dbValueType) -> {
+    private final Set<ProviderCacheKey> doublesToRemove = new HashSet<>();
+    private final Map<ProviderCacheKey, CacheObject> removedToAdd = new HashMap<>();
+    private final LazyBiFunction<ProviderCacheDisk, String, Connection>
+        connection =
+        new LazyBiFunction<>((cache, tableName) -> {
             try {
                 synchronized (cache.cacheMap) {
                     Path path = Path.of(System.getProperty("user.home")).resolve(".MultiSubDownloader");
@@ -59,28 +57,27 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
                         "user", "pass");
 
                     try (Statement stmt = connection.createStatement()) {
-                        stmt.execute("create table IF NOT EXISTS $tableName (key %s, cacheobject %s);".formatted(
-                            dbKeyType == String.class ? "VARCHAR(32768)" : "OBJECT",
-                            dbValueType == String.class ? "VARCHAR(32768)" : "OBJECT"));
+                        stmt.execute(
+                            "create table IF NOT EXISTS $tableName (key VARCHAR(32768), cacheobject VARCHAR(32768)");
                     }
 
                     boolean errorWhileReadingCacheFile = false;
                     try (Statement stmt = connection.createStatement();
                          ResultSet rs = stmt.executeQuery("SELECT key, cacheobject FROM $tableName;")) {
-                        Multimap<K, CacheObject<V>> tempCache = MultimapBuilder.hashKeys()
-                            .treeSetValues(Comparator.comparing((CacheObject<V> value) -> value.age).reversed())
+                        Multimap<ProviderCacheKey, CacheObject> tempCache = MultimapBuilder.hashKeys()
+                            .treeSetValues(Comparator.comparing((CacheObject value) -> value.age).reversed())
                             .build();
                         synchronized (cache.cacheMap) {
                             while (rs.next()) {
                                 try {
-                                    tempCache.put((K) rs.getObject("key"),
-                                        (CacheObject<V>) rs.getObject("cacheobject"));
+                                    tempCache.put((ProviderCacheKey) rs.getObject("key"),
+                                        (CacheObject) rs.getObject("cacheobject"));
                                 } catch (SQLException e2) {
                                     LOGGER.error("Unable to insert object in disk cache. (${e2.getMessage()})", e2);
                                     errorWhileReadingCacheFile = true;
                                 }
                             }
-                            Map<K, Collection<CacheObject<V>>> map = tempCache.asMap();
+                            Map<ProviderCacheKey, Collection<CacheObject>> map = tempCache.asMap();
                             map.entrySet().stream()
                                 .filter(entry -> entry.getValue().size() > 1)
                                 .forEach(entry -> {
@@ -119,9 +116,7 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     private final String tableName;
 
     @NullMarked
-    public DiskCache(
-        Class<K> dbKeyType,
-        Class<V> dbValueType,
+    public ProviderCacheDisk(
         @Nullable Time timeToLive=null,
         @Nullable Integer maxItems=null,
         @Nullable String tableName=null) {
@@ -130,8 +125,6 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
         if (timeToLive != null && timeToLive.isNegative()) {
             throw new IllegalStateException("timeToLive should be a positive number");
         }
-        this.dbKeyType = dbKeyType;
-        this.dbValueType = dbValueType;
         this.timeToLive = timeToLive;
         this.tableName = StringUtils.isBlank(tableName) ? "cacheobjects" : tableName;
         // initialize map in other thread
@@ -144,19 +137,21 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     }
 
     private Connection getConnection() {
-        return connection.apply(this, tableName, dbKeyType, dbValueType);
+        return connection.apply(this, tableName);
     }
 
     @Override
-    public void cleanup(@Nullable Predicate<K> keyFilter) {
+    public void cleanup(@Nullable Predicate<ProviderCacheKey> keyFilter) {
         synchronized (cacheMap) {
-            Iterator<Entry<K, CacheObject<V>>> itr = cacheMap.entrySet().iterator();
-            while (itr.hasNext()) {
-                Entry<K, CacheObject<V>> entry = itr.next();
-                if ((keyFilter == null || keyFilter.test(entry.getKey())) &&
-                    entry.getValue().isExpired(timeToLive)) {
-                    itr.remove();
-                    removeFromDisk(entry.getKey());
+            if (timeToLive != null) {
+                Iterator<Entry<ProviderCacheKey, CacheObject>> itr = cacheMap.entrySet().iterator();
+                while (itr.hasNext()) {
+                    Entry<ProviderCacheKey, CacheObject> entry = itr.next();
+                    if ((keyFilter == null || keyFilter.test(entry.getKey())) &&
+                        entry.getValue().isExpired(timeToLive)) {
+                        itr.remove();
+                        removeFromDisk(entry.getKey());
+                    }
                 }
             }
             Thread.yield();
@@ -164,14 +159,14 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     }
 
     @Override
-    public void remove(K key) {
+    public void remove(ProviderCacheKeyCommon key) {
         super.remove(key);
         synchronized (LOCK) {
             removeFromDisk(key);
         }
     }
 
-    private void removeFromDisk(K key) {
+    private void removeFromDisk(ProviderCacheKeyCommon key) {
         synchronized (LOCK) {
             try (PreparedStatement prep = getConnection().prepareStatement("delete from $tableName where key = ?")) {
                 prep.setObject(1, key);
@@ -183,21 +178,21 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
     }
 
     @Override
-    public void put(K key, V value, @Nullable Time timeToLive) {
+    public void put(ProviderCacheKey key, @Nullable Object value, @Nullable Time timeToLive) {
         synchronized (LOCK) {
             super.put(key, value, timeToLive);
             putFromMemoryCache(key);
         }
     }
 
-    private void putFromMemoryCache(K key) {
+    private void putFromMemoryCache(ProviderCacheKey key) {
         synchronized (LOCK) {
             try (PreparedStatement prep = getConnection().prepareCall(
                 "INSERT INTO $tableName (key,cacheobject) VALUES (?,?)")) {
                 prep.clearParameters();
                 prep.setObject(1, key);
                 synchronized (cacheMap) {
-                    CacheObject<V> cacheObject = cacheMap.get(key);
+                    CacheObject cacheObject = cacheMap.get(key);
                     prep.setObject(2, cacheObject);
                     prep.execute();
                 }
@@ -208,7 +203,7 @@ public final class DiskCache<K extends Serializable, V extends Serializable> ext
         }
     }
 
-    public void putWithoutPersist(K key, @Nullable V value) {
+    public void putWithoutPersist(ProviderCacheKey key, @Nullable Object value) {
         super.put(key, value);
     }
 }

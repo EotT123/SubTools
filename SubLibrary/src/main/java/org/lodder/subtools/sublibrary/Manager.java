@@ -33,10 +33,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.cache.Cache;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.cache.DiskCache;
-import org.lodder.subtools.sublibrary.cache.InMemoryCache;
+import org.lodder.subtools.sublibrary.cache.ProviderCache;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheDisk;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.Nothing;
 import org.lodder.subtools.sublibrary.util.Sleep;
@@ -54,11 +54,10 @@ public class Manager {
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
 
     @val HttpClient httpClient;
-    @val InMemoryCache<String, String> inMemoryCache;
-    @val DiskCache<String, Serializable> diskCache;
+    @val ProviderCacheMemory inMemoryCache;
+    @val ProviderCacheDisk diskCache;
 
-    public Manager(HttpClient httpClient, InMemoryCache<String, String> inMemoryCache,
-        DiskCache<String, Serializable> diskCache) {
+    public Manager(HttpClient httpClient, ProviderCacheMemory inMemoryCache, ProviderCacheDisk diskCache) {
         this.httpClient = httpClient;
         this.inMemoryCache = inMemoryCache;
         this.diskCache = diskCache;
@@ -252,7 +251,7 @@ public class Manager {
 
         public <V extends Serializable, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
             Retry retry=Retry.NONE, Time timeToLive=null) throws X {
-            Cache<String, V> cache = manager.getCache(cacheType);
+            ProviderCache cache = manager.getCache(cacheType);
             if (cache.contains(key) && ! cache.isTemporaryExpired(key)) {
                 return cache.get(key).orElseThrow();
             }
@@ -262,8 +261,8 @@ public class Manager {
                     cache.put(key, value, timeToLive);
                 } else {
                     switch (cache) {
-                        case DiskCache<String, ?> dCache -> dCache.putWithoutPersist(key, null);
-                        case InMemoryCache<String, ?> mCache -> mCache.put(key, null);
+                        case ProviderCacheDisk dCache -> dCache.putWithoutPersist(key, null);
+                        case ProviderCacheMemory mCache -> mCache.put(key, null);
                     }
                 }
                 return value;
@@ -283,7 +282,7 @@ public class Manager {
 
         public <C extends Iterable<? extends V>, V extends Serializable, X extends Exception> C getCollection(
             ThrowingSupplier<C, X> supplier, Retry retry=Retry.NONE) throws X {
-            Optional<Cache<String, C>> optionalCache = manager.getOptionalCache(cacheType);
+            Optional<ProviderCache> optionalCache = manager.getOptionalCache(cacheType);
             return optionalCache.mapEx(cache -> {
                 if (cache.contains(key)) {
                     return cache.get(key).orElseThrow();
@@ -308,17 +307,17 @@ public class Manager {
         }
 
         public <V> Optional<V> getOptional() {
-            Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
+            Optional<ProviderCache> optionalCache = manager.getOptionalCache(cacheType);
             return optionalCache.flatMap(cache -> cache.get(key));
         }
 
         public <V extends Serializable, X extends Exception> Optional<V> getOptional(
             ThrowingSupplier<Optional<V>, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
             boolean storeTempNullValue=false) throws X {
-            Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
+            Optional<ProviderCache> optionalCache = manager.getOptionalCache(cacheType);
 
             if (optionalCache.isPresent()) {
-                Cache<String, V> cache = optionalCache.get();
+                ProviderCache cache = optionalCache.get();
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
                     store(Value.ofOptional(supplier), retry, storeTempNullValue, timeToLive);
@@ -330,8 +329,8 @@ public class Manager {
                         Optional<V> object = executeSupplier(supplier, retry);
                         object.ifPresentOrElse(v -> cache.put(key, v, timeToLive), () -> {
                             switch (cache) {
-                                case DiskCache<String, ?> dCache -> dCache.putWithoutPersist(key, null);
-                                case InMemoryCache<String, ?> mCache -> mCache.put(key, null);
+                                case ProviderCacheDisk<String, ?> dCache -> dCache.putWithoutPersist(key, null);
+                                case ProviderCacheMemory<String, ?> mCache -> mCache.put(key, null);
                             }
                         });
                         return object;
@@ -369,8 +368,8 @@ public class Manager {
                         OptionalInt object = executeSupplier(supplier, retry);
                         object.ifPresentOrElse(v -> cache.put(key, v), () -> {
                             switch (cache) {
-                                case DiskCache dCache -> dCache.putWithoutPersist(key, null);
-                                case InMemoryCache<String, ?> mCache -> mCache.put(key, null);
+                                case ProviderCacheDisk dCache -> dCache.putWithoutPersist(key, null);
+                                case ProviderCacheMemory<String, ?> mCache -> mCache.put(key, null);
                             }
                         });
                         return object;
@@ -414,17 +413,17 @@ public class Manager {
         }
 
         public <V extends Serializable> List<Pair<String, V>> getEntries(Class<V> valueType=null) {
-            Optional<Cache<String, V>> optionalCache = manager.getOptionalCache(cacheType);
+            Optional<ProviderCache> optionalCache = manager.getOptionalCache(cacheType);
             return optionalCache.map(cache -> cache.getEntries(keyFilter)).orElseGet(List::of);
         }
     }
 
-    private <V> Cache<String, V> getCache(CacheType cacheType) {
-        Optional<Cache<String, V>> optionalCache = getOptionalCache(cacheType);
+    private <V> ProviderCache getCache(CacheType cacheType) {
+        Optional<ProviderCache> optionalCache = getOptionalCache(cacheType);
         return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
     }
 
-    private <V> Optional<Cache<String, V>> getOptionalCache(CacheType cacheType) {
+    private <V> Optional<ProviderCache> getOptionalCache(CacheType cacheType) {
         return switch (cacheType) {
             case NONE -> Optional.empty();
             case MEMORY -> (Optional) Optional.of(inMemoryCache);

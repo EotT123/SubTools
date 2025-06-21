@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSerializableCacheObject {
+final class ExpiringCacheObject implements CacheObject {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -26,15 +26,15 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
 
     @override @val Time created;
     @var @set(Private) Time lastAccessed = Time.now();
-    @override @var @Nullable T value;
+    @override @var @Nullable Object value;
 
-    public ExpiringCacheObject(Time created, Time lastAccessed, T value) {
+    public ExpiringCacheObject(Time created, Time lastAccessed, Object value) {
         this.created = created;
         this.lastAccessed = lastAccessed;
         this.value = value;
     }
 
-    protected ExpiringCacheObject(@Nullable T value) {
+    ExpiringCacheObject(@Nullable Object value) {
         this.created = Time.now();
         this.value = value;
     }
@@ -50,17 +50,17 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
     }
 
     @Override
-    public String toString(Function<@Nullable T, String> valueToStringMapper) {
+    public String toString(Function<@Nullable Object, String> valueToStringMapper) {
         return "created:$created|lastAccessed:$lastAccessed|value:${valueToStringMapper.apply(value)}";
     }
 
-    public static <T> Optional<CacheObject<T>> fromString(String string, Function<String, T> valueToObjectMapper) {
+    public static Optional<CacheObject> fromString(String string, Function<String, Object> valueToObjectMapper) {
         Matcher matcher = PATTERN.matcher(string);
         if (matcher.matches()) {
             Time created = Time.create(Long.parseLong(matcher.group(1)), ms);
             Time lastAccessed = Time.create(Long.parseLong(matcher.group(2)), ms);
             String value = matcher.group(3);
-            return Optional.of(new ExpiringCacheObject<>(created, lastAccessed, valueToObjectMapper.apply(value)));
+            return Optional.of(new ExpiringCacheObject(created, lastAccessed, valueToObjectMapper.apply(value)));
         }
         return Optional.empty();
     }

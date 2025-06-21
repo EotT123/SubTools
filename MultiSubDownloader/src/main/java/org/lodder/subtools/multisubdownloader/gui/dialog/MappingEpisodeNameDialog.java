@@ -147,7 +147,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     public enum MappingType {
         TVDB("TVDB", "TVDB",
-            new SelectionForKeyPrefix("", "tvdb-seriemapping-", k -> k.replace("-providerid-", "-serie-"))),
+            new SelectionForKeyPrefix("", "tvdb-seriemapping-", k -> List.of(k.replace("-seriemapping-", "-serie-")))),
         IMDB("IMDB", "IMDB",
             new SelectionForKeyPrefix("", "imdb-releasemapping-")),
         ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, new SelectionForKeyPrefix("", "addic7ed-releasemapping-name:"),
@@ -165,7 +165,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             new SelectionForKeyPrefix("", "opensubtitles-releasemapping-tvdbid:")),
         PODNAPISI("Podnapisi", SubtitleSource.PODNAPISI,
             new SelectionForKeyPrefix("", "podnapisi-releasemapping-name:"),
-            new SelectionForKeyPrefix("", "podnapisi-releasemapping-tvdbid:"));
+            new SelectionForKeyPrefix("", "podnapisi-releasemapping-tvdbid:")),
+        SUBDL("SubDL", SubtitleSource.SUBDL,
+            new SelectionForKeyPrefix("", "subdl-releasemapping-",
+                k -> List.of(k.replace("-releasemapping-", "-releasemapping-"))));
+//        SUBDL("SubDL", SubtitleSource.SUBDL.name(),
+//            new SelectionForKeyPrefix("", "subdl-releasemapping-"),
+//            k -> List.of(k.replace("-providerid-", "-serie-")) );
 
         public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<String, SerieMapping>>>
             MAPPING_SUPPLIER;
@@ -200,7 +206,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         }
     }
 
-    public record SelectionForKeyPrefix(String name, String keyPrefix, Function<String, String> deleteOtherFunction) {
+    public record SelectionForKeyPrefix(String name, String keyPrefix,
+        Function<String, List<String>> deleteOthersFunction) {
         public SelectionForKeyPrefix(String name, String keyPrefix) {
             this(name, keyPrefix, null);
         }

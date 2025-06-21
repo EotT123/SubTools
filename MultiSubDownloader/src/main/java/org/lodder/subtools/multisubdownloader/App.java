@@ -4,7 +4,6 @@ import static manifold.science.util.UnitConstants.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -26,8 +25,8 @@ import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.cache.DiskCache;
-import org.lodder.subtools.sublibrary.cache.InMemoryCache;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheDisk;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,17 +149,13 @@ public class App {
         if (splash != null) {
             splash.progressMsg = Messages.getText("App.Starting");
         }
-        DiskCache<String, Serializable> diskCache =
-            new DiskCache<>(
-                String.class,
-                Serializable.class,
+        ProviderCacheDisk diskCache =
+            new ProviderCacheDisk(
                 500 day,
                 5000);
 
-        InMemoryCache<String, String> inMemoryCache =
-            new InMemoryCache<>(
-                String.class,
-                String.class,
+        ProviderCacheMemory inMemoryCache =
+            new ProviderCacheMemory(
                 10 min,
                 100 ms,
                 2500);

@@ -8,19 +8,19 @@ import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public sealed interface CacheObject<T> extends Serializable permits ExpiringCacheObject, TemporaryCacheObject {
+public sealed interface CacheObject extends Serializable permits ExpiringCacheObject, TemporaryCacheObject {
 
     @val Time created;
-    @val T value;
+    @val Object value;
     @val Time age;
 
     void updateLastAccessed();
 
     boolean isExpired(Time ttl);
 
-    String toString(Function<T, String> valueToStringMapper);
+    String toString(Function<Object, String> valueToStringMapper);
 
-    static <T> CacheObject<T> fromString(String string, Function<String, T> valueToObjectMapper) {
+    static CacheObject fromString(String string, Function<String, CacheObject> valueToObjectMapper) {
         return ExpiringCacheObject.fromString(string, valueToObjectMapper)
             .orElseGet(() -> TemporaryCacheObject.fromString(string, valueToObjectMapper)
                 .orElseThrow(() -> new IllegalStateException("Could not parse value: $string")));

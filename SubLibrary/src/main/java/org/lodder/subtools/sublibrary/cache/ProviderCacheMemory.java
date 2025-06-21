@@ -11,12 +11,12 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class InMemoryCache<K, V> extends Cache<K, V> {
+public final class ProviderCacheMemory extends ProviderCache {
 
     @val(Protected) @Nullable Time timeToLive;
 
-    public InMemoryCache(Class<K> keyType, Class<V> valueType, @Nullable Time timeToLive=null,
-        @Nullable Time timerInterval=null, @Nullable Integer maxItems=null) {
+    public ProviderCacheMemory(@Nullable Time timeToLive=null, @Nullable Time timerInterval=null,
+        @Nullable Integer maxItems=null) {
         super(maxItems);
         if (maxItems != null && maxItems < 1) {
             throw new IllegalStateException("maxItems should be a positive number");
@@ -48,11 +48,13 @@ public final class InMemoryCache<K, V> extends Cache<K, V> {
     }
 
     @Override
-    public void cleanup(@Nullable Predicate<K> keyFilter) {
+    public void cleanup(@Nullable Predicate<ProviderCacheKey> keyFilter) {
         synchronized (cacheMap) {
-            cacheMap.entrySet()
-                .removeIf(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) &&
-                    entry.getValue().isExpired(timeToLive));
+            if (timeToLive != null) {
+                cacheMap.entrySet()
+                    .filter(entry -> (keyFilter == null || keyFilter.test(entry.getKey())) &&
+                        entry.getValue().isExpired(timeToLive)).forEach(e -> remove(e.key));
+            }
             Thread.yield();
         }
     }
