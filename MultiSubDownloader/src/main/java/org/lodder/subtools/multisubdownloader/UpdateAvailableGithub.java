@@ -26,6 +26,7 @@ import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewStableGithubRelease() {
-        return new CacheKey(manager, CacheType.MEMORY, "GitHub-update")
+        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url"))
             .getOptional(() -> {
                 try {
                     String currentVersion = getVersion();
@@ -115,7 +116,7 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return new CacheKey(manager, CacheType.MEMORY, "GitHub-update-nightly")
+        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url-nightly"))
             .getOptional(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
@@ -163,7 +164,7 @@ public class UpdateAvailableGithub {
     }
 
     private CacheKey getUpdateLastUpdateCheckCache() {
-        return new CacheKey(manager, CacheType.MEMORY, "LastUpdateCheck");
+        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "LastUpdateCheck"));
     }
 
     private void updateLastUpdateCheck() {

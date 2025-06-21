@@ -137,12 +137,8 @@ public class ExportImport {
 
         public static void exportSettings(Path path, Manager manager) throws IOException {
             List<SerieMappingWithKey> serieMappingsWithKey = MappingType.values().stream()
-                .map(MappingType::getSelectionForKeyPrefixList)
-                .flatMap(Arrays::stream)
-                .flatMap(selectionForKeyPrefix -> manager.getCache(CacheType.DISK,
-                        k -> k.toString().startsWith(selectionForKeyPrefix.keyPrefix())).getEntries(SerieMapping.class)
-                    .stream()
-                    .map(pair -> new SerieMappingWithKey(pair.getKey(), pair.getValue())))
+                .map(mappingType -> mappingType.getValues(manager)).flatMap(List::stream)
+                .map(pair -> new SerieMappingWithKey(pair.getKey(), pair.getValue()))
                 .toList();
             Files.writeString(path, new GsonBuilder().setPrettyPrinting().create().toJson(serieMappingsWithKey));
         }
@@ -157,18 +153,12 @@ public class ExportImport {
             } catch (IOException e) {
                 throw new CorruptSettingsFileException(e);
             }
-            getImportStyle(userInteractionHandler).ifPresent(importStyle -> {
-                if (importStyle == ImportStyle.OVERWRITE) {
-                    MappingType.values().stream()
-                        .map(MappingType::getSelectionForKeyPrefixList)
-                        .flatMap(Arrays::stream)
-                        .forEach(selectionForKeyPrefix ->
-                            manager.getCache(CacheType.DISK,
-                                k -> k.toString().startsWith(selectionForKeyPrefix.keyPrefix)).clearExpiredCache());
+            getImportStyle(userInteractionHandler).ifPresent(importStyle -> serieMappings.forEach(serieMapping -> {
+                CacheKey cacheKey = new CacheKey(manager, CacheType.DISK, serieMapping.key);
+                if (!cacheKey.isPresent() || importStyle == ImportStyle.OVERWRITE) {
+                    cacheKey.store(Value.of(serieMapping.serieMapping));
                 }
-                serieMappings.forEach(serieMapping ->
-                    new CacheKey(manager, CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
-            });
+            }));
         }
 
         private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {

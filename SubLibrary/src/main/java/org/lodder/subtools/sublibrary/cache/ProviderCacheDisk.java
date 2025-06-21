@@ -54,8 +54,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
                         "user", "pass");
 
                     try (Statement stmt = connection.createStatement()) {
-                        stmt.execute(
-                            "create table IF NOT EXISTS $tableName (key VARCHAR(32768), cacheobject VARCHAR(32768)");
+                        stmt.execute("create table IF NOT EXISTS $tableName (key VARCHAR(32768), cacheobject OBJECT);");
                     }
 
                     boolean errorWhileReadingCacheFile = false;

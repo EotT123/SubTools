@@ -82,6 +82,15 @@ public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, Provi
         }
     }
 
+//    public List<Entry<ProviderCacheKey, CacheObject<V>>> get(
+//        @Nullable BiPredicate<ProviderCacheKey, CacheObject<V>> keyFilter) {
+//        synchronized (cacheMap) {
+//            return cacheMap.entrySet().stream()
+//                .filter(entry -> keyFilter == null || keyFilter.test(entry.getKey(), entry.getValue()))
+//                .toList();
+//        }
+//    }
+
     public boolean isTemporaryObject(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
             return get(key).map(v -> v instanceof TemporaryCacheObject).orElse(false);

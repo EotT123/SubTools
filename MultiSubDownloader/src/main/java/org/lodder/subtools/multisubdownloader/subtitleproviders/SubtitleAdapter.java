@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import static manifold.ext.props.rt.api.PropOption.*;
 import static manifold.science.util.UnitConstants.*;
+import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
@@ -351,40 +351,37 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         UnaryOperator<String> selectFromListMessage,
         Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
 
-        CacheKey tvdbIdCache = providerIds.getTvdbId().mapToObjEx(tvdbId ->
-                getCache("releaseMapping", b -> b.add("tvdbId", tvdbId).add(extraParams)))
-            .orElse(null);
-        if (tvdbIdCache != null && tvdbIdCache.isPresent()) {
-            return tvdbIdCache.getOptional();
-        }
-        CacheKey imdbIdCache = providerIds.getImdbId().map(imdbId ->
-                getCache("releaseMapping", b -> b.add("imdbId", imdbId).add(extraParams)))
-            .orElse(null);
-        if (imdbIdCache != null && imdbIdCache.isPresent()) {
-            return imdbIdCache.getOptional();
+        CacheKey cacheKey = getCache("releaseMapping", b -> b
+            .addIdParam("tvdbId", providerIds.getTvdbId().mapToObj(v -> v).orElse(null))
+            .addIdParam("imdbId", providerIds.getImdbId().orElse(""))
+            .addIdParam("name", name)
+            .add(extraParams));
+
+        if (cacheKey.isPresent()) {
+            return cacheKey.getOptional();
         }
 
         if (StringUtils.isBlank(nameToSearchFor)) {
             return Optional.empty();
         }
 
-        CacheKey releaseNameCache = getCache("releaseMapping",
-            b -> b.add("name", name).add(extraParams));
+//        CacheKey releaseNameCache = getCache("releaseMapping",
+//            b -> b.add("name", name).add(extraParams));
         M releaseMapping = providerReleaseIdByIdFunction.apply(providerIds)
             .map(providerId -> releaseMappingConstructor.apply(name, providerId.id, providerId.name))
             .orElseGetEx(() -> {
                 // Did not find a result when searching by id, or no id's where present.
-                if (StringUtils.equals(nameToSearchFor, name) && releaseNameCache.isPresent()) {
-                    if (releaseNameCache.isTemporaryObject()) {
-                        if (!releaseNameCache.isExpiredTemporary()) {
-                            Optional<M> mapping = releaseNameCache.getOptional();
-                            return mapping.filter(rm -> rm.providerId != null).orElse(null);
-                        }
-                    } else {
-                        Optional<M> mapping = releaseNameCache.getOptional();
-                        return mapping.orElse(null);
-                    }
-                }
+//                if (StringUtils.equals(nameToSearchFor, name) && releaseNameCache.isPresent()) {
+//                    if (releaseNameCache.isTemporaryObject()) {
+//                        if (!releaseNameCache.isExpiredTemporary()) {
+//                            Optional<M> mapping = releaseNameCache.getOptional();
+//                            return mapping.filter(rm -> rm.providerId != null).orElse(null);
+//                        }
+//                    } else {
+//                        Optional<M> mapping = releaseNameCache.getOptional();
+//                        return mapping.orElse(null);
+//                    }
+//                }
                 List<P> providerReleaseIds;
                 try {
                     providerReleaseIds = providerReleaseIdsByNameFunction.apply(nameToSearchFor);
@@ -393,10 +390,10 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                         switch (e.cacheStrategy) {
                             case CACHE_DISABLED -> {
                             }
-                            case CACHE_TEMPORARY -> releaseNameCache.storeTempValue(
+                            case CACHE_TEMPORARY -> cacheKey.storeTempValue(
                                 Value.of(releaseMappingConstructor.apply(name, null, null)));
-                            case CACHE_PERMANENT ->
-                                releaseNameCache.store(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                            case CACHE_PERMANENT -> cacheKey.store(
+                                Value.of(releaseMappingConstructor.apply(name, null, null)));
                         }
                     }
                     throw (X) exc;
@@ -406,7 +403,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     // expiration, to avoid repeatedly querying the provider on each method call.
                     // If a previously cached null value has expired, store it again with double the previous
                     // expiration time.
-                    releaseNameCache.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
+                    cacheKey.storeTempValue(Value.of(releaseMappingConstructor.apply(name, null, null)));
                     return null;
                 }
 
@@ -443,7 +440,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                             // If no release provider id was selected, cache a temporary null value with a 1-day
                             // expiration. If a temporary null value already exists, update it with double the previous
                             // expiration time.
-                            releaseNameCache.store(
+                            cacheKey.store(
                                 value:Value.of(releaseMappingConstructor.apply(nameToSearchFor, null, null)),
                                 timeToLive:1 day,
                                 storeTempNullValue:true);
@@ -456,20 +453,20 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                 }
                 return mapping;
             });
-
-        if (releaseMapping == null) {
-            return Optional.empty();
-        }
-        // cache the result
-        if (tvdbIdCache != null) {
-            tvdbIdCache.store(Value.of(releaseMapping));
-        }
-        if (imdbIdCache != null) {
-            imdbIdCache.store(Value.of(releaseMapping));
-        }
-        releaseNameCache.store(Value.of(releaseMapping));
-
-        return Optional.of(releaseMapping);
+        return Optional.ofNullable(releaseMapping);
+//        if (releaseMapping == null) {
+//            return Optional.empty();
+//        }
+//        // cache the result
+//        if (tvdbIdCache != null) {
+//            tvdbIdCache.store(Value.of(releaseMapping));
+//        }
+//        if (imdbIdCache != null) {
+//            imdbIdCache.store(Value.of(releaseMapping));
+//        }
+//        releaseNameCache.store(Value.of(releaseMapping));
+//
+//        return Optional.of(releaseMapping);
 
 //        if (StringUtils.isBlank(nameToSearchFor)) {
 //            return Optional.empty();
@@ -560,7 +557,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 //                    // If a temporary null value already exists, update it with double the previous expiration time.
 //                    releaseNameCache.store(
 //                        value:Value.of(releaseMappingConstructor.apply(nameToSearchFor, null, null)),
-//                        timeToLive:1day,
+//                        timeToLive:1 day,
 //                        storeTempNullValue:true);
 //                    previousResultsCache.store(Value.ofCollection(providerReleaseIds));
 //                }

@@ -149,11 +149,9 @@ public class App {
         if (splash != null) {
             splash.progressMsg = Messages.getText("App.Starting");
         }
-        ProviderCacheDisk diskCache = new ProviderCacheDisk(500day,
-                5000);
+        ProviderCacheDisk diskCache = new ProviderCacheDisk(500 day, 5000);
 
-        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10min, 100ms,
-                2500);
+        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10 min, 100ms, 2500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }

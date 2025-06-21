@@ -221,11 +221,18 @@ public class Manager {
         }
     }
 
+    public <V> List<Pair<ProviderCacheKey, V>> getEntries(CacheType cacheType,
+        @Nullable Predicate<ProviderCacheKey> keyFilter, Class<V> type=null) {
+        return getCache(cacheType, keyFilter).getEntries(type);
+    }
+
+
     // ============= \\
     // CACHE METHODS \\
     // ============= \\
 
     public record CacheKey(Manager manager, CacheType cacheType, ProviderCacheKey key) {
+
         public boolean isPresent() {
             return manager.getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
         }
@@ -486,6 +493,7 @@ public class Manager {
         @val String source;
         @val String operation;
         //        private final Map<String, Object> extraParams = new LinkedHashMap<>();
+        private final List<ProviderCacheKeyParam> idParams = new ArrayList<>();
         private final List<ProviderCacheKeyParam> params = new ArrayList<>();
 
         public CacheKeyBuilder(SubtitleSource source, String operation) {
@@ -495,6 +503,11 @@ public class Manager {
         public CacheKeyBuilder(String source, String operation) {
             this.source = source;
             this.operation = operation;
+        }
+
+        public CacheKeyBuilder addIdParam(String name, Serializable value) {
+            idParams.add(new ProviderCacheKeyParam(name, value));
+            return this;
         }
 
         public CacheKeyBuilder add(String name, Serializable value) {
@@ -510,7 +523,7 @@ public class Manager {
         }
 
         public ProviderCacheKey build() {
-            return new ProviderCacheKey(source, operation, params);
+            return new ProviderCacheKey(source, operation, idParams, params);
         }
 
     }
