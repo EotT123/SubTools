@@ -49,6 +49,23 @@ public class OptionalExt {
     }
 
     /**
+     * Applies the given {@link ThrowingFunction} to the value if present. If an exception is thrown, consume it.
+     *
+     * @param optional the input {@code Optional} for the extension method
+     * @param function the function to apply
+     * @param <T> the type of the input value
+     * @return an {@code Optional} describing the result of the function, or empty if not present
+     */
+    public static <T, R, X extends Exception> Optional<R> mapConsumeEx(@This Optional<T> optional,
+        ThrowingFunction<? super T, ? extends R, X> function) {
+        try {
+            return optional.mapEx(function);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Applies the given {@link ThrowingFunction} to the value if present.
      *
      * @param optional the input {@code Optional} for the extension method

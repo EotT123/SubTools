@@ -68,7 +68,8 @@ public final class Addic7edProxyGestdownAdapter extends
     @Override
     public List<Addic7edProxyGestdownSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws Addic7edException {
-        return providerIds.getTvdbId().flatMapToObjEx(api::getProviderSerieIds).map(this::toSerieId);
+        return providerIds.getTvdbId().flatMapToObjEx(api::getProviderSerieIds).map(this::toSerieId).map(List::of)
+            .orElseGet(List::of);
     }
 
     @Override
