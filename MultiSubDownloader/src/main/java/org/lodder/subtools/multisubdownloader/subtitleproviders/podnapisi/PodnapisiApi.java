@@ -119,6 +119,13 @@ public class PodnapisiApi implements SubtitleApi {
         return getCache("subtitles", b -> b.add("name", name).add("language", language).add(params))
             .getCollection(() -> {
                 try {
+
+
+//                    https:
+//www.podnapisi.net/nl/moviedb/search/?keywords=Kung+Fu&movie_type=movie&seasons=&episodes=&year=
+//                    https:
+//www.podnapisi.net/nl/moviedb/search/?keywords=Kung+Fu&movie_type=tv-series&seasons=&episodes=&year=
+
                     UrlBuilder urlBuilder = new UrlBuilder(DOMAIN, "/sl/ppodnapisi/search");
                     urlBuilder.addParam(
                         SearchParam.KEYWORDS.pattern.formatted(URLEncoder.encode(name.trim().toLowerCase(),

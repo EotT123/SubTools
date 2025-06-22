@@ -1,11 +1,13 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
+import static org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.ToIntFunction;
 
 import manifold.ext.props.rt.api.override;
@@ -67,37 +69,40 @@ public final class SubsceneAdapter
     // ===== \\
 
     @Override
-    public Optional<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+    public List<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, Integer season)
         throws SubsceneException {
-        Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(providerIds, season);
-        userInteractionHandler.selectFromList(
-            providerReleaseIds,
-            selectFromListMessage.apply(displayName),
-            provider,
-            providerReleaseIdToDisplayStringFunction);
-        return Optional.empty();
+        return providerIds.getImdbId().mapEx(imdbId -> getSortedSerieProviderIds(imdbId,
+            Objects.requireNonNull(season))).orElseGet(List::of);
     }
 
+    /**
+     * @param searchQuery the name of the serie or the imdb id
+     * @param season the season number of the serie
+     * @return list of matching SubSceneSerieId
+     * @throws SubsceneException SubsceneException
+     */
     @Override
-    public List<SubSceneSerieId> getSortedSerieProviderIds(String serieName, @Nullable Integer season)
+    public List<SubSceneSerieId> getSortedSerieProviderIds(String searchQuery, Integer season)
         throws SubsceneException {
         ToIntFunction<SearchResultType> providerTypeFunction = value -> switch (value) {
-            case EXACT -> 1;
-            case TV_SERIE -> 2;
+            case EXACT -> 2;
+            case TV_SERIE -> 1;
             case CLOSE -> 3;
             case null -> 4;
         };
-        Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(serieName);
-        if(season != null){
-            season
+        Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(searchQuery);
+        List<SubSceneSerieId> filteredResults =
+            serieProviderIds.get(TV_SERIE).stream().filter(subSceneSerieId -> Objects.equals(subSceneSerieId.season,
+                season)).toList();
+        if (filteredResults.size() == 1) {
+            return filteredResults;
         }
-
-        return api.getSerieProviderIds(serieName)
+        return api.getSerieProviderIds(searchQuery)
             .entrySet()
             .stream()
             .sorted(Comparator.comparingInt(entry -> providerTypeFunction.applyAsInt(entry.getKey())))
             .map(Entry::getValue)
-            .flatMap(values -> values.stream().sorted(Comparator.comparing(s -> s.getScore(serieName, season))))
+            .flatMap(values -> values.stream().sorted(Comparator.comparing(s -> s.getScore(searchQuery, season))))
             .distinct()
             .toList();
     }

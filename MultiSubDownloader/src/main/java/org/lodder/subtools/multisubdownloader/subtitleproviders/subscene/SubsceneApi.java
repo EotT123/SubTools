@@ -18,7 +18,6 @@ import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
@@ -30,7 +29,6 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.ProviderId;
-import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.slf4j.Logger;
@@ -95,13 +93,13 @@ public class SubsceneApi implements SubtitleApi {
     // ===== \\
 
     /**
-     * @param serieName the name of the serie
+     * @param searchQuery the name of the serie, or the imdb id
      * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
      * @throws SubsceneApiException SubsceneApiException
      */
-    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(String serieName)
+    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(String searchQuery)
         throws SubsceneApiException {
-        return getProviderIds(serieName, elem -> {
+        return getProviderIds(searchQuery, elem -> {
             Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
             if (matcher.matches()) {
                 String name = matcher.group("name");
@@ -110,12 +108,6 @@ public class SubsceneApi implements SubtitleApi {
             }
             return new SubSceneSerieId(elem.text(), elem.attr("href"));
         });
-    }
-
-    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(ProviderIds providerIds,
-        @Nullable Integer season)
-        throws SubsceneApiException {
-        return providerIds.getImdbId().mapEx(this::getSerieProviderIds).orElse(Map.of());
     }
 
     public List<SubsceneSubtitleMetadata> getSubtitles(String providerId, int season, int episode,

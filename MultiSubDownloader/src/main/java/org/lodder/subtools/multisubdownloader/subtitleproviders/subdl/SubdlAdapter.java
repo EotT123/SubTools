@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -61,9 +60,10 @@ public final class SubdlAdapter extends
     // SERIE \\
     // ===== \\
 
-    @Override
-    public Optional<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds) throws SubdlException {
-        return providerIds.getImdbId().flatMapEx(imdbId -> api.getProviderIdUsingImdbId(imdbId));
+    public List<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+        throws SubdlException {
+        return providerIds.getImdbId().flatMapEx(imdbId -> api.getProviderIdUsingImdbId(imdbId).map(List::of))
+            .orElseGet(List::of);
     }
 
     @Override

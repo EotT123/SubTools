@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -60,9 +59,9 @@ public final class PodnapisiAdapter
     // ===== \\
 
 
-    @Override
-    public Optional<ProviderId> getSerieProviderIdById(ProviderIds providerIds) throws PodnapisiException {
-        return Optional.empty();
+    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+        throws PodnapisiException {
+        return List.of();
     }
 
     @Override

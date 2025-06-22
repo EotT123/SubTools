@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,9 +75,9 @@ public final class TvSubtitlesAdapter
     }
 
     @Override
-    public Optional<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws TvSubtitleException {
-        return Optional.empty();
+        return List.of();
     }
 
     @Override
