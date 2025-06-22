@@ -60,7 +60,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
 
     @Override
     public Collection<Addic7edSubtitle> searchMovieSubtitlesWithName(String title, @Nullable Integer year,
-        Language language) throws Addic7edException {
+        Language language, ProviderIds providerIds) throws Addic7edException {
         return getMovieProviderId(title, year).mapEx(providerId -> api.searchMovieSubtitles(providerId.id, language))
             .orElse(List.of());
     }
@@ -117,7 +117,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
 
     @Override
     public Collection<Addic7edSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language) throws Addic7edException {
+        int episode, Language language, ProviderIds providerIds) throws Addic7edException {
         return api.searchSerieSubtitles(serieMapping.providerId, serieMapping.providerName, season, episode, language);
     }
 

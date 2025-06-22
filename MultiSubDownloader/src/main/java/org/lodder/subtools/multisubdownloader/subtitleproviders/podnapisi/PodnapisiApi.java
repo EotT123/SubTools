@@ -1,14 +1,16 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
+import static java.nio.charset.StandardCharsets.*;
 import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 
 import manifold.ext.props.rt.api.override;
@@ -28,6 +30,7 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.data.ProviderId;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.UrlBuilder;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
@@ -55,12 +58,30 @@ public class PodnapisiApi implements SubtitleApi {
      * @param title the movie title
      * @param year the year of the movie (nullable)
      * @param language the subtitle language
+     * @param providerIds other provider ids
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws PodnapisiApiException if the API call fails
      */
     public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
-        Language language) throws PodnapisiApiException {
-        return getSubtitles(title, language, MapUtil.create(SearchParam.YEAR, year));
+        Language language, ProviderIds providerIds) throws PodnapisiApiException {
+        try {
+            Optional<List<PodnapisiSubtitleMetadata>> subtitles =
+                providerIds.getImdbId().mapEx(imdbId -> getSubtitles(
+                    MapUtil.create(
+                        SearchParam.IMDB, imdbId,
+                        SearchParam.LANGUAGE, language.iso639_1,
+                        SearchParam.YEAR, year)));
+            if (subtitles.isPresent()) {
+                return subtitles.get();
+            }
+        } catch (PodnapisiApiException e) {
+            // continue
+        }
+        return getSubtitles(
+            MapUtil.create(
+                SearchParam.KEYWORDS, URLEncoder.encode(title.trim().toLowerCase(), UTF_8),
+                SearchParam.LANGUAGE, language.iso639_1,
+                SearchParam.YEAR, year));
     }
 
     // ===== \\
@@ -87,60 +108,64 @@ public class PodnapisiApi implements SubtitleApi {
      * @param season the season number
      * @param episode the episode number
      * @param language the subtitle language
+     * @param providerIds other provider ids
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws PodnapisiApiException if the API call fails
      */
     public List<PodnapisiSubtitleMetadata> getSerieSubtitles(String serieName, int season, int episode,
-        Language language) throws PodnapisiApiException {
-        return getSubtitles(serieName, language,
-            MapUtil.create(SearchParam.SEASON, season, SearchParam.EPISODE, episode));
+        Language language, ProviderIds providerIds) throws PodnapisiApiException {
+        try {
+            Optional<List<PodnapisiSubtitleMetadata>> serieSubtitles =
+                providerIds.getImdbId().mapEx(imdbId -> getSubtitles(
+                    MapUtil.create(
+                        SearchParam.IMDB, imdbId,
+                        SearchParam.LANGUAGE, language.iso639_1,
+                        SearchParam.SEASON, season,
+                        SearchParam.EPISODE, episode)));
+            if (serieSubtitles.isPresent()) {
+                return serieSubtitles.get();
+            }
+        } catch (PodnapisiApiException e) {
+            // continue
+        }
+        return getSubtitles(
+            MapUtil.create(
+                SearchParam.KEYWORDS, URLEncoder.encode(serieName.trim().toLowerCase(), UTF_8),
+                SearchParam.LANGUAGE, language.iso639_1,
+                SearchParam.SEASON, season,
+                SearchParam.EPISODE, episode));
     }
 
 
-    // ====== \\
-    // COMMON \\
-    // ====== \\
+// ====== \\
+// COMMON \\
+// ====== \\
 
     /**
-     * Fetches a list of available serie subtitles for a given name, language and other parameters.
+     * Fetches a list of available serie subtitles for the given parameters.
      * Results are cached in memory.
      *
-     * @param name the name to search for
-     * @param language the subtitle language
-     * @param paramMap extra search parameters
+     * @param paramMap search parameters
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws PodnapisiApiException if the API call fails
      */
 
-    private List<PodnapisiSubtitleMetadata> getSubtitles(String name, Language language,
-        Map<SearchParam, Serializable> paramMap) throws PodnapisiApiException {
-        List<ProviderCacheKeyParam> params = paramMap.entrySet().stream()
+    private List<PodnapisiSubtitleMetadata> getSubtitles(Map<SearchParam, Serializable> paramMap)
+        throws PodnapisiApiException {
+        List<ProviderCacheKeyParam> params = paramMap.entrySet().stream().sorted(Entry.comparingByKey())
             .map(entry -> new ProviderCacheKeyParam(entry.getKey().name(), entry.getValue())).toList();
-        return getCache("subtitles", b -> b.add("name", name).add("language", language).add(params))
+        return getCache("subtitles", b -> b.add(params))
             .getCollection(() -> {
                 try {
-
-
-//                    https:
-//www.podnapisi.net/nl/moviedb/search/?keywords=Kung+Fu&movie_type=movie&seasons=&episodes=&year=
-//                    https:
-//www.podnapisi.net/nl/moviedb/search/?keywords=Kung+Fu&movie_type=tv-series&seasons=&episodes=&year=
-
                     UrlBuilder urlBuilder = new UrlBuilder(DOMAIN, "/sl/ppodnapisi/search");
-                    urlBuilder.addParam(
-                        SearchParam.KEYWORDS.pattern.formatted(URLEncoder.encode(name.trim().toLowerCase(),
-                            StandardCharsets.UTF_8)));
-//                    if (PODNAPISI_LANGS.containsKey(language)) {
-//                        url.append(SearchParam.LANGUAGE_OLD.pattern.formatted(PODNAPISI_LANGS.get(language)));
-//                    }
-                    urlBuilder.addParam(SearchParam.LANGUAGE.pattern.formatted(language.iso639_1));
                     paramMap.forEach((param, value) -> {
                         if (value != null) {
                             urlBuilder.addParam(param.pattern.formatted(value.toString()));
                         }
                     });
-                    urlBuilder.addParam(SearchParam.XML.pattern);
-
+                    if (!paramMap.containsKey(SearchParam.XML)) {
+                        urlBuilder.addParam(SearchParam.XML.pattern);
+                    }
                     return getXml(urlBuilder.build()).select("subtitle")
                         .stream()
                         .map(this::parsePodnapisiSubtitle)

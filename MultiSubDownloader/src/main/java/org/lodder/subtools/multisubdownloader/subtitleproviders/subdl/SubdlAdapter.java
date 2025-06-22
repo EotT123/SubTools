@@ -52,7 +52,7 @@ public final class SubdlAdapter extends
 
     @Override
     public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) throws SubdlException {
+        Language language, ProviderIds providerIds) throws SubdlException {
         return api.getMovieSubtitles(name, year, language);
     }
 
@@ -82,7 +82,7 @@ public final class SubdlAdapter extends
 
     @Override
     public Collection<SubdlSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws SubdlException {
+        Language language, ProviderIds providerIds) throws SubdlException {
         return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
     }
 

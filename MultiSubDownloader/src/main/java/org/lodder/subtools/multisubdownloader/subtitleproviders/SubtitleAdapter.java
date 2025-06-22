@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import static manifold.science.util.UnitConstants.*;
 import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
@@ -79,7 +78,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
         if (subtitles.isEmpty()) {
             try {
-                subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language));
+                subtitles.addAll(searchMovieSubtitlesWithName(movieRelease.name, movieRelease.year, language,
+                    movieRelease.providerIds));
             } catch (Exception e) {
                 LOGGER.error("API $provider searchSubtitles using title for movie [%s] (%s)"
                     .formatted(movieRelease.name, e.getMessage()), e);
@@ -108,7 +108,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public abstract Collection<API_SUB> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) throws X;
 
     public abstract Collection<API_SUB> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) throws X;
+        Language language, ProviderIds providerIds) throws X;
 
 
 //    @Override
@@ -192,7 +192,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                 .mapEx(mapping -> tvRelease.episodes.stream()
                     .flatMap(episode -> {
                         try {
-                            return searchSubtitles(mapping, tvRelease.season, episode, language).stream();
+                            return searchSubtitles(mapping, tvRelease.season, episode, language,
+                                tvRelease.providerIds).stream();
                         } catch (Exception e) {
                             LOGGER.error("API $source searchSubtitles for serie [%s] (%s)".formatted(
                                     TvRelease.formatName(mapping.providerName, tvRelease.season, episode), e.getMessage()),
@@ -211,7 +212,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     }
 
     public abstract Collection<API_SUB> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws X;
+        Language language, ProviderIds providerIds) throws X;
 
     public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {
@@ -419,7 +420,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             // expiration time.
             cacheKey.store(
                 value:Value.of(releaseMappingConstructor.apply(name, null, null)),
-                timeToLive:1 day,
+                timeToLive:1day,
                 storeTempNullValue:true);
             return Optional.empty();
         } else {

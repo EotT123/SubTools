@@ -60,7 +60,7 @@ public final class OpenSubAdapter
 
     @Override
     public Collection<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithName(String name,
-        @Nullable Integer year, Language language) throws OpenSubtitleException {
+        @Nullable Integer year, Language language, ProviderIds providerIds) throws OpenSubtitleException {
         return api.searchSubtitles(query:name, language:language, type:TypeEnum.MOVIE);
     }
 
@@ -93,7 +93,7 @@ public final class OpenSubAdapter
 
     @Override
     public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language) throws OpenSubtitleException {
+        int episode, Language language, ProviderIds providerIds) throws OpenSubtitleException {
         return api.searchSubtitles(
             query:serieMapping.name,
             season:season,

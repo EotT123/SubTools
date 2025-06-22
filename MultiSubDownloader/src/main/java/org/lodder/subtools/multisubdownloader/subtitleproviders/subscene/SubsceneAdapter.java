@@ -59,7 +59,7 @@ public final class SubsceneAdapter
 
     @Override
     public Collection<SubsceneSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) {
+        Language language, ProviderIds providerIds) {
         // TODO implement this
         return List.of();
     }
@@ -109,7 +109,7 @@ public final class SubsceneAdapter
 
     @Override
     public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws SubsceneException {
+        Language language, ProviderIds providerIds) throws SubsceneException {
         return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 

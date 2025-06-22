@@ -50,8 +50,8 @@ public final class PodnapisiAdapter
 
     @Override
     public Collection<PodnapisiSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) throws PodnapisiException {
-        return api.getMovieSubtitles(name, year, language);
+        Language language, ProviderIds providerIds) throws PodnapisiException {
+        return api.getMovieSubtitles(name, year, language, providerIds);
     }
 
     // ===== \\
@@ -77,8 +77,8 @@ public final class PodnapisiAdapter
 
     @Override
     public Collection<PodnapisiSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws PodnapisiException {
-        return api.getSerieSubtitles(serieMapping.providerName, season, episode, language);
+        Language language, ProviderIds providerIds) throws PodnapisiException {
+        return api.getSerieSubtitles(serieMapping.providerName, season, episode, language, providerIds);
     }
 
     // ====== \\

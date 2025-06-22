@@ -58,7 +58,7 @@ public final class Addic7edProxyGestdownAdapter extends
 
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) throws Addic7edException {
+        Language language, ProviderIds providerIds) throws Addic7edException {
         return List.of();
     }
 
@@ -94,7 +94,7 @@ public final class Addic7edProxyGestdownAdapter extends
 
     @Override
     public List<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language) throws Addic7edException {
+        int episode, Language language, ProviderIds providerIds) throws Addic7edException {
         LOGGER.debug("$provider - getSubtitles: {}", TvRelease.formatName(serieMapping.providerName, season, episode));
         return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }

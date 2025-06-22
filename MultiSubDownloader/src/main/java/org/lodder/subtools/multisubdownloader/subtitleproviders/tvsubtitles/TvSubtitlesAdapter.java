@@ -59,7 +59,7 @@ public final class TvSubtitlesAdapter
 
     @Override
     public Collection<TVSubtitlesSubtitleMetadata> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
-        Language language) {
+        Language language, ProviderIds providerIds) {
         // no movie information available for provider
         return List.of();
     }
@@ -70,7 +70,7 @@ public final class TvSubtitlesAdapter
 
     @Override
     public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws TvSubtitleException {
+        Language language, ProviderIds providerIds) throws TvSubtitleException {
         return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
