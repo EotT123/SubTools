@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -68,10 +67,10 @@ public final class OpenSubAdapter
     // SERIE \\
     // ===== \\
 
-
     @Override
-    public Optional<OpensubtitleId> getSerieProviderIdById(ProviderIds providerIds) throws OpenSubtitleException {
-        return Optional.empty();
+    public List<OpensubtitleId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+        throws OpenSubtitleException {
+        return List.of();
     }
 
     @Override

@@ -96,8 +96,9 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     // ===== \\
 
     @Override
-    public Optional<ProviderId> getSerieProviderIdById(ProviderIds providerIds) throws Addic7edException {
-        return Optional.empty();
+    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+        throws Addic7edException {
+        return List.of();
     }
 
     @Override

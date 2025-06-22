@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import manifold.ext.props.rt.api.override;
@@ -66,9 +65,8 @@ public final class Addic7edProxyGestdownAdapter extends
     // SERIE \\
     // ===== \\
 
-
     @Override
-    public Optional<Addic7edProxyGestdownSerieId> getSerieProviderIdById(ProviderIds providerIds)
+    public List<Addic7edProxyGestdownSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws Addic7edException {
         return providerIds.getTvdbId().flatMapToObjEx(api::getProviderSerieIds).map(this::toSerieId);
     }

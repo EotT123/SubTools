@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
+import static manifold.science.util.UnitConstants.*;
 import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
@@ -420,7 +421,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             // expiration time.
             cacheKey.store(
                 value:Value.of(releaseMappingConstructor.apply(name, null, null)),
-                timeToLive:1day,
+                timeToLive:1 day,
                 storeTempNullValue:true);
             return Optional.empty();
         } else {
