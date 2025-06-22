@@ -10,7 +10,6 @@ import manifold.ext.props.rt.api.val;
 public abstract sealed class ProviderCacheKeyCommon implements Serializable permits ProviderCacheKeySub,
     ProviderCacheKey {
 
-    private static final String DELIMITER = "~/-/~";
     @val String provider;
     @val String type;
     @val List<ProviderCacheKeyParam> params;
@@ -41,7 +40,7 @@ public abstract sealed class ProviderCacheKeyCommon implements Serializable perm
 
     @Override
     public String toString() {
-        return provider + DELIMITER + type + DELIMITER +
-            params.stream().map(ProviderCacheKeyParam::toString).collect(Collectors.joining(DELIMITER));
+        return provider + "-" + type + "-" +
+            params.stream().map(ProviderCacheKeyParam::toString).collect(Collectors.joining("-"));
     }
 }

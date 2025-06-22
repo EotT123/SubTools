@@ -24,6 +24,7 @@ import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbSerie;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class TvdbAdapter implements AdapterIntf {
     public Optional<TvdbSerie> searchSerie(String serieName, ProviderIds providerIds) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
 
-        CacheKey cache = getCache("seriemapping",
+        CacheKey cache = getCache(VideoType.EPISODE + "mapping",
             b -> b.addIdParam("name", encodedSerieName).addIdParam("imdbid", providerIds.getImdbId().orElse(null)));
 
         if (cache.isPresent() && (!cache.isTemporaryObject() || !cache.isExpiredTemporary())) {

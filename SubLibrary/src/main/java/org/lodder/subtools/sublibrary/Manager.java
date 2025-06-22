@@ -6,7 +6,6 @@ import static manifold.science.util.UnitConstants.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -505,12 +504,12 @@ public class Manager {
             this.operation = operation;
         }
 
-        public CacheKeyBuilder addIdParam(String name, Serializable value) {
+        public CacheKeyBuilder addIdParam(String name, Object value) {
             idParams.add(new ProviderCacheKeyParam(name, value));
             return this;
         }
 
-        public CacheKeyBuilder add(String name, Serializable value) {
+        public CacheKeyBuilder add(String name, Object value) {
             params.add(new ProviderCacheKeyParam(name, value));
             return this;
         }

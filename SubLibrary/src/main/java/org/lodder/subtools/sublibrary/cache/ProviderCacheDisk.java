@@ -18,10 +18,14 @@ import java.util.Set;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.gsonfire.GsonFireBuilder;
 import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProviderCacheDisk.class);
     private static final Object LOCK = new Object();
+    private static final Gson GSON = new GsonBuilder().create();
 
     private final @Nullable Time timeToLive;
     private final Set<ProviderCacheKey> doublesToRemove = new HashSet<>();
@@ -54,7 +59,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
                         "user", "pass");
 
                     try (Statement stmt = connection.createStatement()) {
-                        stmt.execute("create table IF NOT EXISTS $tableName (key OBJECT, cacheobject OBJECT);");
+                        stmt.execute("create table IF NOT EXISTS $tableName (key VARCHAR(32768), cacheobject OBJECT);");
                     }
 
                     boolean errorWhileReadingCacheFile = false;
@@ -63,14 +68,16 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
                         Multimap<ProviderCacheKey, CacheObject<V>> tempCache = MultimapBuilder.hashKeys()
                             .treeSetValues(Comparator.comparing((CacheObject<V> value) -> value.age).reversed())
                             .build();
+                        Gson gson = new GsonFireBuilder().enableHooks(SerieMapping.class).createGson();
                         synchronized (cache.cacheMap) {
                             while (rs.next()) {
                                 try {
-                                    tempCache.put((ProviderCacheKey) rs.getObject("key"),
+                                    tempCache.put(gson.fromJson((String) rs.getObject("key"), ProviderCacheKey.class),
                                         (CacheObject<V>) rs.getObject("cacheobject"));
                                 } catch (SQLException e2) {
                                     LOGGER.error("Unable to insert object in disk cache. (${e2.getMessage()})", e2);
                                     errorWhileReadingCacheFile = true;
+//                                    throw new CorruptSettingsFileException(e);
                                 }
                             }
                             Map<ProviderCacheKey, Collection<CacheObject<V>>> map = tempCache.asMap();
@@ -78,7 +85,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
                                 .filter(entry -> entry.getValue().size() > 1)
                                 .forEach(entry -> {
                                     doublesToRemove.add(entry.getKey());
-                                    removedToAdd.put(entry.getKey(), entry.getValue().iterator().next());
+                                    removedToAdd.put(entry.getKey(), entry.getValue().last());
                                 });
                             map.entrySet()
                                 .stream()
@@ -126,9 +133,8 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
         // initialize map in other thread
         new Thread(() -> {
             getConnection();
-            doublesToRemove.forEach(this::removeFromDisk);
+            doublesToRemove.forEach(this::remove);
             removedToAdd.forEach(this::put);
-            removedToAdd.keySet().forEach(this::putFromMemoryCache);
         }).start();
     }
 
@@ -151,7 +157,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
     private void removeFromDisk(ProviderCacheKeyCommon key) {
         synchronized (LOCK) {
             try (PreparedStatement prep = getConnection().prepareStatement("delete from $tableName where key = ?")) {
-                prep.setObject(1, key);
+                prep.setObject(1, GSON.toJson(key));
                 prep.executeUpdate();
             } catch (SQLException e) {
                 LOGGER.error("Unable to delete object from disk cache!", e);
@@ -172,7 +178,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
             try (PreparedStatement prep = getConnection().prepareCall(
                 "INSERT INTO $tableName (key,cacheobject) VALUES (?,?)")) {
                 prep.clearParameters();
-                prep.setObject(1, key);
+                prep.setObject(1, GSON.toJson(key));
                 synchronized (cacheMap) {
                     CacheObject<V> cacheObject = cacheMap.get(key);
                     prep.setObject(2, cacheObject);

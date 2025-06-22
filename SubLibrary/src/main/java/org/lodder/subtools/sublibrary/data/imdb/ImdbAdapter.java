@@ -2,9 +2,12 @@ package org.lodder.subtools.sublibrary.data.imdb;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -56,19 +59,20 @@ public class ImdbAdapter implements AdapterIntf {
 
     public Optional<String> getImdbId(String title, VideoType videoType, @Nullable Integer year=null) {
         try {
-            Optional<ReleaseMapping> releaseMapping = (Optional<ReleaseMapping>) getCache("releasemapping",
-                b -> b.add("title", title).add("videoType", videoType).add("year", year))
-                .getOptional(
-                    () -> getImdbIdOnImdb(title, year, videoType)
-                        .orElseMap(() -> getImdbIdOnGoogle(title, year, videoType))
-                        .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType))
-                        .orElseMap(
-                            () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId)))
-                        .map(imdbId -> (ReleaseMapping) switch (videoType) {
-                            case EPISODE -> new SerieMapping(title, imdbId.id, imdbId.name);
-                            case MOVIE -> new MovieMapping(title, imdbId.id, imdbId.name, year);
-                        }),
-                    storeTempNullValue:true);
+            Optional<ReleaseMapping> releaseMapping =
+                (Optional<ReleaseMapping>) getCache(videoType.name() + "mapping",
+                    b -> b.add("title", title).add("videoType", videoType).add("year", year))
+                    .getOptional(
+                        () -> getImdbIdOnImdb(title, year, videoType)
+                            .orElseMap(() -> getImdbIdOnGoogle(title, year, videoType))
+                            .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType))
+                            .orElseMap(
+                                () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId)))
+                            .map(imdbId -> switch (videoType) {
+                                case EPISODE -> new SerieMapping(title, imdbId.id, imdbId.name);
+                                case MOVIE -> new MovieMapping(title, imdbId.id, imdbId.name, year);
+                            }),
+                        storeTempNullValue:true);
             return releaseMapping.map(ReleaseMapping::getProviderId);
 
 //            Optional<ImdbId> providerId = (Optional<ImdbId>) (Object) getCache("providerId",
@@ -124,11 +128,25 @@ public class ImdbAdapter implements AdapterIntf {
             // found single exact match
             return Optional.of(providerIds.iterator().next());
         }
+        Pattern yearPattern = Pattern.compile("(?<year>[1-2]\\d{3})");
         return userInteractionHandler
             .selectFromList(
                 providerIds.stream().sorted(
                     Comparator.comparing((ImdbId imdbPID) -> imdbPID.videoType == videoType ? -1 : 1)
-                        .thenComparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title))).toList(),
+                        .thenComparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title))
+                        .thenComparing(imdbPID -> {
+                            if (imdbPID.year != null) {
+                                Matcher matcher = yearPattern.matcher(imdbPID.year);
+                                Integer lastYear = null;
+                                while (matcher.find()) {
+                                    lastYear = Integer.parseInt(matcher.group("year"));
+                                }
+                                if (lastYear != null) {
+                                    return Math.abs((year == null ? LocalDate.now().year : year) - lastYear);
+                                }
+                            }
+                            return 0;
+                        })).toList(),
                 getText("Prompter.SelectImdbMatchForSerie", title),
                 provider, providerId -> providerId.name + (StringUtils.isNotBlank(providerId.otherInfo) ?
                     " (" + providerId.otherInfo + ")" : ""));

@@ -13,8 +13,7 @@ class InMemoryCacheTest {
 
     @Test
     void testAddRemoveObjects() {
-        ProviderCacheMemory cache = new ProviderCacheMemory<>(
-            timeToLive:100s, timerInterval:100ms, maxItems:6);
+        ProviderCacheMemory cache = new ProviderCacheMemory<>(maxItems:6);
 
         cache.put(new ProviderCacheKey("provider", "eBay"), "eBay");
         cache.put(new ProviderCacheKey("provider", "Paypal"), "Paypal");

@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.data;
 
+import static org.lodder.subtools.sublibrary.xml.StringUtils.*;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -19,7 +21,8 @@ public class ProviderId implements Serializable {
     }
 
     public static int calculateLevenshteinDistance(String name, String otherName) {
-        return new LevenshteinDistance(100).apply(name.keepLettersOnly(), otherName.keepLettersOnly());
+        return new LevenshteinDistance(100).apply(normalize(name.keepLettersOnly()),
+            normalize(otherName.keepLettersOnly()));
     }
 
     public int calculateLevenshteinDistance(String name) {

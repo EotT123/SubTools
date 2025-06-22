@@ -2,6 +2,7 @@ package org.lodder.subtools.sublibrary.cache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -28,5 +29,20 @@ public final class ProviderCacheKey extends ProviderCacheKeyCommon {
             new ProviderCacheKeySub(provider, type,
                 Stream.of(Stream.of(cacheKeyParam), otherParams.stream()).flatMap(Function.identity())
                     .toList()));
+    }
+
+    @Override public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        ProviderCacheKey that = (ProviderCacheKey) o;
+        return Objects.equals(idParams, that.idParams) && Objects.equals(otherParams, that.otherParams);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(super.hashCode(), idParams, otherParams);
     }
 }

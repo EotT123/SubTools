@@ -50,7 +50,7 @@ record ImdbSearchIdApi(Manager manager) {
                         e -> e.selectFirst("a").text(),
                         e -> e.selectFirst("a").attr("href"), e -> e.selectFirst("span").text(),
                         e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text()).findFirst().orElse(""),
-                        e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text().contains("TV Series") ?
+                        e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text().contains("Series") ?
                             VideoType.EPISODE : VideoType.MOVIE).findFirst().orElse(null));
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);

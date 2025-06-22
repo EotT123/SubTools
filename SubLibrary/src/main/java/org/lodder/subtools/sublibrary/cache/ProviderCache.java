@@ -180,5 +180,4 @@ public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, Provi
     }
 
     protected abstract void removeFromCache(ProviderCacheKey key);
-
 }
