@@ -46,12 +46,9 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
     }
 
     private void setTvdbId(TvRelease release) {
-        release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name)
-            .map(serie -> serie.tvdbId)
+        release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name, release.providerIds)
+            .map(serie -> serie.providerId)
             .ifPresent(tvdbId -> release.providerIds.add(ProviderIdType.TVDB, Integer.parseInt(tvdbId))));
-        // TODO enable this, also use imdbId if present
-//        release.providerIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
-//            .ifPresent(imdbDetails -> release.providerIds.add(ProviderIdType.TVDB, imdbDetails.tvdbId)));
         if (release.providerIds.getTvdbId().isEmpty()) {
             throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
         }

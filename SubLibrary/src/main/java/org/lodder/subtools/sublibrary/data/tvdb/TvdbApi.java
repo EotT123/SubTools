@@ -3,6 +3,7 @@ package org.lodder.subtools.sublibrary.data.tvdb;
 import static manifold.science.util.UnitConstants.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.tvdb.api.LoginApi;
 import com.tvdb.api.SearchApi;
@@ -11,6 +12,7 @@ import com.tvdb.invoker.ApiClient;
 import com.tvdb.invoker.auth.HttpBearerAuth;
 import com.tvdb.model.LoginPost200Response;
 import com.tvdb.model.LoginPostRequest;
+import com.tvdb.model.SearchByRemoteIdResult;
 import com.tvdb.model.SearchResult;
 import com.tvdb.model.SeriesBaseRecord;
 import manifold.ext.props.rt.api.override;
@@ -24,6 +26,7 @@ import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
 import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.lodder.subtools.sublibrary.util.lazy.LazyThrowingSupplier;
 import retrofit2.Call;
@@ -57,21 +60,21 @@ public class TvdbApi implements ApiIntf {
 
     private String getBearerToken() throws TvdbApiException {
 //        try {
-            return manager.getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
-                .get(
-                    supplier:() -> {
-                        try {
-                            LoginPost200Response response = new ApiClient().createService(LoginApi.class)
-                                .loginPost(new LoginPostRequest().apikey(APIKEY)).execute().body();
-                            if (response == null || response.getData() == null) {
-                                throw TvdbApiException.noResult("Could not acquire a bearer token");
-                            }
-                            return response.getData().getToken();
-                        } catch (IOException e) {
-                            throw TvdbApiException.error(e);
+        return manager.getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
+            .get(
+                supplier:() -> {
+                    try {
+                        LoginPost200Response response = new ApiClient().createService(LoginApi.class)
+                            .loginPost(new LoginPostRequest().apikey(APIKEY)).execute().body();
+                        if (response == null || response.getData() == null) {
+                            throw TvdbApiException.noResult("Could not acquire a bearer token");
                         }
-                    },
-                    timeToLive:29.5 day);
+                        return response.getData().getToken();
+                    } catch (IOException e) {
+                        throw TvdbApiException.error(e);
+                    }
+                },
+                timeToLive:29.5 day);
 //        } catch (IOException e) {
 //            throw new TvdbApiException(NO_CONTENT, "Could not acquire a bearer token", CACHE_TEMPORARY, ERROR);
 //        }
@@ -88,29 +91,33 @@ public class TvdbApi implements ApiIntf {
                     .getData());
     }
 
-    public SearchResult searchSerie(int tvdbId) throws TvdbApiException {
+    public SeriesBaseRecord searchSerieWithTvdbId(int tvdbId) throws TvdbApiException {
         return getCache("serie", b -> b.add("tvdbId", tvdbId))
+            .get(() -> apiCall(() -> seriesApi.get().getSeriesBase(tvdbId)).getData());
+    }
+
+    //  Allows searching for an IMDB or EIDR id
+    public SeriesBaseRecord searchSerieWithRemoteId(String remoteId) throws TvdbApiException {
+        return getCache("serie", b -> b.add("remoteId", remoteId))
             .get(() -> {
-                List<SearchResult> series = apiCall(() -> searchApi.get().getSearchResults(null, null, "series",
-                    null, null, null, null, null, null,
-                    null, String.valueOf(tvdbId), null, null)).getData();
-//                        .addErrorHandler(ERR_BAD_REQUEST, retry:false)
-//                        .addErrorHandler(ERR_UNAUTHORIZED, retry:false, logLevel:WARN)
-                if (series == null || series.isEmpty()) {
-                    throw TvdbApiException.noResult("Serie with tvdb id [$tvdbId] not found");
+                List<SearchByRemoteIdResult> data =
+                    apiCall(() -> searchApi.get().getSearchResultsByRemoteId(remoteId)).getData();
+                if (data == null || data.isEmpty()) {
+                    throw TvdbApiException.noResult("Serie with remote id [$remoteId] not found");
                 }
-                return series.getFirst();
+                return data.getFirst().getSeries();
             });
     }
 
-    public SeriesBaseRecord searchEpisode(int tvdbId, int season, int episode, Language language)
+    public Optional<TvdbEpisode> searchEpisode(int tvdbId, int season, int episode, Language language)
         throws TvdbApiException {
         return getCache("episode",
             b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode)
                 .add("language", language))
-            .get(() -> apiCall(
-                () -> seriesApi.get()
-                    .getSeriesSeasonEpisodesTranslated(tvdbId, "default", language.iso639_3, 0)).getData());
+            .getOptional(() -> Optional.ofNullable(apiCall(
+                    () -> seriesApi.get()
+                        .getSeriesSeasonEpisodesTranslated(tvdbId, "default", language.iso639_3, 0)).getData())
+                .map(TvdbEpisode::new));
 //                    .addErrorHandler(BAD_REQUEST, retry:false)
 //                    .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
 //                    .addErrorHandler(NOT_FOUND, retry:false, logLevel:INFO)

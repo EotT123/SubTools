@@ -29,15 +29,20 @@ record ImdbSearchIdApi(Manager manager) {
 
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
-    public Set<ImdbId> getImdbIdOnImdb(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ImdbId> getImdbIdOnImdb(String title, @Nullable Integer year, VideoType videoType)
+        throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-imdb").add("title", title).add("year", year))
             .getCollection(() -> {
                 StringBuilder sb = new StringBuilder("https://www.imdb.com/find/?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {
-                    sb.append("+%28").append(year).append("%29");
+                    sb.append("+%28$").append(year).append("%29");
                 }
+                sb.append(switch (videoType) {
+                    case EPISODE -> "&s=tt&ttype=tv&ref_=fn_tv";
+                    case MOVIE -> "&s=tt&ttype=ft&ref_=fn_mov";
+                });
                 String url = sb.toString().replace("+", "%20");
                 try {
                     Elements searchResults = manager.getAsJsoupDocument(url(url)).select(".find-result-item");
@@ -76,7 +81,8 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ImdbId> getImdbIdOnYahoo(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ImdbId> getImdbIdOnYahoo(String title, @Nullable Integer year, VideoType videoType)
+        throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-yahoo").add("title", title).add("year", year))
             .getCollection(() -> {
@@ -105,7 +111,8 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    public Set<ImdbId> getImdbIdOnGoogle(String title, @Nullable Integer year) throws ImdbSearchIdException {
+    public Set<ImdbId> getImdbIdOnGoogle(String title, @Nullable Integer year, VideoType videoType)
+        throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
             .getCollection(() -> {

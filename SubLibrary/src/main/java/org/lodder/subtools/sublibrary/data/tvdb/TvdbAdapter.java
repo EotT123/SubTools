@@ -12,7 +12,6 @@ import java.util.OptionalInt;
 
 import com.tvdb.model.MovieBaseRecord;
 import com.tvdb.model.SearchResult;
-import com.tvdb.model.SeriesBaseRecord;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Language;
@@ -21,8 +20,10 @@ import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbException;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbSerie;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,61 +49,65 @@ public class TvdbAdapter implements AdapterIntf {
         return Optional.empty();
     }
 
-    public Optional<SearchResult> searchSerie(String serieName) {
+    public Optional<TvdbSerie> searchSerie(String serieName, ProviderIds providerIds) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
 
-        CacheKey cache = getCache("serie", b -> b.add("name", serieName));
+        CacheKey cache = getCache("seriemapping",
+            b -> b.addIdParam("name", encodedSerieName).addIdParam("imdbid", providerIds.getImdbId().orElse(null)));
 
         if (cache.isPresent() && (!cache.isTemporaryObject() || !cache.isExpiredTemporary())) {
             return cache.getOptional();
         }
 
-        Optional<SearchResult> tvdbSerie;
-        List<SearchResult> serieIds;
+        Optional<TvdbSerie> tvdbSerie;
         try {
-            serieIds = api.searchSeries(encodedSerieName);
+            tvdbSerie = providerIds.getImdbId().mapEx(api::searchSerieWithRemoteId)
+                .map(serieBaseRecord -> new TvdbSerie(serieName, serieBaseRecord));
         } catch (TvdbException e) {
-            serieIds = List.of();
-        }
-        if (serieIds.isEmpty()) {
             tvdbSerie = Optional.empty();
-        } else if (!userInteractionHandler.settings.optionsConfirmProviderMapping && serieIds.size() == 1) {
-            tvdbSerie = Optional.of(serieIds.first);
-        } else {
-            Comparator<SearchResult> comparator =
-                Comparator.comparing((SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, s.name));
+        }
+        if (tvdbSerie.isEmpty()) {
+            List<SearchResult> serieIds;
             try {
-                tvdbSerie = userInteractionHandler.selectFromList(
-                    serieIds.stream().sorted(comparator).toList(),
-                    getText("Prompter.SelectTvdbMatchForSerie", serieName),
-                    provider,
-                    s -> "${s.name} (${s.firstAirTime})");
-                if (tvdbSerie.isEmpty()) {
-                    LOGGER.error("Unknown serie name in tvdb: $serieName");
-                    tvdbSerie = promptUserToEnterTvdbId(serieName).mapToObjEx(api::searchSerie);
-                }
+                serieIds = api.searchSeries(encodedSerieName);
+            } catch (TvdbException e) {
+                serieIds = List.of();
+            }
+            if (serieIds.isEmpty()) {
+                tvdbSerie = Optional.empty();
+            } else if (!userInteractionHandler.settings.optionsConfirmProviderMapping && serieIds.size() == 1) {
+                return Optional.of(serieIds.first).map(searchResult -> new TvdbSerie(serieName, searchResult));
+            } else {
+                Comparator<SearchResult> comparator = Comparator.comparing(
+                    (SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, s.name));
+                tvdbSerie = userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
+                    getText("Prompter.SelectTvdbMatchForSerie", serieName), provider,
+                    s -> "${s.name} (${s.firstAirTime})").map(searchResult -> new TvdbSerie(serieName, searchResult));
+            }
+        }
+        if (tvdbSerie.isEmpty()) {
+            try {
+                tvdbSerie = promptUserToEnterTvdbId(serieName).mapToObjEx(api::searchSerieWithTvdbId)
+                    .map(serieBaseRecord -> new TvdbSerie(serieName, serieBaseRecord));
             } catch (TvdbApiException e) {
-                return Optional.empty();
+                //continue
             }
         }
         if (tvdbSerie.isEmpty()) {
             cache.storeTempValue(Value.ofOptional(tvdbSerie));
         } else {
             cache.store(Value.ofOptional(tvdbSerie));
-            Optional<SerieMapping> serieMapping =
-                tvdbSerie.map((SearchResult serie) -> new SerieMapping(serieName, serie.tvdbId, serie.name));
-            getCache("seriemapping", b -> b.add("name", encodedSerieName))
-                .store(Value.ofOptional(serieMapping));
         }
         return tvdbSerie;
+
     }
 
-    public Optional<SeriesBaseRecord> searchEpisode(int tvdbId, int season, int episode) {
+    public Optional<TvdbEpisode> searchEpisode(int tvdbId, int season, int episode) {
         return getCache("episode", b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode))
             .getOptional(
                 () -> {
                     try {
-                        return Optional.of(api.searchEpisode(tvdbId, season, episode, Language.ENGLISH));
+                        return api.searchEpisode(tvdbId, season, episode, Language.ENGLISH);
                     } catch (TvdbApiException e) {
                         LOGGER.error(
                             "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(

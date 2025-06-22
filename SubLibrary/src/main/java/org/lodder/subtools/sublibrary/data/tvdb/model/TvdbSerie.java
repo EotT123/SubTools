@@ -1,36 +1,20 @@
 package org.lodder.subtools.sublibrary.data.tvdb.model;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import com.tvdb.model.SearchResult;
+import com.tvdb.model.SeriesBaseRecord;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
-import manifold.ext.props.rt.api.var;
-import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.Language;
+public class TvdbSerie extends SerieMapping {
+    public TvdbSerie(String name, String providerId, String providerName) {
+        super(name, providerId, providerName);
+    }
 
-public class TvdbSerie implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    @var int id;
-    //@var String serieId;
-    @var @Nullable Language language;
-    @var @Nullable String serieName;
-    @var @Nullable String banner;
-    //@var String overview;
-    @var @Nullable String firstAired;
-    @var @Nullable String imdbId;
-    @var @Nullable String zap2ItId;
-    @var List<String> actors = new ArrayList<>();
-    @var @Nullable String airsDayOfWeek;
-    @var @Nullable String airsTime;
-    @var @Nullable String contentRating;
-    @var List<String> genres = new ArrayList<>();
-    @var @Nullable String network;
-    @var @Nullable String rating;
-    @var @Nullable String runtime;
-    @var @Nullable String status;
-    @var @Nullable String fanArt;
-    @var @Nullable String lastUpdated;
-    @var @Nullable String poster;
+    public TvdbSerie(String name, SearchResult searchResult) {
+        this(name, searchResult.tvdbId, searchResult.name);//, searchResult.year);
+    }
+
+    public TvdbSerie(String name, SeriesBaseRecord seriesBaseRecord) {
+        this(name, String.valueOf(seriesBaseRecord.id), seriesBaseRecord.name);//, seriesBaseRecord.year);
+    }
 }
+

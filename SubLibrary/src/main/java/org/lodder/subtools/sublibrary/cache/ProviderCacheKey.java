@@ -7,16 +7,16 @@ import java.util.stream.Stream;
 
 public final class ProviderCacheKey extends ProviderCacheKeyCommon {
 
-    private final List<ProviderCacheKeyParam> providerCacheKeyIdParams;
-    private final List<ProviderCacheKeyParam> providerCacheKeyOtherParams;
+    private final List<ProviderCacheKeyParam> idParams;
+    private final List<ProviderCacheKeyParam> otherParams;
 
     public ProviderCacheKey(String provider, String type, List<ProviderCacheKeyParam> providerCacheKeyKeyParams=
         new ArrayList<ProviderCacheKeyParam>(), List<ProviderCacheKeyParam> providerCacheKeyParams=
         new ArrayList<ProviderCacheKeyParam>()) {
         super(provider, type,
             Stream.of(providerCacheKeyKeyParams, providerCacheKeyParams).flatMap(List::stream).toList());
-        this.providerCacheKeyIdParams = providerCacheKeyKeyParams;
-        this.providerCacheKeyOtherParams = providerCacheKeyParams;
+        this.idParams = providerCacheKeyKeyParams;
+        this.otherParams = providerCacheKeyParams;
     }
 
 //    public static ProviderCacheKey parse(String value){
@@ -24,9 +24,9 @@ public final class ProviderCacheKey extends ProviderCacheKeyCommon {
 //    }
 
     public Stream<ProviderCacheKeySub> getSubKeyStream() {
-        return providerCacheKeyIdParams.stream().map(cacheKeyParam ->
+        return idParams.stream().map(cacheKeyParam ->
             new ProviderCacheKeySub(provider, type,
-                Stream.of(Stream.of(cacheKeyParam), providerCacheKeyOtherParams.stream()).flatMap(Function.identity())
+                Stream.of(Stream.of(cacheKeyParam), otherParams.stream()).flatMap(Function.identity())
                     .toList()));
     }
 }

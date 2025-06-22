@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public record ProviderCacheKeyParam(String key, @Nullable Object value) implements
-    Comparable<ProviderCacheKeyParam> {
+    Comparable<ProviderCacheKeyParam>, Serializable {
 
     private static final String DELIMITER = "~/:/~";
 

@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import name.falgout.jeffrey.throwing.ThrowingBiFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
@@ -22,6 +21,7 @@ import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingTriFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,10 +111,10 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     private Optional<ImdbId> getImdbIdCommon(String title, @Nullable Integer year, VideoType videoType,
-        ThrowingBiFunction<String, Integer, Collection<ImdbId>, ImdbSearchIdException> providerSerieIdSupplier) {
+        ThrowingTriFunction<String, Integer, VideoType, Collection<ImdbId>, ImdbSearchIdException> providerSerieIdSupplier) {
         Collection<ImdbId> providerIds;
         try {
-            providerIds = providerSerieIdSupplier.apply(title, year);
+            providerIds = providerSerieIdSupplier.apply(title, year, videoType);
         } catch (ImdbSearchIdException e) {
             LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(provider, title, year,
                 e.getMessage()), e);
