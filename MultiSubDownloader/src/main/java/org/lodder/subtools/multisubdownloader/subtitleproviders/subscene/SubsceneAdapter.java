@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
@@ -66,7 +67,14 @@ public final class SubsceneAdapter
     // ===== \\
 
     @Override
-    public Optional<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds) throws SubsceneException {
+    public Optional<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+        throws SubsceneException {
+        Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(providerIds, season);
+        userInteractionHandler.selectFromList(
+            providerReleaseIds,
+            selectFromListMessage.apply(displayName),
+            provider,
+            providerReleaseIdToDisplayStringFunction);
         return Optional.empty();
     }
 
@@ -79,6 +87,11 @@ public final class SubsceneAdapter
             case CLOSE -> 3;
             case null -> 4;
         };
+        Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(serieName);
+        if(season != null){
+            season
+        }
+
         return api.getSerieProviderIds(serieName)
             .entrySet()
             .stream()

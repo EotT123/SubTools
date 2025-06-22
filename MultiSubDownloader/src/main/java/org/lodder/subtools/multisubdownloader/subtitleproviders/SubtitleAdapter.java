@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import static manifold.science.util.UnitConstants.*;
 import static manifold.ext.props.rt.api.PropOption.*;
+import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
@@ -254,7 +255,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     private Optional<SerieMapping> getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
         @Nullable Integer season, ProviderIds providerIds) throws X {
 
-        ThrowingFunction<ProviderIds, Optional<S_ID>, X> providerReleaseIdByIdFunction = this::getSerieProviderIdById;
+        ThrowingSupplier<Optional<S_ID>, X> providerReleaseIdByIdFunction =
+            () -> getSerieProviderIdById(providerIds, season);
         ThrowingFunction<String, List<S_ID>, X> providerReleaseIdsByNameFunction
             = _nameToSearchFor -> getSortedSerieProviderIds(_nameToSearchFor, season);
         TriFunction<String, String, String, SerieMapping> releaseMappingConstructor =
@@ -280,10 +282,11 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * should not be cached in the implementing classes.
      *
      * @param providerIds the provider IDs containing various IDs for providers
+     * @param season the season number of the serie
      * @return an Optional containing the serie provider ID if one was found
      * @throws X if an error occurs during the operation
      */
-    public abstract Optional<S_ID> getSerieProviderIdById(ProviderIds providerIds) throws X;
+    public abstract Optional<S_ID> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) throws X;
 
     /**
      * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
@@ -345,7 +348,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public <M extends ReleaseMapping, P extends ProviderId> Optional<M> getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
         List<ProviderCacheKeyParam> extraParams, ProviderIds providerIds,
-        ThrowingFunction<ProviderIds, Optional<P>, X> providerReleaseIdByIdFunction,
+        ThrowingSupplier<Optional<P>, X> providerReleaseIdByIdFunction,
         ThrowingFunction<String, List<P>, X> providerReleaseIdsByNameFunction,
         TriFunction<String, String, String, M> releaseMappingConstructor,
         UnaryOperator<String> selectFromListMessage,
@@ -367,7 +370,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
 //        CacheKey releaseNameCache = getCache("releaseMapping",
 //            b -> b.add("name", name).add(extraParams));
-        M releaseMapping = providerReleaseIdByIdFunction.apply(providerIds)
+        M releaseMapping = providerReleaseIdByIdFunction.get()
             .map(providerId -> releaseMappingConstructor.apply(name, providerId.id, providerId.name))
             .orElseGetEx(() -> {
                 // Did not find a result when searching by id, or no id's where present.

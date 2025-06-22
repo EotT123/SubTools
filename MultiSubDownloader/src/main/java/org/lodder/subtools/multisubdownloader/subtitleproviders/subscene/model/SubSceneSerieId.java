@@ -15,8 +15,7 @@ public class SubSceneSerieId extends ProviderId {
     @val @Nullable String serieName;
     @val @Nullable Integer season;
 
-    public SubSceneSerieId(String text, String id, @Nullable String serieName=null,
-        @Nullable Integer season=null) {
+    public SubSceneSerieId(String text, String id, @Nullable String serieName=null, @Nullable Integer season=null) {
         super(text, id);
         this.serieName = serieName;
         this.season = season;

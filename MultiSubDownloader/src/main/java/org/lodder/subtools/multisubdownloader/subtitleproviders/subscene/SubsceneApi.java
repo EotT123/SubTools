@@ -18,6 +18,7 @@ import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
@@ -29,6 +30,7 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.ProviderId;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.slf4j.Logger;
@@ -108,6 +110,12 @@ public class SubsceneApi implements SubtitleApi {
             }
             return new SubSceneSerieId(elem.text(), elem.attr("href"));
         });
+    }
+
+    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(ProviderIds providerIds,
+        @Nullable Integer season)
+        throws SubsceneApiException {
+        return providerIds.getImdbId().mapEx(this::getSerieProviderIds).orElse(Map.of());
     }
 
     public List<SubsceneSubtitleMetadata> getSubtitles(String providerId, int season, int episode,

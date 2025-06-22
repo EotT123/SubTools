@@ -76,7 +76,8 @@ public final class TvSubtitlesAdapter
     }
 
     @Override
-    public Optional<ProviderId> getSerieProviderIdById(ProviderIds providerIds) throws TvSubtitleException {
+    public Optional<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+        throws TvSubtitleException {
         return Optional.empty();
     }
 
