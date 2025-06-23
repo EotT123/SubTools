@@ -142,6 +142,27 @@ public class SubdlApi implements SubtitleApi {
      * Fetches a list of available serie subtitles for a given id, season, episode, language.
      * Results are cached in memory.
      *
+     * @param imdbId the imdb id
+     * @param season the season number
+     * @param episode the episode number
+     * @param language the subtitle language
+     * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
+     * @throws SubdlApiException if the API call fails
+     */
+    public List<SubdlSubtitleMetadata> getSerieSubtitlesUsingImdbId(String imdbId, int season, int episode,
+        Language language) throws SubdlApiException {
+        Map<SearchParam, Serializable> params = MapUtil.create(
+            SearchParam.IMDB_ID, imdbId,
+            SearchParam.SEASON, season,
+            SearchParam.TYPE, ReleaseType.tv);
+        return getSubtitles(language, params)
+            .stream().filter(sub -> sub.episodes.contains(episode)).toList();
+    }
+
+    /**
+     * Fetches a list of available serie subtitles for a given id, season, episode, language.
+     * Results are cached in memory.
+     *
      * @param providerId the SubDL ID
      * @param season the season number
      * @param episode the episode number

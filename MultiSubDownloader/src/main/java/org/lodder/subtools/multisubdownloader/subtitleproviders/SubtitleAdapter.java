@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import static manifold.science.util.UnitConstants.*;
 import static manifold.ext.props.rt.api.PropOption.*;
+import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
@@ -212,8 +212,11 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
     }
 
+    public abstract Collection<API_SUB> searchSubtitles(ProviderIds providerIds, int season, int episode,
+        Language language) throws X;
+
     public abstract Collection<API_SUB> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language, ProviderIds providerIds) throws X;
+        Language language) throws X;
 
     public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {

@@ -96,35 +96,47 @@ public class PodnapisiApi implements SubtitleApi {
      * Fetches a list of available serie subtitles for a given id, season, episode, language.
      * Results are cached in memory.
      *
+     * @param imdbId the imdb id
+     * @param season the season number
+     * @param episode the episode number
+     * @param language the subtitle language
+     * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
+     * @throws PodnapisiApiException if the API call fails
+     */
+    public List<PodnapisiSubtitleMetadata> getSerieSubtitlesUsingImdbId(String imdbId, int season, int episode,
+        Language language) throws PodnapisiApiException {
+        return getSubtitles(
+            MapUtil.create(
+                SearchParam.IMDB, imdbId,
+                SearchParam.LANGUAGE, language.iso639_1,
+                SearchParam.SEASON, season,
+                SearchParam.EPISODE, episode));
+    }
+
+    /**
+     * Fetches a list of available serie subtitles for a given id, season, episode, language.
+     * Results are cached in memory.
+     *
      * @param serieName the serie name
      * @param season the season number
      * @param episode the episode number
      * @param language the subtitle language
-     * @param providerIds other provider ids
      * @return a list of {@link PodnapisiSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws PodnapisiApiException if the API call fails
      */
     public List<PodnapisiSubtitleMetadata> getSerieSubtitles(String serieName, int season, int episode,
-        Language language, ProviderIds providerIds) throws PodnapisiApiException {
-        return providerIds.getImdbId()
-            .mapConsumeEx(imdbId -> getSubtitles(
-                MapUtil.create(
-                    SearchParam.IMDB, imdbId,
-                    SearchParam.LANGUAGE, language.iso639_1,
-                    SearchParam.SEASON, season,
-                    SearchParam.EPISODE, episode)))
-            .orElseGetEx(() -> getSubtitles(
+        Language language) throws PodnapisiApiException {
+        return getSubtitles(
                 MapUtil.create(
                     SearchParam.KEYWORDS, URLEncoder.encode(serieName.trim().toLowerCase(), UTF_8),
                     SearchParam.LANGUAGE, language.iso639_1,
                     SearchParam.SEASON, season,
-                    SearchParam.EPISODE, episode)));
+                    SearchParam.EPISODE, episode));
     }
 
-
-// ====== \\
-// COMMON \\
-// ====== \\
+    // ====== \\
+    // COMMON \\
+    // ====== \\
 
     /**
      * Fetches a list of available serie subtitles for the given parameters.

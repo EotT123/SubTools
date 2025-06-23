@@ -91,23 +91,28 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language, ProviderIds providerIds) throws OpenSubtitleException {
+    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws OpenSubtitleException {
         return providerIds.getImdbId()
-            .mapConsumeEx(imdbId ->
+            .mapEx(imdbId ->
                 api.searchSubtitles(
                     imdbId:imdbId,
                     season:season,
                     episode:episode,
                     language:language,
                     type:TypeEnum.EPISODE))
-            .orElseGetEx(() ->
-                api.searchSubtitles(
-                    query:serieMapping.name,
-                    season:season,
-                    episode:episode,
-                    language:language,
-                    type:TypeEnum.EPISODE));
+            .orElseGet(List::of);
+    }
+
+    @Override
+    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws OpenSubtitleException {
+        return api.searchSubtitles(
+            query:serieMapping.name,
+            season:season,
+            episode:episode,
+            language:language,
+            type:TypeEnum.EPISODE);
     }
 
 

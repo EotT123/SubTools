@@ -117,8 +117,14 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     }
 
     @Override
+    public Collection<Addic7edSubtitle> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws Addic7edException {
+        return List.of();
+    }
+
+    @Override
     public Collection<Addic7edSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode, Language language, ProviderIds providerIds) throws Addic7edException {
+        int episode, Language language) throws Addic7edException {
         return api.searchSerieSubtitles(serieMapping.providerId, serieMapping.providerName, season, episode, language);
     }
 

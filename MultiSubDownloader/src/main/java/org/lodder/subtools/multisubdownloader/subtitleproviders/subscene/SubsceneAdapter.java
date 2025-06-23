@@ -108,8 +108,14 @@ public final class SubsceneAdapter
     }
 
     @Override
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
+        Language language) throws SubsceneException {
+        return List.of();
+    }
+
+    @Override
     public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language, ProviderIds providerIds) throws SubsceneException {
+        Language language) throws SubsceneException {
         return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 

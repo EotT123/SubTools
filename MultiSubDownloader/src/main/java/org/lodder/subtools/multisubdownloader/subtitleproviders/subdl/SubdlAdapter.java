@@ -81,8 +81,15 @@ public final class SubdlAdapter extends
     }
 
     @Override
+    public Collection<SubdlSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
+        Language language) throws SubdlException {
+        return providerIds.getImdbId().mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode,
+            language)).orElseGet(List::of);
+    }
+
+    @Override
     public Collection<SubdlSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language, ProviderIds providerIds) throws SubdlException {
+        Language language) throws SubdlException {
         return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
     }
 
