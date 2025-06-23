@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -76,17 +77,16 @@ public final class PodnapisiAdapter
     }
 
     @Override
-    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
-        Language language) throws PodnapisiException {
+    public Optional<Collection<PodnapisiSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws PodnapisiException {
         return providerIds.getImdbId()
-            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language, providerIds))
-            .orElseGet(List::of);
+            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language));
     }
 
     @Override
-    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
-        Language language) throws PodnapisiException {
-        return api.getSerieSubtitles(serieMapping.providerName, season, episode, language);
+    public Optional<Collection<PodnapisiSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws PodnapisiException {
+        return Optional.of(api.getSerieSubtitles(serieMapping.providerName, season, episode, language));
     }
 
     // ====== \\

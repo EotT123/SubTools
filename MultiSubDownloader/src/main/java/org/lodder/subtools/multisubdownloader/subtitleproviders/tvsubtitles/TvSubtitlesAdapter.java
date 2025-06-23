@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,15 +70,17 @@ public final class TvSubtitlesAdapter
     // ===== \\
 
     @Override
-    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
+    public Optional<Collection<TVSubtitlesSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
+        int episode,
         Language language) throws TvSubtitleException {
-        return List.of();
+        return Optional.empty();
     }
 
     @Override
-    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+    public Optional<Collection<TVSubtitlesSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode,
         Language language) throws TvSubtitleException {
-        return api.getSubtitles(serieMapping.providerId, season, episode, language);
+        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
     }
 
     @Override
@@ -89,13 +92,13 @@ public final class TvSubtitlesAdapter
     @Override
     public List<ProviderId> getSortedSerieProviderIds(String serieName, @Nullable Integer season)
         throws TvSubtitleException {
-        Pattern yearPatter = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
+        Pattern yearPattern = Pattern.compile("\\((\\d\\d\\d\\d)-(\\d\\d\\d\\d)\\)");
         return api.getProviderIds(serieName)
             .stream()
             .sorted(Comparator.comparing((ProviderId n) -> !serieName.replaceAll("[^A-Za-z]", "")
                     .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
                 .thenComparing((ProviderId providerId) -> {
-                    Matcher matcher = yearPatter.matcher(providerId.name);
+                    Matcher matcher = yearPattern.matcher(providerId.name);
                     return matcher.find() ? Integer.parseInt(matcher.group(2)) : 0;
                 }, Comparator.reverseOrder()))
             .toList();

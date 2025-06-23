@@ -56,14 +56,14 @@ public class OptionalExt {
      * @param <T> the type of the input value
      * @return an {@code Optional} describing the result of the function, or empty if not present
      */
-//    public static <T, R, X extends Exception> Optional<R> mapConsumeEx(@This Optional<T> optional,
-//        ThrowingFunction<? super T, ? extends R, X> function) {
-//        try {
-//            return optional.mapEx(function);
-//        } catch (Exception e) {
-//            return Optional.empty();
-//        }
-//    }
+    public static <T, R, X extends Exception> Optional<R> mapConsumeEx(@This Optional<T> optional,
+        ThrowingFunction<? super T, ? extends R, X> function) {
+        try {
+            return optional.mapEx(function);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
 
     /**
      * Applies the given {@link ThrowingFunction} to the value if present.

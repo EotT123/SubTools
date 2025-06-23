@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -22,6 +23,7 @@ import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.opensubtitles.model.Subtitle;
 import org.opensubtitles.model.SubtitleAttributes;
 
 public final class OpenSubAdapter
@@ -91,7 +93,7 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(ProviderIds providerIds, int season,
+    public Optional<Collection<Subtitle>> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws OpenSubtitleException {
         return providerIds.getImdbId()
             .mapEx(imdbId ->
@@ -100,19 +102,18 @@ public final class OpenSubAdapter
                     season:season,
                     episode:episode,
                     language:language,
-                    type:TypeEnum.EPISODE))
-            .orElseGet(List::of);
+                    type:TypeEnum.EPISODE));
     }
 
     @Override
-    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
+    public Optional<Collection<org.opensubtitles.model.Subtitle>> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws OpenSubtitleException {
-        return api.searchSubtitles(
+        return Optional.of(api.searchSubtitles(
             query:serieMapping.name,
             season:season,
             episode:episode,
             language:language,
-            type:TypeEnum.EPISODE);
+            type:TypeEnum.EPISODE));
     }
 
 

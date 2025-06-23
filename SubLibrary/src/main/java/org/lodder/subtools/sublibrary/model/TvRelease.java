@@ -32,7 +32,7 @@ public final class TvRelease extends Release {
     }
 
     public TvRelease(String name, int season, List<Integer> episodes, @Nullable Path file=null,
-        @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String originalName=null,
+        @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String originalName=name,
         @Nullable String customName=null, @Nullable String title=null,
         boolean special=false) {
         super(name, VideoType.EPISODE, file, releaseGroup, quality);

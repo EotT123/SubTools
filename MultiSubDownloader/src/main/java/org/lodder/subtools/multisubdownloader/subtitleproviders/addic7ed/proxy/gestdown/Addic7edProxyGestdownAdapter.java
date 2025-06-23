@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import manifold.ext.props.rt.api.override;
@@ -92,16 +93,16 @@ public final class Addic7edProxyGestdownAdapter extends
     }
 
     @Override
-    public List<Addic7edProxyGestdownSubtitle> searchSubtitles( ProviderIds providerIds, int season,
+    public Optional<Collection<Addic7edProxyGestdownSubtitle>> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws Addic7edException {
-        return List.of()
+        return Optional.empty();
     }
 
     @Override
-    public List<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
+    public Optional<Collection<Addic7edProxyGestdownSubtitle>> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws Addic7edException {
         LOGGER.debug("$provider - getSubtitles: {}", TvRelease.formatName(serieMapping.providerName, season, episode));
-        return api.getSubtitles(serieMapping.providerId, season, episode, language);
+        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
     }
 
     // ====== \\

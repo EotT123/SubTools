@@ -47,6 +47,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     @val @override Manager manager;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
+    @val @override String provider = "ADDIC7ED_GESTDOWN";
     private static final TvShowsApi TV_SHOWS_API;
     private static final SubtitlesApi SUBTITLES_API;
 

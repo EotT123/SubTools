@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.ToIntFunction;
 
 import manifold.ext.props.rt.api.override;
@@ -108,15 +109,17 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public Collection<SubsceneSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
+    public Optional<Collection<SubsceneSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
+        int episode,
         Language language) throws SubsceneException {
-        return List.of();
+        return Optional.empty();
     }
 
     @Override
-    public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+    public Optional<Collection<SubsceneSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode,
         Language language) throws SubsceneException {
-        return api.getSubtitles(serieMapping.providerId, season, episode, language);
+        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
     }
 
     @Override

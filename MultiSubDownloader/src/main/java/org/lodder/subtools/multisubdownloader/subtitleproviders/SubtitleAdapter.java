@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -108,6 +109,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
     public abstract Collection<API_SUB> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language) throws X;
 
+    // TODO split name and provider ids
     public abstract Collection<API_SUB> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language, ProviderIds providerIds) throws X;
 
@@ -188,23 +190,39 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     // ===== \\
 
     public Set<SUB> searchSubtitles(TvRelease tvRelease, Language language) {
+        // Search using other provider ids
+        List<Collection<API_SUB>> subtitles = tvRelease.episodes.stream().flatMap(episode -> {
+            try {
+                return searchSubtitles(tvRelease.providerIds, tvRelease.season, episode, language).stream();
+            } catch (Exception e) {
+                LOGGER.error("API $source searchSubtitles for serie [%s] (%s)".formatted(
+                    TvRelease.formatName(tvRelease.name, tvRelease.season, episode), e.getMessage()), e);
+                return Stream.empty();
+            }
+        }).toList();
+        if (!subtitles.isEmpty()) {
+            return subtitles.stream().flatMap(Collection::stream).map(this::convertToSubtitle).toSet();
+        }
+        // Search using current provider id
         try {
             return getProviderSerieMapping(tvRelease)
                 .mapEx(mapping -> tvRelease.episodes.stream()
                     .flatMap(episode -> {
                         try {
-                            return searchSubtitles(mapping, tvRelease.season, episode, language,
-                                tvRelease.providerIds).stream();
+                            return searchSubtitles(mapping, tvRelease.season, episode, language).stream()
+                                .flatMap(Collection::stream);
                         } catch (Exception e) {
                             LOGGER.error("API $source searchSubtitles for serie [%s] (%s)".formatted(
-                                    TvRelease.formatName(mapping.providerName, tvRelease.season, episode), e.getMessage()),
+                                    TvRelease.formatName(mapping.providerName, tvRelease.season, episode),
+                                    e.getMessage()),
                                 e);
                             return Stream.of();
                         }
                     })
                     .map(this::convertToSubtitle).toSet())
                 .orElse(Set.of());
-        } catch (Exception e) {
+        } catch (
+            Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(source.name,
                 TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisode), e.getMessage()), e);
@@ -212,18 +230,20 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
     }
 
-    public abstract Collection<API_SUB> searchSubtitles(ProviderIds providerIds, int season, int episode,
+    public abstract Optional<Collection<API_SUB>> searchSubtitles(ProviderIds providerIds, int season, int episode,
         Language language) throws X;
 
-    public abstract Collection<API_SUB> searchSubtitles(SerieMapping serieMapping, int season, int episode,
+    public abstract Optional<Collection<API_SUB>> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode,
         Language language) throws X;
 
     public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {
             return getProviderSerieMapping(tvRelease, tvRelease.originalName, tvRelease.customName);
         } else {
-            Optional<SerieMapping> providerSerieId = getProviderSerieMapping(tvRelease, tvRelease.originalName);
-            return providerSerieId.isPresent() ? providerSerieId : getProviderSerieMapping(tvRelease, tvRelease.name);
+            return getProviderSerieMapping(tvRelease, tvRelease.originalName)
+                .orElseMapEx(() -> !Objects.equals(tvRelease.originalName, tvRelease.name) ?
+                    getProviderSerieMapping(tvRelease, tvRelease.name) : Optional.empty());
         }
     }
 
@@ -310,9 +330,9 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      */
     public abstract String providerSerieIdToDisplayString(S_ID providerSerieId);
 
-    // ====== \\
-    // COMMON \\
-    // ====== \\
+// ====== \\
+// COMMON \\
+// ====== \\
 
 
     /**
@@ -404,7 +424,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             if (!providerReleaseIds.isEmpty()) {
                 // If only one releases mapping is found and the user has disabled confirmation for single results,
                 // automatically select this mapping as the desired one.
-                if (providerReleaseIds.size() == 1 && !userInteractionHandler.settings.optionsConfirmProviderMapping) {
+                if (providerReleaseIds.size() == 1 &&
+                    !userInteractionHandler.settings.optionsConfirmProviderMapping) {
                     releaseMapping = releaseMappingConstructor.apply(name, providerReleaseIds.first.id,
                         providerReleaseIds.first.name);
                 } else {
@@ -423,13 +444,13 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             // expiration. If a temporary null value already exists, update it with double the previous
             // expiration time.
             cacheKey.store(
-                value:Value.of(releaseMappingConstructor.apply(name, null, null)),
+                value:Value.ofOptional(Optional.empty()),
                 timeToLive:1 day,
                 storeTempNullValue:true);
             return Optional.empty();
         } else {
             Optional<M> result = Optional.of(releaseMapping);
-            cacheKey.store(Value.of(result));
+            cacheKey.store(Value.ofOptional(result));
             return result;
         }
     }
