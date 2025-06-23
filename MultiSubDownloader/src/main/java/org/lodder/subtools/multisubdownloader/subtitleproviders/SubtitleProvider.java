@@ -19,7 +19,7 @@ public interface SubtitleProvider<SUB extends Subtitle> {
 
     @val Manager manager;
     @val SubtitleSource source;
-    @val String name = source.name;
+    @val String provider = source.name;
 
     Set<SUB> searchSubtitles(TvRelease tvRelease, Language language);
 
@@ -40,13 +40,13 @@ public interface SubtitleProvider<SUB extends Subtitle> {
             };
         } catch (Exception e) {
             LoggerFactory.getLogger(SubtitleProvider.class)
-                .error("Error in %s API: %s".formatted(name, e.getMessage()), e);
+                .error("Error in %s API: %s".formatted(provider, e.getMessage()), e);
         }
         return Set.of();
     }
 
     default void clearCache() {
-        manager.getCache(CacheType.DISK, k -> k.provider.equals(source.name)).clearExpiredCache();
+        manager.getCache(CacheType.DISK, k -> k.provider.equals(provider)).clearExpiredCache();
     }
 
     <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X;

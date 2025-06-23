@@ -33,6 +33,7 @@ public final class Addic7edProxyGestdownAdapter extends
 
     private final Addic7edProxyGestdownApi api;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
+    @val @override String provider = "ADDIC7ED_GESTDOWN";
     @val @override boolean useSeasonForSerieId = false;
 
     public Addic7edProxyGestdownAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
