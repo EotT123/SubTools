@@ -18,14 +18,14 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 public final class PodnapisiAdapter
     extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
 
     private static PodnapisiApi api;
-    @val @override SubtitleSource source = SubtitleSource.PODNAPISI;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.PODNAPISI;
     @val @override boolean useSeasonForSerieId = false;
 
     public PodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {

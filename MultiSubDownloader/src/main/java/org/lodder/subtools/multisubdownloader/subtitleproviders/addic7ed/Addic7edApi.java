@@ -32,7 +32,7 @@ import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.data.ProviderId;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 
 public class Addic7edApi implements SubtitleApi {
 
@@ -43,7 +43,7 @@ public class Addic7edApi implements SubtitleApi {
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (?<info>.+), Duration: \\d+\\.\\d+");
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     private final boolean speedy;
     private Time lastRequest = Time.now();
 

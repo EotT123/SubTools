@@ -25,7 +25,7 @@ import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 import org.lodder.subtools.sublibrary.data.ProviderId;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.http.CookieManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class TvSubtitlesApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.TVSUBTITLES;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.TVSUBTITLES;
 
     public TvSubtitlesApi(Manager manager) {
         this.manager = manager;

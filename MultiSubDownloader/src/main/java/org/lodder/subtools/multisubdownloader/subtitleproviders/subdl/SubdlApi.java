@@ -21,7 +21,7 @@ import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import subdl.Serie;
@@ -39,7 +39,7 @@ public class SubdlApi implements SubtitleApi {
     private static final String API_DOMAIN = "https://api.subdl.com/api/v1";
     private static final String API_KEY = "waSZhdBr08sBm3jXNOU0rJ6UWp4lPQvi";
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.SUBDL;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBDL;
 
     public SubdlApi(Manager manager) {
         this.manager = manager;

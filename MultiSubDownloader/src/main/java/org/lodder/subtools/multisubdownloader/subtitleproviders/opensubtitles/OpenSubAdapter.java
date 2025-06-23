@@ -21,7 +21,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.Subtitle;
 import org.opensubtitles.model.SubtitleAttributes;
@@ -31,7 +31,7 @@ public final class OpenSubAdapter
     SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId, OpenSubtitleException> {
 
     private static OpenSubtitlesApi api;
-    @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
     public OpenSubAdapter(Manager manager, Credentials credentials, UserInteractionHandler userInteractionHandler) {
@@ -40,7 +40,7 @@ public final class OpenSubAdapter
             try {
                 api = new OpenSubtitlesApi(manager, credentials);
             } catch (OpenSubtitleException e) {
-                throw new SubtitlesProviderInitException(name, e);
+                throw new SubtitlesProviderInitException(provider, e);
             }
         }
     }

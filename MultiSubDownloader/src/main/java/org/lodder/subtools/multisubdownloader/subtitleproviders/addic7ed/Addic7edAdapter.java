@@ -21,14 +21,14 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Addic7edSubtitle, ProviderId,
     Addic7edException> {
 
     private static Addic7edApi api;
-    @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = true;
 
     public Addic7edAdapter(Manager manager, boolean speedy, Credentials credentials=null,

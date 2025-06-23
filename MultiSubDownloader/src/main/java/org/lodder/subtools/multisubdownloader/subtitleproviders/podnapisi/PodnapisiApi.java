@@ -30,7 +30,7 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.UrlBuilder;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
@@ -38,7 +38,7 @@ public class PodnapisiApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.podnapisi.net";
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.PODNAPISI;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.PODNAPISI;
     private final String userAgent;
 
     public PodnapisiApi(Manager manager, String userAgent) {

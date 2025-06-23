@@ -44,7 +44,7 @@ import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 import org.lodder.subtools.sublibrary.util.http.RetrofitService;
@@ -72,7 +72,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private static final String APIKEY = "YrrY0zddovN1rY55tCWQbMxcNR68wnN3";
 
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     @Nullable Credentials credentials;
 
     private static final Function<Chain, Builder> DEFAULT_BUILDER =

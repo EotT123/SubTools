@@ -24,7 +24,7 @@ import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
@@ -39,7 +39,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
     private final Settings settings;
     private final UserInteractionHandler userInteractionHandler;
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.LOCAL;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.LOCAL;
 
     public Local(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
         this.settings = settings;

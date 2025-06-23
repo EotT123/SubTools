@@ -29,7 +29,7 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.ProviderId;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class SubsceneApi implements SubtitleApi {
     };
 
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.SUBSCENE;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBSCENE;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 

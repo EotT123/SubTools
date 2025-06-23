@@ -18,7 +18,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import subdl.Serie.ReleaseType;
 
@@ -26,7 +26,7 @@ public final class SubdlAdapter extends
     SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId, SubdlException> {
 
     private static SubdlApi api;
-    @val @override SubtitleSource source = SubtitleSource.SUBDL;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBDL;
     @val @override boolean useSeasonForSerieId = false;
 
     public SubdlAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {

@@ -19,7 +19,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.util.http.HttpStatus;
@@ -32,8 +32,7 @@ public final class Addic7edProxyGestdownAdapter extends
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownAdapter.class);
 
     private final Addic7edProxyGestdownApi api;
-    @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
-    @val @override String provider = "ADDIC7ED_GESTDOWN";
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN;
     @val @override boolean useSeasonForSerieId = false;
 
     public Addic7edProxyGestdownAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {

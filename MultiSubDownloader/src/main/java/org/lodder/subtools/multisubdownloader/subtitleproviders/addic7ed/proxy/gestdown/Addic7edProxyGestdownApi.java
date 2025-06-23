@@ -26,7 +26,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +46,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
     private static final String DOMAIN = "https://api.gestdown.info";
 
     @val @override Manager manager;
-    @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
-    @val @override String provider = "ADDIC7ED_GESTDOWN";
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN;
     private static final TvShowsApi TV_SHOWS_API;
     private static final SubtitlesApi SUBTITLES_API;
 

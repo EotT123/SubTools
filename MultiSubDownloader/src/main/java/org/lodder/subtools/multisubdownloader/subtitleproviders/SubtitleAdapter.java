@@ -63,7 +63,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
     @Override
     public String getProvider() {
-        return source.name();
+        return subtitleProviderFrontEnd.name();
     }
 
     // ===== \\
@@ -241,9 +241,18 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         if (StringUtils.isNotBlank(tvRelease.customName)) {
             return getProviderSerieMapping(tvRelease, tvRelease.originalName, tvRelease.customName);
         } else {
-            return getProviderSerieMapping(tvRelease, tvRelease.originalName)
-                .orElseMapEx(() -> !Objects.equals(tvRelease.originalName, tvRelease.name) ?
-                    getProviderSerieMapping(tvRelease, tvRelease.name) : Optional.empty());
+//            return getProviderSerieMapping(tvRelease, tvRelease.originalName)
+//                .orElseMapEx(() -> !Objects.equals(tvRelease.originalName, tvRelease.name) ?
+//                    getProviderSerieMapping(tvRelease, tvRelease.name) : Optional.empty());
+
+            Optional<SerieMapping> providerSerieMapping = getProviderSerieMapping(tvRelease, tvRelease.originalName);
+            if (providerSerieMapping.isEmpty()) {
+                providerSerieMapping =
+                    !Objects.equals(tvRelease.originalName, tvRelease.name) ?
+                        getProviderSerieMapping(tvRelease, tvRelease.name) : Optional.empty();
+            }
+            return providerSerieMapping;
+
         }
     }
 
