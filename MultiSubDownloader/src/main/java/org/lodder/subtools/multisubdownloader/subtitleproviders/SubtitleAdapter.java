@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import static manifold.ext.props.rt.api.PropOption.*;
 import static manifold.science.util.UnitConstants.*;
+import static manifold.ext.props.rt.api.PropOption.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
@@ -223,8 +223,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     })
                     .map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet())
                 .orElse(Set.of());
-        } catch (
-            Exception e) {
+        } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(source.name,
                 TvRelease.formatName(displayName, tvRelease.season, tvRelease.firstEpisode), e.getMessage()), e);
@@ -424,10 +423,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     switch (e.cacheStrategy) {
                         case CACHE_DISABLED -> {
                         }
-                        case CACHE_TEMPORARY -> cacheKey.storeTempValue(
-                            Value.of(releaseMappingConstructor.apply(name, null, null)));
-                        case CACHE_PERMANENT -> cacheKey.store(
-                            Value.of(releaseMappingConstructor.apply(name, null, null)));
+                        case CACHE_TEMPORARY -> cacheKey.storeTempValue(Value.ofOptional(Optional.empty()));
+                        case CACHE_PERMANENT -> cacheKey.store(Value.ofOptional(Optional.empty()));
                     }
                 }
                 throw (X) exc;
