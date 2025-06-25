@@ -21,6 +21,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -114,7 +115,7 @@ public final class TvSubtitlesAdapter
     // ====== \\
 
     @Override
-    public TvSubtiltesSubtitle convertToSubtitle(TVSubtitlesSubtitleMetadata sub) {
+    public TvSubtiltesSubtitle convertToSubtitle(Release release, TVSubtitlesSubtitleMetadata sub) {
         return new TvSubtiltesSubtitle(
             url:sub.url,
             fileName:sub.filename,

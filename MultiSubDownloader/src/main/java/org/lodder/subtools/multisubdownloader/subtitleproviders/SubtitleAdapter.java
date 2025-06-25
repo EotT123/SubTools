@@ -33,6 +33,7 @@ import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
@@ -102,7 +103,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                 }
             }
         }
-        return subtitles.stream().map(this::convertToSubtitle).toSet();
+        return subtitles.stream().map(subtitle -> convertToSubtitle(movieRelease, subtitle)).toSet();
     }
 
     public abstract Collection<API_SUB> searchMovieSubtitlesWithHash(String hash, Language language) throws X;
@@ -201,7 +202,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             }
         }).toList();
         if (!subtitles.isEmpty()) {
-            return subtitles.stream().flatMap(Collection::stream).map(this::convertToSubtitle).toSet();
+            return subtitles.stream().flatMap(Collection::stream)
+                .map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet();
         }
         // Search using current provider id
         try {
@@ -219,7 +221,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                             return Stream.of();
                         }
                     })
-                    .map(this::convertToSubtitle).toSet())
+                    .map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet())
                 .orElse(Set.of());
         } catch (
             Exception e) {
@@ -464,5 +466,5 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
     }
 
-    public abstract SUB convertToSubtitle(API_SUB subtitle);
+    public abstract SUB convertToSubtitle(Release release, API_SUB subtitle);
 }

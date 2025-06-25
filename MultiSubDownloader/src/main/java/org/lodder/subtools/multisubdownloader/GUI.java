@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.io.Serial;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Menu;
@@ -416,7 +417,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                     if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
                         final Subtitle subtitle = (Subtitle) model.getValueAt(i,
                             subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
-                        Supplier<String> filenameSupplier = () -> {
+                        Function<AtomicInteger, String> filenameSupplier = _ -> {
                             String filename = "";
                             if (!subtitle.fileName.endsWith(".srt")) {
                                 filename = subtitle.fileName + ".srt";

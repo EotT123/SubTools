@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
@@ -43,7 +44,7 @@ public abstract class Subtitle implements Serializable {
     }
 
     public abstract List<Path> download(Manager manager, Path destinationFolder,
-        Supplier<String> fileNameFunction) throws IOException;
+        Function<AtomicInteger, String> fileNameFunction) throws IOException;
 
     @Override
     public String toString() {

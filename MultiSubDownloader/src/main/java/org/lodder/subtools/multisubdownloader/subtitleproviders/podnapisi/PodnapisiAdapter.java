@@ -18,6 +18,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -94,14 +95,14 @@ public final class PodnapisiAdapter
     // ====== \\
 
     @Override
-    public PodnapisiSubtitle convertToSubtitle(PodnapisiSubtitleMetadata metadata) {
+    public PodnapisiSubtitle convertToSubtitle(Release release, PodnapisiSubtitleMetadata metadata) {
         return ReleaseParser.parse(metadata.releaseString)
-            .map(release -> new PodnapisiSubtitle(
+            .map(r -> new PodnapisiSubtitle(
                 url:metadata.url,
                 fileName:metadata.releaseString,
                 language:metadata.language,
-                quality:release.quality,
-                releaseGroup:release.releaseGroup,
+                quality:r.quality,
+                releaseGroup:r.releaseGroup,
                 uploader:metadata.uploaderName,
                 hearingImpaired:metadata.hearingImpaired))
             .orElseGet(() -> new PodnapisiSubtitle(

@@ -3,7 +3,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
@@ -28,9 +29,9 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder, Supplier<String> fileNameFunction)
-        throws IOException {
-        Path subPath = destinationFolder.resolve(fileNameFunction.get());
+    public List<Path> download(Manager manager, Path destinationFolder,
+        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
         manager.download(url, subPath);
         return List.of(subPath);
     }

@@ -21,6 +21,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -134,7 +135,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     // ====== \\
 
     @Override
-    public Addic7edSubtitle convertToSubtitle(Addic7edSubtitle sub) {
+    public Addic7edSubtitle convertToSubtitle(Release release, Addic7edSubtitle sub) {
         return sub;
     }
 }

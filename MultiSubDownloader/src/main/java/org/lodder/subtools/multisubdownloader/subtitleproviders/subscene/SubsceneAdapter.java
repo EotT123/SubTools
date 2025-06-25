@@ -25,6 +25,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -140,7 +141,7 @@ public final class SubsceneAdapter
     // ====== \\
 
     @Override
-    public SubsceneSubtitle convertToSubtitle(SubsceneSubtitleMetadata sub) {
+    public SubsceneSubtitle convertToSubtitle(Release release, SubsceneSubtitleMetadata sub) {
         return new SubsceneSubtitle(
             urlSupplier:sub.urlSupplier,
             fileName:sub.name.removeIllegalFilenameChars(),

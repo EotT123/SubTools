@@ -3,7 +3,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.m
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.Nullable;
@@ -30,11 +31,11 @@ public class OpenSubtilteSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder, Supplier<String> fileNameFunction)
-        throws IOException {
+    public List<Path> download(Manager manager, Path destinationFolder,
+        Function<AtomicInteger, String> fileNameFunction) throws IOException {
         try {
             String url = urlSupplier.get();
-            Path subPath = destinationFolder.resolve(fileNameFunction.get());
+            Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
             manager.download(url, subPath);
             return List.of(subPath);
         } catch (OpenSubtitleException e) {

@@ -21,6 +21,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.Subtitle;
@@ -122,17 +123,17 @@ public final class OpenSubAdapter
     // ====== \\
 
     @Override
-    public OpenSubtilteSubtitle convertToSubtitle(org.opensubtitles.model.Subtitle sub) {
+    public OpenSubtilteSubtitle convertToSubtitle(Release release, org.opensubtitles.model.Subtitle sub) {
         SubtitleAttributes attr = sub.getAttributes();
         Language language = Language.ofIso639_1(attr.language);
-        return ReleaseParser.parse(attr.getRelease())
-            .map(release -> new OpenSubtilteSubtitle(
+        return ReleaseParser.parse(attr.release)
+            .map(r -> new OpenSubtilteSubtitle(
                 urlSupplier:() -> api.getDownloadUrl(Integer.parseInt(attr.subtitleId)),
                 fileName:attr.release,
                 language:language,
-                releaseGroup:release.releaseGroup,
+                releaseGroup:r.releaseGroup,
                 uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
-                quality:release.quality,
+                quality:r.quality,
                 hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
             .orElseGet(() -> {
                 ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);

@@ -1,7 +1,7 @@
 package org.lodder.subtools.sublibrary.util.http;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,13 +100,18 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
         boolean success = true;
 
-        try (InputStream in = url.getFile().endsWith(".gz") ?
-            new GZIPInputStream(url.openStream()) : getInputStream(url, getCookieManager(cookieManager))) {
-            byte[] data = in.readAllBytes();
+        try (InputStream rawIn = getInputStream(url, getCookieManager(cookieManager));
+             InputStream in = url.getFile().endsWith(".gz") ? new GZIPInputStream(rawIn) : rawIn;
+             BufferedInputStream bufferedIn = new BufferedInputStream(in)) {
+            bufferedIn.mark(10); // for checking headers
+            boolean isZip = PathExt.isZipFile(bufferedIn);
+            bufferedIn.reset();
 
-            if (url.getFile().endsWith(".zip") || PathExt.isZipFile(new ByteArrayInputStream(data))) {
-                PathExt.unzip(new ByteArrayInputStream(data), file, ".srt");
+            if (isZip || url.getFile().endsWith(".zip")) {
+                PathExt.unzip(bufferedIn, file, ".srt");
             } else {
+                // Buffer the data just once
+                byte[] data = bufferedIn.readAllBytes();
                 if (PathExt.isGZipCompressed(data)) {
                     data = PathExt.decompressGZip(data);
                 }
@@ -121,7 +126,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
             }
         } catch (Exception e) {
             success = false;
-            LOGGER.error("Download problem", e);
+            LOGGER.error("Download problem using url [$url], " + e.getMessage(), e);
         }
         return success;
     }

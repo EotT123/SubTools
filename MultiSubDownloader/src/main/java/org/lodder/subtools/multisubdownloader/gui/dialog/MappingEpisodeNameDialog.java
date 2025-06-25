@@ -29,7 +29,7 @@ import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.lodder.subtools.sublibrary.model.Subtitle;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -142,15 +142,15 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     }
 
     public enum MappingType {
-        TVDB("TVDB", "TVDB", "seriemapping"),
-        IMDB("IMDB", "IMDB", "releasemapping"),
-        ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, "releasemapping"),
-        ADDIC7ED_PROXY("Addic7ed (Proxy)", SubtitleSource.ADDIC7ED.name() + "-GESTDOWN", "releasemapping"),
-        SUBSCENE("Subscene", SubtitleSource.SUBSCENE, "releasemapping"),
-        TV_SUBTITLES("TVSubtitles", SubtitleSource.TVSUBTITLES, "releasemapping"),
-        OPEN_SUBTITLES("OpenSubtitles", SubtitleSource.OPENSUBTITLES, "releasemapping"),
-        PODNAPISI("Podnapisi", SubtitleSource.PODNAPISI, "releasemapping"),
-        SUBDL("SubDL", SubtitleSource.SUBDL, "releasemapping");
+        TVDB("TVDB", "TVDB", "EPISODEmapping"),
+        IMDB("IMDB", "IMDB", "EPISODEmapping"),
+        ADDIC7ED(SubtitleProviderFrontEnd.ADDIC7ED, "EPISODEmapping"),
+        ADDIC7ED_PROXY(SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN, "EPISODEmapping"),
+        SUBSCENE(SubtitleProviderFrontEnd.SUBSCENE, "EPISODEmapping"),
+        TV_SUBTITLES(SubtitleProviderFrontEnd.TVSUBTITLES, "EPISODEmapping"),
+        OPEN_SUBTITLES(SubtitleProviderFrontEnd.OPENSUBTITLES, "EPISODEmapping"),
+        PODNAPISI(SubtitleProviderFrontEnd.PODNAPISI, "EPISODEmapping"),
+        SUBDL(SubtitleProviderFrontEnd.SUBDL, "EPISODEmapping");
 
         private static final TriFunction<Manager, String, String, List<Pair<ProviderCacheKey, SerieMapping>>>
             MAPPING_SUPPLIER = (manager, provider, type) ->
@@ -171,8 +171,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             return providerDisplayName;
         }
 
-        MappingType(String providerDisplayName, SubtitleSource subtitleSource, String type) {
-            this(providerDisplayName, subtitleSource.name, type);
+        MappingType(SubtitleProviderFrontEnd subtitleProviderFrontEnd, String type) {
+            this(subtitleProviderFrontEnd.name, subtitleProviderFrontEnd.subtitleSource.name(), type);
         }
 
         MappingType(String providerDisplayName, String provider, String type) {

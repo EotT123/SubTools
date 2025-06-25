@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -64,8 +64,9 @@ public class DownloadAction {
             FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
         String videoFileName = filenameLibraryBuilder.build(release).toString();
 
-        Supplier<String> fileNameFunction = () ->
-            filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, counter == null ? null :
+        Function<AtomicInteger, String> fileNameFunction = counterOverride ->
+            filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, counter == null ?
+                (counterOverride == null ? null : counterOverride.incrementAndGet()) :
                 counter.incrementAndGet());
 
         List<Path> downloadedSubtitles;

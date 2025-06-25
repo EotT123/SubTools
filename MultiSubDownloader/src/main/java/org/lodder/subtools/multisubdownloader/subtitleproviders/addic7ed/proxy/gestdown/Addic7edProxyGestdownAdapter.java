@@ -19,6 +19,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -110,7 +111,7 @@ public final class Addic7edProxyGestdownAdapter extends
     // ====== \\
 
     @Override
-    public Addic7edProxyGestdownSubtitle convertToSubtitle(Addic7edProxyGestdownSubtitle sub) {
+    public Addic7edProxyGestdownSubtitle convertToSubtitle(Release release, Addic7edProxyGestdownSubtitle sub) {
         return sub;
     }
 

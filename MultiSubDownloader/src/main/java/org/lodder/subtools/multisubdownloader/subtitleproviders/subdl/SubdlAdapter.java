@@ -18,6 +18,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import subdl.Serie.ReleaseType;
@@ -99,7 +100,7 @@ public final class SubdlAdapter extends
     // ====== \\
 
     @Override
-    public SubdlSubtitle convertToSubtitle(SubdlSubtitleMetadata sub) {
+    public SubdlSubtitle convertToSubtitle(Release originalRelease, SubdlSubtitleMetadata sub) {
         return ReleaseParser.parse(sub.title).orElseMapEx(() -> ReleaseParser.parse(sub.fileName))
             .map(release -> new SubdlSubtitle(
                 url:sub.url,
@@ -108,7 +109,8 @@ public final class SubdlAdapter extends
                 quality:release.quality,
                 releaseGroup:release.releaseGroup,
                 uploader:sub.uploader,
-                hearingImpaired:sub.hearingImpaired))
+                hearingImpaired:sub.hearingImpaired,
+                forRelease:originalRelease))
             .orElseGet(() -> new SubdlSubtitle(
                 url:sub.url,
                 title:sub.title,
@@ -116,6 +118,7 @@ public final class SubdlAdapter extends
                 quality:ReleaseParser.getQualityKeyword(sub.title + " " + sub.fileName),
                 releaseGroup:ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".zip")),
                 uploader:sub.uploader,
-                hearingImpaired:sub.hearingImpaired));
+                hearingImpaired:sub.hearingImpaired,
+                forRelease:originalRelease));
     }
 }
