@@ -115,13 +115,12 @@ public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, Provi
         synchronized (cacheMap) {
             if (contains(key)) {
                 return get(key).orElseThrow();
-            } else {
-                V value = supplier.get();
-                ExpiringCacheObject<V> obj = new ExpiringCacheObject<>(value);
-                put(key, obj);
-                return value;
             }
         }
+        V value = supplier.get();
+        ExpiringCacheObject<V> obj = new ExpiringCacheObject<>(value);
+        put(key, obj);
+        return value;
     }
 
     public void remove(ProviderCacheKeyCommon key) {

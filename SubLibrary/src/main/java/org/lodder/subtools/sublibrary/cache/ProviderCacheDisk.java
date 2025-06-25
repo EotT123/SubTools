@@ -179,11 +179,9 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
                 "INSERT INTO $tableName (key,cacheobject) VALUES (?,?)")) {
                 prep.clearParameters();
                 prep.setObject(1, GSON.toJson(key));
-                synchronized (cacheMap) {
-                    CacheObject<V> cacheObject = cacheMap.get(key);
-                    prep.setObject(2, cacheObject);
-                    prep.execute();
-                }
+                CacheObject<V> cacheObject = cacheMap.get(key);
+                prep.setObject(2, cacheObject);
+                prep.execute();
                 getConnection().commit();
             } catch (SQLException e) {
                 LOGGER.error("Unable to insert object in disk cache!", e);
