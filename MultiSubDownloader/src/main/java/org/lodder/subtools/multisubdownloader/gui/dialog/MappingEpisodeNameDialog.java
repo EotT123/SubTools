@@ -11,9 +11,9 @@ import java.awt.*;
 import java.io.Serial;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.function.BiFunction;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
@@ -162,9 +162,6 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         @val String nameColumn;
         @val String mappingColumn;
         @val String providerNameColumn;
-        @val BiFunction<Manager, ProviderCacheKey, List<Pair<ProviderCacheKey, SerieMapping>>>
-            mappingSupplier = (manager, _) -> manager.getEntries(CacheType.DISK,
-            key -> getProvider().equals(key.provider) && getType().equals(key.type));
 
         @Override
         public String toString() {
@@ -216,17 +213,20 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             setDataVector(null,
                 new String[]{mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn});
             mappingType.getValues(manager)
-                    .stream()
-                    .map(serieMappingPair -> {
-                        SerieMapping serieMapping = serieMappingPair.getValue();
-                        String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
-                        if (providerId.contains("/")) {
-                            providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
-                        }
-                        providerId = providerId.replace(".html", "");
-                        return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
-                            serieMapping.providerName, serieMapping);
-                    })
+                .stream()
+                .map(serieMappingPair -> {
+                    SerieMapping serieMapping = serieMappingPair.getValue();
+                    if (serieMapping == null) {
+                        return null;
+                    }
+                    String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
+                    if (providerId.contains("/")) {
+                        providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
+                    }
+                    providerId = providerId.replace(".html", "");
+                    return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
+                        serieMapping.providerName, serieMapping);
+                }).filter(Objects::nonNull)
                 .sorted(Comparator.comparing(
                     row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
                         row.serieMapping.name))

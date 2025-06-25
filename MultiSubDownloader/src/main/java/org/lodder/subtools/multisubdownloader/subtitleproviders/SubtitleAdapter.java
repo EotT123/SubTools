@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import static manifold.science.util.UnitConstants.*;
 import static manifold.ext.props.rt.api.PropOption.*;
+import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.io.IOException;
@@ -387,7 +387,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         UnaryOperator<String> selectFromListMessage,
         Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
 
-        CacheKey cacheKey = getCache("releaseMapping", b -> b
+        CacheKey cacheKey = getCache("EPISODEMapping", b -> b
             .addIdParam("tvdbId", providerIds.getTvdbId().mapToObj(v -> v).orElse(null))
             .addIdParam("imdbId", providerIds.getImdbId().orElse(""))
             .addIdParam("name", name)
