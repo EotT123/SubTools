@@ -64,9 +64,10 @@ public class DownloadAction {
         String videoFileName = filenameLibraryBuilder.build(release).toString();
 
         Function<AtomicInteger, String> fileNameFunction = counterOverride ->
-            filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName, counter == null ?
-                (counterOverride == null ? null : counterOverride.incrementAndGet()) :
-                counter.incrementAndGet());
+            filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName,
+                counter == null ?
+                    (counterOverride == null ? null : counterOverride.incrementAndGet()) :
+                    Integer.valueOf(counter.incrementAndGet()));
 
         List<Path> downloadedSubtitles;
         try {
