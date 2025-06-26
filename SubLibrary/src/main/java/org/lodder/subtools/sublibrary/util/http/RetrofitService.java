@@ -72,14 +72,6 @@ public class RetrofitService {
                 (httpStatus, error) -> defaultExceptionCreator.apply(httpStatus, error, cacheStrategy, logLevel)));
         }
 
-//        public @Self ExecuteCall<T, X> addErrorHandler(ErrorHandlerType errorHandlerType,
-//            @Nullable CacheStrategy cacheStrategy=null, @Nullable LogLevel logLevel=null,
-//            @Nullable Time sleepTimeBeforeRetry=null) {
-//            return addErrorHandler(errorHandlerType.code, cacheStrategy != null ? cacheStrategy :
-//                    errorHandlerType.cacheStrategy, logLevel != null ? logLevel : errorHandlerType.logLevel,
-//                sleepTimeBeforeRetry != null ? sleepTimeBeforeRetry : errorHandlerType.sleepTimeBeforeRetry);
-//        }
-
         public @Self ExecuteCall<T, X> addErrorHandler(ErrorHandler<X> errorHandle) {
             errorHandlers.add(errorHandle);
             return this;

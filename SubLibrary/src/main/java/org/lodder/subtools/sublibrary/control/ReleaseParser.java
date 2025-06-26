@@ -473,7 +473,6 @@ public class ReleaseParser {
                 return "RETAIL";
             }
             return parserResults.parts.getLast();
-//            return text.endsWith(parserResults.parts.getLast()) ? parserResults.parts.getLast() : null;
         }
 
         public List<String> getRemainingParts() {

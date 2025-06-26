@@ -211,19 +211,6 @@ public class PodnapisiApi implements SubtitleApi {
         }
     }
 
-//    protected @Nullable String get(String url) throws PodnapisiApiException {
-//        try {
-//            return manager.get(params(url, CacheType.MEMORY, userAgent,
-//                new Retry(
-//                    1,
-//                    ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&
-//                        e.responseCode < 600,
-//                    5 Second)));
-//        } catch (Exception e) {
-//            throw PodnapisiApiException.error(e);
-//        }
-//    }
-
     private PodnapisiSubtitleMetadata parsePodnapisiSubtitle(Element elem) {
         Function<Element, String> getText = e -> e == null ? null : e.text();
         return new PodnapisiSubtitleMetadata(
@@ -242,16 +229,7 @@ public class PodnapisiApi implements SubtitleApi {
             rating:Double.parseDouble(elem.selectFirst("rating").text()));
     }
 
-//    private Language languageIdToLanguage(String languageId) {
-//        return PODNAPISI_LANGS.entrySet()
-//            .stream()
-//            .filter(entry -> entry.getValue().equals(languageId))
-//            .map(Entry::getKey)
-//            .findFirst()
-//            .orElse(null);
-//    }
-
-//    private static final Map<Language, String> PODNAPISI_LANGS =
+    //    private static final Map<Language, String> PODNAPISI_LANGS =
 //        Collections.unmodifiableMap(new EnumMap<>(Language.class) {
 //            @Serial private static final long serialVersionUID = 1L;
 //

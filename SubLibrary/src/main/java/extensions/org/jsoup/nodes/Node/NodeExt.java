@@ -74,14 +74,6 @@ public class NodeExt {
 //        return node != null && predicate.test(node) ? node : null;
 //    }
 
-//    public static @Nullable @Self Node filter4(@This @Nullable Node node, Predicate<@Self Node> predicate) {
-//        return matches(node, predicate) ? node : null;
-//    }
-//
-//    public static @Nullable @Self Node filter5(@This @Nullable Node node, Predicate<@Self Node> predicate) {
-//        return matches(node, predicate) ? node : null;
-//    }
-
 //    public static <N extends Node> boolean matches(@This @Nullable N node, Predicate<N> predicate) {
 //        return node != null && predicate.test(node);
 //    }

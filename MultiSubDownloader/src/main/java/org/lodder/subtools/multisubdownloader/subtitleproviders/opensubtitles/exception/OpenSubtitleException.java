@@ -12,8 +12,6 @@ public class OpenSubtitleException extends SubtitlesProviderException {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    //    @val int errorCode;
-//    @val boolean skipProvider;
     @val @override String subtitleProvider = SubtitleSource.OPENSUBTITLES.name;
 
     public OpenSubtitleException(String message) {
@@ -27,11 +25,4 @@ public class OpenSubtitleException extends SubtitlesProviderException {
     public OpenSubtitleException(String message, Throwable e) {
         super(message, e);
     }
-
-//    public OpenSubtitleException(int errorCode, String message=null, boolean skipProvider=true) {
-//        super(message);
-//        this.errorCode = errorCode;
-//        this.skipProvider = skipProvider;
-//    }
-
 }

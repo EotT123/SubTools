@@ -12,7 +12,6 @@ public class ContainerExt {
         // hide utility class constructor
     }
 
-
     public static @Self Container addComponent(@This Container component, Component child) {
         component.add(child);
         return component;

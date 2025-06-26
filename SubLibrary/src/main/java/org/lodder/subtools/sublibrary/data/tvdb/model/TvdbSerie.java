@@ -10,11 +10,11 @@ public class TvdbSerie extends SerieMapping {
     }
 
     public TvdbSerie(String name, SearchResult searchResult) {
-        this(name, searchResult.tvdbId, searchResult.name);//, searchResult.year);
+        this(name, searchResult.tvdbId, searchResult.name);
     }
 
     public TvdbSerie(String name, SeriesBaseRecord seriesBaseRecord) {
-        this(name, String.valueOf(seriesBaseRecord.id), seriesBaseRecord.name);//, seriesBaseRecord.year);
+        this(name, String.valueOf(seriesBaseRecord.id), seriesBaseRecord.name);
     }
 }
 

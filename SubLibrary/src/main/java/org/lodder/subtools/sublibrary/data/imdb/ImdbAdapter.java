@@ -59,6 +59,7 @@ public class ImdbAdapter implements AdapterIntf {
 
     public Optional<String> getImdbId(String title, VideoType videoType, @Nullable Integer year=null) {
         try {
+            @SuppressWarnings("unchecked")
             Optional<ReleaseMapping> releaseMapping =
                 (Optional<ReleaseMapping>) getCache(videoType.name() + "mapping",
                     b -> b.add("title", title).add("videoType", videoType).add("year", year))
@@ -74,17 +75,6 @@ public class ImdbAdapter implements AdapterIntf {
                             }),
                         storeTempNullValue:true);
             return releaseMapping.map(ReleaseMapping::getProviderId);
-
-//            Optional<ImdbId> providerId = (Optional<ImdbId>) (Object) getCache("providerId",
-//                b -> b.add("title", title).add("videoType", videoType).add("year", year))
-//                .getOptional(
-//                    () -> getImdbIdOnImdb(title, year, videoType)
-//                        .orElseMap(() -> getImdbIdOnGoogle(title, year, videoType))
-//                        .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType))
-//                        .orElseMap(
-//                            () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId))),
-//                    storeTempNullValue:true);
-//            return providerId.map(ImdbId::getId);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(provider, title, e.getMessage()), e);
             return Optional.empty();

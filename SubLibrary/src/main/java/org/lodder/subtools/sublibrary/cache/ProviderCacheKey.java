@@ -20,10 +20,6 @@ public final class ProviderCacheKey extends ProviderCacheKeyCommon {
         this.otherParams = providerCacheKeyParams;
     }
 
-//    public static ProviderCacheKey parse(String value){
-//
-//    }
-
     public Stream<ProviderCacheKeySub> getSubKeyStream() {
         return idParams.stream().map(cacheKeyParam ->
             new ProviderCacheKeySub(provider, type,

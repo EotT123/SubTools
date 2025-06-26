@@ -320,12 +320,6 @@ public class PathExt {
             ((header[3] & 0xFF) << 24);
 
         return magic == 0x504b0304; // ZIP magic number (little-endian)
-
-
-//        DataInputStream in = new DataInputStream(is);
-//        boolean isZip = in.readInt() == 0x504b0304;
-//        is.reset();
-//        return isZip;
     }
 
     /*

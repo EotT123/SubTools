@@ -82,8 +82,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
             .header("User-Agent", USER_AGENT);
 
     private final LazySupplier<ApiClient> apiClient = new LazySupplier<>(() -> {
-//        ApiKeyAuth apiKeyAuth = new ApiKeyAuth("header", "Api-Key");
-//        apiKeyAuth.setApiKey(APIKEY);
         return new ApiClient(new OkHttpClient.Builder()
             .addInterceptor(chain -> {
                 Builder builder = DEFAULT_BUILDER.apply(chain);
@@ -239,12 +237,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     getValue(aiTranslated), orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
                     parentFeatureId, parentImdbId, parentTmdbId, season, episode, year, getValue(movieHashMatch), page,
                     USER_AGENT)).execute().getData();
-//                .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
-//                .addErrorHandler(FORBIDDEN, retry:false)
-//                .addErrorHandler(NOT_ACCEPTABLE, retry:false)
-//                .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second, logLevel:WARN)
-
-
             // TODO is this filtering needed?
             // String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
             // String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName, "[^A-Za-z]", ""));
@@ -263,10 +255,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     apiCall(() -> downloadApi.get().download(USER_AGENT, new DownloadRequest().fileId(fileId)))
                         .addErrorHandler(createQuotaErrorHandler())
                         .execute().getLink()
-//                    .addErrorHandler(UNAUTHORIZED, retry:false, logLevel:WARN)
-//                    .addErrorHandler(FORBIDDEN, retry:false)
-//                    .addErrorHandler(NOT_ACCEPTABLE, retry:false)
-//                    .addErrorHandler(TOO_MANY_REQUESTS, retry:true, sleepTimeBeforeRetry:5Second, logLevel:WARN)
             );
     }
 

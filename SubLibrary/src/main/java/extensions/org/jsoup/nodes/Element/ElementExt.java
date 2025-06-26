@@ -257,14 +257,6 @@ public class ElementExt {
 //        return element == null || !filter.test(element) ? null : element;
 //    }
 
-//    public static @Nullable @Self Element filter2(@This @Nullable Element element, Predicate<@Self Element> predicate) {
-//        return matches(element, predicate) ? element : null;
-//    }
-//
-//    public static @Nullable @Self Element filter3(@This @Nullable Element element, Predicate<@Self Element> predicate) {
-//        return matches(element, predicate) ? element : null;
-//    }
-
 //    public static boolean matches(@This @Nullable Element element, Predicate<Element> predicate) {
 //        return element != null && predicate.test(element);
 //    }

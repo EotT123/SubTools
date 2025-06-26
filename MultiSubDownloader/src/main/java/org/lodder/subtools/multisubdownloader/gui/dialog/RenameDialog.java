@@ -122,7 +122,6 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
-    //    @ExtensionMethod({ Files.class })
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;

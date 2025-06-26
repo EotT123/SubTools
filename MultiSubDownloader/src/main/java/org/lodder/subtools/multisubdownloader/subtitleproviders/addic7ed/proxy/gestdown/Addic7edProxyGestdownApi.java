@@ -80,10 +80,6 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
                     }
                     return shows;
                 }
-//                    .addErrorHandler(ERR_NOT_FOUND)
-//                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
-//                    .execute().getShows();
-
             );
     }
 
@@ -92,11 +88,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             .getOptional(() -> {
                 List<ShowDto> shows =
                     apiCall(() -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId)).execute().getShows();
-//                    .addErrorHandler(ERR_NOT_FOUND)
-//                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
-//                    .execute().getShows();
                 if (shows == null) {
-//                    throw Addic7edApiException.noResult("Serie with tvdb id [$tvdbId] not found");
                     return Optional.empty();
                 }
                 return shows.stream().findFirst();
@@ -111,11 +103,6 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
                 SubtitleSearchResponse response = apiCall(
                     () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
                         UUID.fromString(providerId), season, episode)).execute();
-//                    .addErrorHandler(ERR_BAD_REQUEST)
-//                    .addErrorHandler(ERR_NOT_FOUND)
-//                    .addErrorHandler(ERR_LOCKED)
-//                    .addErrorHandler(ERR_TOO_MANY_REQUESTS)
-//                    .execute();
                 List<SubtitleDto> subtitles = response.getMatchingSubtitles();
                 if (subtitles == null) {
                     throw Addic7edApiException.noResult("Could not find subtitles for [$providerId], season[$season]," +

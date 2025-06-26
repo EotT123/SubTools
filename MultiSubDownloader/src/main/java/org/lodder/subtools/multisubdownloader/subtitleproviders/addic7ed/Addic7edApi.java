@@ -48,7 +48,6 @@ public class Addic7edApi implements SubtitleApi {
     private Time lastRequest = Time.now();
 
     public Addic7edApi(Manager manager, boolean speedy, Credentials credentials=null) throws Addic7edApiException {
-//        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
         this.manager = manager;
         this.speedy = speedy;
         if (credentials != null) {

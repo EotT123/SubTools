@@ -96,7 +96,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         }
     }
 
-    public boolean doDownloadFile(URL url, final Path file, CookieManager cookieManager=null) {
+    public boolean downloadAndExtractFile(URL url, final Path file, CookieManager cookieManager=null) {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
         boolean success = true;
 

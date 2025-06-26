@@ -17,7 +17,6 @@ public class ComponentExt {
         // hide utility class constructor
     }
 
-
     public static void setRecursive(@This Component component, Consumer<Component> consumer) {
         setRecursive(component, consumer, _ -> true);
     }

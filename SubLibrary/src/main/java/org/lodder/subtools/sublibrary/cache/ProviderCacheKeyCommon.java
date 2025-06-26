@@ -20,10 +20,6 @@ public abstract sealed class ProviderCacheKeyCommon implements Serializable perm
         this.params = params.stream().sorted().toList();
     }
 
-//    public static ProviderCacheKeyCommon parse(String value){
-//
-//    }
-
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;

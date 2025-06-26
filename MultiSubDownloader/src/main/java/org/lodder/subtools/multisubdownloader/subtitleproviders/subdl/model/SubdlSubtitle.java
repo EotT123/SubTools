@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,8 +10,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -54,17 +51,13 @@ public class SubdlSubtitle extends Subtitle {
         Files.createDirectories(tempDir);
         String zipFileName = url.contains("/") ? StringUtils.substringAfterLast(url, "/").removeIllegalWindowsChars() :
             url.removeIllegalWindowsChars();
-//        Path zipPath = tempDir.resolve(zipFileName);
         Path unzipPath = tempDir.resolve(StringUtils.substringBeforeLast(zipFileName, "."));
 
         if (!Files.exists(unzipPath)) {
-            if (!manager.download(url, unzipPath)) {
+            if (!manager.downloadAndExtractFile(url, unzipPath)) {
                 return List.of();
             }
         }
-
-        // unzip the downloaded file
-        // unzip(zipPath, unzipPath);
 
         // find all extracted subtitle files and move them to the destination folder, renaming them using the
         // provided function
@@ -111,34 +104,6 @@ public class SubdlSubtitle extends Subtitle {
                     }
                 }).filter(Objects::nonNull)
                 .toList();
-        }
-    }
-
-    private record SubToCopy(Path origin, Path destination) {
-    }
-
-    ;
-
-    private static void unzip(Path zipPath, Path outputDir) throws IOException {
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipPath))) {
-            ZipEntry entry = zis.getNextEntry();
-            while (entry != null) {
-                Path outPath = outputDir.resolve(entry.getName()).normalize();
-                // Prevent Zip Slip
-                if (!outPath.startsWith(outputDir.toAbsolutePath())) {
-                    throw new IOException("Blocked zip entry: " + entry.getName());
-                }
-                if (entry.isDirectory()) {
-                    Files.createDirectories(outPath);
-                } else {
-                    Files.createDirectories(outPath.getParent());
-                    try (OutputStream out = Files.newOutputStream(outPath)) {
-                        zis.transferTo(out);
-                    }
-                }
-                zis.closeEntry();
-                entry = zis.getNextEntry();
-            }
         }
     }
 }

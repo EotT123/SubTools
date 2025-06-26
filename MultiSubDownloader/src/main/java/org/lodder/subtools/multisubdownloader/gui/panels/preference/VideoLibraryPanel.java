@@ -17,7 +17,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-//@ExtensionMethod({ Files.class })
 public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
     permits EpisodeLibraryPanel, MovieLibraryPanel {
 

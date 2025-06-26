@@ -16,7 +16,6 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//@ExtensionMethod({ Files.class })
 public class FileListAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);

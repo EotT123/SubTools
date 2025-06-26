@@ -77,7 +77,6 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
                                 } catch (SQLException e2) {
                                     LOGGER.error("Unable to insert object in disk cache. (${e2.getMessage()})", e2);
                                     errorWhileReadingCacheFile = true;
-//                                    throw new CorruptSettingsFileException(e);
                                 }
                             }
                             Map<ProviderCacheKey, Collection<CacheObject<V>>> map = tempCache.asMap();

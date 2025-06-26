@@ -63,9 +63,9 @@ public class Manager {
         this.diskCache = diskCache;
     }
 
-    public boolean download(String downloadLink, Path file) throws IOException {
+    public boolean downloadAndExtractFile(String downloadLink, Path file) throws IOException {
         try {
-            return httpClient.doDownloadFile(new URI(downloadLink).toURL(), file);
+            return httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file);
         } catch (MalformedURLException | URISyntaxException e) {
             throw new IOException("incorrect url", e);
         }

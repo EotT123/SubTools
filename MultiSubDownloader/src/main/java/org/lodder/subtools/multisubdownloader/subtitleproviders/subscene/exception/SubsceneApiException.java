@@ -41,8 +41,4 @@ public class SubsceneApiException extends SubsceneException implements ApiExcept
         cause.getMessage(), CacheStrategy cacheStrategy=CACHE_TEMPORARY) {
         return new SubsceneApiException(SERVER_ERROR, cause, message, cacheStrategy, ERROR);
     }
-
-//    public static SubsceneApiException error(String message, CacheStrategy cacheStrategy=CACHE_TEMPORARY) {
-//        return new SubsceneApiException(SERVER_ERROR, null, message, cacheStrategy, ERROR);
-//    }
 }

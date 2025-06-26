@@ -37,9 +37,4 @@ public record ProviderCacheKeyParam(String key, @Nullable String value) implemen
     @Override public int hashCode() {
         return Objects.hash(key, value);
     }
-
-    //    public static ProviderCacheKeyParam parse(String value){
-//        String[] split = value.split(DELIMITER);
-//        return new ProviderCacheKeyParam(split[0], split[1]);
-//    }
 }

@@ -13,7 +13,6 @@ public class GridBagLayoutExt {
         // hide utility class constructor
     }
 
-
     public static @Self GridBagLayout columnWidths(@This GridBagLayout gridBagLayout, int[] columnWidths) {
         gridBagLayout.columnWidths = columnWidths;
         return gridBagLayout;

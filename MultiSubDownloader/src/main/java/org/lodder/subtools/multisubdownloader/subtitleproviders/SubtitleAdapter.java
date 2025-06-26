@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
  * @param <S_ID> type of the serie provider id
  * @param <X> type of the exception thrown by the api
  */
-//@ExtensionMethod({Files.class})
 public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception> implements
     SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
@@ -114,78 +113,6 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public abstract Collection<API_SUB> searchMovieSubtitlesWithName(String name, @Nullable Integer year,
         Language language, ProviderIds providerIds) throws X;
 
-
-//    @Override
-//    public Optional<MovieMapping> getProviderMovieMapping(MovieRelease movieRelease) throws X_API {
-//        return getProviderMovieMapping(movieRelease.name, movieRelease.name, movieRelease.name, movieRelease.year,
-//            movieRelease.providerIds);
-//    }
-
-//    /**
-//     * Attempts to retrieve a movie mapping from a provider using the specified parameters.
-//     * <p>
-//     * This method caches the results to prevent redundant provider queries. If no movie mapping is found or if
-//     * the user is manually searching with a custom name, it will store temporary cache values to avoid unnecessary
-//     * repeated user prompts during the same execution.
-//     * </p>
-//     * <p>
-//     * If {@code nameToSearchFor} differs from {@code name}, it indicates that the user has entered a custom search name.
-//     * This distinction is used to determine caching behavior and result matching logic.
-//     * </p>
-//     *
-//     * @param name the name of the movie
-//     * @param nameToSearchFor the name to search for in the provider's data. If this differs from the name, it is a
-//     * custom name entered by the user.
-//     * @param displayName the name to display in the UI
-//     * @param year the year to narrow down the search results
-//     * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
-//     * @return an {@code Optional<MovieMapping>} containing the mapping information if found, or an empty {@code
-//     * Optional} if none is found.
-//     * @throws X_API if an error occurs during the retrieval operation
-//     */
-//    private Optional<MovieMapping> getProviderMovieMapping(String name, String nameToSearchFor, String displayName,
-//        @Nullable Integer year, ProviderIds providerIds) throws X_API {
-//
-//        ThrowingBiFunction<ProviderIds, String, List<M_ID>, X_API> providerReleaseIdsFunction
-//            = (_providerIds, _nameToSearchFor) -> getSortedMovieProviderIds(_providerIds, _nameToSearchFor, year);
-//        TriFunction<String, String, String, MovieMapping> releaseMappingConstructor =
-//            (_name, providerId, providerName) -> new MovieMapping(_name, providerId, providerName, year);
-//        UnaryOperator<String> selectFromListMessage =
-//            _displayName -> year == null ? getText("SelectDialog.SelectMovieNameForName", _displayName) :
-//                getText("SelectDialog.SelectMovieNameForNameWithSeason", _displayName, year);
-//        Function<M_ID, String> providerReleaseIdToDisplayStringFunction = this::providerMovieIdToDisplayString;
-//
-//        return getProviderReleaseMapping(name,
-//            nameToSearchFor, displayName,
-//            Map.of("year", year),
-//            providerIds,
-//            providerReleaseIdsFunction,
-//            releaseMappingConstructor,
-//            selectFromListMessage,
-//            providerReleaseIdToDisplayStringFunction);
-//    }
-//
-//    /**
-//     * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
-//     * should not be cached in the implementing classes.
-//     *
-//     * @param providerIds the provider IDs containing various IDs for providers
-//     * @param serieName the name of the movie
-//     * @param year the year number of the movie
-//     * @return a list of sorted movie provider IDs
-//     * @throws X_API if an error occurs during the operation
-//     */
-//    public abstract List<M_ID> getSortedMovieProviderIds(ProviderIds providerIds, String serieName,
-//        @Nullable Integer year) throws X_API;
-//
-//    /**
-//     * Converts a provider-specific movie id to a displayable string format.
-//     *
-//     * @param providerMovieId the provider-specific movie identifier to be converted to a display string
-//     * @return a string representation of the movie id suitable for display purposes
-//     */
-//    public abstract String providerMovieIdToDisplayString(M_ID providerMovieId);
-
     // ===== \\
     // SERIE \\
     // ===== \\
@@ -242,10 +169,6 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         if (StringUtils.isNotBlank(tvRelease.customName)) {
             return getProviderSerieMapping(tvRelease, tvRelease.originalName, tvRelease.customName);
         } else {
-//            return getProviderSerieMapping(tvRelease, tvRelease.originalName)
-//                .orElseMapEx(() -> !Objects.equals(tvRelease.originalName, tvRelease.name) ?
-//                    getProviderSerieMapping(tvRelease, tvRelease.name) : Optional.empty());
-
             Optional<SerieMapping> providerSerieMapping = getProviderSerieMapping(tvRelease, tvRelease.originalName);
             if (providerSerieMapping.isEmpty()) {
                 providerSerieMapping =

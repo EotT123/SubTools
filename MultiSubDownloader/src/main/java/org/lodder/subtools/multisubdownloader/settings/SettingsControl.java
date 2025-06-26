@@ -16,7 +16,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//@ExtensionMethod({Files.class})
 public class SettingsControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);

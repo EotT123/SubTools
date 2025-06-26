@@ -36,7 +36,7 @@ public class SubsceneSubtitle extends Subtitle {
         try {
             String url = urlSupplier.get();
             Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-            manager.download(url, subPath);
+            manager.downloadAndExtractFile(url, subPath);
             return List.of(subPath);
         } catch (SubsceneException e) {
             throw new IOException(e);
