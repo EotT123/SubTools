@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,11 +64,18 @@ public class Manager {
         this.diskCache = diskCache;
     }
 
-    public boolean downloadAndExtractFile(String downloadLink, Path file) throws IOException {
+    public void downloadAndExtractFile(String downloadLink, Path file) throws IOException {
         try {
-            return httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file);
+            httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file);
+            if (!Files.exists(file)) {
+                throw new IOException("Could not download subtitle");
+            } else if (Files.size(file) == 0) {
+                // file is empty, delete it
+                Files.delete(file);
+                throw new IOException("Downloaded subtitle is empty");
+            }
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new IOException("incorrect url", e);
+            throw new IOException("Invalid url: " + downloadLink, e);
         }
     }
 

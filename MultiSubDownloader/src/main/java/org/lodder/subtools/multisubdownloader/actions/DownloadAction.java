@@ -74,8 +74,8 @@ public class DownloadAction {
             downloadedSubtitles = subtitle.download(manager, path, fileNameFunction);
             LOGGER.debug("downloaded {} subtitles", downloadedSubtitles.size());
         } catch (IOException e) {
-            LOGGER.error("Error while getting url for [${release.releaseDescription}] (${e.getMessage()})", e);
-            throw e;
+            throw new IOException(
+                "Error while downloading subtitle for [${release.releaseDescription}] (" + e.getMessage() + ")", e);
         }
         if (downloadedSubtitles.isEmpty()) {
             return;
