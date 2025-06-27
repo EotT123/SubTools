@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
@@ -64,9 +65,10 @@ public class Manager {
         this.diskCache = diskCache;
     }
 
-    public void downloadAndExtractFile(String downloadLink, Path file) throws IOException {
+    public void downloadAndExtractFile(String downloadLink, Path file,
+        ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
         try {
-            httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file);
+            httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file, validateFunction);
             if (!Files.exists(file)) {
                 throw new IOException("Could not download subtitle");
             } else if (Files.size(file) == 0) {

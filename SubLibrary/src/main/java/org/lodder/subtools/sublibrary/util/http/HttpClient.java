@@ -23,6 +23,7 @@ import java.util.zip.GZIPInputStream;
 import extensions.java.io.InputStream.InputStreamExt;
 import extensions.java.nio.file.Path.PathExt;
 import jakarta.ws.rs.core.HttpHeaders;
+import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.HttpConnection;
 import org.slf4j.Logger;
@@ -96,7 +97,9 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         }
     }
 
-    public void downloadAndExtractFile(URL url, final Path file, CookieManager cookieManager=null) throws IOException {
+    public void downloadAndExtractFile(URL url, final Path file,
+        ThrowingConsumer<String, IOException> validateFunction=null, CookieManager cookieManager=null)
+        throws IOException {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
 
         try (InputStream rawIn = getInputStream(url, getCookieManager(cookieManager));
@@ -115,12 +118,11 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
                     data = PathExt.decompressGZip(data);
                 }
                 String content = new String(data, StandardCharsets.UTF_8);
-                if (content.contains("Daily Download count exceeded")) {
-                    LOGGER.error("Download problem: Addic7ed Daily Download count exceeded!");
-                } else {
-                    Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-                        StandardOpenOption.WRITE);
+                if (validateFunction != null) {
+                    validateFunction.accept(content);
                 }
+                Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE);
             }
         }
     }
