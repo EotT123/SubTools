@@ -81,8 +81,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
             .header("Content-Type", CONTENT_TYPE)
             .header("User-Agent", USER_AGENT);
 
-    private final LazySupplier<ApiClient> apiClient = new LazySupplier<>(() -> {
-        return new ApiClient(new OkHttpClient.Builder()
+    private final LazySupplier<ApiClient> apiClient = new LazySupplier<>(() ->
+        new ApiClient(new OkHttpClient.Builder()
             .addInterceptor(chain -> {
                 Builder builder = DEFAULT_BUILDER.apply(chain);
                 if (credentials != null) {
@@ -95,8 +95,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 }
                 return chain.proceed(builder.build());
             })
-            .build());
-    });
+            .build()));
     private final LazySupplier<SubtitlesApi> subtitlesApi =
         new LazySupplier<>(() -> apiClient.get().createService(SubtitlesApi.class));
     private final LazySupplier<DownloadApi> downloadApi =
