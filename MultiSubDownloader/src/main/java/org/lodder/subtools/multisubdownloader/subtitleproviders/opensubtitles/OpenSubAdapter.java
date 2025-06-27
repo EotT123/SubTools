@@ -128,7 +128,7 @@ public final class OpenSubAdapter
         Language language = Language.ofIso639_1(attr.language);
         return ReleaseParser.parse(attr.release)
             .map(r -> new OpenSubtilteSubtitle(
-                urlSupplier:() -> api.getDownloadUrl(Integer.parseInt(attr.subtitleId)),
+                urlSupplier:() -> api.getDownloadUrl(attr.legacySubtitleId.intValue()),
                 fileName:attr.release,
                 language:language,
                 releaseGroup:r.releaseGroup,
@@ -138,7 +138,7 @@ public final class OpenSubAdapter
             .orElseGet(() -> {
                 ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
                 return new OpenSubtilteSubtitle(
-                    urlSupplier:() -> api.getDownloadUrl(Integer.parseInt(attr.subtitleId)),
+                    urlSupplier:() -> api.getDownloadUrl(attr.legacySubtitleId.intValue()),
                     fileName:attr.release,
                     language:Language.ofIso639_1(attr.language),
                     releaseGroup:extraInfo.getReleaseGroupBestEffort(),
