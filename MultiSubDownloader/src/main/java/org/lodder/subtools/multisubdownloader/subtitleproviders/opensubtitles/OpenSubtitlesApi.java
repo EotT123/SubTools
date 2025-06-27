@@ -6,12 +6,18 @@ import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
@@ -37,8 +43,10 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.pa
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.SearchSubtitlesEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.TrustedSourcesEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.TypeEnum;
+import org.lodder.subtools.sublibrary.CacheStrategy;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.LogLevel;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Retry;
@@ -53,7 +61,6 @@ import org.opensubtitles.api.AuthenticationApi;
 import org.opensubtitles.api.DownloadApi;
 import org.opensubtitles.api.SubtitlesApi;
 import org.opensubtitles.invoker.ApiClient;
-import org.opensubtitles.model.DownloadRequest;
 import org.opensubtitles.model.Login200Response;
 import org.opensubtitles.model.LoginRequest;
 import org.opensubtitles.model.Subtitle;
@@ -250,11 +257,34 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
-            .get(() ->
-                    apiCall(() -> downloadApi.get().download(USER_AGENT, new DownloadRequest().fileId(fileId)))
-                        .addErrorHandler(createQuotaErrorHandler())
-                        .execute().getLink()
-            );
+            .get(() -> {
+                try (HttpClient client = HttpClient.newHttpClient()) {
+
+                    HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://api.opensubtitles.com/api/v1/download"))
+                        .header("Accept", "application/json")
+                        .header("Api-Key", APIKEY)
+                        .header("Authorization", "Bearer " + getBearerToken(credentials.username, credentials.password))
+                        .header("Content-Type", "application/json")
+                        .header("User-Agent", "Test v1.0")
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"10274768\"}"))
+                        .build();
+
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
+                } catch (IOException | InterruptedException | JsonSyntaxException e) {
+                    throw new OpenSubtitleApiException(SERVER_ERROR, e.getMessage(), CacheStrategy.CACHE_DISABLED,
+                        LogLevel.ERROR);
+                }
+            });
+
+
+//        return getCache("downloadUrl", b -> b.add("fileId", fileId))
+//            .get(() ->
+//                    apiCall(() -> downloadApi.get().download(USER_AGENT, new DownloadRequest().fileId(fileId)))
+//                        .addErrorHandler(createQuotaErrorHandler())
+//                        .execute().getLink()
+//            );
     }
 
     private static <T> ExecuteCall<T, OpenSubtitleApiException> apiCall(
