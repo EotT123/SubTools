@@ -5,10 +5,18 @@ import java.io.Serial;
 public class ImdbException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = 8887410537703318009L;
+    private static final long serialVersionUID = 1L;
 
-    public ImdbException(String s, String url, Exception e) {
-        super("$s: $url", e);
+    public ImdbException(String s) {
+        super(s);
+    }
+
+    public ImdbException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ImdbException(Throwable cause) {
+        super(cause);
     }
 
 }

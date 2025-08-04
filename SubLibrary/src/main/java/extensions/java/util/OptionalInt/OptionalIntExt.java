@@ -3,48 +3,138 @@ package extensions.java.util.OptionalInt;
 
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.IntFunction;
+import java.util.function.IntUnaryOperator;
 
-import com.pivovarit.function.ThrowingIntFunction;
-import com.pivovarit.function.ThrowingSupplier;
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
+import name.falgout.jeffrey.throwing.ThrowingIntFunction;
 import name.falgout.jeffrey.throwing.ThrowingIntUnaryOperator;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 
 
 @Extension
-@UtilityClass
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalIntExt {
 
+    private OptionalIntExt() {
+        // hide utility class constructor
+    }
+
     /**
-     * If the value is present, apply the {@link ThrowingIntUnaryOperator} and return the value wrapped in an
+     * If a value is present, applies the {@link IntUnaryOperator} to it and returns the result wrapped in an {@link OptionalInt}.
      *
-     * @param optional input object of the extension method
-     * @param function the function to apply to the value if present
-     * @param <X> type of the exception that can be thrown
-     * @return the result of the function wrapped in an @{link OptionalInt} if the value is present, otherwise an empty
-     *     {@code OptionalInt}
-     * @throws X exception type of the throwing Function {@link OptionalInt}. Otherwise, return an empty
-     *     {@code OptionalInt}
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param function the function to apply if a value is present
+     * @return an {@code OptionalInt} describing the result of applying the function, or an empty {@code OptionalInt} if no value is present
      */
-    public static <X extends Exception> OptionalInt map(@This OptionalInt optional,
+    public static OptionalInt map(@This OptionalInt optional, IntUnaryOperator function) {
+        return optional.isPresent() ? OptionalInt.of(function.applyAsInt(optional.getAsInt())) : OptionalInt.empty();
+    }
+
+    /**
+     * If a value is present, applies the {@link ThrowingIntUnaryOperator} to it and returns the result wrapped in an {@link OptionalInt}.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param function the function to apply if a value is present
+     * @param <X> the type of exception that the function may throw
+     * @return an {@code OptionalInt} describing the result of applying the function, or an empty {@code OptionalInt} if no value is present
+     * @throws X if the function throws an exception
+     */
+    public static <X extends Exception> OptionalInt mapEx(@This OptionalInt optional,
         ThrowingIntUnaryOperator<X> function) throws X {
         return optional.isPresent() ? OptionalInt.of(function.applyAsInt(optional.getAsInt())) : OptionalInt
             .empty();
     }
 
-    public static <X extends Exception> OptionalInt orElseMap(@This OptionalInt optionalInt,
+
+    /**
+     * If a value is present, applies the {@link IntFunction} to it and returns the result wrapped in an {@link Optional}.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param function the function to apply if a value is present
+     * @param <R> the type of the result
+     * @return an {@code Optional} describing the result of applying the function, or an empty {@code Optional} if no value is present
+     */
+    public static <R> Optional<R> mapToObj(@This OptionalInt optional, IntFunction<R> function) {
+        return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsInt())) : Optional.empty();
+    }
+
+    /**
+     * If a value is present, applies the {@link ThrowingIntFunction} to it and returns the result wrapped in an {@link Optional}.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param function the function to apply if a value is present
+     * @param <R> the type of the result
+     * @param <X> the type of exception that the function may throw
+     * @return an {@code Optional} describing the result of applying the function, or an empty {@code Optional} if no value is present
+     * @throws X if the function throws an exception
+     */
+    public static <R, X extends Exception> Optional<R> mapToObjEx(@This OptionalInt optional,
+        ThrowingIntFunction<R, X> function) throws X {
+        return optional.isPresent() ? Optional.ofNullable(function.apply(optional.getAsInt())) : Optional.empty();
+    }
+
+    /**
+     * If a value is present, applies the {@link ThrowingIntFunction} to it and returns the result wrapped in an {@link Optional}.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param function the function to apply if a value is present
+     * @param <R> the type of the result
+     * @param <X> the type of exception that the function may throw
+     * @return an {@code Optional} describing the result of applying the function, or an empty {@code Optional} if no value is present
+     * @throws X if the function throws an exception
+     */
+    public static <R, X extends Exception> Optional<R> flatMapToObjEx(@This OptionalInt optional,
+        ThrowingIntFunction<Optional<R>, X> function) throws X {
+        return optional.isPresent() ? function.apply(optional.getAsInt()) : Optional.empty();
+    }
+
+    /**
+     * Returns the value if present, otherwise returns the result of the provided {@link ThrowingSupplier}.
+     *
+     * @param optionalInt the input {@code OptionalInt} for the extension method
+     * @param intSupplier a supplier that provides an {@code OptionalInt} if the original is empty
+     * @param <X> the type of exception that the supplier may throw
+     * @return the original {@code OptionalInt} if present; otherwise, the result from {@code intSupplier}
+     * @throws X if the supplier throws an exception
+     */
+    public static <X extends Exception> OptionalInt orElseMapEx(@This OptionalInt optionalInt,
         ThrowingSupplier<OptionalInt, X> intSupplier) throws X {
         return optionalInt.isPresent() ? optionalInt : intSupplier.get();
     }
 
-    public static <T, X extends Exception> Optional<T> mapToObj(@This OptionalInt optionalInt,
-        ThrowingIntFunction<T, X> mapper) throws X {
-        return optionalInt.isPresent() ? Optional.ofNullable(mapper.apply(optionalInt.getAsInt())) : Optional
-            .empty();
+
+    public static <R, X extends Exception> Optional<R> flatMap(@This OptionalInt optionalInt,
+        IntFunction<Optional<R>> mapper) throws X {
+        return optionalInt.isPresent() ? mapper.apply(optionalInt.getAsInt()) : Optional.empty();
     }
 
-    public static Integer orElseNull(@This OptionalInt optionalInt) {
-        return optionalInt.isPresent() ? optionalInt.getAsInt() : null;
+    /**
+     * Executes the given {@link Runnable} if the {@code OptionalInt} is empty.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param runnable the action to perform if no value is present
+     */
+    public static void ifNotPresent(@This OptionalInt optional, Runnable runnable) {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
+    }
+
+    /**
+     * Executes the given {@link ThrowingRunnable} if the {@code OptionalInt} is empty.
+     *
+     * @param optional the input {@code OptionalInt} for the extension method
+     * @param runnable the action to perform if no value is present
+     * @param <X> the type of exception that the runnable may throw
+     * @throws X if the runnable throws an exception
+     */
+    public static <X extends Throwable> void ifNotPresentEx(@This OptionalInt optional,
+        ThrowingRunnable<X> runnable) throws X {
+        if (optional.isEmpty()) {
+            runnable.run();
+        }
     }
 }

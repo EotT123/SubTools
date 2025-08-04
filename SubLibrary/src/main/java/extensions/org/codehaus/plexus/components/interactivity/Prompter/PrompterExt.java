@@ -18,9 +18,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import dnl.utils.text.table.TextTable;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.UtilityClass;
-import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
@@ -29,9 +26,13 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
 
-@Extension
-@UtilityClass
+// see #692
+//@Extension
 public class PrompterExt {
+
+    private PrompterExt() {
+        // hide utility class constructor
+    }
 
     public static Validator<String> NON_BLANK_VALIDATOR =
         new Validator<>(StringUtils::isNotBlank, getText("Prompter.ValueNonBlank"));
@@ -67,7 +68,7 @@ public class PrompterExt {
         Function<String, Integer> toObjectMapper=Integer::parseInt,
         List<Validator<Integer>> objectValidators=new ArrayList<Validator<Integer>>()) {
 
-        return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators).mapToInt(v -> v);
+        return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators).mapToIntEx(v -> v);
     }
 
     public static Optional<Boolean> promptBoolean(@This Prompter prompter, String message,
@@ -218,10 +219,13 @@ public class PrompterExt {
         }
     }
 
-    @RequiredArgsConstructor
     public static class TableDisplayer<T> {
 
         private final List<ColumnDisplayer<T>> columnDisplayers;
+
+        public TableDisplayer(List<ColumnDisplayer<T>> columnDisplayers) {
+            this.columnDisplayers = columnDisplayers;
+        }
 
         @SafeVarargs
         public final void display(T... tableElements) {
@@ -230,7 +234,7 @@ public class PrompterExt {
                 .map(tableElement -> columnDisplayers.stream()
                     .map(columnDisplayer -> columnDisplayer.toStringMapper().apply(tableElement))
                     .toArray())
-                .toTypedArray(Object[][]::new);
+                .toArray(Object[][]::new);
 
             TextTable tt = new TextTable(columnNames, dataTable);
             // this adds the numbering on the left
@@ -262,8 +266,6 @@ public class PrompterExt {
             tt.setAddRowNumbering(true);
             tt.printTable(printStream, 0);
         }
-
-
     }
 
     private static class LineReadingOutputStream extends OutputStream {

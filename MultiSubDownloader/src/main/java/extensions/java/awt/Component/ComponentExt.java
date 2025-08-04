@@ -5,15 +5,17 @@ import java.awt.event.MouseListener;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import org.jspecify.annotations.Nullable;
 
-@UtilityClass
 @Extension
 public class ComponentExt {
+
+    private ComponentExt() {
+        // hide utility class constructor
+    }
 
     public static void setRecursive(@This Component component, Consumer<Component> consumer) {
         setRecursive(component, consumer, _ -> true);

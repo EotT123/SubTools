@@ -15,7 +15,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 
 public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
 
-    @Serial private static final long serialVersionUID = -1498846730946617177L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final LibrarySettings librarySettings;
     private final JCheckBox chkBackupSubtitle;

@@ -6,7 +6,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JSubsceneAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.SubsceneAdapter;
 
 public class SubsceneServiceProvider implements ServiceProvider {
 
@@ -18,6 +18,6 @@ public class SubsceneServiceProvider implements ServiceProvider {
     @Override
     public void register(Container app, UserInteractionHandler userInteractionHandler) {
         /* Add the SubtitleProvider to the store */
-        app.makeSubtitleProviderStore().addProvider(new JSubsceneAdapter(app.makeManager(), userInteractionHandler));
+        app.makeSubtitleProviderStore().addProvider(new SubsceneAdapter(app.makeManager(), userInteractionHandler));
     }
 }

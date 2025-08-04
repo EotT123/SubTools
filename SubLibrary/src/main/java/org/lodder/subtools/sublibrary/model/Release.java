@@ -7,26 +7,25 @@ import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
 public abstract sealed class Release permits MovieRelease, TvRelease {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
+    @var String name;
     @val VideoType videoType;
     @val @Nullable Path filePath;
     @val @Nullable String quality;
     @val @Nullable String releaseGroup;
-    @val @Nullable String extension;
-    @var @Nullable Integer tvdbId;
+    @val ProviderIds providerIds = new ProviderIds();
 
-    protected Release(VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
-        @Nullable String quality, @Nullable String extension) {
+    protected Release(String name, VideoType videoType, @Nullable Path filePath, @Nullable String releaseGroup,
+        @Nullable String quality) {
+        this.name = name;
         this.videoType = videoType;
         this.filePath = filePath;
         this.releaseGroup = releaseGroup;
         this.quality = quality;
-        this.extension = extension;
     }
 
     public void addMatchingSub(Subtitle sub) {
@@ -50,7 +49,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     }
 
     public boolean hasExtension(String extension) {
-        return StringUtils.isNotBlank(extension) && extension.equals(this.extension);
+        return filePath != null && filePath.fileNameAsString.endsWith(extension);
     }
 
     @Override
@@ -60,5 +59,9 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
 
     public String getReleaseDescription() {
         return fileName;
+    }
+
+    public boolean hasSameId(Release other, ProviderIdType providerIdType) {
+        return providerIds.isEqual(other.providerIds, providerIdType);
     }
 }

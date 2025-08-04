@@ -5,8 +5,7 @@ import static java.util.Objects.*;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 
-import com.pivovarit.function.ThrowingIntFunction;
-import com.pivovarit.function.exception.WrappedException;
+import name.falgout.jeffrey.throwing.ThrowingIntFunction;
 
 /**
  * Represents a function that accepts one argument and does not return any value;
@@ -19,10 +18,6 @@ import com.pivovarit.function.exception.WrappedException;
 public interface ThrowingIntConsumer<E extends Exception> {
 
     void accept(int i) throws E;
-
-    static IntConsumer unchecked(ThrowingIntConsumer<?> consumer) {
-        return requireNonNull(consumer).uncheck();
-    }
 
     /**
      * Returns a new BiConsumer instance which rethrows the checked exception using the Sneaky Throws pattern
@@ -62,19 +57,6 @@ public interface ThrowingIntConsumer<E extends Exception> {
         return arg -> {
             accept(arg);
             return null;
-        };
-    }
-
-    /**
-     * @return a Consumer instance which wraps thrown checked exception instance into a RuntimeException
-     */
-    default IntConsumer uncheck() {
-        return i -> {
-            try {
-                accept(i);
-            } catch (final Exception e) {
-                throw new WrappedException(e);
-            }
         };
     }
 }

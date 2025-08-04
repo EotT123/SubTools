@@ -3,18 +3,20 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SubtitleProviderStore {
-    protected final Set<SubtitleProvider> subtitleProviders = new HashSet<>();
+import org.lodder.subtools.sublibrary.model.Subtitle;
 
-    public Set<SubtitleProvider> getAllProviders() {
+public class SubtitleProviderStore {
+    protected final Set<SubtitleProvider<? extends Subtitle>> subtitleProviders = new HashSet<>();
+
+    public Set<SubtitleProvider<? extends Subtitle>> getAllProviders() {
         return new HashSet<>(this.subtitleProviders);
     }
 
-    public void addProvider(SubtitleProvider provider) {
+    public void addProvider(SubtitleProvider<? extends Subtitle> provider) {
         this.subtitleProviders.add(provider);
     }
 
-    public void deleteProvider(SubtitleProvider subtitleProvider) {
+    public void deleteProvider(SubtitleProvider<? extends Subtitle> subtitleProvider) {
         this.subtitleProviders.remove(subtitleProvider);
     }
 }

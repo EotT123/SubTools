@@ -45,7 +45,7 @@ public class SearchWorker extends Thread {
                     break;
                 }
                 this.release = release;
-                LOGGER.debug("[Search] {} searching {} ", this.provider.name, release);
+                LOGGER.debug("[Search] {} searching {} ", this.provider.provider, release);
 
                 Set<Subtitle> subtitles = this.provider.search(release, language);
 
@@ -53,7 +53,7 @@ public class SearchWorker extends Thread {
                 this.subtitles = Set.copyOf(subtitles);
 
                 this.busy = false;
-                LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.name, subtitles.size(),
+                LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.provider, subtitles.size(),
                         release);
 
                 if (!this.isInterrupted()) {

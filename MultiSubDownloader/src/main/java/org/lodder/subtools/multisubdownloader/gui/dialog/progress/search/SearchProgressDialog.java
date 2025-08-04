@@ -20,7 +20,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 public class SearchProgressDialog extends MultiSubDialog implements SearchProgressListener {
 
     @Serial
-    private static final long serialVersionUID = -1331536352530988442L;
+    private static final long serialVersionUID = 1L;
     private final GUI window;
     private final SearchProgressTableModel tableModel;
     private final JProgressBar progressBar;
@@ -61,7 +61,8 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
     @Override
     public void progress(SubtitleProvider provider, int jobsLeft, Release release) {
         this.setVisible();
-        this.tableModel.update(provider.name, jobsLeft, release == null ? "Done" : release.fileName);
+        this.tableModel.update(provider.subtitleProviderFrontEnd.name, jobsLeft, release == null ? "Done" :
+            release.fileName);
     }
 
     @Override

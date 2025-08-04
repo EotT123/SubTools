@@ -1,10 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.Messages;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum LibraryOtherFileActionType {
 
     NOTHING("PreferenceDialog.Action.Nothing"),
@@ -14,6 +11,10 @@ public enum LibraryOtherFileActionType {
     MOVE_AND_RENAME("PreferenceDialog.Action.MoveAndRename");
 
     private final String msgCode;
+
+    LibraryOtherFileActionType(String msgCode) {
+        this.msgCode = msgCode;
+    }
 
     @Override
     public String toString() {

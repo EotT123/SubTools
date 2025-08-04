@@ -2,13 +2,24 @@ package org.lodder.subtools.sublibrary.exception;
 
 import java.io.Serial;
 
-import lombok.experimental.StandardException;
+import manifold.ext.props.rt.api.val;
 
-@StandardException
 public abstract class SubtitlesProviderException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = -2959483164333075297L;
+    private static final long serialVersionUID = 1L;
 
-    public abstract String getSubtitleProvider();
+    @val abstract String subtitleProvider;
+
+    protected SubtitlesProviderException(String message) {
+        super(message);
+    }
+
+    protected SubtitlesProviderException(Throwable cause) {
+        super(cause);
+    }
+
+    protected SubtitlesProviderException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -4,14 +4,11 @@ import static manifold.science.util.UnitConstants.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.prefs.Preferences;
 
 import ch.qos.logback.classic.Level;
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -24,18 +21,16 @@ import org.lodder.subtools.multisubdownloader.framework.Bootstrapper;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Splash;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.cache.DiskCache;
-import org.lodder.subtools.sublibrary.cache.InMemoryCache;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheDisk;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
 import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtensionMethod({Files.class})
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -80,22 +75,21 @@ public class App {
 
         if (line.hasCliOption(CliOption.NO_GUI)) {
             bootstrapper.initialize(new UserInteractionHandlerCLI(prefCtrl.settings));
-            CLI cmd = new CLI(prefCtrl, app);
 
             /* Defined here so there is output on console */
             importPreferences(line);
 
             try {
-                cmd.setUp(line);
+                CLI cmd = new CLI(prefCtrl, app, line);
                 if (line.hasCliOption(CliOption.HELP)) {
                     formatter.printHelp(ConfigProperties.getProperty(Property.NAME), getCLIOptions());
                     return;
                 }
+                cmd.run();
             } catch (CliException e) {
                 System.out.println("Error: " + e.getMessage());
                 return;
             }
-            cmd.run();
         } else {
             /* Defined here so there is output in the splash */
             importPreferences(line);
@@ -114,10 +108,10 @@ public class App {
         }
         new Thread(() -> {
             List<String> providerNames =
-                app.makeSubtitleProviderStore().getAllProviders().stream().map(SubtitleProvider::getProviderName)
+                app.makeSubtitleProviderStore().getAllProviders().stream().map(provider -> provider.provider)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
-            manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key::startsWith))
+            manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key.provider::equals))
                 .clearExpiredCache();
         }).start();
 
@@ -154,20 +148,9 @@ public class App {
         if (splash != null) {
             splash.progressMsg = Messages.getText("App.Starting");
         }
-        DiskCache<String, Serializable> diskCache =
-            new DiskCache<>(
-                String.class,
-                Serializable.class,
-                500 day,
-                2500);
+        ProviderCacheDisk diskCache = new ProviderCacheDisk(500 day, 5000);
 
-        InMemoryCache<String, String> inMemoryCache =
-            new InMemoryCache<>(
-                String.class,
-                String.class,
-                10 min,
-                100 ms,
-                500);
+        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10 min, 100ms, 2500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }

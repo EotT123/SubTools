@@ -9,28 +9,32 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import manifold.science.measures.Time;
- 
-@ToString
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSerializableCacheObject {
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
+final class ExpiringCacheObject<V> implements CacheObject<V> {
 
     @Serial
-    private static final long serialVersionUID = 3852086993086134232L;
+    private static final long serialVersionUID = 1L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|lastAccessed:(.*?)|value:(.*)");
 
     @override @val Time created;
     @var @set(Private) Time lastAccessed = Time.now();
-    @override @var T value;
+    @override @var @Nullable V value;
 
-    protected ExpiringCacheObject(T value) {
+    public ExpiringCacheObject(Time created, Time lastAccessed, V value) {
+        this.created = created;
+        this.lastAccessed = lastAccessed;
+        this.value = value;
+    }
+
+    ExpiringCacheObject(@Nullable V value) {
         this.created = Time.now();
         this.value = value;
     }
@@ -46,11 +50,12 @@ sealed class ExpiringCacheObject<T> implements CacheObject<T> permits ExpiringSe
     }
 
     @Override
-    public String toString(Function<T, String> valueToStringMapper) {
+    public String toString(Function<@Nullable V, String> valueToStringMapper) {
         return "created:$created|lastAccessed:$lastAccessed|value:${valueToStringMapper.apply(value)}";
     }
 
-    public static <T> Optional<CacheObject<T>> fromString(String string, Function<String, T> valueToObjectMapper) {
+    public static <V> Optional<CacheObject<V>> fromString(String string,
+        Function<String, V> valueToObjectMapper) {
         Matcher matcher = PATTERN.matcher(string);
         if (matcher.matches()) {
             Time created = Time.create(Long.parseLong(matcher.group(1)), ms);

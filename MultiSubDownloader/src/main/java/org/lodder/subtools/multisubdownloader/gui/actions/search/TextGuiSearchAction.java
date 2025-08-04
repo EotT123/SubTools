@@ -42,15 +42,14 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
         model.clearTable();
 
         // TODO: Redefine what a "release" is.
-        Release release = switch (type) {
-            case EPISODE ->
-                new TvRelease(name:name, season:inputPanel.season, episode:inputPanel.episode, quality:inputPanel.quality);
-            case MOVIE -> new MovieRelease(name:name, quality:inputPanel.quality);
+        return switch (type) {
+            case EPISODE -> List.of(
+                new TvRelease(name:name, season:inputPanel.season, episode:inputPanel.episode, quality:inputPanel.quality));
+            case MOVIE -> List.of(new MovieRelease(name:name, quality:inputPanel.quality));
             default -> releaseFactory.createRelease(Path.of(
                     name + (VideoExtensions.values().stream().anyMatch(ext -> name.endsWith("." + ext)) ? "" : ".")),
-                userInteractionHandler);
+                userInteractionHandler).map(List::of).orElseGet(List::of);
         };
-        return release != null ? List.of(release) : List.of();
     }
 
     @Override

@@ -1,21 +1,16 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
 
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
-@ExtensionMethod({ Files.class })
 public class CleanAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanAction.class);
@@ -24,16 +19,20 @@ public class CleanAction {
 
     private final LibrarySettings librarySettings;
 
+    public CleanAction(LibrarySettings librarySettings) {
+        this.librarySettings = librarySettings;
+    }
+
     public void cleanUpFiles(Release release, Path destination, String videoFileName) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryOtherFileAction {}", librarySettings.otherFileAction);
         if (!destination.isDirectory()) {
             throw new IllegalArgumentException("Destination [%s] is not a folder".formatted(destination));
         }
 
-        release.getPath().list().asThrowingStream(IOException.class)
+        release.getPath().list()
             .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
                 || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
-            .forEach(p -> {
+            .forEachEx(p -> {
                 switch (librarySettings.otherFileAction) {
                     case MOVE -> move(p, destination);
                     case MOVE_AND_RENAME -> moveAndRename(p, destination, videoFileName);

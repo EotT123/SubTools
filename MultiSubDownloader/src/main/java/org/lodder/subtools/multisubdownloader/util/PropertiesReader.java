@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 
 public class PropertiesReader {
@@ -34,10 +33,13 @@ public class PropertiesReader {
         return PropertiesReader.getPropertiesReader().properties.getProperty(property.value);
     }
 
-    @AllArgsConstructor
     public enum PomProperty {
         BUILD_TIMESTAMP("build.timestamp");
 
         @val String value;
+
+        PomProperty(String value) {
+            this.value = value;
+        }
     }
 }

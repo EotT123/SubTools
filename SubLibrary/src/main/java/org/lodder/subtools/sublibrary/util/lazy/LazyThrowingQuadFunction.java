@@ -1,9 +1,7 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingQuadFunction;
 
-@RequiredArgsConstructor
 public class LazyThrowingQuadFunction<T, U, V, W, R, X extends Exception> {
 
     private final Object lock = new Object();
@@ -13,6 +11,10 @@ public class LazyThrowingQuadFunction<T, U, V, W, R, X extends Exception> {
     private R object;
 
     private volatile boolean initialized = false;
+
+    public LazyThrowingQuadFunction(ThrowingQuadFunction<T, U, V, W, R, X> function) {
+        this.function = function;
+    }
 
     public R apply(T arg1, U arg2, V arg3, W arg4) throws X {
         if (!initialized) {

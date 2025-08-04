@@ -69,12 +69,15 @@
         </dependency>
         <dependency>
             <groupId>systems.manifold</groupId>
-            <artifactId>manifold-science</artifactId>
+            <artifactId>manifold-json-rt</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-yaml-rt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-science</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
@@ -93,12 +96,16 @@
             <artifactId>throwing-streams</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.pivovarit</groupId>
-            <artifactId>throwing-function</artifactId>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -171,6 +178,16 @@
                             <artifactId>manifold-strings</artifactId>
                             <version>${manifold.version}</version>
                         </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-json</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-yaml</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
@@ -235,10 +252,9 @@
                             <apiPackage>org.gestdown.api</apiPackage>
                             <invokerPackage>org.gestdown.invoker</invokerPackage>
                             <packageName>org.gestdown</packageName>
-                            <!--<language>java</language>-->
                             <skipValidateSpec>true</skipValidateSpec>
                             <apisToGenerate>Subtitles,TvShows</apisToGenerate>
-                            <modelsToGenerate>AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse</modelsToGenerate>
+                            <!--                            <modelsToGenerate>AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse</modelsToGenerate>-->
                             <generateModelTests>false</generateModelTests>
                             <configOptions>
                                 <typeMappings>integer=int,int=int</typeMappings>
@@ -246,20 +262,10 @@
                                 <serializableModel>true</serializableModel>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
-                                <!--<sourceFolder>src/gen/java</sourceFolder>-->
-                                <!--<java8>true</java8>-->
                                 <dateLibrary>java8-localdatetime</dateLibrary>
                                 <useJakartaEe>true</useJakartaEe>
+                                <library>retrofit2</library>
                             </configOptions>
-
-                            <typeMappings>
-                                <typeMapping>OffsetDateTime=Instant</typeMapping>
-                                <typeMapping>LocalDateTime=Instant</typeMapping>
-                            </typeMappings>
-                            <importMappings>
-                                <importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping>
-                                <importMapping>java.time.LocalDateTime=java.time.Instant</importMapping>
-                            </importMappings>
                         </configuration>
                     </execution>
                     <execution>
@@ -281,12 +287,13 @@
                             <generateModelTests>false</generateModelTests>
                             <configOptions>
                                 <typeMappings>integer=int,int=int</typeMappings>
-                                <useSwaggerAnnotations>false</useSwaggerAnnotations>
+                                <!--                                <useSwaggerAnnotations>false</useSwaggerAnnotations>-->
                                 <serializableModel>true</serializableModel>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
                                 <!--<sourceFolder>src/gen/java</sourceFolder>-->
                                 <useJakartaEe>true</useJakartaEe>
+                                <library>retrofit2</library>
                             </configOptions>
                         </configuration>
                     </execution>

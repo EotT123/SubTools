@@ -6,7 +6,7 @@ import java.util.Comparator;
 
 public class ServiceProviderComparator implements Comparator<ServiceProvider>, Serializable {
     @Serial
-    private static final long serialVersionUID = 7236933845444427431L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int compare(ServiceProvider a, ServiceProvider b) {

@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.actions;
 
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.SubtitleComparator;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -12,13 +11,17 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 public class UserInteractionHandlerAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInteractionHandlerAction.class);
 
     private final Settings settings;
     private final UserInteractionHandler userInteractionHandler;
+
+    public UserInteractionHandlerAction(Settings settings, UserInteractionHandler userInteractionHandler) {
+        this.settings = settings;
+        this.userInteractionHandler = userInteractionHandler;
+    }
 
     /**
      * @param release release

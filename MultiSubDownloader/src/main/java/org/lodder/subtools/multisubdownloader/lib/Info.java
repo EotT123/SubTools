@@ -1,16 +1,18 @@
 package org.lodder.subtools.multisubdownloader.lib;
 
-import lombok.experimental.UtilityClass;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("java:S106")
-@UtilityClass
 public class Info {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Info.class);
+
+    private Info() {
+        // hide utility class constructor
+    }
 
     public static void subtitleSources(Settings settings, boolean isCli) {
         if (isCli) {
@@ -26,6 +28,7 @@ public class Info {
                 case PODNAPISI -> settings.serieSourcePodnapisi;
                 case TVSUBTITLES -> settings.serieSourceTvSubtitles;
                 case SUBSCENE -> settings.serieSourceSubscene;
+                case SUBDL -> settings.serieSourceSubdl;
             };
             if (isCli) {
                 System.out.println(" - provider : " + source + " enabled: " + enabled);

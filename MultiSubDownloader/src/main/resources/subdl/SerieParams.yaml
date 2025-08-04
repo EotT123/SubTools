@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Serie API
+  version: 1.0.0
+
+components:
+  schemas:
+    Language:
+      type: string
+      enum:
+        - AR
+        - BR_PT
+        - DA
+        - NL
+        - EN
+        - FA
+        - FI
+        - FR
+        - ID
+        - IT
+        - NO
+        - RO
+        - ES
+        - SV
+        - VI
+        - SQ
+        - AZ
+        - BE
+        - BN
+        - ZH_BG
+        - BS
+        - BG
+        - BG_EN
+        - MY
+        - CA
+        - ZH
+        - HR
+        - CS
+        - NL_EN
+        - EN_DE
+        - EO
+        - ET
+        - KA
+        - DE
+        - EL
+        - KL
+        - HE
+        - HI
+        - HU
+        - HU_EN
+        - IS
+        - JA
+        - KO
+        - KU
+        - LV
+        - LT
+        - MK
+        - MS
+        - ML
+        - MNI
+        - PL
+        - PT
+        - RU
+        - SR
+        - SI
+        - SK
+        - SL
+        - TL
+        - TA
+        - TE
+        - TH
+        - TR
+        - UK
+        - UR
+
+    User:
+      type: object
+      required:
+        - api_key
+      properties:
+        api_key:
+          type: string
+          description: the api key from subdl account
+        film_name:
+          type: string
+          description: Text search by film name.
+        file_name:
+          type: string
+          description: Search by file name.
+        sd_id:
+          type: integer
+          description: Search by SubDL ID.
+        imdb_id:
+          type: integer
+          description: Search by IMDb ID.
+        tmdb_id:
+          type: integer
+          description: Search by TMDB ID.
+        season_number:
+          type: integer
+          description: Specific season number for TV shows.
+        episode_number:
+          type: integer
+          description: Specific episode number for TV shows.
+        type:
+          type: string
+          description: Type of the content, either movie or tv.
+        year:
+          type: string
+          description: Release year of the movie or TV show.
+        languages:
+          $ref: '#/components/schemas/Language'
+          description: Comma-separated language codes for subtitle languages. list of supported languages
+        subs_per_page:
+          type: integer
+          description: limit of subtitles will see in the results default is 10, (max can be 30)
+        comment:
+          type: boolean
+          description: send comment=1 to get author comment on subtitle
+        releases:
+          type: boolean
+          description: send releases=1 to get releases list on subtitle
+        hi:
+          type: boolean
+          description: send hi=1 to get is Hearing Impaired on subtitle
+        full_season:
+          type: boolean
+          description: send full_season=1 to get all full season subtitles

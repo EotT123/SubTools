@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,9 +19,9 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.Roman.RomanNumeral;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.AudioEncoding;
@@ -39,52 +40,51 @@ import org.slf4j.LoggerFactory;
  * This class parses a file's name and its metadata to determine the release type (movie or TV series), creating a
  * {@link Release} object containing the metadata
  */
+@NullMarked
 public class ReleaseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
 
-    /**
-     * Parses the provided file path to determine the release type (movie or TV show) and its details.
-     *
-     * @param file The file to parse.
-     * @return A Release object representing the parsed data.
-     * @throws ReleaseParseException if the file's name cannot be parsed.
-     */
-    public final Release parse(Path file) throws ReleaseParseException {
-        if (file.getParent() != null) {
-            try {
-                return parsePatternResult(file, file.getParent().fileName.toString(), null);
-            } catch (Exception e) {
-                // Continue to next name
-            }
-        }
-        try {
-            var fileNameAndExtension = file.fileName.splitExtension();
-            return parsePatternResult(file, fileNameAndExtension.filename, fileNameAndExtension.extension);
-        } catch (Exception e) {
-            throw new ReleaseParseException("Unknown format, can't be parsed: ${file.toAbsolutePath()}");
-        }
+    private ReleaseParser() {
+        // hide utility class constructor
     }
 
     /**
-     * Parses the given file's name using a series of regex patterns to extract relevant metadata and constructs the
-     * corresponding {@link Release} object (either a {@link MovieRelease} or {@link TvRelease}). The method attempts to
-     * identify and parse key details such as the release type, season, episodes, quality, and release group from the
-     * filename.
+     * Attempts to parse the given file using a series of regex patterns to extract relevant metadata and constructs
+     * the corresponding {@link Release} object (either a {@link MovieRelease} or {@link TvRelease}).
+     * The method attempts to identify and parse key details such as the release type, season, episodes, quality,
+     * and release group from the filename.
      *
      * @param file The file path being parsed.
-     * @param fileParseName The file name (without extension) or the parent directory name.
-     * @param extension The extension of the file, or null for a parent directory.
-     * @return A {@link Release} object representing the parsed release information (either a movie or TV show).
-     * @throws ReleaseParseException If the file name cannot be parsed into a valid release format.
+     * @param includeParent If true, the parent directory name is also parsed.
+     * @return an {@link Optional} containing the {@link Release} if parsing was successful; otherwise
+     * {@link Optional#empty()}
      */
-    private Release parsePatternResult(Path file, String fileParseName, String extension) throws ReleaseParseException {
-        ParserResults parserResults = new ParserResults(fileParseName);
+    public static Optional<Release> parse(Path file, boolean includeParent=false) throws ReleaseParseException {
+        Optional<Release> release = includeParent ? parse(file.getParent().fileNameAsString, file) : Optional.empty();
+        return release.orElseMapEx(() -> parse(StringUtils.substringBeforeLast(file.fileNameAsString, "."), file));
+    }
+
+    /**
+     * Attempts to parse the given value using a series of regex patterns to extract relevant metadata and constructs
+     * the corresponding {@link Release} object (either a {@link MovieRelease} or {@link TvRelease}).
+     * <br>
+     * The method attempts to identify and parse key details such as the release type, season, episodes, quality,
+     * and release group from the filename.
+     *
+     * @param text value to be parsed.
+     * @param file The file path being parsed.
+     * @return an {@link Optional} containing the {@link Release} if parsing was successful; otherwise
+     * {@link Optional#empty()}
+     */
+    public static Optional<Release> parse(String text, @Nullable Path file=null) {
+        ParserResults parserResults = new ParserResults(StringUtils.endsWithAny(text, ".zip", ".srt") ?
+            StringUtils.substringBeforeLast(text, ".") : text);
 
         parseReleaseType(parserResults);
         String quality = String.join(" ", getQualityKeyWordsAlreadyParsed(parserResults));
 
-        // When quality parts are found, the filename is split into multiple parts. Consider the last part as the
+        // When quality parts are found, the filename is split into multiple parts. Consider the last part the
         // release group
         String releaseGroup = parserResults.parts.size() > 1 ? parserResults.parts.last : "";
         if (StringUtils.isNotBlank(releaseGroup)) {
@@ -115,42 +115,42 @@ public class ReleaseParser {
                 // MovieRelease object
                 if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE).stream()
                     .anyMatch(source -> source.likelyMovieRelease || !source.likelyTvRelease)) {
-                    if (StringUtils.equals(parserResults.parts.first, fileParseName)) {
-                        throw new ReleaseParseException("Could not parse " + fileParseName);
+                    if (StringUtils.equals(parserResults.parts.first, text)) {
+                        return Optional.empty();
                     }
-                    return new MovieRelease(
+                    return Optional.of(new MovieRelease(
                         name:cleanUnwantedChars(parserResults.parts.first),
                         file:file,
                         year:parserResults.getNamedMatchValue(YEAR),
                         releaseGroup:releaseGroup,
-                        quality:StringUtils.toRootLowerCase(quality),
-                        extension:extension);
+                        quality:StringUtils.toRootLowerCase(quality)));
                 }
             }
         }
 
         // the file is considered a tv show at this point.
 
-        Integer season;
+        int season;
         List<Integer> episodes = new ArrayList<>();
         if (!parserResults.contains(SEASON) || (parserResults.containsNone(EPISODE, EPISODES_TEXT))) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
-                throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
+                return Optional.empty();
             }
             // Parse the number parts. They are still present at this point, because they were not removed from the
             // remaining parts earlier
             parserResults.parse(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
             // When using the part numbers, assume only one season exists for the TV show
             season = 1;
-            episodes.add(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER));
+            episodes.add(Objects.requireNonNull(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER)));
         } else {
-            season = parserResults.getNamedMatchValue(SEASON);
+            season = Objects.requireNonNull(parserResults.getNamedMatchValue(SEASON));
             episodes.addAll(Objects.requireNonNull(parserResults.getNamedMatchValue(EPISODE, EPISODES_TEXT)));
         }
 
         // if no serie name was yet found, use the first remaining part as the serie name
         String name =
-            parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
+            parserResults.containsNone(NAME) ? parserResults.parts.first :
+                Objects.requireNonNull(parserResults.getNamedMatchValue(NAME));
         // create a new parser to parse a potential year in the title (only at the end of the name)
         parserResults.createWithNewText(name)
             .parse(Regex.builder()
@@ -164,14 +164,10 @@ public class ReleaseParser {
                 .endOfText());
         name = parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
 
-        if (StringUtils.equals(name, fileParseName)) {
-            throw new ReleaseParseException("Could not parse " + fileParseName);
+        if (StringUtils.equals(name, text)) {
+            return Optional.empty();
         }
-        if (season == null) {
-            throw new ReleaseParseException("Could not find a season and/or episodes" + fileParseName);
-        }
-
-        return new TvRelease(
+        return Optional.of(new TvRelease(
             name:cleanUnwantedChars(name),
             season:season,
             episodes:episodes,
@@ -179,11 +175,10 @@ public class ReleaseParser {
             title:cleanUnwantedChars(parserResults.getNamedMatchValue(TITLE)),
             releaseGroup:releaseGroup,
             special:isSpecialEpisode(season, episodes),
-            quality:StringUtils.toRootLowerCase(quality),
-            extension:extension);
+            quality:StringUtils.toRootLowerCase(quality)));
     }
 
-    @AllArgsConstructor
+    @NullMarked
     enum SeasonEpisodeType {
         SXXEXX(Regex.builder()
             .regex("s")
@@ -200,9 +195,13 @@ public class ReleaseParser {
             .regex("\\)"));
 
         @val RegexNext regex;
+
+        SeasonEpisodeType(RegexNext regex) {
+            this.regex = regex;
+        }
     }
 
-    @AllArgsConstructor
+    @NullMarked
     enum NumberType {
         ARABIC(Regex.builder()
             .tag(ARABIC_NUMBER).regex("\\d{1,2}")),
@@ -211,6 +210,10 @@ public class ReleaseParser {
             .regex("[" + RomanNumeral.values().stream().map(RomanNumeral::name).collect(Collectors.joining()) + "]+"));
 
         @val RegexNext regex;
+
+        NumberType(RegexNext regex) {
+            this.regex = regex;
+        }
     }
 
     /**
@@ -281,6 +284,7 @@ public class ReleaseParser {
         parseResults.parse(Regex.builder().tag(VIDEO_ENCODING).regex(VideoEncoding.class, VideoEncoding::getRegex));
     }
 
+    @NullMarked
     static class ParserResults {
         @val List<String> parts = new ArrayList<>();
         private final NamedMatches namedMatches;
@@ -360,8 +364,7 @@ public class ReleaseParser {
         }
 
         public boolean contains(Tag<?> tag) {
-            List<?> namedMatch = getNamedMatch(tag);
-            return namedMatch != null && !namedMatch.isEmpty();
+            return !getNamedMatch(tag).isEmpty();
         }
 
         public boolean containsNone(Tag<?>... tags) {
@@ -396,9 +399,9 @@ public class ReleaseParser {
      * @param text The input text to clean.
      * @return The cleaned text.
      */
-    private String cleanUnwantedChars(String text) {
+    private static String cleanUnwantedChars(@Nullable String text) {
         if (text == null) {
-            return null;
+            return "";
         }
         String newText = text;
         newText = newText.replace("cd1", " ").replace("cd2", " ");
@@ -433,7 +436,56 @@ public class ReleaseParser {
         return getQualityKeyWordsAlreadyParsed(parserResults);
     }
 
-    private static List<String> getQualityKeyWordsAlreadyParsed(ParserResults parserResults) {
+    public static ReleaseParserExtraInfo parseExtraInfo(String text) {
+        return ReleaseParserExtraInfo.parseExtraInfo(text);
+    }
+
+    public static class ReleaseParserExtraInfo {
+
+        private final String text;
+        private final ParserResults parserResults;
+
+        private ReleaseParserExtraInfo(String extraInfo) {
+            String info = StringUtils.endsWithAny(extraInfo, ".srt", ".zip", ".rar") ? extraInfo.substring(0,
+                extraInfo.length() - 4) : extraInfo;
+            info = StringUtils.replaceIgnoreCase(info, "REPACK.", "");
+            info = StringUtils.replaceIgnoreCase(info, "REPACK-", "");
+            info = StringUtils.replaceIgnoreCase(info, "INTERNAL.", "");
+            info = StringUtils.replaceIgnoreCase(info, "INTERNAL-", "");
+            this.text = info;
+            this.parserResults = new ParserResults(extraInfo);
+            parseReleaseType(parserResults);
+        }
+
+        public static ReleaseParserExtraInfo parseExtraInfo(String text) {
+            return new ReleaseParserExtraInfo(text);
+        }
+
+        public String getQualityKeyword() {
+            return String.join(" ", getQualityKeyWordsAlreadyParsed(parserResults));
+        }
+
+        public @Nullable String getReleaseGroupBestEffort() {
+            if (parserResults.parts.isEmpty()) {
+                return null;
+            }
+            if (StringUtils.containsIgnoreCase(text, "retail")) {
+                return "RETAIL";
+            }
+            return parserResults.parts.getLast();
+        }
+
+        public List<String> getRemainingParts() {
+            return parserResults.parts;
+        }
+
+        public String getRemainingPartsAsString() {
+            return String.join(" ", parserResults.parts);
+        }
+    }
+
+
+    private static List<String> getQualityKeyWordsAlreadyParsed(ReleaseParser.ParserResults parserResults) {
         return Stream.of(
                 parserResults.getNamedMatch(QUALITY),
                 parserResults.getNamedMatch(SOURCE),
@@ -474,7 +526,7 @@ public class ReleaseParser {
             map.put(key, values.stream().distinct().toList());
         }
 
-        public List<String> get(Tag<?> tag) {
+        public @Nullable List<String> get(Tag<?> tag) {
             return map.get(tag.value);
         }
     }

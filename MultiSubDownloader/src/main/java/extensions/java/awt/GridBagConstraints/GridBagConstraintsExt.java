@@ -2,14 +2,15 @@ package extensions.java.awt.GridBagConstraints;
 
 import java.awt.*;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 
 @Extension
-@UtilityClass
 public class GridBagConstraintsExt {
+    private GridBagConstraintsExt() {
+        // hide utility class constructor
+    }
 
     public static @Self GridBagConstraints insets(@This GridBagConstraints gridBagConstraints, Insets insets) {
         gridBagConstraints.insets = insets;

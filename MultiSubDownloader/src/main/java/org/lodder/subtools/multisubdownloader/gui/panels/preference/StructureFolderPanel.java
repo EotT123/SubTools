@@ -23,7 +23,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 public class StructureFolderPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
-    private static final long serialVersionUID = 3476596236588408382L;
+    private static final long serialVersionUID = 1L;
 
     private final LibrarySettings librarySettings;
     private final MyTextFieldPath txtLibraryFolder;

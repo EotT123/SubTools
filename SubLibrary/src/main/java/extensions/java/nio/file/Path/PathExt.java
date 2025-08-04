@@ -2,7 +2,6 @@ package extensions.java.nio.file.Path;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,8 +14,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
+import manifold.ext.rt.api.ExtensionSource;
+import manifold.ext.rt.api.MethodSignature;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
@@ -24,9 +24,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
 import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
 
-@UtilityClass
 @Extension
+@ExtensionSource(source = Files.class, methods = {@MethodSignature(name = "size", paramTypes = {Path.class})})
 public class PathExt {
+
+    private PathExt() {
+        // hide utility class constructor
+    }
 
     public static String getExtension(@This Path path) {
         return StringUtils.substringAfterLast(path.getFileName().toString(), ".");
@@ -44,7 +48,8 @@ public class PathExt {
         return changeExtension(path, "");
     }
 
-    public record FilenameAndExtension(String filename, String extension) {}
+    public record FilenameAndExtension(String filename, String extension) {
+    }
 
     public static FilenameAndExtension splitExtension(@This Path path) {
         return new FilenameAndExtension(StringUtils.substringBeforeLast(path.getFileName().toString(), "."),
@@ -138,8 +143,8 @@ public class PathExt {
 
     private static Path moveNonEmptyDirectoryRecursively(Path source, Path target, StandardCopyOption... copyOptions)
         throws IOException {
-        foreachSubfile(source, s -> s.asThrowingStream(IOException.class)
-            .forEach(child -> moveNonEmptyDirectory(child, target.resolve(source.getFileName()), copyOptions)));
+        foreachSubfile(source,
+            s -> s.forEachEx(child -> moveNonEmptyDirectory(child, target.resolve(source.getFileName()), copyOptions)));
         Files.delete(source);
         return target;
     }
@@ -269,30 +274,52 @@ public class PathExt {
 
     /////////////////////
 
-    public static void unzip(InputStream inputStream, Path outputFile, String extensionFilter) throws IOException {
+    public static void unzip(InputStream inputStream, Path outputDir, String extensionFilter) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(inputStream)) {
             ZipEntry ze;
             while ((ze = zis.getNextEntry()) != null) {
-                if (ze.getName().endsWith(extensionFilter)) {
-                    byte[] buff = new byte[1024];
-                    // get file name
-                    try (OutputStream fos = Files.newOutputStream(outputFile)) {
-                        int l;
-                        // write buffer to file
-                        while ((l = zis.read(buff)) > 0) {
-                            fos.write(buff, 0, l);
+                if (!ze.isDirectory() && ze.getName().endsWith(extensionFilter)) {
+                    Path outputPath = outputDir.resolve(ze.getName()).normalize();
+
+                    // Prevent Zip Slip
+                    if (!outputPath.startsWith(outputDir)) {
+                        throw new IOException("Bad zip entry: " + ze.getName());
+                    }
+
+                    Files.createDirectories(outputPath.getParent());
+                    try (OutputStream out = Files.newOutputStream(outputPath)) {
+                        byte[] buffer = new byte[4096];
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            out.write(buffer, 0, len);
                         }
                     }
                 }
             }
         }
-
     }
 
     public static boolean isZipFile(InputStream inputStream) throws IOException {
-        try (DataInputStream in = new DataInputStream(new BufferedInputStream(inputStream))) {
-            return in.readInt() == 0x504b0304;
+        InputStream is = inputStream;
+        if (!is.markSupported()) {
+            is = new BufferedInputStream(is);
         }
+        is.mark(4);
+
+        byte[] header = new byte[4];
+        int bytesRead = is.read(header);
+        is.reset();
+
+        if (bytesRead < 4) {
+            return false; // not enough bytes to be a zip file
+        }
+
+        int magic = ((header[0] & 0xFF)) |
+            ((header[1] & 0xFF) << 8) |
+            ((header[2] & 0xFF) << 16) |
+            ((header[3] & 0xFF) << 24);
+
+        return magic == 0x504b0304; // ZIP magic number (little-endian)
     }
 
     /*
@@ -306,19 +333,15 @@ public class PathExt {
      *
      * @throws java.io.IOException if the byte array couldn't be read
      */
-    public static boolean isGZipCompressed(byte[] bytes) {
-        if (bytes == null || bytes.length < 2) {
-            return false;
-        } else {
-            return bytes[0] == (byte) GZIPInputStream.GZIP_MAGIC
-                && bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
-        }
-    }
-
     public static byte[] decompressGZip(byte[] data) throws IOException {
         try (ByteArrayInputStream binput = new ByteArrayInputStream(data);
              GZIPInputStream gzinput = new GZIPInputStream(binput)) {
             return gzinput.readAllBytes();
         }
+    }
+
+    public static boolean isGZipCompressed(byte[] data) {
+        return data.length >= 2 && data[0] == (byte) GZIPInputStream.GZIP_MAGIC &&
+            data[1] == (byte) GZIPInputStream.GZIP_MAGIC >> 8;
     }
 }

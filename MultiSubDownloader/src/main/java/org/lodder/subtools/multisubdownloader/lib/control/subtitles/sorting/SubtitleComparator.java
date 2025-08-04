@@ -9,7 +9,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 public class SubtitleComparator implements Comparator<Subtitle>, Serializable {
 
     @Serial
-    private static final long serialVersionUID = 3952954240904865448L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int compare(Subtitle a, Subtitle b) {

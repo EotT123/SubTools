@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles;
 
-import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.ExactNameFilter;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.KeywordFilter;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.ReleaseGroupFilter;
@@ -9,13 +8,16 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-@RequiredArgsConstructor
 public class SubtitleFiltering {
 
     private final Settings settings;
     private final SubtitleFilter exactName = new ExactNameFilter();
     private final SubtitleFilter keyword = new KeywordFilter();
     private final SubtitleFilter releaseGroup = new ReleaseGroupFilter();
+
+    public SubtitleFiltering(Settings settings) {
+        this.settings = settings;
+    }
 
     public boolean useSubtitle(Subtitle subtitle, Release release) {
         return !excludeSubtitle(subtitle, release);

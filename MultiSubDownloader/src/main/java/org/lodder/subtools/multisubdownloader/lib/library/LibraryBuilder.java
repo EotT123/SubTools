@@ -1,33 +1,37 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
-import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbSerie;
+import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
+import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbSerie;
+import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Release;
 
-@RequiredArgsConstructor
 public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, PathLibraryBuilder {
 
-    private final @Nullable TheTvdbAdapter tvdbAdapter;
+    private final @Nullable TvdbAdapter tvdbAdapter;
+
+    public LibraryBuilder(@Nullable TvdbAdapter tvdbAdapter) {
+        this.tvdbAdapter = tvdbAdapter;
+    }
 
     public abstract Path build(Release release);
 
     protected String getShowName(String name) {
-        return tvdbAdapter != null ? tvdbAdapter.getSerie(name).map(TheTvdbSerie::getSerieName).orElse(name) : name;
+        return tvdbAdapter != null ?
+            tvdbAdapter.searchSerie(name, new ProviderIds()).map(TvdbSerie::getProviderName).orElse(name) : name;
     }
 
     protected String replace(String structure, StructureTag tag, String value) {
         return structure.replace(tag.label, value);
     }
 
-    protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, List<Integer> episodeNumbers,
+    protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, Set<Integer> episodeNumbers,
         boolean leadingZero) {
         if (structure.contains(tag.label)) {
             String afterLabel = StringUtils.substringAfter(structure, tag.label);

@@ -1,50 +1,50 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
 import static manifold.science.measures.TimeUnit.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 
-import java.io.Serial;
-import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
-import com.pivovarit.function.ThrowingSupplier;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneApiException;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubSceneSerieId;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleDescriptor;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
-import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.ProviderSerieId;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.lodder.subtools.sublibrary.data.ProviderId;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.Utils;
 
 public class SubsceneApi implements SubtitleApi {
 
-    private static final Time RATE_DURATION_SHORT = 1 Second;
-    private static final Time RATE_DURATION_LONG = 5 Second;
-    private static final String DOMAIN = "https://subscene.com";
-    private static final Pattern SERIE_NAME_PATTERN = Pattern.compile(".*? - ([A-Z][a-z]*) Season.*");
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
+
+    private static final Time RATE_DURATION_SHORT = 1Second;
+    private static final Time RATE_DURATION_LONG = 5Second;
+    private static final String DOMAIN = "https://sub-scene.com";
+    private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
+    private static final Pattern SERIE_NAME_PATTERN =
+        Pattern.compile("(?<name>.*?) - (?<seasonName>[A-Z][a-z]*) Season.*");
 
     private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
         case HttpClientException httpClientException ->
@@ -53,12 +53,12 @@ public class SubsceneApi implements SubtitleApi {
         default -> false;
     };
 
-    private final Manager manager;
+    @val @override Manager manager;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBSCENE;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 
     private Time lastRequest = Time.now();
-    @val @override SubtitleSource subtitleSource = SubtitleSource.SUBSCENE;
 
     public SubsceneApi(Manager manager) {
 //        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
@@ -66,75 +66,123 @@ public class SubsceneApi implements SubtitleApi {
         addCookie("ForeignOnly", "False");
     }
 
+    // ===== \\
+    // MOVIE \\
+    // ===== \\
+
+//    /**
+//     * @param title the movie title
+//     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
+//     * @throws SubsceneApiException SubsceneApiException
+//     */
+//    public Map<SearchResultType, List<SubSceneMovieId>> getMovieProviderIds(String title) throws SubsceneApiException {
+//        return getProviderIds(title, elem -> {
+//            String _title = null;
+//            Integer _year = null;
+//            Matcher matcher = MOVIE_NAME_PATTERN.matcher(elem.text());
+//            if (matcher.matches()) {
+//                _title = matcher.group("title");
+//                _year = Integer.parseInt(matcher.group("year"));
+//            }
+//            return new SubSceneMovieId(elem.text(), elem.attr("href"), _title, _year);
+//        });
+//    }
+
+    // ===== \\
+    // SERIE \\
+    // ===== \\
+
     /**
-     * @param serieName the serie name
-     * @return a {@link Map} containing a list of {@link ProviderSerieId provider serie ids} per type
-     * @throws SubsceneException SubsceneException
+     * @param searchQuery the name of the serie, or the imdb id
+     * @return a {@link Map} containing a list of {@link ProviderId provider serie ids} per type
+     * @throws SubsceneApiException SubsceneApiException
      */
-    public Map<String, List<SubSceneSerieId>> getSubSceneSerieNames(String serieName) throws SubsceneException {
-        try {
-            if (StringUtils.isBlank(serieName)) {
-                return Map.of();
+    public Map<SearchResultType, List<SubSceneSerieId>> getSerieProviderIds(String searchQuery)
+        throws SubsceneApiException {
+        return getProviderIds(searchQuery, elem -> {
+            Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
+            if (matcher.matches()) {
+                String name = matcher.group("name");
+                Integer season = getOrdinalNumber(matcher.group("seasonName"));
+                return new SubSceneSerieId(elem.text(), elem.attr("href"), name, season);
             }
-            String url = "$DOMAIN/subtitles/searchbytitle?query=" + serieName.urlEncode();
-            return getJsoupDocument(url).selectFirstByClass("search-result").selectAllByTag("h2")
-                .stream()
-                .collect(Utils.mapCollector((map, titleElement) -> map.put(titleElement.text(),
-                    titleElement.nextElementSibling().selectAllByTag("a").stream().map(elem -> {
-                        Matcher matcher = SERIE_NAME_PATTERN.matcher(elem.text());
-                        int season = 0;
-                        if (matcher.matches()) {
-                            season = OrdinalNumber.optionalFromValue(matcher.group(1))
-                                .mapToInt(OrdinalNumber::getNumber).orElse(-1);
-                        }
-                        return new SubSceneSerieId(elem.text(), elem.attr("href"), season);
-                    }).toList())));
-        } catch (Exception e) {
-            throw new SubsceneException(e);
-        }
+            return new SubSceneSerieId(elem.text(), elem.attr("href"));
+        });
     }
 
-    public List<SubsceneSubtitleDescriptor> getSubtitles(SerieMapping providerSerieId, int season, int episode,
-        Language language) throws SubsceneException {
-        return manager.getCache(CacheType.MEMORY, "%s-subtitles-%s-%s-%s-%s".formatted(subtitleSource.name,
-                providerSerieId.providerId, season, episode, language))
+    public List<SubsceneSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
+        Language language) throws SubsceneApiException {
+        return getCache("subtitles",
+            b -> b.add("providerId", providerId).add("season", season).add("episode", episode))
             .getCollection(() -> {
                 setLanguageWithCookie(language);
                 try {
-                    return getJsoupDocument(DOMAIN + providerSerieId.providerId)
-                        .selectAllByCss("td.a1")
+                    return getJsoupDocument(DOMAIN + providerId)
+                        .select("td.a1")
                         .stream()
-                        .map(el -> (Element) el.parent())
+                        .map((Element e) -> e.parentElement())
                         .map(row -> {
-                            Language lang = Language.fromValueOptional(row.selectAllByCss(".a1 span.l").text().trim())
-                                .orElse(null);
-                            String name = row.selectAllByCss(".a1 span:not(.l)").text().trim();
+                            Language lang = Language.ofName(row.select(".a1 span.l").text().trim(), Language.ENGLISH);
+                            String name = row.select(".a1 span:not(.l)").text().trim();
                             boolean hearingImpaired = row.selectFirstByCss(".a41") != null;
                             String uploader = row.selectFirstByCss(".a5 > a").text().trim();
                             String comment = row.selectFirstByCss(".a6 > div").text().trim();
-                            ThrowingSupplier<String, SubsceneException> urlSupplier = () -> getDownloadUrl(
-                                DOMAIN + row.selectAllByCss(".a1 > a").attr("href").trim());
-                            return new SubsceneSubtitleDescriptor(lang, name, hearingImpaired, uploader, comment,
+                            ThrowingSupplier<String, SubsceneApiException> urlSupplier = () -> getDownloadUrl(
+                                DOMAIN + row.select(".a1 > a").attr("href").trim());
+                            return new SubsceneSubtitleMetadata(lang, name, hearingImpaired, uploader, comment,
                                 urlSupplier);
                         })
-                        .filter(subDescriptor -> subDescriptor.seasonEpisode != null &&
-                            subDescriptor.seasonEpisode.containsEpisode(episode))
+                        .filter(metadata -> metadata.seasonEpisode != null &&
+                            metadata.seasonEpisode.containsEpisode(episode))
+                        // TODO is this needed?
+                        .filter(metadata -> metadata.language == language)
+                        // TODO is this needed
+                        .filter(sub -> sub.name.contains("S%02dE%02d".formatted(season, episode)))
                         .toList();
                 } catch (Exception e) {
-                    throw new SubsceneException(e);
+                    LOGGER.error(e.getMessage(), e);
+                    throw SubsceneApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
             });
     }
 
-    private String getDownloadUrl(String seriePageUrl) throws SubsceneException {
+    // ====== \\
+    // COMMON \\
+    // ====== \\
+
+    /**
+     * @param name the release name
+     * @param <S> the type of the {@link SubSceneSerieId} contained in the {@link Map}
+     * @return a {@link Map} containing a list of {@link ProviderId provider release ids} per type
+     * @throws SubsceneApiException SubsceneApiException
+     */
+    public <S extends SubSceneSerieId> Map<SearchResultType, List<S>> getProviderIds(String name,
+        Function<Element, S> subsceneIdCreator) throws SubsceneApiException {
+        try {
+            if (StringUtils.isBlank(name)) {
+                return Map.of();
+            }
+            String url = "$DOMAIN/subtitles/searchbytitle?query=" + name.urlEncode();
+            return getJsoupDocument(url).selectFirstByClass("search-result").select("h2")
+                .stream()
+                .collect(Utils.mapCollector((map, titleElement) -> map.put(SearchResultType.of(titleElement.text()),
+                    titleElement.nextElementSibling().select("a").stream().map(subsceneIdCreator).toList())));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw SubsceneApiException.error(e);
+        }
+    }
+
+    private String getDownloadUrl(String seriePageUrl) throws SubsceneApiException {
         try {
             String href = getJsoupDocument(seriePageUrl).selectFirstById("downloadButton").attr("href");
             if (StringUtils.isBlank(href)) {
-                throw new SubsceneException("href for $seriePageUrl is blank");
+                throw SubsceneApiException.error(message:"href for $seriePageUrl is blank");
             }
             return DOMAIN + href;
         } catch (ManagerException e) {
-            throw new SubsceneException(e);
+            LOGGER.error(e.getMessage(), e);
+            throw SubsceneApiException.error(e, cacheStrategy:CACHE_DISABLED);
         }
     }
 
@@ -154,8 +202,8 @@ public class SubsceneApi implements SubtitleApi {
     }
 
     private void setLanguageWithCookie(Language language) {
-        int languageId = SUBSCENE_LANGS.get(language);
-        if (selectedLanguage != languageId) {
+        Integer languageId = getSubsceneLangId(language);
+        if (languageId != null && selectedLanguage != languageId) {
             addCookie("LanguageFilter", String.valueOf(languageId));
             selectedLanguage = languageId;
         }
@@ -173,211 +221,193 @@ public class SubsceneApi implements SubtitleApi {
         manager.storeCookies("subscene.com", Map.of(cookieName, cookieValue));
     }
 
-    private static final Map<Language, Integer> SUBSCENE_LANGS =
-        Collections.unmodifiableMap(new EnumMap<>(Language.class) {
-            @Serial private static final long serialVersionUID = 2950169212654074275L;
-
-            {
-                put(Language.ARABIC, 2);
-                put(Language.BENGALI, 54);
-                put(Language.PORTUGUESE, 4); // BRAZILLIAN PORTUGUESE
-                put(Language.CHINESE_SIMPLIFIED, 7);
-                put(Language.CZECH, 9);
-                put(Language.DANISH, 10);
-                put(Language.DUTCH, 11);
-                put(Language.ENGLISH, 13);
-                // put(Language.FARSI / PERSIAN, 46);
-                put(Language.FINNISH, 17);
-                put(Language.FRENCH, 18);
-                put(Language.GERMAN, 19);
-                put(Language.GREEK, 21);
-                put(Language.HEBREW, 22);
-                put(Language.INDONESIAN, 44);
-                put(Language.ITALIAN, 26);
-                put(Language.KOREAN, 28);
-                put(Language.MALAY, 50);
-                put(Language.NORWEGIAN, 30);
-                put(Language.POLISH, 31);
-                put(Language.PORTUGUESE, 32);
-                put(Language.ROMANIAN, 33);
-                put(Language.SPANISH, 38);
-                put(Language.SWEDISH, 39);
-                put(Language.THAI, 40);
-                put(Language.TURKISH, 41);
-                put(Language.VIETNAMESE, 45);
-                put(Language.ALBANIAN, 1);
-                put(Language.ARMENIAN, 73);
-                put(Language.AZERBAIJANI, 55);
-                // put(Language.BASQUE, 74);
-                put(Language.BELARUSIAN, 68);
-                put(Language.CHINESE_SIMPLIFIED, 3); // BIG 5 CODE
-                put(Language.BOSNIAN, 60);
-                put(Language.BULGARIAN, 5);
-                // put(Language.BULGARIAN / ENGLISH, 6);
-                // put(Language.BURMESE, 61);
-                // put(Language.CAMBODIAN / KHMER, 79);
-                put(Language.CATALAN, 49);
-                put(Language.CROATIAN, 8);
-                // put(Language.DUTCH / ENGLISH, 12);
-                // put(Language.ENGLISH / GERMAN, 15);
-                // put(Language.ESPERANTO, 47);
-                put(Language.ESTONIAN, 16);
-                // put(Language.GEORGIAN, 62);
-                // put(Language.GREENLANDIC, 57);
-                put(Language.HINDI, 51);
-                put(Language.HUNGARIAN, 23);
-                // put(Language.HUNGARIAN / ENGLISH, 24);
-                put(Language.ICELANDIC, 25);
-                put(Language.JAPANESE, 27);
-                put(Language.KANNADA, 78);
-                // put(Language.KINYARWANDA, 81);
-                // put(Language.KURDISH, 52);
-                put(Language.LATVIAN, 29);
-                put(Language.LITHUANIAN, 43);
-                put(Language.MACEDONIAN, 48);
-                put(Language.MALAYALAM, 64);
-                // put(Language.MANIPURI, 65);
-                // put(Language.MONGOLIAN, 72);
-                // put(Language.NEPALI, 80);
-                // put(Language.PASHTO, 67);
-                // put(Language.PUNJABI, 66);
-                put(Language.RUSSIAN, 34);
-                put(Language.SERBIAN, 35);
-                put(Language.SINHALA, 58);
-                put(Language.SLOVAK, 36);
-                put(Language.SLOVENIAN, 37);
-                // put(Language.SOMALI, 70);
-                // put(Language.SUNDANESE, 76);
-                // put(Language.SWAHILI, 75);
-                put(Language.TAGALOG, 53);
-                put(Language.TAMIL, 59);
-                put(Language.TELUGU, 63);
-                put(Language.UKRAINIAN, 56);
-                // put(Language.URDU, 42);
-                // put(Language.YORUBA, 71);
-
-            }
-        });
-
-    @Getter
-    @RequiredArgsConstructor
-    private enum OrdinalNumber {
-        ZEROTH(0, "Zeroth"),
-        FIRST(1, "First"),
-        SECOND(2, "Second"),
-        THIRD(3, "Third"),
-        FOURTH(4, "Fourth"),
-        FIFTH(5, "Fifth"),
-        SIXTH(6, "Sixth"),
-        SEVENTH(7, "Seventh"),
-        EIGHTH(8, "Eighth"),
-        NINTH(9, "Ninth"),
-        TENTH(10, "Tenth"),
-        ELEVENTH(11, "Eleventh"),
-        TWELFTH(12, "Twelfth"),
-        THIRTEENTH(13, "Thirteenth"),
-        FOURTEENTH(14, "Fourteenth"),
-        FIFTEENTH(15, "Fifteenth"),
-        SIXTEENTH(16, "Sixteenth"),
-        SEVENTEENTH(17, "Seventeenth"),
-        EIGHTEENTH(18, "Eighteenth"),
-        NINETEENTH(19, "Nineteenth"),
-        TWENTIETH(20, "Twentieth"),
-        TWENTY_FIRST(21, "Twenty-First"),
-        TWENTY_SECOND(22, "Twenty-Second"),
-        TWENTY_THIRD(23, "Twenty-Third"),
-        TWENTY_FOURTH(24, "Twenty-Fourth"),
-        TWENTY_FIFTH(25, "Twenty-Fifth"),
-        TWENTY_SIXTH(26, "Twenty-Sixth"),
-        TWENTY_SEVENTH(27, "Twenty-Seventh"),
-        TWENTY_EIGHTH(28, "Twenty-Eighth"),
-        TWENTY_NINTH(29, "Twenty-Ninth"),
-        THIRTIETH(30, "Thirtieth"),
-        THIRTY_FIRST(31, "Thirty-First"),
-        THIRTY_SECOND(32, "Thirty-Second"),
-        THIRTY_THIRD(33, "Thirty-Third"),
-        THIRTY_FOURTH(34, "Thirty-Fourth"),
-        THIRTY_FIFTH(35, "Thirty-Fifth"),
-        THIRTY_SIXTH(36, "Thirty-Sixth"),
-        THIRTY_SEVENTH(37, "Thirty-Seventh"),
-        THIRTY_EIGHTH(38, "Thirty-Eighth"),
-        THIRTY_NINTH(39, "Thirty-Ninth"),
-        FORTIETH(40, "Fortieth"),
-        FORTY_FIRST(41, "Forty-First"),
-        FORTY_SECOND(42, "Forty-Second"),
-        FORTY_THIRD(43, "Forty-Third"),
-        FORTY_FOURTH(44, "Forty-Fourth"),
-        FORTY_FIFTH(45, "Forty-Fifth"),
-        FORTY_SIXTH(46, "Forty-Sixth"),
-        FORTY_SEVENTH(47, "Forty-Seventh"),
-        FORTY_EIGHTH(48, "Forty-Eighth"),
-        FORTY_NINTH(49, "Forty-Ninth"),
-        FIFTIETH(50, "Fiftieth"),
-        FIFTY_FIRST(51, "Fifty-First"),
-        FIFTY_SECOND(52, "Fifty-Second"),
-        FIFTY_THIRD(53, "Fifty-Third"),
-        FIFTY_FOURTH(54, "Fifty-Fourth"),
-        FIFTY_FIFTH(55, "Fifty-Fifth"),
-        FIFTY_SIXTH(56, "Fifty-Sixth"),
-        FIFTY_SEVENTH(57, "Fifty-Seventh"),
-        FIFTY_EIGHTH(58, "Fifty-Eighth"),
-        FIFTY_NINTH(59, "Fifty-Ninth"),
-        SIXTIETH(60, "Sixtieth"),
-        SIXTY_FIRST(61, "Sixty-First"),
-        SIXTY_SECOND(62, "Sixty-Second"),
-        SIXTY_THIRD(63, "Sixty-Third"),
-        SIXTY_FOURTH(64, "Sixty-Fourth"),
-        SIXTY_FIFTH(65, "Sixty-Fifth"),
-        SIXTY_SIXTH(66, "Sixty-Sixth"),
-        SIXTY_SEVENTH(67, "Sixty-Seventh"),
-        SIXTY_EIGHTH(68, "Sixty-Eighth"),
-        SIXTY_NINTH(69, "Sixty-Ninth"),
-        SEVENTIETH(70, "Seventieth"),
-        SEVENTY_FIRST(71, "Seventy-First"),
-        SEVENTY_SECOND(72, "Seventy-Second"),
-        SEVENTY_THIRD(73, "Seventy-Third"),
-        SEVENTY_FOURTH(74, "Seventy-Fourth"),
-        SEVENTY_FIFTH(75, "Seventy-Fifth"),
-        SEVENTY_SIXTH(76, "Seventy-Sixth"),
-        SEVENTY_SEVENTH(77, "Seventy-Seventh"),
-        SEVENTY_EIGHTH(78, "Seventy-Eighth"),
-        SEVENTY_NINTH(79, "Seventy-Ninth"),
-        EIGHTIETH(80, "Eightieth"),
-        EIGHTY_FIRST(81, "Eighty-First"),
-        EIGHTY_SECOND(82, "Eighty-Second"),
-        EIGHTY_THIRD(83, "Eighty-Third"),
-        EIGHTY_FOURTH(84, "Eighty-Fourth"),
-        EIGHTY_FIFTH(85, "Eighty-Fifth"),
-        EIGHTY_SIXTH(86, "Eighty-Sixth"),
-        EIGHTY_SEVENTH(87, "Eighty-Seventh"),
-        EIGHTY_EIGHTH(88, "Eighty-Eighth"),
-        EIGHTY_NINTH(89, "Eighty-Ninth"),
-        NINETIETH(90, "Ninetieth"),
-        NINETY_FIRST(91, "Ninety-First"),
-        NINETY_SECOND(92, "Ninety-Second"),
-        NINETY_THIRD(93, "Ninety-Third"),
-        NINETY_FOURTH(94, "Ninety-Fourth"),
-        NINETY_FIFTH(95, "Ninety-Fifth"),
-        NINETY_SIXTH(96, "Ninety-Sixth"),
-        NINETY_SEVENTH(97, "Ninety-Seventh"),
-        NINETY_EIGHTH(98, "Ninety-Eighth"),
-        NINETY_NINTH(99, "Ninety-Ninth"),
-        HUNDREDTH(100, "Hundredth");
-
-        private final int number;
-        private final String value;
-
-        public static Optional<OrdinalNumber> optionalFromValue(String value) {
-            return Stream.of(OrdinalNumber.values())
-                .filter(ordinalNumber -> StringUtils.equalsIgnoreCase(value, ordinalNumber.getValue()))
-                .findAny();
-        }
+    private Integer getSubsceneLangId(Language language) {
+        return switch (language) {
+            case ARABIC -> 2;
+            case BENGALI -> 54;
+//             case BRAZILLIAN PORTUGUESE -> 4; // BRAZILLIAN PORTUGUESE
+            case CHINESE -> 7; // CHINESE SIMPLIFIED
+            case CZECH -> 9;
+            case DANISH -> 10;
+            case DUTCH_FLEMISH -> 11;
+            case ENGLISH -> 13;
+            case PERSIAN -> 46;
+            case FINNISH -> 17;
+            case FRENCH -> 18;
+            case GERMAN -> 19;
+            case GREEK_MODERN -> 21;
+            case HEBREW -> 22;
+            case INDONESIAN -> 44;
+            case ITALIAN -> 26;
+            case KOREAN -> 28;
+            case MALAY -> 50;
+            case NORWEGIAN -> 30;
+            case POLISH -> 31;
+            case PORTUGUESE -> 32;
+            case ROMANIAN_MOLDAVIAN_MOLDOVAN -> 33;
+            case SPANISH_CASTILIAN -> 38;
+            case SWEDISH -> 39;
+            case THAI -> 40;
+            case TURKISH -> 41;
+            case VIETNAMESE -> 45;
+            case ALBANIAN -> 1;
+            case ARMENIAN -> 73;
+            case AZERBAIJANI -> 55;
+            case BASQUE -> 74;
+            case BELARUSIAN -> 68;
+//            case CHINESE -> 3; // BIG 5 CODE
+            case BOSNIAN -> 60;
+            case BULGARIAN -> 5;
+//             case BULGARIAN / ENGLISH -> 6;
+            case BURMESE -> 61;
+            case CENTRAL_KHMER -> 79;
+            case CATALAN_VALENCIAN -> 49;
+            case CROATIAN -> 8;
+            // case DUTCH / ENGLISH -> 12;
+            // case ENGLISH / GERMAN -> 15;
+            case ESPERANTO -> 47;
+            case ESTONIAN -> 16;
+            case GEORGIAN -> 62;
+            case KALAALLISUT_GREENLANDIC -> 57;
+            case HINDI -> 51;
+            case HUNGARIAN -> 23;
+//             case HUNGARIAN / ENGLISH -> 24;
+            case ICELANDIC -> 25;
+            case JAPANESE -> 27;
+            case KANNADA -> 78;
+            case KINYARWANDA -> 81;
+            case KURDISH -> 52;
+            case LATVIAN -> 29;
+            case LITHUANIAN -> 43;
+            case MACEDONIAN -> 48;
+            case MALAYALAM -> 64;
+//             case MANIPURI -> 65;
+            case MONGOLIAN -> 72;
+            case NEPALI -> 80;
+            case PASHTO_PUSHTO -> 67;
+            case PUNJABI_PANJABI -> 66;
+            case RUSSIAN -> 34;
+            case SERBIAN -> 35;
+            case SINHALA_SINHALESE -> 58;
+            case SLOVAK -> 36;
+            case SLOVENIAN -> 37;
+            case SOMALI -> 70;
+            case SUNDANESE -> 76;
+            case SWAHILI -> 75;
+            case TAGALOG -> 53;
+            case TAMIL -> 59;
+            case TELUGU -> 63;
+            case UKRAINIAN -> 56;
+            case URDU -> 42;
+            case YORUBA -> 71;
+            default -> null;
+        };
     }
 
-    public static String getOrdinalName(int ordinal) {
-        if (ordinal < 0 || ordinal > 100) {
-            return "not defined";
-        }
-        return OrdinalNumber.values()[ordinal].getValue();
+    private Integer getOrdinalNumber(String text) {
+        return switch (text) {
+            case "Zeroth" -> 0;
+            case "First" -> 1;
+            case "Second" -> 2;
+            case "Third" -> 3;
+            case "Fourth" -> 4;
+            case "Fifth" -> 5;
+            case "Sixth" -> 6;
+            case "Seventh" -> 7;
+            case "Eighth" -> 8;
+            case "Ninth" -> 9;
+            case "Tenth" -> 10;
+            case "Eleventh" -> 11;
+            case "Twelfth" -> 12;
+            case "Thirteenth" -> 13;
+            case "Fourteenth" -> 14;
+            case "Fifteenth" -> 15;
+            case "Sixteenth" -> 16;
+            case "Seventeenth" -> 17;
+            case "Eighteenth" -> 18;
+            case "Nineteenth" -> 19;
+            case "Twentieth" -> 20;
+            case "Twenty-First" -> 21;
+            case "Twenty-Second" -> 22;
+            case "Twenty-Third" -> 23;
+            case "Twenty-Fourth" -> 24;
+            case "Twenty-Fifth" -> 25;
+            case "Twenty-Sixth" -> 26;
+            case "Twenty-Seventh" -> 27;
+            case "Twenty-Eighth" -> 28;
+            case "Twenty-Ninth" -> 29;
+            case "Thirtieth" -> 30;
+            case "Thirty-First" -> 31;
+            case "Thirty-Second" -> 32;
+            case "Thirty-Third" -> 33;
+            case "Thirty-Fourth" -> 34;
+            case "Thirty-Fifth" -> 35;
+            case "Thirty-Sixth" -> 36;
+            case "Thirty-Seventh" -> 37;
+            case "Thirty-Eighth" -> 38;
+            case "Thirty-Ninth" -> 39;
+            case "Fortieth" -> 40;
+            case "Forty-First" -> 41;
+            case "Forty-Second" -> 42;
+            case "Forty-Third" -> 43;
+            case "Forty-Fourth" -> 44;
+            case "Forty-Fifth" -> 45;
+            case "Forty-Sixth" -> 46;
+            case "Forty-Seventh" -> 47;
+            case "Forty-Eighth" -> 48;
+            case "Forty-Ninth" -> 49;
+            case "Fiftieth" -> 50;
+            case "Fifty-First" -> 51;
+            case "Fifty-Second" -> 52;
+            case "Fifty-Third" -> 53;
+            case "Fifty-Fourth" -> 54;
+            case "Fifty-Fifth" -> 55;
+            case "Fifty-Sixth" -> 56;
+            case "Fifty-Seventh" -> 57;
+            case "Fifty-Eighth" -> 58;
+            case "Fifty-Ninth" -> 59;
+            case "Sixtieth" -> 60;
+            case "Sixty-First" -> 61;
+            case "Sixty-Second" -> 62;
+            case "Sixty-Third" -> 63;
+            case "Sixty-Fourth" -> 64;
+            case "Sixty-Fifth" -> 65;
+            case "Sixty-Sixth" -> 66;
+            case "Sixty-Seventh" -> 67;
+            case "Sixty-Eighth" -> 68;
+            case "Sixty-Ninth" -> 69;
+            case "Seventieth" -> 70;
+            case "Seventy-First" -> 71;
+            case "Seventy-Second" -> 72;
+            case "Seventy-Third" -> 73;
+            case "Seventy-Fourth" -> 74;
+            case "Seventy-Fifth" -> 75;
+            case "Seventy-Sixth" -> 76;
+            case "Seventy-Seventh" -> 77;
+            case "Seventy-Eighth" -> 78;
+            case "Seventy-Ninth" -> 79;
+            case "Eightieth" -> 80;
+            case "Eighty-First" -> 81;
+            case "Eighty-Second" -> 82;
+            case "Eighty-Third" -> 83;
+            case "Eighty-Fourth" -> 84;
+            case "Eighty-Fifth" -> 85;
+            case "Eighty-Sixth" -> 86;
+            case "Eighty-Seventh" -> 87;
+            case "Eighty-Eighth" -> 88;
+            case "Eighty-Ninth" -> 89;
+            case "Ninetieth" -> 90;
+            case "Ninety-First" -> 91;
+            case "Ninety-Second" -> 92;
+            case "Ninety-Third" -> 93;
+            case "Ninety-Fourth" -> 94;
+            case "Ninety-Fifth" -> 95;
+            case "Ninety-Sixth" -> 96;
+            case "Ninety-Seventh" -> 97;
+            case "Ninety-Eighth" -> 98;
+            case "Ninety-Ninth" -> 99;
+            case "Hundredth" -> 100;
+            default -> null;
+        };
     }
 }

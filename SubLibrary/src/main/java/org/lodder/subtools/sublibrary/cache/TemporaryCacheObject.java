@@ -8,26 +8,27 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.ToString;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-@ToString
-sealed class TemporaryCacheObject<T> implements CacheObject<T> permits TemporarySerializableCacheObject {
+@NullMarked
+final class TemporaryCacheObject<V> implements CacheObject<V> {
 
     @Serial
-    private static final long serialVersionUID = -152474119228350222L;
+    private static final long serialVersionUID = 1L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
     @override @val Time created;
     @val Time timeToLive;
-    @override @val T value;
+    @override @val @Nullable V value;
 
-    protected TemporaryCacheObject(Time timeToLive, T value) {
+    TemporaryCacheObject(Time timeToLive, @Nullable V value) {
         this(Time.now(), timeToLive, value);
     }
 
-    private TemporaryCacheObject(Time created, Time timeToLive, T value) {
+    private TemporaryCacheObject(Time created, Time timeToLive, @Nullable V value) {
         this.created = created;
         this.timeToLive = timeToLive;
         this.value = value;
@@ -49,12 +50,12 @@ sealed class TemporaryCacheObject<T> implements CacheObject<T> permits Temporary
     }
 
     @Override
-    public String toString(Function<T, String> valueToStringMapper) {
+    public String toString(Function<@Nullable V, String> valueToStringMapper) {
         return "created:%s|expire:%s|value:%s".formatted(created, timeToLive, valueToStringMapper.apply(value));
     }
 
-    public static <T> Optional<TemporaryCacheObject<T>> fromString(String string,
-            Function<String, T> valueToObjectMapper) {
+    public static <V> Optional<TemporaryCacheObject<V>> fromString(String string,
+        Function<@Nullable String, V> valueToObjectMapper) {
         Matcher matcher = PATTERN.matcher(string);
         if (matcher.matches()) {
             Time created = Time.create(Long.parseLong(matcher.group(1)), ms);

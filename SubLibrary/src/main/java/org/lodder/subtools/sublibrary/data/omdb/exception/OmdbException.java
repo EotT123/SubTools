@@ -5,10 +5,17 @@ import java.io.Serial;
 public class OmdbException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = 8887410537703318009L;
+    private static final long serialVersionUID = 1L;
 
-    public OmdbException(String s, String url, Exception e) {
-        super("$s: $url", e);
+    public OmdbException(String message) {
+        super(message);
     }
 
+    public OmdbException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public OmdbException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -2,15 +2,16 @@ package extensions.javax.swing.JCheckBox;
 
 import javax.swing.*;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @Extension
-@UtilityClass
 public class JCheckBoxExt {
+    private JCheckBoxExt() {
+        // hide utility class constructor
+    }
 
     public static @Self JCheckBox addCheckedChangeListener(@This JCheckBox checkBox, BooleanConsumer... listeners) {
         checkBox.addItemListener(e -> listeners.forEach(lis -> lis.accept(((JCheckBox) e.getSource()).isSelected())));

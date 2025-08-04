@@ -3,19 +3,20 @@ package org.lodder.subtools.sublibrary.model;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.data.tvdb.model.TheTvdbEpisode;
+import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 
 public final class TvRelease extends Release {
 
     // parsed from the filename
-    @val String name;
     @val int season;
-    @val List<Integer> episodes;
+    @val Set<Integer> episodes;
     @var @Nullable String title;
     // tvdb name
     @var @Nullable String originalName;
@@ -24,21 +25,20 @@ public final class TvRelease extends Release {
     @val @Nullable String customName;
 
     public TvRelease(String name, int season, int episode, @Nullable Path file=null, @Nullable String releaseGroup=null,
-        @Nullable String quality=null, @Nullable String extension=null, @Nullable String originalName=null,
-        @Nullable String customName=null, @Nullable String title=null, boolean special=false) {
-        this(name, season, List.of(episode), file, releaseGroup, quality, extension, originalName, customName, title,
+        @Nullable String quality=null, @Nullable String originalName=null, @Nullable String customName=null,
+        @Nullable String title=null, boolean special=false) {
+        this(name, season, List.of(episode), file, releaseGroup, quality, originalName, customName, title,
             special);
     }
 
     public TvRelease(String name, int season, List<Integer> episodes, @Nullable Path file=null,
-        @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String extension=null,
-        @Nullable String originalName=null, @Nullable String customName=null, @Nullable String title=null,
+        @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String originalName=name,
+        @Nullable String customName=null, @Nullable String title=null,
         boolean special=false) {
-        super(VideoType.EPISODE, file, releaseGroup, quality, extension);
-        this.name = name;
+        super(name, VideoType.EPISODE, file, releaseGroup, quality);
         this.title = title;
         this.season = season;
-        this.episodes = Collections.unmodifiableList(episodes);
+        this.episodes = Collections.unmodifiableSortedSet(new TreeSet<>(episodes));
         this.special = special;
         this.originalName = originalName;
         this.customName = customName;
@@ -56,12 +56,16 @@ public final class TvRelease extends Release {
         return "S%02dE%02d".formatted(season, episode);
     }
 
-    public void updateTvdbEpisodeInfo(TheTvdbEpisode tvdbEpisode) {
-        this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
+//    public void updateTvdbEpisodeInfo(TvdbEpisode tvdbEpisode) {
+//        this.title = tvdbEpisode.episodeName; // update to reflect correct episode title
+//    }
+
+    public void updateImdbEpisodeInfo(ImdbDetails tvdbEpisode) {
+        // TODO implement this
     }
 
     public int getFirstEpisode() {
-        return episodes.first;
+        return episodes.first();
     }
 
     @Override

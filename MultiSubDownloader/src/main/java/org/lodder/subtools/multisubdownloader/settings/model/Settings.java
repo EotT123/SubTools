@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.settings.model;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -13,6 +12,7 @@ import java.util.Set;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
@@ -27,22 +27,22 @@ public class Settings implements UserInteractionSettingsIntf {
     @var boolean optionSubtitleExcludeHearingImpaired;
     @var boolean optionsShowOnlyFound;
     @var boolean optionsStopOnSearchError;
-    @val Set<PathOrRegex> excludeList = new LinkedHashSet<>();
-    @val LibrarySettings movieLibrarySettings = new LibrarySettings();
-    @val LibrarySettings episodeLibrarySettings = new LibrarySettings();
+    @val final Set<PathOrRegex> excludeList = new LinkedHashSet<>();
+    @val final LibrarySettings movieLibrarySettings = new LibrarySettings();
+    @val final LibrarySettings episodeLibrarySettings = new LibrarySettings();
     @var String generalProxyHost = "";
     @var int generalProxyPort = 80;
     @var boolean generalProxyEnabled;
-    @var List<Path> defaultIncomingFolders = new ArrayList<>();
-    @var List<Path> localSourcesFolders = new ArrayList<>();
+    @var final List<Path> defaultIncomingFolders = new ArrayList<>();
+    @var final List<Path> localSourcesFolders = new ArrayList<>();
     @var boolean optionRecursive;
-    @val ScreenSettings screenSettings = new ScreenSettings();
+    @val final ScreenSettings screenSettings = new ScreenSettings();
     @var boolean loginAddic7edEnabled;
-    @var String loginAddic7edUsername;
-    @var String loginAddic7edPassword;
+    @var @Nullable String loginAddic7edUsername;
+    @var @Nullable String loginAddic7edPassword;
     @var boolean loginOpenSubtitlesEnabled;
-    @var String loginOpenSubtitlesUsername;
-    @var String loginOpenSubtitlesPassword;
+    @var @Nullable String loginOpenSubtitlesUsername;
+    @var @Nullable String loginOpenSubtitlesPassword;
     @var boolean serieSourceAddic7ed = true;
     @var boolean serieSourceAddic7edProxy = true;
     @var boolean serieSourceTvSubtitles = true;
@@ -50,18 +50,19 @@ public class Settings implements UserInteractionSettingsIntf {
     @var boolean serieSourceOpensubtitles = true;
     @var boolean serieSourceLocal = true;
     @var boolean serieSourceSubscene = true;
+    @var boolean serieSourceSubdl = true;
     @var SettingsProcessEpisodeSource processEpisodeSource = SettingsProcessEpisodeSource.TVDB;
-    @val Map<String, Integer> sortWeights;
-    @var Language subtitleLanguage;
+    @val final Map<String, Integer> sortWeights;
+    @var @Nullable Language subtitleLanguage;
     @override @var boolean optionsMinAutomaticSelection;
     @override @var int optionsMinAutomaticSelectionValue;
-    @var UpdateCheckPeriod updateCheckPeriod;
-    @var UpdateType updateType;
+    @var @Nullable UpdateCheckPeriod updateCheckPeriod;
+    @var @Nullable UpdateType updateType;
     @override @var boolean optionsDefaultSelection;
-    @override @var List<VideoPatterns.Source> optionsDefaultSelectionQualityList = new ArrayList<>();
+    @override @var final List<VideoPatterns.Source> optionsDefaultSelectionQualityList = new ArrayList<>();
     @var int settingsVersion;
     @override @var boolean optionsConfirmProviderMapping;
-    @var Language language;
+    @var @Nullable Language language;
 
     public Settings() {
         // TODO: user should be able to edit/add these through a panel
@@ -89,12 +90,7 @@ public class Settings implements UserInteractionSettingsIntf {
             case TVSUBTITLES -> serieSourceTvSubtitles;
             case LOCAL -> serieSourceLocal;
             case SUBSCENE -> serieSourceSubscene;
+            case SUBDL -> serieSourceSubdl;
         };
-    }
-
-    public Settings replaceExcludeList(Collection<PathOrRegex> exclusions) {
-        excludeList.clear();
-        excludeList.addAll(exclusions);
-        return this;
     }
 }

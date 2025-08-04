@@ -36,10 +36,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.pivovarit</groupId>
-            <artifactId>throwing-function</artifactId>
-        </dependency>
-        <dependency>
             <groupId>name.falgout.jeffrey</groupId>
             <artifactId>throwing-interfaces</artifactId>
         </dependency>
@@ -76,10 +72,6 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.uwetrottmann.thetvdb-java</groupId>
-            <artifactId>thetvdb-java</artifactId>
-        </dependency>
-        <dependency>
             <groupId>systems.manifold</groupId>
             <artifactId>manifold-ext-rt</artifactId>
         </dependency>
@@ -100,9 +92,12 @@
             <artifactId>manifold-science</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-json-rt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-yaml-rt</artifactId>
         </dependency>
         <!-- prompter -->
         <dependency>
@@ -125,6 +120,32 @@
         <dependency>
             <groupId>com.pivovarit</groupId>
             <artifactId>more-gatherers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+
+        <!-- openapi dependencies -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-scalars</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
         </dependency>
         
         <dependency>
@@ -178,6 +199,16 @@
                             <artifactId>manifold-params</artifactId>
                             <version>${manifold.version}</version>
                         </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-json</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-yaml</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
@@ -192,6 +223,73 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-source/openapi/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>tvdb</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatorName>java</generatorName>
+                            <inputSpec>${project.basedir}/src/main/resources/Tvdb/Tvdb-api.json</inputSpec>
+                            <output>${project.build.directory}/generated-source/openapi</output>
+                            <modelPackage>com.tvdb.model</modelPackage>
+                            <apiPackage>com.tvdb.api</apiPackage>
+                            <invokerPackage>com.tvdb.invoker</invokerPackage>
+                            <packageName>com.tvdb</packageName>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <apisToGenerate>Series,Movies,Search,Login</apisToGenerate>
+                            <!-- Allows models to deserialize unknown fields without failing -->
+                            <additionalProperties>true</additionalProperties>
+                            <!--                            <modelsToGenerate>-->
+                            <!--                                AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse-->
+                            <!--                            </modelsToGenerate>-->
+                            <generateModelTests>false</generateModelTests>
+
+                            <!--                            <instantiationTypes>number=int</instantiationTypes>-->
+                            <typeMappings>integer=int,number=int</typeMappings>
+                            <configOptions>
+                                <!--                                <typeMappings>integer=int,number=Integer</typeMappings>-->
+                                <!--                                <useSwaggerAnnotations>false</useSwaggerAnnotations>-->
+                                <serializableModel>true</serializableModel>
+                                <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <!-- Allows models to deserialize unknown fields without failing -->
+                                <additionalProperties>true</additionalProperties>
+                                <!-- Prevents OpenAPI generator from enforcing strict property matching -->
+                                <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+                                <serializationLibrary>gson</serializationLibrary>
+                                <!--<sourceFolder>src/gen/java</sourceFolder>-->
+                                <!--<java8>true</java8>-->
+                                <!--                                <dateLibrary>java8-localdatetime</dateLibrary>-->
+                                <useJakartaEe>true</useJakartaEe>
+                                <library>retrofit2</library>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

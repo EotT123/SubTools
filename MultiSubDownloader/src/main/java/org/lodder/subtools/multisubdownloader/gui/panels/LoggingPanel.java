@@ -13,7 +13,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.LogTextAppender;
 public class LoggingPanel extends JPanel {
 
     @Serial
-    private static final long serialVersionUID = 1578326761175927376L;
+    private static final long serialVersionUID = 1L;
 
     private final JTextArea txtLogging;
     private final Logger ROOT = (Logger) org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);

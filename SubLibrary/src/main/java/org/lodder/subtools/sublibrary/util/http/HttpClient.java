@@ -1,7 +1,7 @@
 package org.lodder.subtools.sublibrary.util.http;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +23,7 @@ import java.util.zip.GZIPInputStream;
 import extensions.java.io.InputStream.InputStreamExt;
 import extensions.java.nio.file.Path.PathExt;
 import jakarta.ws.rs.core.HttpHeaders;
+import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.HttpConnection;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
+            conn.setInstanceFollowRedirects(true);
             getCookieManager(cookieManager).setCookies(conn);
             if (StringUtils.isNotBlank(userAgent)) {
                 conn.setRequestProperty(HttpHeaders.USER_AGENT, userAgent);
@@ -95,37 +97,37 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         }
     }
 
-    public boolean doDownloadFile(URL url, final Path file, CookieManager cookieManager=null) {
+    public void downloadAndExtractFile(URL url, final Path file,
+        ThrowingConsumer<String, IOException> validateFunction=null, CookieManager cookieManager=null)
+        throws IOException {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
-        boolean success = true;
 
-        try (InputStream in = url.getFile().endsWith(".gz") ?
-            new GZIPInputStream(url.openStream()) : getInputStream(url, getCookieManager(cookieManager))) {
-            byte[] data = in.readAllBytes();
+        try (InputStream rawIn = getInputStream(url, getCookieManager(cookieManager));
+             InputStream in = url.getFile().endsWith(".gz") ? new GZIPInputStream(rawIn) : rawIn;
+             BufferedInputStream bufferedIn = new BufferedInputStream(in)) {
+            bufferedIn.mark(10); // for checking headers
+            boolean isZip = PathExt.isZipFile(bufferedIn);
+            bufferedIn.reset();
 
-            if (url.getFile().endsWith(".zip") || PathExt.isZipFile(new ByteArrayInputStream(data))) {
-                PathExt.unzip(new ByteArrayInputStream(data), file, ".srt");
+            if (isZip || url.getFile().endsWith(".zip")) {
+                PathExt.unzip(bufferedIn, file, ".srt");
             } else {
+                // Buffer the data just once
+                byte[] data = bufferedIn.readAllBytes();
                 if (PathExt.isGZipCompressed(data)) {
                     data = PathExt.decompressGZip(data);
                 }
                 String content = new String(data, StandardCharsets.UTF_8);
-                if (content.contains("Daily Download count exceeded")) {
-                    LOGGER.error("Download problem: Addic7ed Daily Download count exceeded!");
-                    success = false;
-                } else {
-                    Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-                        StandardOpenOption.WRITE);
+                if (validateFunction != null) {
+                    validateFunction.accept(content);
                 }
+                Files.write(file, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE);
             }
-        } catch (Exception e) {
-            success = false;
-            LOGGER.error("Download problem", e);
         }
-        return success;
     }
 
-    private InputStream getInputStream(URL url, CookieManager cookieManager=null) throws Exception {
+    private InputStream getInputStream(URL url, CookieManager cookieManager=null) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         cookieManager.setCookies(conn);
         conn.addRequestProperty(HttpHeaders.USER_AGENT, "Mozilla");
@@ -140,16 +142,20 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
             if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
                 || status == HttpURLConnection.HTTP_SEE_OTHER) {
                 String locationHeader = conn.getHeaderField(HttpHeaders.LOCATION);
-                URL newUrl;
-                if (HttpClient.isUrl(locationHeader)) {
-                    newUrl = new URI(locationHeader).toURL();
-                } else {
-                    newUrl = new URI("%s://%s/%s".formatted(url.protocol, conn.getURL().host,
-                        locationHeader.trim().replace(" ", "%20"))).toURL();
+                try {
+                    URL newUrl;
+                    if (HttpClient.isUrl(locationHeader)) {
+                        newUrl = new URI(locationHeader).toURL();
+                    } else {
+                        newUrl = new URI("%s://%s/%s".formatted(url.protocol, conn.getURL().host,
+                            locationHeader.trim().replace(" ", "%20"))).toURL();
+                    }
+                    return getInputStream(newUrl, cookieManager);
+                } catch (URISyntaxException e) {
+                    throw new IOException(e);
                 }
-                return getInputStream(newUrl, cookieManager);
             }
-            throw new Exception("error: " + status);
+            throw new IOException("error: " + status);
         } else {
             return conn.getInputStream();
         }

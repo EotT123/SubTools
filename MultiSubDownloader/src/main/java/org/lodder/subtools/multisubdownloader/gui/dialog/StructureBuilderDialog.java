@@ -31,7 +31,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 public class StructureBuilderDialog extends MultiSubDialog implements DocumentListener {
 
-    @Serial private static final long serialVersionUID = -5174968778375028124L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private final VideoType videoType;
     private final StructureType structureType;
@@ -107,10 +107,10 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         switch (videoType) {
             case EPISODE -> tvRelease = (TvRelease) releaseFactory.createRelease(
                 Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"),
-                userInteractionHandler, false);
+                userInteractionHandler, false).orElse(null);
             case MOVIE -> movieRelease = (MovieRelease) releaseFactory.createRelease(
                 Path.of("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv"),
-                userInteractionHandler, false);
+                userInteractionHandler, false).orElse(null);
         }
     }
 

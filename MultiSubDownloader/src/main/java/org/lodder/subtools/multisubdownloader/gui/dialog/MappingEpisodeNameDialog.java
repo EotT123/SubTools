@@ -9,26 +9,27 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.Serial;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
+import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
+import org.lodder.subtools.sublibrary.model.Subtitle;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
@@ -40,7 +41,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private final SubtitleProviderStore subtitleProviderStore;
     private final JButton btnAddCustomMapping;
     private final JTable table;
-    private Optional<SubtitleProvider> selectedSubtitleProvider;
+    private Optional<SubtitleProvider<? extends Subtitle>> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
     public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
@@ -83,11 +84,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                         int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                         MappingTableModel model = (MappingTableModel) table.getModel();
                         Row row = (Row) model.getDataVector().get(rowNbr);
-                        manager.getCache(CacheType.DISK, row.key).remove();
-                        if (row.selectionForKeyPrefix.deleteOtherFunction() != null) {
-                            manager.getCache(CacheType.DISK,
-                                row.selectionForKeyPrefix.deleteOtherFunction().apply(row.key)).remove();
-                        }
+                        new CacheKey(manager, CacheType.DISK, row.key).remove();
                         model.removeRow(rowNbr);
                     }))
                 .addComponent("skip", btnAddCustomMapping =
@@ -110,7 +107,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                         originalName:currentName,
                                         customName:newName);
                                     try {
-                                        provider.getProviderSerieId(tvRelease).ifPresentOrElse(serieId -> {
+                                        provider.getProviderSerieMapping(tvRelease).ifPresentOrElse(serieId -> {
                                             row.serieMapping =
                                                 new SerieMapping(currentName, serieId.providerId, serieId.providerName,
                                                     serieId.season);
@@ -137,7 +134,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
             .stream()
-            .filter(subtitleProvider -> subtitleProvider.providerName.equals(mappingType.providerName))
+            .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
             .findAny();
         btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
         mappingTableModel.mappingType = mappingType;
@@ -145,101 +142,91 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     }
 
     public enum MappingType {
-        TVDB("TVDB", "TVDB",
-            new SelectionForKeyPrefix("", "TVDB-serieId-", k -> k.replace("-serieId-", "-tvdbSerie-"))),
-        ADDIC7ED("Addic7ed", SubtitleSource.ADDIC7ED, new SelectionForKeyPrefix("", "ADDIC7ED-serieName-name:"),
-            new SelectionForKeyPrefix("", "ADDIC7ED-serieName-tvdbId:")),
-        ADDIC7ED_PROXY("Addic7ed (Proxy)", SubtitleSource.ADDIC7ED.name() + "-GESTDOWN",
-            new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-name:"),
-            new SelectionForKeyPrefix("", "ADDIC7ED-GESTDOWN-serieName-tvdbId:")),
-        SUBSCENE("Subscene", SubtitleSource.SUBSCENE, new SelectionForKeyPrefix("", "SUBSCENE-serieName-name:"),
-            new SelectionForKeyPrefix("", "SUBSCENE-serieName-tvdbId:")),
-        TV_SUBTITLES("TVSubtitles", SubtitleSource.TVSUBTITLES,
-            new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-name:"),
-            new SelectionForKeyPrefix("", "TVSUBTITLES-serieName-tvdbId:")),
-        OPEN_SUBTITLES("OpenSubtitles", SubtitleSource.OPENSUBTITLES,
-            new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-name:"),
-            new SelectionForKeyPrefix("", "OPENSUBTITLES-serieName-tvdbId:")),
-        PODNAPISI("Podnapisi", SubtitleSource.PODNAPISI, new SelectionForKeyPrefix("", "PODNAPISI-serieName-name:"),
-            new SelectionForKeyPrefix("", "PODNAPISI-serieName-tvdbId:"));
+        TVDB("TVDB", "TVDB", "EPISODEmapping"),
+        IMDB("IMDB", "IMDB", "EPISODEmapping"),
+        ADDIC7ED(SubtitleProviderFrontEnd.ADDIC7ED, "EPISODEmapping"),
+        ADDIC7ED_PROXY(SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN, "EPISODEmapping"),
+        SUBSCENE(SubtitleProviderFrontEnd.SUBSCENE, "EPISODEmapping"),
+        TV_SUBTITLES(SubtitleProviderFrontEnd.TVSUBTITLES, "EPISODEmapping"),
+        OPEN_SUBTITLES(SubtitleProviderFrontEnd.OPENSUBTITLES, "EPISODEmapping"),
+        PODNAPISI(SubtitleProviderFrontEnd.PODNAPISI, "EPISODEmapping"),
+        SUBDL(SubtitleProviderFrontEnd.SUBDL, "EPISODEmapping");
 
-        public static final BiFunction<Manager, SelectionForKeyPrefix, List<Pair<String, SerieMapping>>>
-            MAPPING_SUPPLIER;
-        @val String name;
-        @val String providerName;
+        private static final TriFunction<Manager, String, String, List<Pair<ProviderCacheKey, SerieMapping>>>
+            MAPPING_SUPPLIER = (manager, provider, type) ->
+            manager.getEntries(CacheType.DISK, key -> provider.equals(key.provider) && type.equals(key.type));
+
+        @val String providerDisplayName;
+        @val String provider;
+        @val String type;
         @val String nameColumn;
         @val String mappingColumn;
         @val String providerNameColumn;
-        @val SelectionForKeyPrefix[] selectionForKeyPrefixList;
 
         @Override
         public String toString() {
-            return name;
+            return providerDisplayName;
         }
 
-        static {
-            MAPPING_SUPPLIER = (manager, selectionForKeyPrefix) ->
-                manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix)).getEntries();
+        MappingType(SubtitleProviderFrontEnd subtitleProviderFrontEnd, String type) {
+            this(subtitleProviderFrontEnd.name, subtitleProviderFrontEnd.subtitleSource.name(), type);
         }
 
-        MappingType(String name, SubtitleSource subtitleSource, SelectionForKeyPrefix... selectionForKeyPrefixList) {
-            this(name, subtitleSource.name(), selectionForKeyPrefixList);
-        }
-
-        MappingType(String name, String providerName, SelectionForKeyPrefix... selectionForKeyPrefixList) {
-            this.name = name;
-            this.providerName = providerName;
+        MappingType(String providerDisplayName, String provider, String type) {
+            this.providerDisplayName = providerDisplayName;
+            this.provider = provider;
+            this.type = type;
             this.nameColumn = getText("MappingEpisodeNameDialog.SceneShowName");
             this.mappingColumn = getText("MappingEpisodeNameDialog.ProviderId");
             this.providerNameColumn = getText("MappingEpisodeNameDialog.ProviderName");
-            this.selectionForKeyPrefixList = selectionForKeyPrefixList;
         }
-    }
 
-    public record SelectionForKeyPrefix(String name, String keyPrefix, Function<String, String> deleteOtherFunction) {
-        public SelectionForKeyPrefix(String name, String keyPrefix) {
-            this(name, keyPrefix, null);
+        public List<Pair<ProviderCacheKey, SerieMapping>> getValues(Manager manager) {
+            return MAPPING_SUPPLIER.apply(manager, provider, type);
         }
     }
 
     private static class Row extends Vector<String> {
-        @Serial private static final long serialVersionUID = 8620670431074648999L;
-        @val String key;
-        @val SelectionForKeyPrefix selectionForKeyPrefix;
+        @Serial private static final long serialVersionUID = 1L;
+        @val ProviderCacheKey key;
         @var SerieMapping serieMapping;
 
-        public Row(String key, String name, String providerId, String providerName, SerieMapping serieMapping,
-            SelectionForKeyPrefix selectionForKeyPrefix) {
+        public Row(ProviderCacheKey key, String name, String providerId, String providerName,
+            SerieMapping serieMapping) {
             this.key = key;
             this.serieMapping = serieMapping;
-            this.selectionForKeyPrefix = selectionForKeyPrefix;
             add(name);
             add(providerId);
             add(providerName);
         }
     }
 
-    @AllArgsConstructor
     private static class MappingTableModel extends DefaultTableModel {
-        @Serial private static final long serialVersionUID = 7860605766969472980L;
+        @Serial private static final long serialVersionUID = 1L;
         @val Manager manager;
+
+        public MappingTableModel(Manager manager) {
+            this.manager = manager;
+        }
 
         void setMappingType(MappingType mappingType) {
             setDataVector(null,
                 new String[]{mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn});
-            Arrays.stream(mappingType.selectionForKeyPrefixList)
-                .flatMap(selectionForKeyPrefix -> MappingType.MAPPING_SUPPLIER.apply(manager, selectionForKeyPrefix)
-                    .stream()
-                    .map(serieMappingPair -> {
-                        SerieMapping serieMapping = serieMappingPair.getValue();
-                        String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
-                        if (providerId.contains("/")) {
-                            providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
-                        }
-                        providerId = providerId.replace(".html", "");
-                        return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
-                            serieMapping.providerName, serieMapping, selectionForKeyPrefix);
-                    }))
+            mappingType.getValues(manager)
+                .stream()
+                .map(serieMappingPair -> {
+                    SerieMapping serieMapping = serieMappingPair.getValue();
+                    if (serieMapping == null) {
+                        return null;
+                    }
+                    String providerId = serieMapping.providerId == null ? "" : serieMapping.providerId;
+                    if (providerId.contains("/")) {
+                        providerId = providerId.substring(providerId.lastIndexOf("/") + 1);
+                    }
+                    providerId = providerId.replace(".html", "");
+                    return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
+                        serieMapping.providerName, serieMapping);
+                }).filter(Objects::nonNull)
                 .sorted(Comparator.comparing(
                     row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
                         row.serieMapping.name))

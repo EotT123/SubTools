@@ -2,46 +2,55 @@ package org.lodder.subtools.sublibrary.data.omdb;
 
 import java.util.Optional;
 
+import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
+import org.lodder.subtools.sublibrary.data.AdapterIntf;
+import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class OmdbAdapter {
+public class OmdbAdapter implements AdapterIntf {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OmdbAdapter.class);
     private static OmdbAdapter instance;
-    private final Manager manager;
-    private final LazySupplier<OmdbApi> omdpApi;
-    @val String providerName = "OMDB";
+    private final OmdbApi api;
+    @val @override Manager manager;
+    @val @override String provider = "OMDB";
 
-    private OmdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
+    public OmdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
-        this.omdpApi = new LazySupplier<>(() -> {
-            try {
-                return new OmdbApi(manager);
-            } catch (Exception e) {
-                throw new SubtitlesProviderInitException(providerName, e);
-            }
-        });
+        this.api = new OmdbApi(manager);
     }
 
-    private OmdbApi getApi() {
-        return omdpApi.get();
-    }
-    public Optional<OmdbDetails> getMovieDetails(int imdbId) {
+    public Optional<Omdb.Release> searchReleaseWithImdbId(String imdbId) {
         try {
-            return manager.getCache(CacheType.DISK, "$providerName-movieDetails-$imdbId")
+            return getCache("release", b -> b.add("imdbId", imdbId))
                 .getOptional(
-                    supplier:() -> getApi().getMovieDetails(imdbId),
+                    supplier:() -> api.searchRelease(imdbId),
                     storeTempNullValue:true);
-        } catch (Exception e) {
-            LOGGER.error("API $providerName getMovieDetails for id [$imdbId] (${e.getMessage()})", e);
+        } catch (OmdbException e) {
+            return Optional.empty();
+        }
+    }
+
+
+    public Optional<Omdb.Release> searchMovie(String title, Integer year=null) {
+        try {
+            return getCache("movie", b -> b.add("title", title).add("year", year))
+                .getOptional(
+                    supplier:() -> api.searchMovie(title, year),
+                    storeTempNullValue:true);
+        } catch (OmdbException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Omdb.Release> searchSerie(String name) {
+        try {
+            return getCache("serie", b -> b.add("name", name))
+                .getOptional(
+                    supplier:() -> api.searchSerie(name),
+                    storeTempNullValue:true);
+        } catch (OmdbException e) {
             return Optional.empty();
         }
     }
@@ -52,5 +61,4 @@ public class OmdbAdapter {
         }
         return instance;
     }
-
 }

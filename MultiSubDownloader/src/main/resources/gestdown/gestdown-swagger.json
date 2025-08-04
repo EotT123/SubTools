@@ -1,9 +1,9 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.4",
   "info": {
     "title": "Gestdown: Addicted Proxy",
     "description": "Provide a full api to search and download subtitles from Addic7ed website.",
-    "version": "4.29.11"
+    "version": "4.38.7"
   },
   "servers": [
     {
@@ -488,7 +488,7 @@
           "Subtitles"
         ],
         "summary": "Get subtitles for an episode of a given show in the wanted language",
-        "description": "Start by using the /shows/search/SHOW_NAME to find the showUniqueId of the show you're interested in.\r\n            \r\nThen use the subtitles/get/ endpoint to get subtitle for the episode you want.",
+        "description": "Start by using the /shows/search/SHOW_NAME to find the showUniqueId of the show you're interested in.\n            \nThen use the subtitles/get/ endpoint to get subtitle for the episode you want.",
         "parameters": [
           {
             "name": "language",
@@ -1138,7 +1138,7 @@
           "slug": {
             "minLength": 1,
             "type": "string",
-            "description": "Slug to be used in URL for the show\r\n<example>wellington-paranormal</example>",
+            "description": "Slug to be used in URL for the show\n<example>wellington-paranormal</example>",
             "readOnly": true
           }
         },

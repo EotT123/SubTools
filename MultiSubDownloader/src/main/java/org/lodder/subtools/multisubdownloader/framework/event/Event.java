@@ -2,11 +2,10 @@ package org.lodder.subtools.multisubdownloader.framework.event;
 
 import java.util.Collection;
 
-import lombok.Getter;
+import manifold.ext.props.rt.api.val;
 
-@Getter
 public class Event {
-    private final String eventName;
+    @val String eventName;
     private final EventBag eventBag;
 
     public Event(String name, EventBag bag=new EventBag()) {

@@ -1,101 +1,227 @@
 package org.lodder.subtools.sublibrary;
 
-import java.util.Optional;
-import java.util.Set;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.multisubdownloader.Messages;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Language {
 
-    ALBANIAN("App.Language.Albanian", "sq", Set.of("alb", "sq", "Albanian")),
-    ARABIC("App.Language.Arabic", "ar", Set.of("ara", "Arabic")),
-    ARMENIAN("App.Language.Armenian", "hy", Set.of("arm", "hye", "Armenian")),
-    AZERBAIJANI("App.Language.Azerbaijani", "az", Set.of("aze", "Azerbaijani")),
-    BELARUSIAN("App.Language.Belarusian", "be", Set.of("bel", "Belarusian")),
-    BENGALI("App.Language.Bengali", "bn", Set.of("ben", "Bengali")),
-    BOSNIAN("App.Language.Bosnian", "bs", Set.of("bos", "Bosnian")),
-    BULGARIAN("App.Language.Bulgarian", "bg", Set.of("bul", "Bulgarian")),
-    CANTONESE("App.Language.Cantonese", "yue", Set.of("Yuet", "Cantonese")),
-    CATALAN("App.Language.Catalan", "ca", Set.of("cat", "Catalan")),
-    CHINESE_SIMPLIFIED("App.Language.Chinese_simplified", "zh", Set.of("chi", "zho", "Chinese")),
-    CHINESE_TRADITIONAL("App.Language.Chinese_traditional", "zh", Set.of("chi", "zho", "Chinese")),
-    CROATIAN("App.Language.Croatian", "hr", Set.of("hrv", "Croatian")),
-    CZECH("App.Language.Czech", "cs", Set.of("cze", "ces", "Czech")),
-    DANISH("App.Language.Danish", "da", Set.of("dan", "Danish")),
-    DUTCH("App.Language.Dutch", "nl", Set.of("dut", "nld", "ned", "Dutch")),
-    ENGLISH("App.Language.English", "en", Set.of("eng", "english")),
-    ESTONIAN("App.Language.Estonian", "et", Set.of("est", "Estonian")),
-    EUSKERA("App.Language.Euskera", "eu", Set.of("Euskera")),
-    FINNISH("App.Language.Finnish", "fi", Set.of("Fin", "Finnish")),
-    FRENCH("App.Language.French", "fr", Set.of("fre", "fra", "French")),
-    GALICIAN("App.Language.Galician", "gl", Set.of("glg", "Galician")),
-    GERMAN("App.Language.German", "de", Set.of("ger", "deu", "German")),
-    GREEK("App.Language.Greek", "el", Set.of("gre", "ell", "Greek")),
-    HEBREW("App.Language.Hebrew", "he", Set.of("heb", "Hebrew")),
-    HINDI("App.Language.Hindi", "hi", Set.of("hin", "Hindi")),
-    HUNGARIAN("App.Language.Hungarian", "hu", Set.of("hun", "Hungarian")),
-    ICELANDIC("App.Language.Icelandic", "is", Set.of("ice", "isl", "Icelandic")),
-    INDONESIAN("App.Language.Indonesian", "id", Set.of("ind", "Indonesian")),
-    IRISH("App.Language.Irish", "ga", Set.of("gle", "Irish")),
-    ITALIAN("App.Language.Italian", "it", Set.of("ita", "Italian")),
-    JAPANESE("App.Language.Japanese", "ja", Set.of("jpn", "Japanese")),
-    KANNADA("App.Language.Kannada", "ka", Set.of("kan", "Kannada")),
-    KLINGON("App.Language.Klingon", "tlh", Set.of("Klingon")),
-    KOREAN("App.Language.Korean", "ko", Set.of("kor", "Korean")),
-    LATVIAN("App.Language.Latvian", "lv", Set.of("lav", "Latvian")),
-    LITHUANIAN("App.Language.Lithuanian", "lt", Set.of("lit", "Lithuanian")),
-    MACEDONIAN("App.Language.Macedonian", "mk", Set.of("mac", "mkd", "Macedonian")),
-    MALAY("App.Language.Malay", "ms", Set.of("may", "msa", "Malay")),
-    MALAYALAM("App.Language.Malayalam", "ml", Set.of("mal", "Malayalam")),
-    MARATHI("App.Language.Marathi", "mr", Set.of("mar", "Marathi")),
-    NORWEGIAN("App.Language.Norwegian", "no", Set.of("nor", "Norwegian")),
-    PERSIAN("App.Language.Persian", "fa", Set.of("per", "fas", "Persian")),
-    POLISH("App.Language.Polish", "pl", Set.of("pol", "Polish")),
-    PORTUGUESE("App.Language.Portuguese", "pt", Set.of("por", "Portuguese")),
-    ROMANIAN("App.Language.Romanian", "ro", Set.of("rum", "ron", "Romanian")),
-    RUSSIAN("App.Language.Russian", "ru", Set.of("rus", "Russian")),
-    SERBIAN("App.Language.Serbian", "sr", Set.of("srp", "Serbian")),
-    SINHALA("App.Language.Sinhala", "si", Set.of("sin", "Sinhalese", "Sinhala")),
-    SLOVAK("App.Language.Slovak", "sk", Set.of("slo", "slk", "Slovak")),
-    SLOVENIAN("App.Language.Slovenian", "sl", Set.of("slv", "Slovenian")),
-    SPANISH("App.Language.Spanish", "es", Set.of("spa", "Spanish")),
-    SWEDISH("App.Language.Swedish", "se", Set.of("swe", "Swedish")),
-    TAGALOG("App.Language.Tagalog", "tl", Set.of("tgl", "Tagalog")),
-    TAMIL("App.Language.Tamil", "ta", Set.of("tam", "Tamil")),
-    TELUGU("App.Language.Telugu", "te", Set.of("tel", "Telugu")),
-    THAI("App.Language.Thai", "th", Set.of("tha", "Thai")),
-    TURKISH("App.Language.Turkish", "tr", Set.of("tur", "Turkish")),
-    UKRAINIAN("App.Language.Ukrainian", "uk", Set.of("ukr", "Ukrainian")),
-    VIETNAMESE("App.Language.Vietnamese", "vi", Set.of("vie", "Vietnamese")),
-    WELSH("App.Language.Welsh", "cy", Set.of("wel", "cym", "Welsh"));
+    ABKHAZIAN("App.Language.Abkhazian", "abk", "ab"),
+    AFAR("App.Language.Afar", "aar", "aa"),
+    AFRIKAANS("App.Language.Afrikaans", "afr", "af"),
+    AKAN("App.Language.Akan", "aka", "ak"),
+    ALBANIAN("App.Language.Albanian", "sqi", "sq"),
+    AMHARIC("App.Language.Amharic", "amh", "am"),
+    ARABIC("App.Language.Arabic", "ara", "ar"),
+    ARAGONESE("App.Language.Aragonese", "arg", "ar"),
+    ARMENIAN("App.Language.Armenian", "hye", "hy"),
+    ASSAMESE("App.Language.Assamese", "asm", "as"),
+    AVARIC("App.Language.Avaric", "ava", "av"),
+    AVESTAN("App.Language.Avestan", "ave", "ae"),
+    AYMARA("App.Language.Aymara", "aym", "ay"),
+    AZERBAIJANI("App.Language.Azerbaijani", "aze", "az"),
+    BAMBARA("App.Language.Bambara", "bam", "bm"),
+    BASHKIR("App.Language.Bashkir", "bak", "ba"),
+    BASQUE("App.Language.Basque", "eus", "eu"),
+    BELARUSIAN("App.Language.Belarusian", "bel", "be"),
+    BENGALI("App.Language.Bengali", "ben", "bn"),
+    BISLAMA("App.Language.Bislama", "bis", "bi"),
+    BOSNIAN("App.Language.Bosnian", "bos", "bs"),
+    BRETON("App.Language.Breton", "bre", "br"),
+    BULGARIAN("App.Language.Bulgarian", "bul", "bg"),
+    BURMESE("App.Language.Burmese", "mya", "my"),
+    CATALAN_VALENCIAN("App.Language.Catalan-Valencian", "cat", "ca"),
+    CENTRAL_KHMER("App.Language.Central-Khmer", "khm", "km"),
+    CHAMORRO("App.Language.Chamorro", "cha", "ch"),
+    CHECHEN("App.Language.Chechen", "che", "ce"),
+    CHICHEWA_CHEWA_NYANJA("App.Language.Chichewa-Chewa-Nyanja", "nya", "ny"),
+    CHINESE("App.Language.Chinese", "zho", "zh"),
+    OLD_CHURCH_SLAVONIC("App.Language.Old-Church-Slavonic", "chu", "cu"),
+    CHUVASH("App.Language.Chuvash", "chv", "cv"),
+    CORNISH("App.Language.Cornish", "cor", "kw"),
+    CORSICAN("App.Language.Corsican", "cos", "co"),
+    CREE("App.Language.Cree", "cre", "cr"),
+    CROATIAN("App.Language.Croatian", "hrv", "hr"),
+    CZECH("App.Language.Czech", "ces", "cs"),
+    DANISH("App.Language.Danish", "dan", "da"),
+    DIVEHI_DHIVEHI_MALDIVIAN("App.Language.Divehi_Dhivehi_Maldivian", "div", "dv"),
+    DUTCH_FLEMISH("App.Language.Dutch-Flemish", "nld", "nl"),
+    DZONGKHA("App.Language.Dzongkha", "dzo", "dz"),
+    ENGLISH("App.Language.English", "eng", "en"),
+    ESPERANTO("App.Language.Esperanto", "epo", "eo"),
+    ESTONIAN("App.Language.Estonian", "est", "et"),
+    EWE("App.Language.Ewe", "ewe", "ee"),
+    FAROESE("App.Language.Faroese", "fao", "fo"),
+    FIJIAN("App.Language.Fijian", "fij", "fj"),
+    FINNISH("App.Language.Finnish", "fin", "fi"),
+    FRENCH("App.Language.French", "fra", "fr"),
+    FULAH("App.Language.Fulah", "ful", "ff"),
+    GAELIC_SCOTTISH_GAELIC("App.Language.Gaelic_Scottish_Gaelic", "gla", "gd"),
+    GALICIAN("App.Language.Galician", "glg", "gl"),
+    GANDA("App.Language.Ganda", "lug", "lg"),
+    GEORGIAN("App.Language.Georgian", "kat", "ka"),
+    GERMAN("App.Language.German", "deu", "de"),
+    GREEK_MODERN("App.Language.Greek-Modern", "ell", "el"),
+    GUARANI("App.Language.Guarani", "grn", "gn"),
+    GUJARATI("App.Language.Gujarati", "guj", "gu"),
+    HAITIAN_HAITIAN_CREOLE("App.Language.Haitian-Haitian-Creole", "hat", "ht"),
+    HAUSA("App.Language.Hausa", "hau", "ha"),
+    HEBREW("App.Language.Hebrew", "heb", "he"),
+    HERERO("App.Language.Herero", "her", "hz"),
+    HINDI("App.Language.Hindi", "hin", "hi"),
+    HIRI_MOTU("App.Language.Hiri_Motu", "hmo", "ho"),
+    HUNGARIAN("App.Language.Hungarian", "hun", "hu"),
+    ICELANDIC("App.Language.Icelandic", "isl", "is"),
+    IDO("App.Language.Ido", "ido", "io"),
+    IGBO("App.Language.Igbo", "ibo", "ig"),
+    INDONESIAN("App.Language.Indonesian", "ind", "id"),
+    INTERLINGUA("App.Language.Interlingua", "ina", "ia"),
+    INTERLINGUE_OCCIDENTAL("App.Language.Interlingue-Occidental", "ile", "ie"),
+    INUKTITUT("App.Language.Inuktitut", "iku", "iu"),
+    INUPIAQ("App.Language.Inupiaq", "ipk", "ik"),
+    IRISH("App.Language.Irish", "gle", "ga"),
+    ITALIAN("App.Language.Italian", "ita", "it"),
+    JAPANESE("App.Language.Japanese", "jpn", "ja"),
+    JAVANESE("App.Language.Javanese", "jav", "jv"),
+    KALAALLISUT_GREENLANDIC("App.Language.Kalaallisut_Greenlandic", "kal", "kl"),
+    KANNADA("App.Language.Kannada", "kan", "kn"),
+    KANURI("App.Language.Kanuri", "kau", "kr"),
+    KASHMIRI("App.Language.Kashmiri", "kas", "ks"),
+    KAZAKH("App.Language.Kazakh", "kaz", "kk"),
+    KIKUYU_GIKUYU("App.Language.Kikuyu-Gikuyu", "kik", "ki"),
+    KINYARWANDA("App.Language.Kinyarwanda", "kin", "rw"),
+    KOMI("App.Language.Komi", "kom", "kv"),
+    KONGO("App.Language.Kongo", "kon", "kg"),
+    KOREAN("App.Language.Korean", "kor", "ko"),
+    KUANYAMA_KWANYAMA("App.Language.Kuanyama-Kwanyama", "kua", "kj"),
+    KURDISH("App.Language.Kurdish", "kur", "ku"),
+    KYRGYZ_KIRGHIZ("App.Language.Kyrgyz-Kirghiz", "kir", "ky"),
+    LAO("App.Language.Lao", "lao", "lo"),
+    LATIN("App.Language.Latin", "lat", "la"),
+    LATVIAN("App.Language.Latvian", "lav", "lv"),
+    LIMBURGAN_LIMBURGER_LIMBURGISH("App.Language.Limburgan-Limburger-Limburgish", "lim", "li"),
+    LINGALA("App.Language.Lingala", "lin", "ln"),
+    LITHUANIAN("App.Language.Lithuanian", "lit", "lt"),
+    LUBA_KATANGA("App.Language.Luba-Katanga", "lub", "lu"),
+    LUXEMBOURGISH_LETZEBURGESCH("App.Language.Luxembourgish-Letzeburgesch", "ltz", "lb"),
+    MACEDONIAN("App.Language.Macedonian", "mkd", "mk"),
+    MALAGASY("App.Language.Malagasy", "mlg", "mg"),
+    MALAY("App.Language.Malay", "msa", "ms"),
+    MALAYALAM("App.Language.Malayalam", "mal", "ml"),
+    MALTESE("App.Language.Maltese", "mlt", "mt"),
+    MANX("App.Language.Manx", "glv", "gv"),
+    MAORI("App.Language.Maori", "mri", "mi"),
+    MARATHI("App.Language.Marathi", "mar", "mr"),
+    MARSHALLESE("App.Language.Marshallese", "mah", "mh"),
+    MONGOLIAN("App.Language.Mongolian", "mon", "mn"),
+    NAURU("App.Language.Nauru", "nau", "na"),
+    NAVAJO_NAVAHO("App.Language.Navajo-Navaho", "nav", "nv"),
+    NDONGA("App.Language.Ndonga", "ndo", "ng"),
+    NEPALI("App.Language.Nepali", "nep", "ne"),
+    NORTH_NDEBELE("App.Language.North-Ndebele", "nde", "nd"),
+    NORTHERN_SAMI("App.Language.Northern-Sami", "sme", "se"),
+    NORWEGIAN("App.Language.Norwegian", "nor", "no"),
+    NORWEGIAN_BOKMåL("App.Language.Norwegian-Bokmål", "nob", "nb"),
+    NORWEGIAN_NYNORSK("App.Language.Norwegian-Nynorsk", "nno", "nn"),
+    OCCITAN("App.Language.Occitan", "oci", "oc"),
+    OJIBWA("App.Language.Ojibwa", "oji", "oj"),
+    ORIYA("App.Language.Oriya", "ori", "or"),
+    OROMO("App.Language.Oromo", "orm", "om"),
+    OSSETIAN_OSSETIC("App.Language.Ossetian_Ossetic", "oss", "os"),
+    PALI("App.Language.Pali", "pli", "pi"),
+    PASHTO_PUSHTO("App.Language.Pashto_Pushto", "pus", "ps"),
+    PERSIAN("App.Language.Persian", "fas", "fa"),
+    POLISH("App.Language.Polish", "pol", "pl"),
+    PORTUGUESE("App.Language.Portuguese", "por", "pt"),
+    PUNJABI_PANJABI("App.Language.Punjabi-Panjabi", "pan", "pa"),
+    QUECHUA("App.Language.Quechua", "que", "qu"),
+    ROMANIAN_MOLDAVIAN_MOLDOVAN("App.Language.Romanian-Moldavian-Moldovan", "ron", "ro"),
+    ROMANSH("App.Language.Romansh", "roh", "rm"),
+    RUNDI("App.Language.Rundi", "run", "rn"),
+    RUSSIAN("App.Language.Russian", "rus", "ru"),
+    SAMOAN("App.Language.Samoan", "smo", "sm"),
+    SANGO("App.Language.Sango", "sag", "sg"),
+    SANSKRIT("App.Language.Sanskrit", "san", "sa"),
+    SARDINIAN("App.Language.Sardinian", "srd", "sc"),
+    SERBIAN("App.Language.Serbian", "srp", "sr"),
+    SHONA("App.Language.Shona", "sna", "sn"),
+    SICHUAN_YI_NUOSU("App.Language.Sichuan_Yi_Nuosu", "iii", "ii"),
+    SINDHI("App.Language.Sindhi", "snd", "sd"),
+    SINHALA_SINHALESE("App.Language.Sinhala-Sinhalese", "sin", "si"),
+    SLOVAK("App.Language.Slovak", "slk", "sk"),
+    SLOVENIAN("App.Language.Slovenian", "slv", "sl"),
+    SOMALI("App.Language.Somali", "som", "so"),
+    SOUTH_NDEBELE("App.Language.South-Ndebele", "nbl", "nr"),
+    SOUTHERN_SOTHO("App.Language.Southern-Sotho", "sot", "st"),
+    SPANISH_CASTILIAN("App.Language.Spanish-Castilian", "spa", "es"),
+    SUNDANESE("App.Language.Sundanese", "sun", "su"),
+    SWAHILI("App.Language.Swahili", "swa", "sw"),
+    SWATI("App.Language.Swati", "ssw", "ss"),
+    SWEDISH("App.Language.Swedish", "swe", "sv"),
+    TAGALOG("App.Language.Tagalog", "tgl", "tl"),
+    TAHITIAN("App.Language.Tahitian", "tah", "ty"),
+    TAJIK("App.Language.Tajik", "tgk", "tg"),
+    TAMIL("App.Language.Tamil", "tam", "ta"),
+    TATAR("App.Language.Tatar", "tat", "tt"),
+    TELUGU("App.Language.Telugu", "tel", "te"),
+    THAI("App.Language.Thai", "tha", "th"),
+    TIBETAN("App.Language.Tibetan", "bod", "bo"),
+    TIGRINYA("App.Language.Tigrinya", "tir", "ti"),
+    TONGA("App.Language.Tonga", "ton", "to"),
+    TSONGA("App.Language.Tsonga", "tso", "ts"),
+    TSWANA("App.Language.Tswana", "tsn", "tn"),
+    TURKISH("App.Language.Turkish", "tur", "tr"),
+    TURKMEN("App.Language.Turkmen", "tuk", "tk"),
+    TWI("App.Language.Twi", "twi", "tw"),
+    UIGHUR_UYGHUR("App.Language.Uighur-Uyghur", "uig", "ug"),
+    UKRAINIAN("App.Language.Ukrainian", "ukr", "uk"),
+    URDU("App.Language.Urdu", "urd", "ur"),
+    UZBEK("App.Language.Uzbek", "uzb", "uz"),
+    VENDA("App.Language.Venda", "ven", "ve"),
+    VIETNAMESE("App.Language.Vietnamese", "vie", "vi"),
+    VOLAPüK("App.Language.Volapük", "vol", "vo"),
+    WALLOON("App.Language.Walloon", "wln", "wa"),
+    WELSH("App.Language.Welsh", "cym", "cy"),
+    WESTERN_FRISIAN("App.Language.Western_Frisian", "fry", "fy"),
+    WOLOF("App.Language.Wolof", "wol", "wo"),
+    XHOSA("App.Language.Xhosa", "xho", "xh"),
+    YIDDISH("App.Language.Yiddish", "yid", "yi"),
+    YORUBA("App.Language.Yoruba", "yor", "yo"),
+    ZHUANG_CHUANG("App.Language.Zhuang-Chuang", "zha", "za"),
+    ZULU("App.Language.Zulu", "zul", "zu"),
+
+    KLINGON("App.Language.Klingon", "tlh", null);
 
     @val String msgCode;
-    @val String langCode;
-    @val Set<String> langCodesOther;
+    @val String iso639_3;
+    @val String iso639_1;
 
-    public static Language fromValue(String value) {
-        return Language.values().stream()
-                .filter(lang -> lang.name().equalsIgnoreCase(value))
-                .findAny()
-                .orElseThrow();
+    Language(String msgCode, String iso639_3, String iso639_1) {
+        this.msgCode = msgCode;
+        this.iso639_3 = iso639_3;
+        this.iso639_1 = iso639_1;
     }
 
-    public static Optional<Language> fromValueOptional(String value) {
-        return Language.values().stream().filter(lang -> lang.name().equalsIgnoreCase(value)).findAny();
+    public static @Nullable Language ofIso639_1(String iso639_1) {
+        return Language.values().stream().filter(lang -> lang.iso639_1.equalsIgnoreCase(iso639_1)).findAny()
+            .orElse(null);
     }
 
-    public static Optional<Language> fromIdOptional(String languageId) {
-        return Language.values().stream().filter(lang -> lang.langCode.equalsIgnoreCase(languageId)).findAny();
-    }
-
-    public static Language fromId(String languageId) {
-        return fromIdOptional(languageId).orElseThrow();
+    public static @Nullable Language ofIso639_3(String iso639_3) {
+        return Language.values().stream().filter(lang -> lang.iso639_3.equalsIgnoreCase(iso639_3)).findAny()
+            .orElse(null);
     }
 
     public String getName() {
-        return name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
+        return Messages.getText(msgCode);
+    }
+
+    public String getName(Language language) {
+        return Messages.getText(msgCode, language);
+    }
+
+    public static @Nullable Language ofName(String value, Language language) {
+        return Language.values().stream().filter(lang -> lang.getName(language).equalsIgnoreCase(value)).findAny()
+            .orElse(null);
     }
 }

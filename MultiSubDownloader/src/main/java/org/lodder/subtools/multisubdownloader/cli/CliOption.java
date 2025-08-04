@@ -1,10 +1,8 @@
 package org.lodder.subtools.multisubdownloader.cli;
 
-import lombok.AllArgsConstructor;
 import manifold.ext.props.rt.api.get;
 import org.lodder.subtools.multisubdownloader.Messages;
 
-@AllArgsConstructor
 public enum CliOption {
     HELP("help", false, "App.OptionHelpMsg"),
     NO_GUI("nogui", false, "App.OptionNoGuiMsg"),
@@ -26,6 +24,13 @@ public enum CliOption {
     @get String longValue;
     @get boolean hasArg;
     @get String msgCode;
+
+    CliOption(String value, String longValue, boolean hasArg, String msgCode) {
+        this.value = value;
+        this.longValue = longValue;
+        this.hasArg = hasArg;
+        this.msgCode = msgCode;
+    }
 
     CliOption(String value, boolean hasArg, String description) {
         this(value, null, hasArg, description);

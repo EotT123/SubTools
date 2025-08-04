@@ -10,8 +10,8 @@ import org.lodder.subtools.multisubdownloader.framework.service.providers.Servic
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JAddic7edAdapter;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.adapters.JAddic7edViaProxyAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.Addic7edAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.Addic7edProxyGestdownAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Manager;
 
@@ -46,19 +46,19 @@ public class Addic7edServiceProvider implements ServiceProvider {
         boolean loginEnabled = false;
         Credentials credentials = null;
         if (settings.loginAddic7edEnabled) {
-            String username = StringUtils.trim(settings.loginAddic7edUsername);
-            String password = StringUtils.trim(settings.loginAddic7edPassword);
+            String username = StringUtils.trimToNull(settings.loginAddic7edUsername);
+            String password = StringUtils.trimToNull(settings.loginAddic7edPassword);
             /* Protect against empty login */
-            if (!username.isEmpty() && !password.isEmpty()) {
+            if (username != null && password != null) {
                 credentials = new Credentials(username, password);
             }
         }
 
         if (settings.serieSourceAddic7edProxy) {
-            return new JAddic7edViaProxyAdapter(manager, userInteractionHandler);
+            return new Addic7edProxyGestdownAdapter(manager, userInteractionHandler);
         } else {
             boolean speedy = app.makePreferences().getBoolean(CliOption.SPEEDY.value, false);
-            return new JAddic7edAdapter(manager, speedy, credentials, userInteractionHandler);
+            return new Addic7edAdapter(manager, speedy, credentials, userInteractionHandler);
         }
     }
 

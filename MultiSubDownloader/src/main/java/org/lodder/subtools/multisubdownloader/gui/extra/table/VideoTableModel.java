@@ -25,7 +25,7 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 
 public class VideoTableModel extends DefaultTableModel {
 
-    @Serial private static final long serialVersionUID = 4205143311042280620L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private static final List<SearchColumnName> SHOW_COLUMNS =
             List.of(TYPE, RELEASE, FILENAME, TITLE, SEASON, EPISODE, FOUND, SELECT, OBJECT);
@@ -136,7 +136,7 @@ public class VideoTableModel extends DefaultTableModel {
                 case FILENAME -> subtitle.fileName;
                 case SELECT -> false;
                 case OBJECT -> subtitle;
-                case SOURCE -> subtitle.subtitleSource;
+                case SOURCE -> subtitle.source;
                 case SCORE -> subtitle.score;
                 default -> throw new IllegalArgumentException("Unexpected value: " + searchColumn);
             }).collect(Collectors.toCollection(Vector::new));

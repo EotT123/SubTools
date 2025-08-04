@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class MyTextFieldInteger extends MyTextFieldCommon<Integer, MyTextFieldInteger> {
     @Serial
-    private static final long serialVersionUID = -8526638589445703452L;
+    private static final long serialVersionUID = 1L;
 
     private static final Function<Integer, String> TO_STRING_MAPPER = i -> i == null ? null : String.valueOf(i);
     private static final Function<String, Integer> TO_OBJECT_MAPPER = s -> s == null ? null : Integer.parseInt(s);

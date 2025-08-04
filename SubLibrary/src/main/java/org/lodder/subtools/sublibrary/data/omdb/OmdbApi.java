@@ -1,38 +1,50 @@
 package org.lodder.subtools.sublibrary.data.omdb;
 
-import static org.lodder.subtools.sublibrary.PageContentParams.*;
-
 import java.util.Optional;
+import java.util.function.Consumer;
 
-import lombok.RequiredArgsConstructor;
+import Omdb.Release;
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
+import manifold.json.rt.api.Requester;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
-import org.lodder.subtools.sublibrary.data.omdb.model.OmdbDetails;
-import org.w3c.dom.Node;
+import org.lodder.subtools.sublibrary.data.ApiIntf;
+import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbApiException;
 
-@RequiredArgsConstructor
-class OmdbApi {
+class OmdbApi implements ApiIntf {
 
-    private static final String DOMAIN = "http://www.omdbapi.com";
-    private final Manager manager;
+    private static final String API_KEY = "74473b06";
+    private static final String API_DOMAIN = "http://www.omdbapi.com";
+    @val @override Manager manager;
+    @val @override String provider = "OMDB";
 
-    public Optional<OmdbDetails> getMovieDetails(int imdbId) throws OmdbException {
-        return manager.getCache(CacheType.MEMORY, "OMDB-moviedetails-$imdbId")
-            .getOptional(() -> {
-                final String url = "$DOMAIN/?i=tt$%07d&plot=short&r=xml".formatted(imdbId);
-                try {
-                    return manager.getAsDocument(url(url))
-                        .getElementsByTagName("movie").stream()
-                        .map(this::parseOMDBDetails).findFirst();
-                } catch (Exception e) {
-                    throw new OmdbException("Error OMDB API", url, e);
-                }
-            });
+    public OmdbApi(Manager manager) {
+        this.manager = manager;
     }
 
-    private OmdbDetails parseOMDBDetails(Node node) {
-        return new OmdbDetails(node.getAttribute("title"), Integer.parseInt(node.getAttribute("year")));
+    public Optional<Release> searchRelease(String imdbId) throws OmdbApiException {
+        return getCache("release", b -> b.add("imdbId", imdbId))
+            .getOptional(() -> search(req -> req.withParam("i", imdbId)));
     }
 
+    public Optional<Release> searchMovie(String title, Integer year=null) throws OmdbApiException {
+        return getCache("movie", b -> b.add("title", title).add("year", year))
+            .getOptional(() -> search(req -> req.withParam("t", title).withParam("type", "movie")));
+    }
+
+    public Optional<Release> searchSerie(String name) throws OmdbApiException {
+        return getCache("serie", b -> b.add("name", name))
+            .getOptional(() -> search(req -> req.withParam("t", name).withParam("type", "series")));
+    }
+
+    private static Optional<Release> search(Consumer<Requester<Release>> extraParamConsumer) throws OmdbApiException {
+        try {
+            Requester<Release> request = Release.request(API_DOMAIN).withParam("apikey", API_KEY);
+            extraParamConsumer.accept(request);
+            Release release = request.getOne();
+            return release.response ? Optional.of(release) : Optional.empty();
+        } catch (Exception e) {
+            throw OmdbApiException.error(null, e.getMessage().replace("apikey=" + API_KEY, ""));
+        }
+    }
 }

@@ -8,7 +8,7 @@ import manifold.ext.props.rt.api.var;
 
 public class ArrowButton extends JButton {
 
-    @Serial private static final long serialVersionUID = -4630720317499130016L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /**
      * The cardinal direction of the arrow(s), any of {@link SwingConstants#NORTH}, {@link SwingConstants#SOUTH},

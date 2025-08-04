@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.xml;
 
 
+import java.text.Normalizer;
 import java.util.HashMap;
 
 /**
@@ -100,6 +101,13 @@ public class StringUtils {
             }
         } while (continueLoop);
         return text;
+    }
+
+    public static String normalize(String text) {
+        // Normalize the string to NFD form (decomposes letters and accents)
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+        // Remove all combining diacritical marks
+        return normalized.replaceAll("\\p{M}", "");
     }
 
 }

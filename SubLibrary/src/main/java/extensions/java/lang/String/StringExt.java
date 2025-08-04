@@ -8,15 +8,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.function.Function;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
-@UtilityClass
 @Extension
 public class StringExt {
+
+    private StringExt() {
+        // hide utility class constructor
+    }
 
     public static String removeIllegalFilenameChars(@This String s) {
         return s.replace("/", "").replace("\0", "");
@@ -44,5 +46,13 @@ public class StringExt {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    public static @Nullable String keepLettersOnly(@This @Nullable String text) {
+        return text == null ? null : text.replaceAll("[^A-Za-z]", "");
+    }
+
+    public static @Nullable String keepNumbersOnly(@This @Nullable String text) {
+        return text == null ? null : text.replaceAll("[^0-9]", "");
     }
 }

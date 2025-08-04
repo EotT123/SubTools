@@ -12,7 +12,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 public class SubtitleTableModel extends DefaultTableModel {
 
     @Serial
-    private static final long serialVersionUID = 4205143311042280620L;
+    private static final long serialVersionUID = 1L;
 
     private static final SubtitleTableColumnName[] COLUMNS =
         Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED)

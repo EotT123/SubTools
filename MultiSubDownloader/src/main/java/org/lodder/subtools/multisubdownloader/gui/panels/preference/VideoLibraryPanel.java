@@ -4,9 +4,7 @@ import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
 import java.io.Serial;
-import java.nio.file.Files;
 
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
@@ -19,15 +17,14 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-@ExtensionMethod({ Files.class })
 public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
     permits EpisodeLibraryPanel, MovieLibraryPanel {
 
-    @Serial private static final long serialVersionUID = -9175813173306481849L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @val LibrarySettings librarySettings;
     private final JComboBox<LibraryActionType> cbxLibraryAction;
-    private final JCheckBox chkUseTVDBNaming;
+    private final JCheckBox chkuseTvdbNaming;
     private final PartialDisableComboBox<LibraryOtherFileActionType> cbxLibraryOtherFileAction;
     private final SubtitleBackupPanel pnlBackup;
     protected final StructureFolderPanel pnlStructureFolder;
@@ -47,7 +44,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             .addToPanel(this, "span, growx");
         {
 
-            this.chkUseTVDBNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
+            this.chkuseTvdbNaming = new JCheckBox(getText("PreferenceDialog.UseTvdbName")).visible(
                 VideoType.EPISODE == videoType).addTo(performActionPanel, "hidemode 3, wrap");
 
             new JLabel(getText("PreferenceDialog.ActionForShowFiles")).addTo(performActionPanel);
@@ -123,7 +120,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
 
     public void loadPreferenceSettings() {
         cbxLibraryAction.setSelectedItem(librarySettings.action);
-        chkUseTVDBNaming.setSelected(librarySettings.useTVDBNaming);
+        chkuseTvdbNaming.setSelected(librarySettings.useTvdbNaming);
         cbxLibraryOtherFileAction.setSelectedItem(librarySettings.otherFileAction);
 
         checkEnableStatusPanel();
@@ -135,7 +132,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
             pnlBackup.savePreferenceSettings();
         }
         librarySettings.action = this.cbxLibraryAction.getSelectedValue();
-        librarySettings.useTVDBNaming = this.chkUseTVDBNaming.isSelected();
+        librarySettings.useTvdbNaming = this.chkuseTvdbNaming.isSelected();
         librarySettings.otherFileAction = this.cbxLibraryOtherFileAction.getSelectedValue();
 
         pnlStructureFolder.savePreferenceSettings();

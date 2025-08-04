@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader;
@@ -26,10 +26,10 @@ import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequiredArgsConstructor
 public class UpdateAvailableGithub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
@@ -41,7 +41,12 @@ public class UpdateAvailableGithub {
     private final Manager manager;
     private final Settings settings;
 
-    public boolean shouldCheckForNewUpdate(UpdateCheckPeriod updateCheckPeriod) {
+    public UpdateAvailableGithub(Manager manager, Settings settings) {
+        this.manager = manager;
+        this.settings = settings;
+    }
+
+    public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
         LocalDate lastUpdateCheck = getLastUpdateCheck();
         try {
             return switch (updateCheckPeriod) {
@@ -49,6 +54,7 @@ public class UpdateAvailableGithub {
                 case WEEKLY -> DAYS.between(lastUpdateCheck, LocalDate.now()) > 6;
                 case MONTHLY -> DAYS.between(lastUpdateCheck, LocalDate.now()) > 30;
                 case MANUAL -> false;
+                case null -> false;
             };
         } catch (Exception e) {
             LOGGER.error("checkProgram", e);
@@ -60,6 +66,7 @@ public class UpdateAvailableGithub {
         return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease();
+            case null -> Optional.empty();
         };
     }
 
@@ -67,11 +74,12 @@ public class UpdateAvailableGithub {
         return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease().isPresent();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease().isPresent();
+            case null -> false;
         };
     }
 
     private Optional<String> getUrlLatestNewStableGithubRelease() {
-        return manager.getCache(CacheType.MEMORY, "GitHub-update")
+        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url"))
             .getOptional(() -> {
                 try {
                     String currentVersion = getVersion();
@@ -82,7 +90,7 @@ public class UpdateAvailableGithub {
                                 userAgent:null))
                         .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
                     Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
-                    String versionText = element.parent().selectFirstByTag("a").text();
+                    String versionText = element.parentElement().selectFirst("a").text();
                     Matcher matcher = versionPattern.matcher(versionText);
                     matcher.find();
                     String version = matcher.group();
@@ -108,7 +116,7 @@ public class UpdateAvailableGithub {
     }
 
     private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return manager.getCache(CacheType.MEMORY, "GitHub-update-nightly")
+        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url-nightly"))
             .getOptional(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
@@ -156,7 +164,7 @@ public class UpdateAvailableGithub {
     }
 
     private CacheKey getUpdateLastUpdateCheckCache() {
-        return manager.getCache(CacheType.DISK, "LastUpdateCheck");
+        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "LastUpdateCheck"));
     }
 
     private void updateLastUpdateCheck() {

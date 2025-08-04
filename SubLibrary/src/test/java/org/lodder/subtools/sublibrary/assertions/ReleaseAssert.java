@@ -32,7 +32,7 @@ public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAsse
 
     public @Self ReleaseAssert<R> hasExtension(String extension) {
         isNotNull();
-        assertThat(actual.extension).isEqualTo(extension);
+        assertThat(actual.hasExtension(extension)).isTrue();
         return this;
     }
 

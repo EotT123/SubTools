@@ -8,7 +8,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serial;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Streams;
-import lombok.experimental.ExtensionMethod;
 import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.Nullable;
@@ -34,7 +32,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
-import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -125,7 +122,6 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
-    @ExtensionMethod({ Files.class })
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;
@@ -154,16 +150,15 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
 
         private void rename(Path dir) throws IOException {
-            dir.list().asThrowingStream(IOException.class).forEach(file -> {
+            dir.list().forEachEx(file -> {
                 if (file.isRegularFile()) {
                     if (!file.fileNameContainsIgnoreCase("sample") && extensions.contains(file.getExtension())) {
-                        Release release = releaseFactory.createRelease(file, userInteractionHandler);
-                        if (release != null) {
+                        releaseFactory.createRelease(file, userInteractionHandler).ifPresent(release -> {
                             publish(release.fileName);
                             if (release.videoType == videoType) {
                                 renameAction.rename(file, release);
                             }
-                        }
+                        });
                     }
                 } else if (isRecursive && file.isDirectory()) {
                     rename(file);

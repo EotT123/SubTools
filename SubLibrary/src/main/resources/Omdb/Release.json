@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Movie or Series Metadata",
+  "type": "object",
+  "properties": {
+    "Title": {
+      "type": "string"
+    },
+    "Year": {
+      "type": "string"
+    },
+    "Rated": {
+      "type": "string"
+    },
+    "Released": {
+      "type": "string"
+    },
+    "Runtime": {
+      "type": "string"
+    },
+    "Genre": {
+      "type": "string"
+    },
+    "Director": {
+      "type": "string"
+    },
+    "Writer": {
+      "type": "string"
+    },
+    "Actors": {
+      "type": "string"
+    },
+    "Plot": {
+      "type": "string"
+    },
+    "Language": {
+      "type": "string"
+    },
+    "Country": {
+      "type": "string"
+    },
+    "Awards": {
+      "type": "string"
+    },
+    "Poster": {
+      "type": "string",
+      "format": "uri"
+    },
+    "Ratings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Source": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Source",
+          "Value"
+        ]
+      }
+    },
+    "Metascore": {
+      "type": "string"
+    },
+    "imdbRating": {
+      "type": "string"
+    },
+    "imdbVotes": {
+      "type": "string"
+    },
+    "imdbID": {
+      "type": "string"
+    },
+    "Type": {
+      "type": "string",
+      "enum": [
+        "movie",
+        "series",
+        "episode"
+      ]
+    },
+    "totalSeasons": {
+      "type": "integer"
+    },
+    "DVD": {
+      "type": "string"
+    },
+    "BoxOffice": {
+      "type": "string"
+    },
+    "Production": {
+      "type": "string"
+    },
+    "Website": {
+      "type": "string"
+    },
+    "Response": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "Title",
+    "imdbID",
+    "Response"
+  ],
+  "additionalProperties": false
+}

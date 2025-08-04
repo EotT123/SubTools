@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
 public class MultiSubDialog extends JDialog {
 
     @Serial
-    private static final long serialVersionUID = -2357021997104425566L;
+    private static final long serialVersionUID = 1L;
 
     public MultiSubDialog(@Nullable JFrame frame=null, String title, boolean modal) {
         super(frame);

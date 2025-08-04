@@ -3,16 +3,20 @@ package org.lodder.subtools.sublibrary.control;
 
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
-import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-@UtilityClass
+@NullMarked
 public class VideoPatterns {
 
+    private VideoPatterns() {
+        // hide utility class constructor
+    }
+
+    @NullMarked
     public interface RegexPattern {
         @val Pattern pattern;
         @val String value;
@@ -22,6 +26,7 @@ public class VideoPatterns {
         }
     }
 
+    @NullMarked
     public enum Quality implements RegexPattern {
         Q8K("8k", "8k"),
         Q4K("4k", "4k"),
@@ -39,7 +44,7 @@ public class VideoPatterns {
             this.pattern = Pattern.compile(quality, Pattern.CASE_INSENSITIVE);
         }
 
-        public static Quality fromValue(String value) {
+        public static @Nullable Quality fromValue(@Nullable String value) {
             return value == null ? null : Quality.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -47,10 +52,10 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
+    @NullMarked
     public enum VideoEncoding implements RegexPattern {
-        X264("x264", "[xh]264"),
-        X265("x265", "[xh]265|hevc");
+        X264("x264", "[xh][_|-|\\.]?264"),
+        X265("x265", "[xh][_|-|\\.]?265|hevc");
 
         @val @override Pattern pattern;
         @val @override String value;
@@ -60,7 +65,7 @@ public class VideoPatterns {
             pattern = Pattern.compile(quality, Pattern.CASE_INSENSITIVE);
         }
 
-        public static VideoEncoding fromValue(String value) {
+        public static @Nullable VideoEncoding fromValue(@Nullable String value) {
             return value == null ? null : VideoEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -68,9 +73,16 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
+    @NullMarked
     public enum AudioEncoding implements RegexPattern {
-        DD5_1("dd5.1", "dd5[-.]1");
+        FORMAT_DD5_1("dd5.1", "dd5[_|-|\\.]?1"),
+        FORMAT_DDP5_1("ddp5.1", "ddp5[_|-|\\.]?1"),
+        CHANNEL_2("2ch", "2[_|-|\\.]?ch"),
+        CHANNEL_6("6ch", "6[_|-|\\.]?ch"),
+        BIT_DEPTH_8("8bit", "8[_|-|\\.]?bit"),
+        BIT_DEPTH_10("10bit", "10[_|-|\\.]?bit"),
+        BIT_DEPTH_UNKNOWN("", "\\d{1,2}[_|-|\\.]?bit"),
+        ATMOS("atmos", "atmos");
 
         @val @override Pattern pattern;
         @val @override String value;
@@ -80,7 +92,7 @@ public class VideoPatterns {
             pattern = Pattern.compile(quality, Pattern.CASE_INSENSITIVE);
         }
 
-        public static AudioEncoding fromValue(String value) {
+        public static @Nullable AudioEncoding fromValue(@Nullable String value) {
             return value == null ? null : AudioEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -88,7 +100,7 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
+    @NullMarked
     public enum Source implements RegexPattern {
         HDTV("hdtv", "hdtv", true, false),
         DVDRIP("dvdrip", "dvdrip", false, false),
@@ -119,7 +131,7 @@ public class VideoPatterns {
             this.likelyMovieRelease = likelyMovieRelease;
         }
 
-        public static Source fromValue(String value) {
+        public static @Nullable Source fromValue(@Nullable String value) {
             return value == null ? null : Source.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
                 .findAny()
@@ -136,7 +148,7 @@ public class VideoPatterns {
         }
     }
 
-    @AllArgsConstructor
+    @NullMarked
     public enum VideoExtensions {
         MKV("mkv"),
         MP4("mp4"),
@@ -146,8 +158,12 @@ public class VideoPatterns {
         M4V("m4v");
 
         @val String value;
+
+        VideoExtensions(String value) {
+            this.value = value;
+        }
     }
 
     public static final Set<String> EXTENSIONS =
-        VideoExtensions.values().stream().map(VideoExtensions::getValue).collect(Collectors.toSet());
+        VideoExtensions.values().stream().map(VideoExtensions::getValue).toSet();
 }

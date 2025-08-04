@@ -1,9 +1,7 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import com.pivovarit.function.ThrowingRunnable;
-import lombok.RequiredArgsConstructor;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
 
-@RequiredArgsConstructor
 public class LazyThrowingRunnable<X extends Exception> {
 
     private final ThrowingRunnable<X> runnable;
@@ -11,6 +9,10 @@ public class LazyThrowingRunnable<X extends Exception> {
     private final Object lock = new Object();
 
     private volatile boolean initialized = false;
+
+    public LazyThrowingRunnable(ThrowingRunnable<X> runnable) {
+        this.runnable = runnable;
+    }
 
     public void run() throws X {
         if (!initialized) {

@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://subdl.com/schemas/User.json",
+  "type": "object",
+  "definitions": {
+    "Language": {
+      "type": "string",
+      "enum": ["AR", "BR_PT", "DA", "NL", "EN", "FA", "FI", "FR", "ID", "IT", "NO", "RO", "ES", "SV", "VI", "SQ", "AZ", "BE", "BN", "ZH_BG", "BS", "BG", "BG_EN", "MY", "CA", "ZH", "HR", "CS", "NL_EN", "EN_DE", "EO", "ET", "KA", "DE", "EL", "KL", "HE", "HI", "HU", "HU_EN", "IS", "JA", "KO", "KU", "LV", "LT", "MK", "MS", "ML", "MNI", "PL", "PT", "RU", "SR", "SI", "SK", "SL", "TL", "TA", "TE", "TH", "TR", "UK", "UR"]
+    }
+  },
+  "properties": {
+    "api_key": {
+      "description":"the api key from subdl account",
+      "type": "string"
+    },
+    "film_name": {
+      "description":"Text search by film name.",
+      "type": "string"
+    },
+    "file_name": {
+      "description":"Search by file name.",
+      "type": "string"
+    },
+    "sd_id": {
+      "description":"Search by SubDL ID.",
+      "type": "integer"
+    },
+    "imdb_id": {
+      "description":"Search by IMDb ID.",
+      "type": "integer"
+    },
+    "tmdb_id": {
+      "description":"Search by TMDB ID.",
+      "type": "integer"
+    },
+    "season_number": {
+      "description":"Specific season number for TV shows.",
+      "type": "integer"
+    },
+    "episode_number": {
+      "description":"Specific episode number for TV shows.",
+      "type": "integer"
+    },
+    "type": {
+      "description":"Type of the content, either movie or tv.",
+      "type": "string"
+    },
+    "year": {
+      "description":"Release year of the movie or TV show.",
+      "type": "string"
+    },
+    "languages": {
+      "description":"Comma-separated language codes for subtitle languages. list of supported languages",
+      "$ref" : "#/definitions/Language"
+    },
+    "subs_per_page": {
+      "description":"limit of subtitles will see in the results default is 10, (max can be 30)",
+      "type": "integer"
+    },
+    "comment": {
+      "description":"send comment=1 to get author comment on subtitle",
+      "type": "boolean"
+    },
+    "releases": {
+      "description":"send releases=1 to get releases list on subtitle",
+      "type": "boolean"
+    },
+    "hi": {
+      "description":"send hi=1 to get is Hearing Impaired on subtitle",
+      "type": "boolean"
+    },
+    "full_season": {
+      "description":"send full_season=1 to get all full season subtitles",
+      "type": "boolean"
+    }
+  },
+  "required": ["api_key"]
+}

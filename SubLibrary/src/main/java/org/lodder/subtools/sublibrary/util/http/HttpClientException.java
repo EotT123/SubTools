@@ -9,7 +9,7 @@ import manifold.ext.props.rt.api.val;
 public class HttpClientException extends Exception {
 
     @Serial
-    private static final long serialVersionUID = 5583416046207372599L;
+    private static final long serialVersionUID = 1L;
     @val int responseCode;
     @val String responseMessage;
 

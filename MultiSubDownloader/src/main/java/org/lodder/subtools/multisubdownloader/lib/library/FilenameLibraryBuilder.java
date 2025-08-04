@@ -10,7 +10,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStru
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.data.tvdb.TheTvdbAdapter;
+import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -27,7 +27,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     private final boolean rename;
 
     public FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        boolean includeLanguageCode, Map<Language, String> languageTags, TheTvdbAdapter tvdbAdapter=null,
+        boolean includeLanguageCode, Map<Language, String> languageTags, TvdbAdapter tvdbAdapter=null,
         boolean rename) {
         super(tvdbAdapter);
         this.structure = structure;
@@ -46,7 +46,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
             includeLanguageCode:libSettings.includeLanguageCode,
             languageTags:libSettings.langCodeMap,
-            tvdbAdapter:libSettings.useTVDBNaming ? TheTvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
             rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVE_AND_RENAME));
     }
 
@@ -71,7 +71,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, SerieStructureTag.RELEASE_GROUP, release.releaseGroup);
 
-                    fName += "." + release.extension;
+                    fName += "." + StringUtils.substringAfterLast(release.fileName, ".");
                     yield fName;
                 }
                 case MovieRelease movieRelease -> {
@@ -82,7 +82,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                     fName = replace(fName, MovieStructureTag.QUALITY, release.quality);
                     fName = replace(fName, MovieStructureTag.RELEASE_GROUP, release.releaseGroup);
 
-                    fName += "." + release.extension;
+                    fName += "." + StringUtils.substringAfterLast(release.fileName, ".");
                     yield fName;
                 }
             };
@@ -102,13 +102,15 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     }
 
     public String buildSubtitle(Release release, String filename, Language language, @Nullable Integer version) {
-        final String extension = "." + release.extension;
+        String extension = "." + StringUtils.substringAfterLast(release.fileName, ".");
         String subFileName = filename;
         if (version != null) {
-            subFileName = subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version.${release.extension}";
+            subFileName =
+                subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version." +
+                    StringUtils.substringAfterLast(release.fileName, ".");
         }
         if (includeLanguageCode) {
-            String langCode = language == null ? "" : languageTags.getOrDefault(language, language.langCode);
+            String langCode = language == null ? "" : languageTags.getOrDefault(language, language.iso639_3);
             subFileName = changeExtension(subFileName, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
         } else {
             subFileName = changeExtension(subFileName, ".srt");

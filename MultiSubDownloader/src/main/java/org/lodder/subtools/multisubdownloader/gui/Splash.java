@@ -11,7 +11,7 @@ import net.miginfocom.swing.MigLayout;
 public class Splash extends JWindow {
 
     @Serial
-    private static final long serialVersionUID = -7795482367449509520L;
+    private static final long serialVersionUID = 1L;
     private final JProgressBar progressBar;
 
     public Splash() {

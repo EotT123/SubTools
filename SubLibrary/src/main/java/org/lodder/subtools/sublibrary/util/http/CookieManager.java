@@ -6,7 +6,6 @@ import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -186,7 +185,7 @@ public class CookieManager {
 
     public String toString(String domain) {
         return store.computeIfAbsent(domain, _ -> new HashMap<>()).entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getKey))
+            .sorted(Entry.comparingByKey())
             .map(e -> e.getKey() + "=" + e.getValue().get(e.getKey()) + "\n").reduce("", (a, b) -> a + b);
     }
 }

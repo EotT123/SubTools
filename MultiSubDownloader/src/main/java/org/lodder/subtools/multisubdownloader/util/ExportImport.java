@@ -5,8 +5,6 @@ import static org.lodder.subtools.multisubdownloader.Messages.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.io.Serial;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -17,25 +15,21 @@ import java.util.prefs.InvalidPreferencesFormatException;
 
 import com.google.gson.GsonBuilder;
 import io.gsonfire.GsonFireBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.StandardException;
-import lombok.experimental.UtilityClass;
 import manifold.ext.props.rt.api.val;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler.MessageSeverity;
 import org.lodder.subtools.sublibrary.util.filefilter.ExtensionFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.JsonFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.XmlFileFilter;
 
-@RequiredArgsConstructor
 public class ExportImport {
 
     private final Manager manager;
@@ -43,19 +37,34 @@ public class ExportImport {
     private final UserInteractionHandler userInteractionHandler;
     private final Component parent;
 
-    @AllArgsConstructor
+    public ExportImport(Manager manager, SettingsControl settingsControl, UserInteractionHandler userInteractionHandler,
+        Component parent) {
+        this.manager = manager;
+        this.settingsControl = settingsControl;
+        this.userInteractionHandler = userInteractionHandler;
+        this.parent = parent;
+    }
+
     public enum SettingsType {
         PREFERENCES(FileType.XML), SERIE_MAPPING(FileType.JSON);
 
         @val FileType fileType;
+
+        SettingsType(FileType fileType) {
+            this.fileType = fileType;
+        }
     }
 
-    @AllArgsConstructor
     private enum FileType {
         XML(".xml", new XmlFileFilter()), JSON(".json", new JsonFileFilter());
 
         @val String extension;
         @val ExtensionFileFilter fileFilter;
+
+        FileType(String extension, ExtensionFileFilter fileFilter) {
+            this.extension = extension;
+            this.fileFilter = fileFilter;
+        }
     }
 
     public void importSettings(SettingsType listType) {
@@ -100,14 +109,17 @@ public class ExportImport {
             });
     }
 
-    @UtilityClass
     public static class ExportImportPreferences {
 
-        public void exportSettings(Path path, SettingsControl settingsControl) throws Exception {
+        private ExportImportPreferences() {
+            // hide utility class constructor
+        }
+
+        public static void exportSettings(Path path, SettingsControl settingsControl) throws Exception {
             settingsControl.exportPreferences(path);
         }
 
-        public void importSettings(Path path, UserInteractionHandler userInteractionHandler,
+        public static void importSettings(Path path, UserInteractionHandler userInteractionHandler,
             SettingsControl settingsControl) throws CorruptSettingsFileException {
             try {
                 settingsControl.importPreferences(path);
@@ -117,43 +129,36 @@ public class ExportImport {
         }
     }
 
-    @UtilityClass
     public static class ExportImportSerieMapping {
 
-        public void exportSettings(Path path, Manager manager) throws IOException {
-            List<SeriemappingWithKey> serieMappingsWithKey = MappingType.values().stream()
-                .map(MappingType::getSelectionForKeyPrefixList)
-                .flatMap(Arrays::stream)
-                .flatMap(selectionForKeyPrefix -> manager.getCache(CacheType.DISK,
-                        k -> k.startsWith(selectionForKeyPrefix.keyPrefix())).getEntries(SerieMapping.class)
-                    .stream()
-                    .map(pair -> new SeriemappingWithKey(pair.getKey(), pair.getValue())))
+        private ExportImportSerieMapping() {
+            // hide utility class constructor
+        }
+
+        public static void exportSettings(Path path, Manager manager) throws IOException {
+            List<SerieMappingWithKey> serieMappingsWithKey = MappingType.values().stream()
+                .map(mappingType -> mappingType.getValues(manager)).flatMap(List::stream)
+                .map(pair -> new SerieMappingWithKey(pair.getKey(), pair.getValue()))
                 .toList();
             Files.writeString(path, new GsonBuilder().setPrettyPrinting().create().toJson(serieMappingsWithKey));
         }
 
-        public void importSettings(Path path, UserInteractionHandler userInteractionHandler, Manager manager)
+        public static void importSettings(Path path, UserInteractionHandler userInteractionHandler, Manager manager)
             throws CorruptSettingsFileException {
-            SeriemappingWithKey[] serieMappings;
+            SerieMappingWithKey[] serieMappings;
             try {
                 serieMappings = new GsonFireBuilder().enableHooks(SerieMapping.class)
                     .createGson()
-                    .fromJson(Files.readString(path), SeriemappingWithKey[].class);
+                    .fromJson(Files.readString(path), SerieMappingWithKey[].class);
             } catch (IOException e) {
                 throw new CorruptSettingsFileException(e);
             }
-            getImportStyle(userInteractionHandler).ifPresent(importStyle -> {
-                if (importStyle == ImportStyle.OVERWRITE) {
-                    MappingType.values().stream()
-                        .map(MappingType::getSelectionForKeyPrefixList)
-                        .flatMap(Arrays::stream)
-                        .forEach(selectionForKeyPrefix ->
-                            manager.getCache(CacheType.DISK, k -> k.startsWith(selectionForKeyPrefix.keyPrefix))
-                                .clearExpiredCache());
+            getImportStyle(userInteractionHandler).ifPresent(importStyle -> serieMappings.forEach(serieMapping -> {
+                CacheKey cacheKey = new CacheKey(manager, CacheType.DISK, serieMapping.key);
+                if (!cacheKey.isPresent() || importStyle == ImportStyle.OVERWRITE) {
+                    cacheKey.store(Value.of(serieMapping.serieMapping));
                 }
-                serieMappings.forEach(serieMapping ->
-                    manager.getCache(CacheType.DISK, serieMapping.key).store(Value.of(serieMapping.serieMapping)));
-            });
+            }));
         }
 
         private static Optional<ImportStyle> getImportStyle(UserInteractionHandler userInteractionHandler) {
@@ -166,16 +171,11 @@ public class ExportImport {
                 });
         }
 
-        @AllArgsConstructor
-        @Data
-        private static class SeriemappingWithKey implements Serializable {
-            @Serial private static final long serialVersionUID = 1L;
-            private String key;
-            private SerieMapping serieMapping;
+        private record SerieMappingWithKey(ProviderCacheKey key, SerieMapping serieMapping) {
         }
     }
 
-    private Optional<Path> chooseFile(FileType fileType) {
+    private Optional<Path> chooseFile(ExportImport.FileType fileType) {
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setAcceptAllFileFilterUsed(false);
@@ -192,7 +192,9 @@ public class ExportImport {
         OVERWRITE, APPEND
     }
 
-    @StandardException
     public static class CorruptSettingsFileException extends Exception {
+        public CorruptSettingsFileException(Throwable cause) {
+            super(cause);
+        }
     }
 }

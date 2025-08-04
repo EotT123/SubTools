@@ -4,13 +4,15 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import lombok.RequiredArgsConstructor;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 
-@RequiredArgsConstructor
 public class PopupListener extends MouseAdapter {
 
     private final JPopupMenu popupMenu;
+
+    public PopupListener(JPopupMenu popupMenu) {
+        this.popupMenu = popupMenu;
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {

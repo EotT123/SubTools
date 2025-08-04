@@ -4,14 +4,16 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 
-@UtilityClass
 @Extension
 public class ArrayExt {
+
+    private ArrayExt() {
+        // hide utility class constructor
+    }
 
     /**
      * Performs an action for each element of the array.

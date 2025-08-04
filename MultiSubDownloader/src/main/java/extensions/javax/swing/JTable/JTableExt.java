@@ -1,17 +1,19 @@
 package extensions.javax.swing.JTable;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.TableModel;
 import java.util.function.Function;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 
 @Extension
-@UtilityClass
 public class JTableExt {
+
+    private JTableExt() {
+        // hide utility class constructor
+    }
 
     public static @Self JTable model(@This JTable jTable, TableModel dataModel) {
         jTable.setModel(dataModel);

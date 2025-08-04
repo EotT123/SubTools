@@ -5,15 +5,16 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.function.Consumer;
 
-import lombok.experimental.UtilityClass;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
-@UtilityClass
 @Extension
 public class AbstractButtonExt {
+    private AbstractButtonExt() {
+        // hide utility class constructor
+    }
 
     public static @Self AbstractButton actionListener(@This AbstractButton abstractButton, ActionListener listener) {
         abstractButton.addActionListener(listener);
