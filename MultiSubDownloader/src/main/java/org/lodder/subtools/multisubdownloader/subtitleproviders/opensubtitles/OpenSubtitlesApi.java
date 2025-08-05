@@ -267,7 +267,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                         .header("Authorization", "Bearer " + getBearerToken(credentials.username, credentials.password))
                         .header("Content-Type", "application/json")
                         .header("User-Agent", "Test v1.0")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"10274768\"}"))
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
                         .build();
 
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

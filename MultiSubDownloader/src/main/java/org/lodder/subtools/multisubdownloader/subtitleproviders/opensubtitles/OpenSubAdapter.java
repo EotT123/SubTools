@@ -126,9 +126,10 @@ public final class OpenSubAdapter
     public OpenSubtilteSubtitle convertToSubtitle(Release release, org.opensubtitles.model.Subtitle sub) {
         SubtitleAttributes attr = sub.getAttributes();
         Language language = Language.ofIso639_1(attr.language);
+        int fileId = attr.files.stream().findFirst().orElseThrow().fileId.intValue();
         return ReleaseParser.parse(attr.release)
             .map(r -> new OpenSubtilteSubtitle(
-                urlSupplier:() -> api.getDownloadUrl(attr.legacySubtitleId.intValue()),
+                urlSupplier:() -> api.getDownloadUrl(fileId),
                 fileName:attr.release,
                 language:language,
                 releaseGroup:r.releaseGroup,
@@ -138,7 +139,7 @@ public final class OpenSubAdapter
             .orElseGet(() -> {
                 ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
                 return new OpenSubtilteSubtitle(
-                    urlSupplier:() -> api.getDownloadUrl(attr.legacySubtitleId.intValue()),
+                    urlSupplier:() -> api.getDownloadUrl(fileId),
                     fileName:attr.release,
                     language:Language.ofIso639_1(attr.language),
                     releaseGroup:extraInfo.getReleaseGroupBestEffort(),
