@@ -43,7 +43,7 @@ public class Messages {
     }
 
     private static ResourceBundle getMessageBundle(Language language) {
-        Locale locale = language == Language.ENGLISH ? Locale.ROOT : Locale.forLanguageTag(language.iso639_3);
+        Locale locale = language == Language.ENGLISH ? Locale.ROOT : Locale.forLanguageTag(language.iso639_1);
         return ResourceBundle.getBundle(BUNDLE_NAME, locale);
     }
 
