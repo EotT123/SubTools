@@ -5,3 +5,7 @@ Coverity Scan:
 
 SubTools
 ========
+
+[![TheTVDB Logo](/images/attribution/logo1.png)](https://thetvdb.com/subscribe)
+Metadata provided by [TheTVDB](https://thetvdb.com/subscribe). Please consider adding missing information or
+subscribing.
