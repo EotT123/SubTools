@@ -99,6 +99,10 @@
             <groupId>systems.manifold</groupId>
             <artifactId>manifold-yaml-rt</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.uwetrottmann.thetvdb-java</groupId>
+            <artifactId>thetvdb-java</artifactId>
+        </dependency>
         <!-- prompter -->
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
