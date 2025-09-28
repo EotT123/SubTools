@@ -119,7 +119,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
 
     public Set<SUB> searchSubtitles(TvRelease tvRelease, Language language) {
         // Search using other provider ids
-        List<Collection<API_SUB>> subtitles = tvRelease.episodes.stream().flatMap(episode -> {
+        List<API_SUB> subtitles = tvRelease.episodes.stream().flatMap(episode -> {
             try {
                 return searchSubtitles(tvRelease.providerIds, tvRelease.season, episode, language).stream();
             } catch (Exception e) {
@@ -129,8 +129,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             }
         }).toList();
         if (!subtitles.isEmpty()) {
-            return subtitles.stream().flatMap(Collection::stream)
-                .map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet();
+            return subtitles.stream().map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet();
         }
         // Search using current provider id
         try {
@@ -138,8 +137,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                 .mapEx(mapping -> tvRelease.episodes.stream()
                     .flatMap(episode -> {
                         try {
-                            return searchSubtitles(mapping, tvRelease.season, episode, language).stream()
-                                .flatMap(Collection::stream);
+                            return searchSubtitles(mapping, tvRelease.season, episode, language).stream();
                         } catch (Exception e) {
                             LOGGER.error("API $source searchSubtitles for serie [%s] (%s)".formatted(
                                     TvRelease.formatName(mapping.providerName, tvRelease.season, episode),
@@ -158,12 +156,11 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
     }
 
-    public abstract Optional<Collection<API_SUB>> searchSubtitles(ProviderIds providerIds, int season, int episode,
+    public abstract Collection<API_SUB> searchSubtitles(ProviderIds providerIds, int season, int episode,
         Language language) throws X;
 
-    public abstract Optional<Collection<API_SUB>> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode,
-        Language language) throws X;
+    public abstract Collection<API_SUB> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws X;
 
     public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
         if (StringUtils.isNotBlank(tvRelease.customName)) {

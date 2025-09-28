@@ -78,16 +78,17 @@ public final class PodnapisiAdapter
     }
 
     @Override
-    public Optional<Collection<PodnapisiSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
+    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws PodnapisiException {
         return providerIds.getImdbId()
-            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language));
+            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language))
+            .orElse(List.of());
     }
 
     @Override
-    public Optional<Collection<PodnapisiSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws PodnapisiException {
-        return Optional.of(api.getSerieSubtitles(serieMapping.providerName, season, episode, language));
+        return api.getSerieSubtitles(serieMapping.providerName, season, episode, language);
     }
 
     // ====== \\

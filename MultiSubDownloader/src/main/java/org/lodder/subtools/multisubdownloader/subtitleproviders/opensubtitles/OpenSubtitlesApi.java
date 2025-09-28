@@ -124,9 +124,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
             .get(() -> getBearerTokenWithoutCache(username, password)
-                .orElseThrow(() -> OpenSubtitleApiException.noResult("Could not acquire a bearer token, " +
-                    "invalid username/password?")),
-                timeToLive:23.5hr);
+                    .orElseThrow(() -> OpenSubtitleApiException.noResult("Could not acquire a bearer token, " +
+                        "invalid username/password?")),
+                timeToLive:23.5 hr);
     }
 
     private static Optional<String> getBearerTokenWithoutCache(String username, String password)
@@ -160,14 +160,14 @@ public class OpenSubtitlesApi implements SubtitleApi {
             .getCollection(() -> {
                 try {
                     return manager.getAsJsonArray(PageContentParams.params(
-                            url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
-                                + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
-                            cacheType:CacheType.MEMORY,
-                            userAgent:"",
-                            retry:new Retry(
-                                1,
-                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5Second)
+                        url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
+                        + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
+                        cacheType:CacheType.MEMORY,
+                        userAgent:"",
+                        retry:new Retry(
+                        1,
+                        exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                        5Second)
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))

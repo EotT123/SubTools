@@ -110,17 +110,15 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public Optional<Collection<SubsceneSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
-        int episode,
-        Language language) throws SubsceneException {
-        return Optional.empty();
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws SubsceneException {
+        return List.of();
     }
 
     @Override
-    public Optional<Collection<SubsceneSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode,
-        Language language) throws SubsceneException {
-        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws SubsceneException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override

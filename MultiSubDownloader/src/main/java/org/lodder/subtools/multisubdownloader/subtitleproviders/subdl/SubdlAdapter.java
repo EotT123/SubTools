@@ -83,16 +83,16 @@ public final class SubdlAdapter extends
     }
 
     @Override
-    public Optional<Collection<SubdlSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season, int episode,
+    public Collection<SubdlSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
         Language language) throws SubdlException {
         return providerIds.getImdbId().mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode,
-            language));
+            language)).orElse(List.of());
     }
 
     @Override
-    public Optional<Collection<SubdlSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<SubdlSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws SubdlException {
-        return Optional.of(api.getSerieSubtitles(serieMapping.providerId, season, episode, language));
+        return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     // ====== \\

@@ -71,17 +71,15 @@ public final class TvSubtitlesAdapter
     // ===== \\
 
     @Override
-    public Optional<Collection<TVSubtitlesSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
-        int episode,
-        Language language) throws TvSubtitleException {
-        return Optional.empty();
+    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws TvSubtitleException {
+        return List.of();
     }
 
     @Override
-    public Optional<Collection<TVSubtitlesSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode,
-        Language language) throws TvSubtitleException {
-        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
+    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws TvSubtitleException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override

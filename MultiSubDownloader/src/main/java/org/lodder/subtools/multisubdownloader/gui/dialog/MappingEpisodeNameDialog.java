@@ -45,8 +45,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private MappingType selectedMappingType;
 
     public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
-        SubtitleProviderStore subtitleProviderStore,
-        UserInteractionHandlerGUI userInteractionHandler) {
+        SubtitleProviderStore subtitleProviderStore, UserInteractionHandlerGUI userInteractionHandler) {
         super(frame, getText("MappingEpisodeNameDialog.Title"), true);
         this.subtitleProviderStore = subtitleProviderStore;
         this.mappingTableModel = new MappingTableModel(manager);
