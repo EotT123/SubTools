@@ -32,6 +32,9 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
             ElementWrapper<T>[] wrappedOptions = options.stream()
                 .map(option -> new ElementWrapper<>(option, toStringMapper == null ? String::valueOf : toStringMapper))
                 .toArray(ElementWrapper[]::new);
+            if (wrappedOptions.length == 0) {
+                return Optional.empty();
+            }
             return Optional.ofNullable(
                     (ElementWrapper<T>) JOptionPane.showInputDialog(frame, message, title, JOptionPane.DEFAULT_OPTION,
                         null, wrappedOptions, wrappedOptions[0]))
