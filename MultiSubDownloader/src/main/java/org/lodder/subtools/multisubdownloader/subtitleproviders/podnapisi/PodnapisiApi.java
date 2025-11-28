@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 import static java.nio.charset.StandardCharsets.*;
 import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
-import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -26,6 +25,7 @@ import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.Retry;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.data.ProviderId;
@@ -200,7 +200,7 @@ public class PodnapisiApi implements SubtitleApi {
 
     protected @Nullable Document getXml(String url) throws PodnapisiApiException {
         try {
-            return manager.getAsJsoupDocument(params(url, CacheType.MEMORY, userAgent,
+            return manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
                 new Retry(
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&

@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-final class ExpiringCacheObject<V> implements CacheObject<V> {
+public final class ExpiringCacheObject<V> implements CacheObject<V> {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ final class ExpiringCacheObject<V> implements CacheObject<V> {
     @var @set(Private) Time lastAccessed = Time.now();
     @override @var @Nullable V value;
 
-    public ExpiringCacheObject(Time created, Time lastAccessed, V value) {
+    public ExpiringCacheObject(Time created, Time lastAccessed, @Nullable V value) {
         this.created = created;
         this.lastAccessed = lastAccessed;
         this.value = value;

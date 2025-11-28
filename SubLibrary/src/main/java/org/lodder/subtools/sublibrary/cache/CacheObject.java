@@ -19,10 +19,4 @@ public sealed interface CacheObject<V> extends Serializable permits ExpiringCach
     boolean isExpired(Time ttl);
 
     String toString(Function<V, String> valueToStringMapper);
-
-    static <V> CacheObject<V> fromString(String string, Function<String, V> valueToObjectMapper) {
-        return ExpiringCacheObject.fromString(string, valueToObjectMapper)
-            .orElseGet(() -> TemporaryCacheObject.fromString(string, valueToObjectMapper)
-                .orElseThrow(() -> new IllegalStateException("Could not parse value: $string")));
-    }
 }

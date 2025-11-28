@@ -15,11 +15,12 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-final class TemporaryCacheObject<V> implements CacheObject<V> {
+public final class TemporaryCacheObject<V> implements CacheObject<V> {
 
     @Serial
     private static final long serialVersionUID = 1L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
+
     @override @val Time created;
     @val Time timeToLive;
     @override @val @Nullable V value;

@@ -193,7 +193,7 @@ public class SubsceneApi implements SubtitleApi {
         }
 
         Document document =
-            manager.getAsJsoupDocument(PageContentParams.params(
+            manager.getAsJsoupDocument(new PageContentParams(
                 url:url,
                 userAgent:"",
                 retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));

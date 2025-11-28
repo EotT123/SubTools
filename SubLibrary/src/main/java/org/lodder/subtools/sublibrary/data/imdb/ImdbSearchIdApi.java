@@ -1,7 +1,5 @@
 package org.lodder.subtools.sublibrary.data.imdb;
 
-import static org.lodder.subtools.sublibrary.PageContentParams.*;
-
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +17,7 @@ import org.jsoup.select.Elements;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
+import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
@@ -45,7 +44,8 @@ record ImdbSearchIdApi(Manager manager) {
                 });
                 String url = sb.toString().replace("+", "%20");
                 try {
-                    Elements searchResults = manager.getAsJsoupDocument(url(url)).select(".find-result-item");
+                    Elements searchResults =
+                        manager.getAsJsoupDocument(new PageContentParams(url)).select(".find-result-item");
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirst("a").text(),
                         e -> e.selectFirst("a").attr("href"), e -> e.selectFirst("span").text(),
@@ -64,7 +64,7 @@ record ImdbSearchIdApi(Manager manager) {
             .get(() -> {
                 String url = "https://www.imdb.com/title/" + imdbId;
                 try {
-                    String json = manager.getAsJsoupDocument(url(url))
+                    String json = manager.getAsJsoupDocument(new PageContentParams(url))
                         .selectFirst("html > head > script[type=\"application/ld+json\"]").data();
                     JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
                     String name = jsonObject.get("name").getAsString();
@@ -97,7 +97,7 @@ record ImdbSearchIdApi(Manager manager) {
                 String url = sb.toString();
 
                 try {
-                    Elements searchResults = manager.getAsJsoupDocument(url(url))
+                    Elements searchResults = manager.getAsJsoupDocument(new PageContentParams(url))
                         .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
                     Function<Element, String> toStringMapper = e -> Optional.ofNullable((Element) e.selectFirst("h3"))
                         .map(e2 -> e2.text().replace(" - IMDb", ""))
@@ -125,7 +125,8 @@ record ImdbSearchIdApi(Manager manager) {
                 String url = sb.toString();
                 try {
                     Elements searchResults =
-                        manager.getAsJsoupDocument(url(url)).select("a[href*='https://www.imdb.com/title/tt']");
+                        manager.getAsJsoupDocument(new PageContentParams(url))
+                            .select("a[href*='https://www.imdb.com/title/tt']");
                     Function<Element, String> toStringMapper =
                         e -> e.selectFirst("span").text().replace(" - IMDb", "");
                     Function<Element, String> toHrefMapper = e -> e.attr("href");

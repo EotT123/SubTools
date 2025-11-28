@@ -159,7 +159,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
             .getCollection(() -> {
                 try {
-                    return manager.getAsJsonArray(PageContentParams.params(
+                    return manager.getAsJsonArray(new PageContentParams(
                         url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                         + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
                         cacheType:CacheType.MEMORY,

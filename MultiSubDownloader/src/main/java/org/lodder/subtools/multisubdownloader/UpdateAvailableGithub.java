@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader;
 
 import static java.time.temporal.ChronoUnit.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
-import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -84,7 +83,7 @@ public class UpdateAvailableGithub {
                 try {
                     String currentVersion = getVersion();
                     Element element =
-                        manager.getAsJsoupDocument(PageContentParams.params(
+                        manager.getAsJsoupDocument(new PageContentParams(
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
@@ -99,7 +98,7 @@ public class UpdateAvailableGithub {
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
                     Element artifactElement = manager.getAsJsoupDocument(
-                            PageContentParams.params(url:versionBlockUrl, userAgent:null))
+                            new PageContentParams(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
@@ -122,7 +121,7 @@ public class UpdateAvailableGithub {
                     LocalDateTime buildTista = getBuildTista();
 
                     Element rowElement =
-                        manager.getAsJsoupDocument(PageContentParams.params(
+                        manager.getAsJsoupDocument(new PageContentParams(
                                 url:"$REPO_URL/actions?query=branch%3Amaster",
                                 cacheType:CacheType.MEMORY,
                                 userAgent:null))
@@ -134,7 +133,7 @@ public class UpdateAvailableGithub {
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getAsJsoupDocument(params(url, CacheType.MEMORY))
+                    String downloadUrl = manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();
