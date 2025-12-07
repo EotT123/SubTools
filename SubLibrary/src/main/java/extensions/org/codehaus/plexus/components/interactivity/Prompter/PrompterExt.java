@@ -3,6 +3,7 @@ package extensions.org.codehaus.plexus.components.interactivity.Prompter;
 import static com.pivovarit.gatherers.MoreGatherers.*;
 import static java.lang.System.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,16 +19,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import dnl.utils.text.table.TextTable;
-import manifold.ext.rt.api.This;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
 
 // see #692
 //@Extension
+@NullMarked
 public class PrompterExt {
 
     private PrompterExt() {
@@ -44,7 +46,7 @@ public class PrompterExt {
             getText("Prompter.NoAbbreviation").equalsIgnoreCase(v) ||
             getText("Prompter.No").equalsIgnoreCase(v));
 
-    public static void show(@This Prompter prompter, String message, Object... replacements) {
+    public static void show(Prompter prompter, String message, Object... replacements) {
         try {
             prompter.showMessage(message.formatted(replacements));
         } catch (PrompterException e) {
@@ -52,32 +54,36 @@ public class PrompterExt {
         }
     }
 
-    public static void pressAnyKeyToContinue(@This Prompter prompter) {
-        prompt(prompter:prompter, message:"Press any key to continue", toObjectMapper:Function.identity());
+    public static void pressAnyKeyToContinue(Prompter prompter) {
+        prompt(prompter, "Press any key to continue", List.of(), Function.identity());
     }
 
-    public static Optional<String> promptString(@This Prompter prompter, String message,
-        List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR),
-        List<Validator<String>> objectValidators=new ArrayList<Validator<String>>()) {
+    public static Optional<String> promptString(Prompter prompter, String message,
+        @Nullable List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR),
+        @Nullable List<Validator<String>> objectValidators=new ArrayList<Validator<String>>()) {
 
-        return prompt(prompter, message, inputValidators, Function.identity(), objectValidators);
+        return prompt(prompter, message, ifNullThenGet(inputValidators, () -> List.of(NON_BLANK_VALIDATOR)),
+            Function.identity(), ifNullThenGet(objectValidators, List::of));
     }
 
-    public static OptionalInt promptInt(@This Prompter prompter, String message,
-        List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR, INT_VALIDATOR),
-        Function<String, Integer> toObjectMapper=Integer::parseInt,
-        List<Validator<Integer>> objectValidators=new ArrayList<Validator<Integer>>()) {
+    public static OptionalInt promptInt(Prompter prompter, String message,
+        @Nullable List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR, INT_VALIDATOR),
+        @Nullable Function<String, Integer> toObjectMapper=Integer::parseInt,
+        @Nullable List<Validator<Integer>> objectValidators=new ArrayList<Validator<Integer>>()) {
 
-        return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators).mapToIntEx(v -> v);
+        return prompt(prompter, message,
+            ifNullThenGet(inputValidators, () -> List.of(NON_BLANK_VALIDATOR, INT_VALIDATOR)),
+            toObjectMapper != null ? toObjectMapper : Integer::parseInt,
+            ifNullThenGet(objectValidators, List::of)).mapToIntEx(v -> v);
     }
 
-    public static Optional<Boolean> promptBoolean(@This Prompter prompter, String message,
+    public static Optional<Boolean> promptBoolean(Prompter prompter, String message,
         List<Validator<String>> inputValidators=List.of(NON_BLANK_VALIDATOR, BOOLEAN_VALIDATOR)) {
 
         return prompt(prompter, message, inputValidators, Boolean::parseBoolean, List.of());
     }
 
-    public static <T> Optional<T> promptValueFromList(@This Prompter prompter,
+    public static <T> Optional<T> promptValueFromList(Prompter prompter,
         String message,
         Iterable<T> elements,
         Function<T, String> toStringMapper=String::valueOf,
@@ -85,11 +91,12 @@ public class PrompterExt {
         @Nullable TableDisplayer<T> tableDisplayer=null,
         @Nullable Comparator<T> sorter=null) {
 
-        Validator<String> inputValidator =
+        Validator<@Nullable String> inputValidator =
             new Validator<>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt).isPresent());
-        Function<String, Integer> toObjectMapper = v -> v == null ? null : Integer.parseUnsignedInt(v);
+        Function<@Nullable String, @Nullable Integer> toObjectMapper =
+            v -> v == null ? null : Integer.parseUnsignedInt(v);
         int numberOfElements = elements.size();
-        List<Validator<Integer>> objectValidators =
+        List<Validator<@Nullable Integer>> objectValidators =
             List.of(new Validator<>(number -> number == null || (number > 0 && number <= numberOfElements),
                 getText("Prompter.ValueNotInRange", numberOfElements)));
 
@@ -103,7 +110,7 @@ public class PrompterExt {
             List.of(inputValidator), promptFunction);
     }
 
-    public static <T> List<T> promptValuesFromList(@This Prompter prompter,
+    public static <T> List<T> promptValuesFromList(Prompter prompter,
         String message,
         Iterable<T> elements,
         Function<T, String> toStringMapper=String::valueOf,
@@ -111,7 +118,7 @@ public class PrompterExt {
         @Nullable TableDisplayer<T> tableDisplayer=null,
         @Nullable Comparator<T> sorter=null) {
 
-        Validator<String> inputValidator = new Validator<>(v -> v == null ||
+        Validator<@Nullable String> inputValidator = new Validator<>(v -> v == null ||
             v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt).isPresent()));
         Function<String, int[]> toObjectsMapper =
             v -> Arrays.stream(v.split(",")).mapToInt(Integer::parseUnsignedInt).toArray();
@@ -167,8 +174,8 @@ public class PrompterExt {
 
     private static <T> Optional<T> prompt(Prompter prompter, String message,
         List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
-        Function<String, T> toObjectMapper,
-        List<Validator<T>> objectValidators=new ArrayList<Validator<T>>()) {
+        Function<String, @Nullable T> toObjectMapper,
+        List<Validator<@Nullable T>> objectValidators=new ArrayList<Validator<T>>()) {
         try {
             String value = prompter.prompt(message + System.lineSeparator());
             for (Validator<String> inputValidator : inputValidators) {
@@ -178,7 +185,7 @@ public class PrompterExt {
                 }
             }
             T object = toObjectMapper.apply(value);
-            for (Validator<T> objectValidator : objectValidators) {
+            for (Validator<@Nullable T> objectValidator : objectValidators) {
                 if (objectValidator.isInvalid(object)) {
                     prompter.showMessage(objectValidator.errorMessage);
                     return prompt(prompter, message, inputValidators, toObjectMapper, objectValidators);
@@ -190,7 +197,7 @@ public class PrompterExt {
         }
     }
 
-    public static <T> T promptValues(@This Prompter prompter, String message,
+    public static <T> T promptValues(Prompter prompter, String message,
         List<Validator<String>> inputValidators=new ArrayList<Validator<String>>(),
         Function<String, T> toObjectsMapper,
         List<Validator<T>> objectValidators=new ArrayList<Validator<T>>()) {

@@ -8,12 +8,13 @@ import java.util.function.Function;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.gui.InputPane;
 import org.lodder.subtools.sublibrary.util.Validator;
 
+@NullMarked
 public class UserInteractionHandlerGUI implements UserInteractionHandler {
 
     private static final Object LOCK = new Object();
@@ -25,6 +26,7 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
         this.frame = frame;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<T> selectFromList(Iterable<T> options, String message,
         @Nullable String title, @Nullable Function<T, String> toStringMapper) {
@@ -36,9 +38,8 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
                 return Optional.empty();
             }
             return Optional.ofNullable(
-                    (ElementWrapper<T>) JOptionPane.showInputDialog(frame, message, title, JOptionPane.DEFAULT_OPTION,
-                        null, wrappedOptions, wrappedOptions[0]))
-                .map(ElementWrapper::element);
+                (ElementWrapper<T>) JOptionPane.showInputDialog(frame, message, title, JOptionPane.DEFAULT_OPTION, null,
+                    wrappedOptions, wrappedOptions[0])).map(ElementWrapper::element);
         }
     }
 
@@ -97,7 +98,7 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
 
     private record ElementWrapper<T>(T element, Function<T, String> toStringMapper) {
         @Override
-        public @NonNull String toString() {
+        public String toString() {
             return toStringMapper.apply(element);
         }
     }

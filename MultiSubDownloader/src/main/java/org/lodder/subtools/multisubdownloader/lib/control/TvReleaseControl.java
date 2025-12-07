@@ -50,7 +50,7 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
             .map(serie -> serie.providerId)
             .ifPresent(tvdbId -> release.providerIds.add(ProviderIdType.TVDB, Integer.parseInt(tvdbId))));
         if (release.providerIds.getTvdbId().isEmpty()) {
-            throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
+//            throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
         }
     }
 

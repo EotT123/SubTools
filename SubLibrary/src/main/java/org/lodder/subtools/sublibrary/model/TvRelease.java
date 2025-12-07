@@ -9,9 +9,11 @@ import java.util.TreeSet;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 
+@NullMarked
 public final class TvRelease extends Release {
 
     // parsed from the filename
@@ -33,8 +35,7 @@ public final class TvRelease extends Release {
 
     public TvRelease(String name, int season, List<Integer> episodes, @Nullable Path file=null,
         @Nullable String releaseGroup=null, @Nullable String quality=null, @Nullable String originalName=name,
-        @Nullable String customName=null, @Nullable String title=null,
-        boolean special=false) {
+        @Nullable String customName=null, @Nullable String title=null, boolean special=false) {
         super(name, VideoType.EPISODE, file, releaseGroup, quality);
         this.title = title;
         this.season = season;

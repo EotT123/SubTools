@@ -9,11 +9,13 @@ import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 
+@NullMarked
 public abstract class Subtitle implements Serializable {
 
     @val @Nullable String fileName;

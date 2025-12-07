@@ -4,9 +4,11 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
+@NullMarked
 public class UserInteractionSettings implements UserInteractionSettingsIntf {
 
     @override @val boolean optionsAlwaysConfirm;

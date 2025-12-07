@@ -123,7 +123,6 @@ public class Manager {
         public org.jsoup.nodes.Document postAsJsoupDocument() throws ManagerException {
             return Jsoup.parse(post());
         }
-
     }
 
     // ================ \\
@@ -208,7 +207,7 @@ public class Manager {
 
     public record Retry(int retries, Predicate<Exception> predicate, Time waitTime) {
 
-        public static final Retry NONE = new Retry(0, null, 0Second);
+        public static final Retry NONE = new Retry(0, null, 0 Second);
 
         public Retry {
             if (retries < 0) {
@@ -260,7 +259,7 @@ public class Manager {
 
         public Optional<Time> getTemporaryTimeToLive() {
             return manager.getOptionalCache(cacheType).map(cache -> cache.getTemporaryTimeToLive(key))
-                .orElseGet(() -> Optional.of(0Second));
+                .orElseGet(() -> Optional.of(0 Second));
         }
 
         public void remove() {
@@ -268,7 +267,7 @@ public class Manager {
         }
 
         public <V, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
-            Retry retry=Retry.NONE, Time timeToLive=null) throws X {
+            @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
             ProviderCache<V> cache = manager.getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
                 return cache.get(key).orElseThrow();
@@ -330,7 +329,7 @@ public class Manager {
         }
 
         public <V, X extends Exception> Optional<V> getOptional(
-            ThrowingSupplier<Optional<V>, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
+            ThrowingSupplier<Optional<V>, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
             boolean storeTempNullValue=false) throws X {
             Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
 
@@ -338,7 +337,7 @@ public class Manager {
                 ProviderCache<V> cache = optionalCache.get();
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
-                    store(Value.ofOptional(supplier), retry, storeTempNullValue, timeToLive);
+                    store(Value.ofOptional(supplier), storeTempNullValue, timeToLive, retry);
                     return cache.get(key);
                 } else if (containsKey && !isExpiredTemporary()) {
                     return cache.get(key);
@@ -371,13 +370,13 @@ public class Manager {
         }
 
         public <X extends Exception> OptionalInt getOptionalInt(
-            ThrowingSupplier<OptionalInt, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
+            ThrowingSupplier<OptionalInt, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
             boolean storeTempNullValue=false) throws X {
 
             return manager.getOptionalCache(cacheType).mapEx(cache -> {
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
-                    store(Value.ofOptionalInt(supplier), retry, storeTempNullValue, timeToLive);
+                    store(Value.ofOptionalInt(supplier), storeTempNullValue, timeToLive, retry);
                     return cache.get(key).mapToIntEx(t -> (int) t);
                 } else if (containsKey && !isExpiredTemporary()) {
                     return cache.get(key).mapToIntEx(t -> (int) t);
@@ -408,15 +407,15 @@ public class Manager {
         }
 
         public <V, X extends Exception> void store(Value<V, X> value,
-            Retry retry=Retry.NONE, boolean storeTempNullValue=false, @Nullable Time timeToLive=null) throws X {
+            boolean storeTempNullValue=false, @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
 
             V object = value.getValue(retry);
-            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12hr) * 2 : timeToLive;
+            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
             manager.getCache(cacheType).put(key, object, ttl);
         }
 
         public <V, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
-            Time ttl = getTemporaryTimeToLive().orElse(1hr) * 2;
+            Time ttl = getTemporaryTimeToLive().orElse(1 hr) * 2;
             manager.getCache(cacheType).put(key, value.getValue(), ttl);
         }
     }

@@ -1,6 +1,8 @@
 package org.lodder.subtools.sublibrary.model;
 
-public enum ProviderIdType {
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
+public enum ProviderIdType {
     IMDB, TVDB, OMDB
 }

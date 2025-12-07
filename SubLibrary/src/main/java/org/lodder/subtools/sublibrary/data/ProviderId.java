@@ -8,7 +8,9 @@ import java.util.Objects;
 
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ProviderId implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;

@@ -8,15 +8,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProviderIds {
-    private final Map<ProviderIdType, Object> providerIdMap = new LinkedHashMap<>();
+    private final Map<ProviderIdType, @Nullable Object> providerIdMap = new LinkedHashMap<>();
 
     public ProviderIds add(ProviderIdType providerIdType, Object value){
         providerIdMap.put(providerIdType, value);
         return this;
     }
 
-    public Object get(ProviderIdType providerIdType){
+    public @Nullable Object get(ProviderIdType providerIdType) {
         return providerIdMap.get(providerIdType);
     }
     public OptionalInt getTvdbId(){

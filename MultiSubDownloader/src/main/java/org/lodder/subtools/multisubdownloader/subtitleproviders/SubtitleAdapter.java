@@ -373,8 +373,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             // expiration time.
             cacheKey.store(
                 value:Value.ofOptional(Optional.empty()),
-                timeToLive:1 day,
-                storeTempNullValue:true);
+                storeTempNullValue:true,
+                timeToLive:1 day);
             return Optional.empty();
         } else {
             Optional<M> result = Optional.of(releaseMapping);

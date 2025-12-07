@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.model;
 
+import static util.Utils.*;
+
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -7,8 +9,10 @@ import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract sealed class Release permits MovieRelease, TvRelease {
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
@@ -40,12 +44,12 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return matchingSubsSet.size();
     }
 
-    public String getFileName() {
+    public @Nullable String getFileName() {
         return filePath != null ? filePath.getFileName().toString() : null;
     }
 
-    public Path getPath() {
-        return filePath != null ? filePath.getParent() : null;
+    public @Nullable Path getPath() {
+        return ifNotNull(filePath, Path::getParent);
     }
 
     public boolean hasExtension(String extension) {
@@ -57,7 +61,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
         return "${getClass().getSimpleName()}: $fileName $quality";
     }
 
-    public String getReleaseDescription() {
+    public @Nullable String getReleaseDescription() {
         return fileName;
     }
 
