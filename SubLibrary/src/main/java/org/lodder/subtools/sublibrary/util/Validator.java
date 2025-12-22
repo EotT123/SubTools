@@ -4,6 +4,9 @@ import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public record Validator<T>(Predicate<? super T> predicate, String errorMessage=getText("Prompter.ValueIsNotValid")) {
     public boolean isValid(T value) {
         return predicate.test(value);

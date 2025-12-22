@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.gui.actions.search;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -19,6 +20,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
+@NullMarked
 public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
 
     public TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,

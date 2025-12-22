@@ -7,6 +7,7 @@ import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PartialDisableComboBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
@@ -17,6 +18,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public abstract sealed class VideoLibraryPanel extends JPanel implements PreferencePanelIntf
     permits EpisodeLibraryPanel, MovieLibraryPanel {
 

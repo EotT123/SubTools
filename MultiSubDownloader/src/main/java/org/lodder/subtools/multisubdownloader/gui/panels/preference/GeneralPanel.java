@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
@@ -27,6 +28,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial private static final long serialVersionUID = 1L;

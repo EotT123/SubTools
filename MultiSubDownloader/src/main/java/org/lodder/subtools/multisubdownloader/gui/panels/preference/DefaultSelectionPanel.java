@@ -13,10 +13,12 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.ArrowButton;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
+@NullMarked
 public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -43,6 +45,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         loadPreferenceSettings();
     }
 
+    @NullMarked
     private static class ScrollTable<E> extends Container {
 
         @Serial private static final long serialVersionUID = 1L;

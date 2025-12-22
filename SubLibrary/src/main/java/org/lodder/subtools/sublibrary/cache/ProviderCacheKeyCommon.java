@@ -6,7 +6,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract sealed class ProviderCacheKeyCommon implements Serializable permits ProviderCacheKeySub,
     ProviderCacheKey {
 
@@ -20,17 +22,16 @@ public abstract sealed class ProviderCacheKeyCommon implements Serializable perm
         this.params = params.stream().sorted().toList();
     }
 
-    @Override public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProviderCacheKeyCommon that = (ProviderCacheKeyCommon) o;
-        return Objects.equals(provider, that.provider) &&
-            Objects.equals(type, that.type) &&
-            Objects.equals(params, that.params);
+    @Override
+    public boolean equals(Object o) {
+        return this == o || (o instanceof ProviderCacheKeyCommon that
+            && Objects.equals(provider, that.provider)
+            && Objects.equals(type, that.type)
+            && Objects.equals(params, that.params));
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(provider, type, params);
     }
 

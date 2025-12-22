@@ -3,7 +3,9 @@ package org.lodder.subtools.sublibrary.util;
 import static java.time.temporal.ChronoUnit.*;
 
 import manifold.science.measures.Time;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Sleep {
 
     private Sleep() {

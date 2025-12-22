@@ -1,10 +1,8 @@
 package org.lodder.subtools.sublibrary.model;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
@@ -39,7 +37,7 @@ public final class TvRelease extends Release {
         super(name, VideoType.EPISODE, file, releaseGroup, quality);
         this.title = title;
         this.season = season;
-        this.episodes = Collections.unmodifiableSortedSet(new TreeSet<>(episodes));
+        this.episodes = Set.copyOf(episodes);
         this.special = special;
         this.originalName = originalName;
         this.customName = customName;

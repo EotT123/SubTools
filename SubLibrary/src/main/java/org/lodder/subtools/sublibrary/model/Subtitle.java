@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.model;
 
+import static util.Utils.*;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -36,13 +38,14 @@ public abstract class Subtitle implements Serializable {
         SubtitleSource source,
         boolean hearingImpaired=false,
         @Nullable String quality=null) {
+
         this.fileName = fileName;
         this.language = language;
         this.releaseGroup = releaseGroup;
         this.uploader = uploader;
         this.source = source;
         this.hearingImpaired = hearingImpaired;
-        this.quality = quality == null ? ReleaseParser.getQualityKeyword(fileName) : quality;
+        this.quality = ifNullThenGet(quality, () -> ReleaseParser.getQualityKeyword(fileName));
     }
 
     public abstract List<Path> download(Manager manager, Path destinationFolder,

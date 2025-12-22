@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName;
@@ -20,6 +21,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableModel
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class SelectDialog extends MultiSubDialog {
 
     @Serial private static final long serialVersionUID = 1L;

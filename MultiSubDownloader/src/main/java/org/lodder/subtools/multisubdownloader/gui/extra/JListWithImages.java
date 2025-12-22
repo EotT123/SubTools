@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Objects;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     @Serial
@@ -66,6 +68,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         return Optional.ofNullable(getModel().getElementAt(index));
     }
 
+    @NullMarked
     public static class LabelPanel<T> extends JPanel {
 
         @Serial private static final long serialVersionUID = 1L;
@@ -86,6 +89,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         }
     }
 
+    @NullMarked
     private static class Label<T> extends JLabel {
         @Serial private static final long serialVersionUID = 1L;
         @val T object;

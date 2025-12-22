@@ -1,7 +1,9 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class LazyThrowingFunction<T, S, X extends Exception> {
 
     private final ThrowingFunction<T, S, X> function;

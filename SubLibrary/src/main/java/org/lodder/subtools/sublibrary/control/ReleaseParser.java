@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.control;
 
+import static java.util.Objects.*;
 import static org.lodder.subtools.sublibrary.control.RegexUtils.*;
 import static org.lodder.subtools.sublibrary.control.Tags.*;
 
@@ -9,7 +10,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -141,16 +141,15 @@ public class ReleaseParser {
             parserResults.parse(part_number_Regex(NumberType.ARABIC), part_number_Regex(NumberType.ROMAN));
             // When using the part numbers, assume only one season exists for the TV show
             season = 1;
-            episodes.add(Objects.requireNonNull(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER)));
+            episodes.add(requireNonNull(parserResults.getNamedMatchValue(ARABIC_NUMBER, ROMAN_NUMBER)));
         } else {
-            season = Objects.requireNonNull(parserResults.getNamedMatchValue(SEASON));
-            episodes.addAll(Objects.requireNonNull(parserResults.getNamedMatchValue(EPISODE, EPISODES_TEXT)));
+            season = requireNonNull(parserResults.getNamedMatchValue(SEASON));
+            episodes.addAll(requireNonNull(parserResults.getNamedMatchValue(EPISODE, EPISODES_TEXT)));
         }
 
         // if no serie name was yet found, use the first remaining part as the serie name
-        String name =
-            parserResults.containsNone(NAME) ? parserResults.parts.first :
-                Objects.requireNonNull(parserResults.getNamedMatchValue(NAME));
+        String name = parserResults.containsNone(NAME) ?
+            parserResults.parts.first : requireNonNull(parserResults.getNamedMatchValue(NAME));
         // create a new parser to parse a potential year in the title (only at the end of the name)
         parserResults.createWithNewText(name)
             .parse(Regex.builder()
@@ -322,7 +321,7 @@ public class ReleaseParser {
             boolean result = false;
             Multimap<String, String> matches = MultimapBuilder.hashKeys().arrayListValues().build();
             for (RegexBuilderBuild regexBuilder : regexBuilders) {
-                result &=
+                result |=
                     regexBuilder.createWithDelimiter().stream().map(v -> parsePrivate(matches, v, removeMatchedParts))
                         .toList().contains(true);
             }
@@ -440,6 +439,7 @@ public class ReleaseParser {
         return ReleaseParserExtraInfo.parseExtraInfo(text);
     }
 
+    @NullMarked
     public static class ReleaseParserExtraInfo {
 
         private final String text;
@@ -519,6 +519,7 @@ public class ReleaseParser {
     /**
      * Helper class for storing and retrieving named regular expression matches.
      */
+    @NullMarked
     private static class NamedMatches {
         private final Map<String, List<String>> map = new HashMap<>();
 

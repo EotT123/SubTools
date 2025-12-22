@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class ToStringListCellRenderer<T> implements ListCellRenderer<T> {
 
     private final ListCellRenderer originalRenderer;

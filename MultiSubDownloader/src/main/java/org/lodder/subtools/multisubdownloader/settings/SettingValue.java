@@ -13,6 +13,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Objects;
 import extensions.java.nio.file.Path.PathExt;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
@@ -27,6 +28,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 
+@NullMarked
 public enum SettingValue {
 
     // SETTINGS
@@ -432,9 +434,11 @@ public enum SettingValue {
         return new Mapper<>(Enum::name, v -> Enum.valueOf(type, v));
     }
 
+    @NullMarked
     private record Mapper<T>(Function<T, String> toStringMapper, Function<String, T> toObjectMapper) {
     }
 
+    @NullMarked
     private interface Mappers {
         Mapper<String> STRING = new Mapper<>(Function.identity(), Function.identity());
         Mapper<Character> CHAR = new Mapper<>(String::valueOf, s -> s.charAt(0));
@@ -529,6 +533,7 @@ public enum SettingValue {
         return new SettingMapTyped<>(rootElementFunction, mapGetter, keyMapper, valueMapper);
     }
 
+    @NullMarked
     private static class SettingTyped<S, T> extends SettingCommon {
 
         // SINGLE VALUE
@@ -596,6 +601,7 @@ public enum SettingValue {
         }
     }
 
+    @NullMarked
     private static class SettingMapTyped<S, K, V> extends SettingCommon {
 
         SettingMapTyped(Function<Settings, S> rootElementFunction, Function<S, Map<K, V>> mapGetter,

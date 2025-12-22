@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
@@ -24,6 +25,7 @@ import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import util.Utils;
 
+@NullMarked
 record ImdbSearchIdApi(Manager manager) {
 
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");

@@ -17,7 +17,7 @@ public class VideoPatterns {
     }
 
     @NullMarked
-    public interface RegexPattern {
+    public sealed interface RegexPattern {
         @val Pattern pattern;
         @val String value;
 

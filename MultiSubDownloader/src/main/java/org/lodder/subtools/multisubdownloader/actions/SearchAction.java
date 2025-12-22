@@ -7,6 +7,7 @@ import java.util.List;
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -23,6 +24,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public abstract class SearchAction implements Runnable, Cancelable, SearchHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);

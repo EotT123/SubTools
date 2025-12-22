@@ -226,6 +226,7 @@ public class PrompterExt {
         }
     }
 
+    @NullMarked
     public static class TableDisplayer<T> {
 
         private final List<ColumnDisplayer<T>> columnDisplayers;
@@ -275,6 +276,7 @@ public class PrompterExt {
         }
     }
 
+    @NullMarked
     private static class LineReadingOutputStream extends OutputStream {
         private final ByteArrayOutputStream byteArrayOutputStream;
 
@@ -295,6 +297,7 @@ public class PrompterExt {
 
     }
 
+    @NullMarked
     public record ColumnDisplayer<T>(String columnName, Function<? super T, String> toStringMapper) {
     }
 }

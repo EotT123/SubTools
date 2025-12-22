@@ -1,20 +1,25 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
+import static util.Utils.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
+@NullMarked
 public class MemoryFolderChooser {
 
-    private static MemoryFolderChooser instance;
+    private static final LazySupplier<MemoryFolderChooser> instance = new LazySupplier<>(MemoryFolderChooser::new);
     private final JFileChooser chooser;
-    @var Path memory;
+    @var @Nullable Path memory;
 
     private MemoryFolderChooser() {
         chooser = new JFileChooser();
@@ -23,20 +28,17 @@ public class MemoryFolderChooser {
     }
 
     public static MemoryFolderChooser getInstance() {
-        if (instance == null) {
-            instance = new MemoryFolderChooser();
-        }
-        return instance;
+        return instance.get();
     }
 
-    public Optional<Path> selectDirectory(Component c, String title, Path path) {
-        return selectDirectory(c, title, path.toFile());
+    public Optional<Path> selectDirectory(Component c, String title, @Nullable Path path) {
+        return selectDirectory(c, title, ifNotNull(path, Path::toFile));
     }
 
-    public Optional<Path> selectDirectory(Component c, String title, File file) {
+    public Optional<Path> selectDirectory(Component c, String title, @Nullable File file) {
         chooser.setDialogTitle(title);
-        if (file == null || !StringUtils.isBlank(file.getAbsolutePath())) {
-            chooser.setCurrentDirectory(Objects.requireNonNullElseGet(memory.toFile(), () -> new File(".")));
+        if (file != null && !StringUtils.isBlank(file.getAbsolutePath())) {
+            chooser.setCurrentDirectory(ifNotNullOrElseGet(memory, Path::toFile, () -> new File(".")));
         } else {
             chooser.setCurrentDirectory(file);
         }

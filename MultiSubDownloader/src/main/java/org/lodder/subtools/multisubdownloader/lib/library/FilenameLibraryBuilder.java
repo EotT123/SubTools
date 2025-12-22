@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
@@ -17,6 +18,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public final class FilenameLibraryBuilder extends LibraryBuilder {
 
     private final String structure;
@@ -27,7 +29,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
     private final boolean rename;
 
     public FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        boolean includeLanguageCode, Map<Language, String> languageTags, TvdbAdapter tvdbAdapter=null,
+        boolean includeLanguageCode, Map<Language, String> languageTags, @Nullable TvdbAdapter tvdbAdapter=null,
         boolean rename) {
         super(tvdbAdapter);
         this.structure = structure;

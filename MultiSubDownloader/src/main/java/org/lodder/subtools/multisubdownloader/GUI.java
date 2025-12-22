@@ -24,6 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Menu;
 import org.lodder.subtools.multisubdownloader.gui.actions.search.FileGuiSearchAction;
@@ -69,6 +70,7 @@ import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class GUI extends JFrame implements PropertyChangeListener {
 
     @Serial private static final long serialVersionUID = 1L;

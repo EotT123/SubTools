@@ -7,8 +7,10 @@ import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class JSONArrayExt {
 
     private JSONArrayExt() {

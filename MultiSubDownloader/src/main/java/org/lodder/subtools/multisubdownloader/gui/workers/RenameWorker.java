@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.gui.workers;
 import javax.swing.*;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
@@ -14,6 +15,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class RenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
     private final CustomTable table;

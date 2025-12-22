@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -139,19 +140,23 @@ class SubtitleFilteringTest {
         return new TestSetupFiltering().assertThatFilter(filter);
     }
 
+    @NullMarked
     private interface TestSetupSubtitlesIntf {
         TestSetupReleaseIntf appliedOnSubtitles(Subtitle... subtitles);
     }
 
 
+    @NullMarked
     private interface TestSetupReleaseIntf {
         TestSetupMatchesIntf forRelease(Release release);
     }
 
+    @NullMarked
     private interface TestSetupMatchesIntf {
         void matchesSubtitles(Subtitle... subtitles);
     }
 
+    @NullMarked
     private static class TestSetupFiltering
             implements TestSetupSubtitlesIntf, TestSetupReleaseIntf, TestSetupMatchesIntf {
         private SubtitleFiltering filter;

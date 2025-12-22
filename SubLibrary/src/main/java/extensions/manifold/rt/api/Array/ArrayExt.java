@@ -7,8 +7,10 @@ import java.util.function.Consumer;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class ArrayExt {
 
     private ArrayExt() {

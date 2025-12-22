@@ -1,8 +1,10 @@
 package org.lodder.subtools.multisubdownloader.cli;
 
 import manifold.ext.props.rt.api.get;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 
+@NullMarked
 public enum CliOption {
     HELP("help", false, "App.OptionHelpMsg"),
     NO_GUI("nogui", false, "App.OptionNoGuiMsg"),

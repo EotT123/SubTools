@@ -13,8 +13,10 @@ import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
+@NullMarked
 public class MyPasswordField extends JPasswordField implements MyPasswordFieldOthersIntf {
 
     @Serial
@@ -79,6 +81,7 @@ public class MyPasswordField extends JPasswordField implements MyPasswordFieldOt
         return this;
     }
 
+    @NullMarked
     private static class ObjectWrapper<S> {
         @var S value;
     }

@@ -11,9 +11,11 @@ import name.falgout.jeffrey.throwing.ThrowingLongFunction;
 import name.falgout.jeffrey.throwing.ThrowingLongUnaryOperator;
 import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@NullMarked
 public class OptionalLongExt {
 
     private OptionalLongExt() {

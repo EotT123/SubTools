@@ -8,12 +8,14 @@ import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
+@NullMarked
 public class Addic7edSubtitle extends Subtitle {
 
     @val String url;

@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import com.google.common.collect.Streams;
 import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.actions.RenameAction;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
@@ -35,6 +36,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class RenameDialog extends MultiSubDialog implements PropertyChangeListener {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -122,6 +124,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
+    @NullMarked
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;

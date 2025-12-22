@@ -14,6 +14,8 @@ import com.tvdb.model.MovieBaseRecord;
 import com.tvdb.model.SearchResult;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
@@ -29,11 +31,12 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class TvdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvdbAdapter.class);
     private static final String API_KEY = "A1720D2DDFDCE82D";
-    private static TvdbAdapter instance;
+    private static @Nullable TvdbAdapter instance;
     @val @override Manager manager;
     @val @override String provider = "TVDB";
     private final UserInteractionHandler userInteractionHandler;
@@ -53,8 +56,9 @@ public class TvdbAdapter implements AdapterIntf {
     public Optional<TvdbSerie> searchSerie(String serieName, ProviderIds providerIds) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
 
-        CacheKey cache = getCache(VideoType.EPISODE + "mapping",
-            b -> b.addIdParam("name", encodedSerieName).addIdParam("imdbid", providerIds.getImdbId().orElse(null)));
+        CacheKey cache = getCache(VideoType.EPISODE + "mapping", b -> b
+            .addIdParam("name", encodedSerieName)
+            .addIdParam("imdbid", providerIds.getImdbId().orElse(null)));
 
         if (cache.isPresent() && (!cache.isTemporaryObject() || !cache.isExpiredTemporary())) {
             return cache.getOptional();

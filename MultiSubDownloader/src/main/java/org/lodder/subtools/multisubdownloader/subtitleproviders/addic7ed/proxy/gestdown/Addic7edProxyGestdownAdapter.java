@@ -9,6 +9,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.gestdown.model.ShowDto;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -26,6 +27,7 @@ import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class Addic7edProxyGestdownAdapter extends
     SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, Addic7edException> {
 
@@ -115,6 +117,7 @@ public final class Addic7edProxyGestdownAdapter extends
     }
 
 
+    @NullMarked
     private enum ReturnCode {
         NOT_FOUND((code, _) -> code == HttpStatus.NOT_FOUND),
         RATE_LIMIT_REACHED((code, _) -> code == HttpStatus.TOO_MANY_REQUESTS),

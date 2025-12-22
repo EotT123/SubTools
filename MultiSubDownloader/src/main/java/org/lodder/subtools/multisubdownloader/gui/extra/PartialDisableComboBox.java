@@ -9,9 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author <a href="http://vetruvet.blogspot.com/2011/03/jcombobox-with-disabled-items.html">author</a>
  */
+@NullMarked
 public class PartialDisableComboBox<T> extends JComboBox<T> {
     @Serial
     private static final long serialVersionUID = 1L;

@@ -28,6 +28,6 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof LRUMap map && this.maxItems == map.maxItems && super.equals(map);
+        return this == o || (o instanceof LRUMap map && this.maxItems == map.maxItems && super.equals(map));
     }
 }

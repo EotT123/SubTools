@@ -3,8 +3,10 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class SubtitleProviderStore {
     protected final Set<SubtitleProvider<? extends Subtitle>> subtitleProviders = new HashSet<>();
 

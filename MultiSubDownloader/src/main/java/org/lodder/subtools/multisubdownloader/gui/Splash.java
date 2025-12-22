@@ -7,7 +7,9 @@ import java.awt.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Splash extends JWindow {
 
     @Serial

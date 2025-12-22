@@ -7,6 +7,9 @@ import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class SearchProgressTableModel extends DefaultTableModel {
 
     @Serial

@@ -1,8 +1,10 @@
 package org.lodder.subtools.multisubdownloader.cli.progress;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 
+@NullMarked
 public final class CLIFileIndexerProgress extends CLIProgress implements IndexingProgressListener {
 
     private String currentFile;

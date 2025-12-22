@@ -8,9 +8,11 @@ import java.util.function.Consumer;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @Extension
+@NullMarked
 public class AbstractButtonExt {
     private AbstractButtonExt() {
         // hide utility class constructor

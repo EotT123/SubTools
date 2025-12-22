@@ -14,11 +14,14 @@ import com.optimaize.langdetect.ngram.NgramExtractors;
 import com.optimaize.langdetect.profiles.LanguageProfileReader;
 import com.optimaize.langdetect.text.CommonTextObjectFactories;
 import com.optimaize.langdetect.text.TextObjectFactory;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.lodder.subtools.sublibrary.util.lazy.LazyThrowingSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class DetectLanguage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DetectLanguage.class);
@@ -31,11 +34,11 @@ public class DetectLanguage {
         new LazySupplier<>(CommonTextObjectFactories::forDetectingOnLargeText);
     private static final double MIN_PROBABILITY = 0.9;
 
-    public static Language execute(Path file) {
+    public static @Nullable Language execute(Path file) {
         return execute(file, null);
     }
 
-    public static Language execute(Path file, Language defaultLang) {
+    public static @Nullable Language execute(Path file, @Nullable Language defaultLang) {
         return executeOptional(file).orElse(defaultLang);
     }
 

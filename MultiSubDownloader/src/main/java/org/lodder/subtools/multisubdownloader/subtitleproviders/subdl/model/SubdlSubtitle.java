@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
@@ -24,6 +25,7 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class SubdlSubtitle extends Subtitle {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubdlSubtitle.class);
 

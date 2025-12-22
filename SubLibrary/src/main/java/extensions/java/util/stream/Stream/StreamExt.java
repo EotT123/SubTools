@@ -9,8 +9,10 @@ import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class StreamExt {
 
     private StreamExt() {

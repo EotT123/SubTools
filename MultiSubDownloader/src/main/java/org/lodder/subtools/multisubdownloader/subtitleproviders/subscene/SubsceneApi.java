@@ -18,6 +18,7 @@ import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.Utils;
 
+@NullMarked
 public class SubsceneApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);

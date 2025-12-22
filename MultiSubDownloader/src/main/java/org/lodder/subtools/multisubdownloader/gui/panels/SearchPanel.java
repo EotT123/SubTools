@@ -5,7 +5,9 @@ import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class SearchPanel<I extends InputPanel> extends JPanel {
 
     @Serial

@@ -6,11 +6,14 @@ import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.CacheStrategy;
 import org.lodder.subtools.sublibrary.LogLevel;
 import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
 import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 
+@NullMarked
 public class OmdbApiException extends OmdbException implements ApiExceptionIntf {
 
     @val @override HttpStatus errorCode;
@@ -25,7 +28,8 @@ public class OmdbApiException extends OmdbException implements ApiExceptionIntf 
         this.logLevel = logLevel;
     }
 
-    private OmdbApiException(HttpStatus errorCode, Exception cause, String message, CacheStrategy cacheStrategy,
+    private OmdbApiException(HttpStatus errorCode, @Nullable Exception cause, String message,
+        CacheStrategy cacheStrategy,
         LogLevel logLevel) {
         super(message, cause);
         this.errorCode = errorCode;
@@ -38,7 +42,7 @@ public class OmdbApiException extends OmdbException implements ApiExceptionIntf 
         return new OmdbApiException(NO_CONTENT, message, cacheStrategy, logLevel);
     }
 
-    public static OmdbApiException error(Exception cause, String message=cause.getMessage(),
+    public static OmdbApiException error(@Nullable Exception cause, String message=cause.getMessage(),
         CacheStrategy cacheStrategy=CACHE_TEMPORARY) {
         return new OmdbApiException(SERVER_ERROR, cause, message, cacheStrategy, ERROR);
     }

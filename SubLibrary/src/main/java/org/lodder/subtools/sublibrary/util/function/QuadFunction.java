@@ -2,7 +2,10 @@ package org.lodder.subtools.sublibrary.util.function;
 
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
+
 @FunctionalInterface
+@NullMarked
 public interface QuadFunction<T, U, V, W, R> {
 
     R apply(T t, U u, V v, W w);

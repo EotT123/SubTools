@@ -32,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCache;
@@ -51,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+@NullMarked
 public class Manager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
@@ -66,7 +68,7 @@ public class Manager {
     }
 
     public void downloadAndExtractFile(String downloadLink, Path file,
-        ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
+        @Nullable ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
         try {
             httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file, validateFunction);
             if (!Files.exists(file)) {
@@ -93,6 +95,7 @@ public class Manager {
         return new PostBuilder(httpClient, url, userAgent);
     }
 
+    @NullMarked
     public static class PostBuilder {
         @val HttpClient httpClient;
         @val String url;
@@ -150,7 +153,7 @@ public class Manager {
         return asStringDocument.isPresent() ? XMLHelper.getDocument(asStringDocument.get()) : null;
     }
 
-    public org.jsoup.nodes.Document getAsJsoupDocument(PageContentParams params,
+    public @Nullable org.jsoup.nodes.Document getAsJsoupDocument(PageContentParams params,
         @Nullable Predicate<String> emptyResultPredicate=null) throws ManagerException {
         return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
     }
@@ -185,7 +188,7 @@ public class Manager {
     }
 
     private String getContentWithoutCache(String url, String userAgent, Retry retry,
-        CookieManager cookieManager) throws ManagerException {
+        @Nullable CookieManager cookieManager) throws ManagerException {
         try {
             return httpClient.doGet(new URI(url).toURL(), userAgent, cookieManager);
         } catch (HttpClientException e) {
@@ -205,7 +208,8 @@ public class Manager {
         }
     }
 
-    public record Retry(int retries, Predicate<Exception> predicate, Time waitTime) {
+    @NullMarked
+    public record Retry(int retries, @Nullable Predicate<Exception> predicate, Time waitTime) {
 
         public static final Retry NONE = new Retry(0, null, 0 Second);
 
@@ -230,7 +234,7 @@ public class Manager {
     }
 
     public <V> List<Pair<ProviderCacheKey, V>> getEntries(CacheType cacheType,
-        @Nullable Predicate<ProviderCacheKey> keyFilter, Class<V> type=null) {
+        Predicate<ProviderCacheKey> keyFilter, @Nullable Class<V> type=null) {
         return getCache(cacheType, keyFilter).getEntries(type);
     }
 
@@ -239,6 +243,7 @@ public class Manager {
     // CACHE METHODS \\
     // ============= \\
 
+    @NullMarked
     public record CacheKey(Manager manager, CacheType cacheType, ProviderCacheKey key) {
 
         public boolean isPresent() {
@@ -420,6 +425,7 @@ public class Manager {
         }
     }
 
+    @NullMarked
     public record CacheKeyFilter(Manager manager, CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
         public void clearExpiredCache() {
             Time now = Time.now();
@@ -430,7 +436,7 @@ public class Manager {
             manager.getCache(cacheType).deleteEntries(keyFilter);
         }
 
-        public <V> List<Pair<ProviderCacheKey, V>> getEntries(Class<V> valueType=null) {
+        public <V> List<Pair<ProviderCacheKey, V>> getEntries(@Nullable Class<V> valueType=null) {
             Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
             return optionalCache.map(cache -> cache.getEntries(keyFilter)).orElseGet(List::of);
         }
@@ -458,6 +464,7 @@ public class Manager {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @NullMarked
     public record Value<V, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
         public static <V> Value<V, Nothing> of(V value) {
             return new Value<>(_ -> value);
@@ -497,6 +504,7 @@ public class Manager {
         }
     }
 
+    @NullMarked
     public static class CacheKeyBuilder {
         @val String source;
         @val String operation;
@@ -513,12 +521,12 @@ public class Manager {
             this.operation = operation;
         }
 
-        public CacheKeyBuilder addIdParam(String name, Object value) {
+        public CacheKeyBuilder addIdParam(String name, @Nullable Object value) {
             idParams.add(new ProviderCacheKeyParam(name, value));
             return this;
         }
 
-        public CacheKeyBuilder add(String name, Object value) {
+        public CacheKeyBuilder add(String name, @Nullable Object value) {
             params.add(new ProviderCacheKeyParam(name, value));
             return this;
         }
@@ -540,7 +548,8 @@ public class Manager {
     // HELPER METHODS \\
     // ############## \\
 
-    private static <V, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier, Retry retry) throws X {
+    private static <V, X extends Exception> @Nullable V executeSupplier(ThrowingSupplier<@Nullable V, X> supplier,
+        Retry retry) throws X {
         try {
             return supplier.get();
         } catch (Exception e) {

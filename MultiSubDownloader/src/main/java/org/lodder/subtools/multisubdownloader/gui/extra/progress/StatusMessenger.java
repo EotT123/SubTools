@@ -4,7 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class StatusMessenger implements Messenger {
     @val static StatusMessenger instance = new StatusMessenger();
 

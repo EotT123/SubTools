@@ -9,6 +9,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Roman {
 
+        @NullMarked
     public enum RomanNumeral {
         I(1),
         V(5),

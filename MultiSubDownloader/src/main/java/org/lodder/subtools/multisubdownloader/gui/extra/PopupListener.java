@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 
+@NullMarked
 public class PopupListener extends MouseAdapter {
 
     private final JPopupMenu popupMenu;

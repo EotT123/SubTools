@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * Created by IntelliJ IDEA. User: lodder Date: 4/12/11 Time: 8:52 AM To change this template use Path | Settings | Path
  * Templates.
  */
+@NullMarked
 public class DownloadWorker extends SwingWorker<Void, String> implements Cancelable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadWorker.class);

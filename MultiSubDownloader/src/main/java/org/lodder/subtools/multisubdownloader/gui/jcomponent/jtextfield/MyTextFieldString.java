@@ -4,6 +4,9 @@ import java.io.Serial;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class MyTextFieldString extends MyTextFieldCommon<String, MyTextFieldString> {
     @Serial
     private static final long serialVersionUID = 1L;

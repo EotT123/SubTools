@@ -96,6 +96,7 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
         }
     }
 
+    @NullMarked
     private record ElementWrapper<T>(T element, Function<T, String> toStringMapper) {
         @Override
         public String toString() {

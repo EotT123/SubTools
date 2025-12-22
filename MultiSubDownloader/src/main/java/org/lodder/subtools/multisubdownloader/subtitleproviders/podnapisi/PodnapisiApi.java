@@ -16,6 +16,7 @@ import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.exception.PodnapisiApiException;
@@ -34,6 +35,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.UrlBuilder;
 import org.lodder.subtools.sublibrary.util.http.HttpClientException;
 
+@NullMarked
 public class PodnapisiApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.podnapisi.net";
@@ -175,6 +177,7 @@ public class PodnapisiApi implements SubtitleApi {
     }
 
     // see https://www.podnapisi.net/forum/viewtopic.php?f=62&t=26164#p212652
+    @NullMarked
     private enum SearchParam {
         YEAR("sY=%s"),
         SEASON("sTS=%s&sT=1"),

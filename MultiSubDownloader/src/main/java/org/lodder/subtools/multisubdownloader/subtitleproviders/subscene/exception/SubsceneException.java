@@ -4,9 +4,12 @@ import java.io.Serial;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderException;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
+@NullMarked
 public class SubsceneException extends SubtitlesProviderException {
 
     @Serial
@@ -22,7 +25,7 @@ public class SubsceneException extends SubtitlesProviderException {
         super(cause);
     }
 
-    public SubsceneException(String message, Throwable cause) {
+    public SubsceneException(String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 }

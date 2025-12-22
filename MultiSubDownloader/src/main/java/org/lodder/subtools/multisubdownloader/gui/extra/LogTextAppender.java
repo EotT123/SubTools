@@ -11,8 +11,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.EchoEncoder;
 import ch.qos.logback.core.encoder.Encoder;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class LogTextAppender extends AppenderBase<ILoggingEvent> {
     private final Encoder<ILoggingEvent> encoder = new EchoEncoder<>();
     private final ByteArrayOutputStream out = new ByteArrayOutputStream();

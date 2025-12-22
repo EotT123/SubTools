@@ -3,10 +3,10 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -27,6 +27,7 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.Subtitle;
 import org.opensubtitles.model.SubtitleAttributes;
 
+@NullMarked
 public final class OpenSubAdapter
     extends
     SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId, OpenSubtitleException> {

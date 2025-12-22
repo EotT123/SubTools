@@ -5,9 +5,11 @@ import javax.swing.*;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @Extension
+@NullMarked
 public class JCheckBoxExt {
     private JCheckBoxExt() {
         // hide utility class constructor

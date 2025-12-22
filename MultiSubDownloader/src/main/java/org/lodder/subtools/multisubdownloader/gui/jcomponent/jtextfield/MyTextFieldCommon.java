@@ -14,8 +14,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
+@NullMarked
 public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> extends JTextField implements
     MyTextFieldToStringMapperIntf<T, R>,
     MyTextFieldToObjectMapperIntf<T, R>,
@@ -92,6 +94,7 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
         return self();
     }
 
+    @NullMarked
     private static class ObjectWrapper<S> {
         private S value;
 

@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.serviceproviders;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.framework.Container;
@@ -15,6 +16,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Manager;
 
+@NullMarked
 public class Addic7edServiceProvider implements ServiceProvider {
 
     protected Container app;

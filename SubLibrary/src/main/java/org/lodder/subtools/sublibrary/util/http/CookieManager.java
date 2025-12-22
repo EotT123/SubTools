@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * CookieManager is a simple utility for handling cookies when working with java.net.URL and java.net.URLConnection
  * objects.
@@ -26,7 +29,7 @@ import java.util.StringTokenizer;
  *
  * @author Ian Brown
  **/
-
+@NullMarked
 public class CookieManager {
 
     private final Map<String, Map<String, Map<String, String>>> store;
@@ -99,7 +102,7 @@ public class CookieManager {
     }
 
     public CookieManager storeCookies(String domain, Map<String, String> cookieMap) {
-        if (cookieMap != null && !cookieMap.isEmpty()) {
+        if (!cookieMap.isEmpty()) {
             Map<String, Map<String, String>> domainStore = store.computeIfAbsent(domain, _ -> new HashMap<>());
             cookieMap.forEach((k, v) -> domainStore.put(k, Map.of(k, v)));
         }
@@ -160,7 +163,7 @@ public class CookieManager {
         }
     }
 
-    private boolean isNotExpired(String cookieExpires) {
+    private boolean isNotExpired(@Nullable String cookieExpires) {
         try {
             return cookieExpires == null ||
                 LocalDateTime.now().isBefore(LocalDateTime.parse(cookieExpires, DATE_FORMATTER));
@@ -170,7 +173,7 @@ public class CookieManager {
         }
     }
 
-    private boolean comparePaths(String cookiePath, String targetPath) {
+    private boolean comparePaths(@Nullable String cookiePath, String targetPath) {
         return cookiePath == null || "/".equals(cookiePath) ||
             targetPath.regionMatches(0, cookiePath, 0, cookiePath.length());
     }

@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.control;
 
+import static java.util.Objects.*;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -119,7 +121,7 @@ public class RegexUtils {
         }
 
         private String createCurrent() {
-            return tag == null ? regex : "(?<${tag.value}>$regex)";
+            return tag != null ? "(?<${tag.value}>$regex)" : requireNonNull(regex);
         }
 
         @Override
@@ -141,5 +143,4 @@ public class RegexUtils {
                 "^" + result + "$");
         }
     }
-
 }

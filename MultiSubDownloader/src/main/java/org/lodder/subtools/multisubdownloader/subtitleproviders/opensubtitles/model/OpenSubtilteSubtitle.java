@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.exception.OpenSubtitleException;
 import org.lodder.subtools.sublibrary.Language;
@@ -14,6 +15,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
+@NullMarked
 public class OpenSubtilteSubtitle extends Subtitle {
 
     private final ThrowingSupplier<String, OpenSubtitleException> urlSupplier;

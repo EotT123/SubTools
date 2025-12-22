@@ -10,12 +10,14 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.State;
 import org.lodder.subtools.sublibrary.Manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class SettingsControl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsControl.class);

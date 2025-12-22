@@ -4,6 +4,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ServiceProviderComparator implements Comparator<ServiceProvider>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

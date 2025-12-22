@@ -5,9 +5,11 @@ import java.util.OptionalInt;
 import java.util.UUID;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 
+@NullMarked
 public class Addic7edProxyGestdownSerieId extends ProviderId {
 
     @Serial

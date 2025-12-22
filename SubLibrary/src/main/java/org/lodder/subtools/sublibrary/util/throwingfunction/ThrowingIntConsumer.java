@@ -2,10 +2,10 @@ package org.lodder.subtools.sublibrary.util.throwingfunction;
 
 import static java.util.Objects.*;
 
-import java.util.Objects;
 import java.util.function.IntConsumer;
 
 import name.falgout.jeffrey.throwing.ThrowingIntFunction;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Represents a function that accepts one argument and does not return any value;
@@ -15,6 +15,7 @@ import name.falgout.jeffrey.throwing.ThrowingIntFunction;
  *
  */
 @FunctionalInterface
+@NullMarked
 public interface ThrowingIntConsumer<E extends Exception> {
 
     void accept(int i) throws E;
@@ -24,7 +25,6 @@ public interface ThrowingIntConsumer<E extends Exception> {
      * @return BiConsumer instance that rethrows the checked exception using the Sneaky Throws pattern
      */
     static IntConsumer sneaky(ThrowingIntConsumer<?> consumer) {
-        Objects.requireNonNull(consumer);
         return i -> {
             try {
                 consumer.accept(i);

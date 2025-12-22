@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -16,6 +17,7 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public interface SubtitleProvider<SUB extends Subtitle> {
 
     @val Manager manager;

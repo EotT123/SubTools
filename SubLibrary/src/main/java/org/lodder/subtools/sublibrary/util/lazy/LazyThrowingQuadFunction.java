@@ -1,7 +1,9 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingQuadFunction;
 
+@NullMarked
 public class LazyThrowingQuadFunction<T, U, V, W, R, X extends Exception> {
 
     private final Object lock = new Object();

@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import org.apache.commons.cli.CommandLine;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.actions.DownloadAction;
 import org.lodder.subtools.multisubdownloader.actions.FileListAction;
 import org.lodder.subtools.multisubdownloader.actions.UserInteractionHandlerAction;
@@ -30,6 +31,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CLI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CLI.class);

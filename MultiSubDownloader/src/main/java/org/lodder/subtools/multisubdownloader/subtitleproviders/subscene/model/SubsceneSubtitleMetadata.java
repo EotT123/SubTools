@@ -4,11 +4,13 @@ import java.io.Serializable;
 
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.SeasonEpisode;
 
+@NullMarked
 public class SubsceneSubtitleMetadata implements Serializable {
 
     @val @Nullable Language language;

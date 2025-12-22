@@ -4,7 +4,9 @@ import java.util.Objects;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OpenSubtitlesMovieMetadata {
 
     @var String name;

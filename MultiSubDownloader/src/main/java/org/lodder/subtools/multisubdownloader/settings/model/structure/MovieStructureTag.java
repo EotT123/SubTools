@@ -2,8 +2,10 @@ package org.lodder.subtools.multisubdownloader.settings.model.structure;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 
+@NullMarked
 public enum MovieStructureTag implements StructureTag {
 
     MOVIE_TITLE("%MOVIE TITLE%", "StructureBuilderDialog.MovieName"),

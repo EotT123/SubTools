@@ -5,7 +5,9 @@ import java.util.function.Function;
 
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class SneakyThrowUtil {
     private SneakyThrowUtil() {
     }

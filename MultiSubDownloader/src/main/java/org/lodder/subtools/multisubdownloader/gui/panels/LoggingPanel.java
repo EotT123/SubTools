@@ -8,8 +8,10 @@ import java.io.Serial;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.LogTextAppender;
 
+@NullMarked
 public class LoggingPanel extends JPanel {
 
     @Serial

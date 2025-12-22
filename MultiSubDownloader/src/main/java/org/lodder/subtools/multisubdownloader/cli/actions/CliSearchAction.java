@@ -8,6 +8,7 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.CLI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -27,6 +28,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CliSearchAction extends SearchAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);

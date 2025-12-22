@@ -3,9 +3,11 @@ package org.lodder.subtools.sublibrary.assertions;
 import static org.assertj.core.api.Assertions.*;
 
 import manifold.ext.rt.api.Self;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 
+@NullMarked
 public class TvReleaseAssert extends ReleaseAssert<TvRelease> {
 
     public TvReleaseAssert(TvRelease actual) {

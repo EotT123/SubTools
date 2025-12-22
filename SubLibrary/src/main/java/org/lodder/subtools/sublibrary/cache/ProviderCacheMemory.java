@@ -37,7 +37,7 @@ public final class ProviderCacheMemory<V> extends ProviderCache<V> {
         Thread t = new Thread(() -> {
             while (true) {
                 sleep(timerInterval);
-                cleanup((k, v) -> v.isExpired(timeToLive));
+                cleanup((_, v) -> v.isExpired(timeToLive));
             }
         });
 

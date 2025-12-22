@@ -2,7 +2,9 @@ package org.lodder.subtools.sublibrary.util.lazy;
 
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class LazyThrowingSupplier<T, X extends Exception> {
 
     private final ThrowingSupplier<T, X> supplier;

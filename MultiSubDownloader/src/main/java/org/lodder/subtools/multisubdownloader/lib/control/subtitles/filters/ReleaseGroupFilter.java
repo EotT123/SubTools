@@ -1,12 +1,14 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class ReleaseGroupFilter extends SubtitleFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseGroupFilter.class);

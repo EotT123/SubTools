@@ -11,10 +11,12 @@ import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
 import manifold.ext.rt.api.ThisClass;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.ToStringListCellRenderer;
 
 @Extension
+@NullMarked
 public class JComboBoxExt {
     
     private JComboBoxExt() {

@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class MultiSubDialog extends JDialog {
 
     @Serial

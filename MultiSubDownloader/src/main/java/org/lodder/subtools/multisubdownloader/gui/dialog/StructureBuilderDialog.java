@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryBuilder;
@@ -29,6 +30,7 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class StructureBuilderDialog extends MultiSubDialog implements DocumentListener {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -45,6 +47,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     private String oldStructure;
     private JPanel tagPanel;
 
+    @NullMarked
     public enum StructureType {
         FILE, FOLDER
     }
@@ -161,6 +164,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         parseText();
     }
 
+    @NullMarked
     private class InsertTag implements MouseListener {
 
         @Override

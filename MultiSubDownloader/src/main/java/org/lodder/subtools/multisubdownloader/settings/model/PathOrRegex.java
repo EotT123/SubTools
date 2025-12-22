@@ -12,7 +12,9 @@ import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.rt.api.Self;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PathOrRegex implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;

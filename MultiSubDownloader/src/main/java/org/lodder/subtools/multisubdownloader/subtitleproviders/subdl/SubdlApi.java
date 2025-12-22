@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.json.rt.api.Requester;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.exception.SubdlApiException;
@@ -31,6 +32,7 @@ import subdl.Serie.ReleaseType;
  * An implementation of the {@link SubtitleApi} interface for interacting with the SubDL subtitle provider.
  * It allows fetching subtitle identifiers and subtitle metadata from the SubDL API.
  */
+@NullMarked
 public class SubdlApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
@@ -246,6 +248,7 @@ public class SubdlApi implements SubtitleApi {
             });
     }
 
+    @NullMarked
     private enum SearchParam {
         API_KEY("api_key"),
         SUBDL_ID("sd_id"),

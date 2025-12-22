@@ -8,10 +8,12 @@ import java.awt.event.WindowEvent;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.Messenger;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
 
+@NullMarked
 public class ProgressDialog extends MultiSubDialog implements Messenger {
 
     @Serial

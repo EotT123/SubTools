@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.ExactNameFilter;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.KeywordFilter;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.ReleaseGroupFilter;
@@ -8,6 +9,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class SubtitleFiltering {
 
     private final Settings settings;

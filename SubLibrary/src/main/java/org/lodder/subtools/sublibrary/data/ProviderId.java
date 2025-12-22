@@ -31,15 +31,14 @@ public class ProviderId implements Serializable {
         return calculateLevenshteinDistance(name, this.name);
     }
 
-    @Override public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProviderId that = (ProviderId) o;
-        return Objects.equals(name, that.name) && Objects.equals(id, that.id);
+    @Override
+    public boolean equals(Object o) {
+        return this == o || (o instanceof ProviderId that
+            && Objects.equals(name, that.name) && Objects.equals(id, that.id));
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(name, id);
     }
 }

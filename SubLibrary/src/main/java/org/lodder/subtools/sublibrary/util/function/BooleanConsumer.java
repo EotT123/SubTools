@@ -3,6 +3,8 @@ package org.lodder.subtools.sublibrary.util.function;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A type-specific {@link Consumer}; provides methods to consume a primitive type both as object and
  * as primitive.
@@ -18,6 +20,7 @@ import java.util.function.Consumer;
  * source: it.unimi.dsi.fastutil
  */
 @FunctionalInterface
+@NullMarked
 public interface BooleanConsumer extends Consumer<Boolean> {
     /**
      * Performs this operation on the given input.

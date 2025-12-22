@@ -6,6 +6,7 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
@@ -22,6 +23,7 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public abstract sealed class GuiSearchAction<P extends InputPanel> extends SearchAction
     permits FileGuiSearchAction, TextGuiSearchAction {
 

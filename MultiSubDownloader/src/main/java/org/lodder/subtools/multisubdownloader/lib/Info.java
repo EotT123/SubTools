@@ -1,11 +1,13 @@
 package org.lodder.subtools.multisubdownloader.lib;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("java:S106")
+@NullMarked
 public class Info {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Info.class);

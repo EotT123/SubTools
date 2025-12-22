@@ -4,8 +4,10 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public enum Addic7edLanguage {
     ALL(null, "All", 0),
     ALBANIAN(Language.ALBANIAN, "Albanian", 52),

@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class EventBag {
     protected final Map<String, Object> attributes = new HashMap<>();
 

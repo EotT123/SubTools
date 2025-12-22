@@ -17,12 +17,14 @@ import java.util.stream.IntStream;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 
+@NullMarked
 public class VideoTableModel extends DefaultTableModel {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -86,6 +88,7 @@ public class VideoTableModel extends DefaultTableModel {
         return new Row(release, userInteractionHandler);
     }
 
+    @NullMarked
     private static class Row {
         private final Release release;
         private final UserInteractionHandler userInteractionHandler;

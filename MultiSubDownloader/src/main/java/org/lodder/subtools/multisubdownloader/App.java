@@ -15,6 +15,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.exceptions.CliException;
 import org.lodder.subtools.multisubdownloader.framework.Bootstrapper;
@@ -31,6 +32,7 @@ import org.lodder.subtools.sublibrary.util.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);

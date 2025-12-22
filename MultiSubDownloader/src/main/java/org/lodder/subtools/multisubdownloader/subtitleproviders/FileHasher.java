@@ -12,10 +12,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Hash code is based on Media Player Classic. In natural language it calculates: size + 64bit checksum of the first and
  * last 64k (even if they overlap because the file is smaller than 128k).
  */
+@NullMarked
 public class FileHasher {
 
     /**

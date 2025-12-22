@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 
 import manifold.ext.rt.api.Self;
 import org.assertj.core.api.AbstractAssert;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 
+@NullMarked
 public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAssert<R>, R> {
 
     public ReleaseAssert(R actual) {

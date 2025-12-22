@@ -3,8 +3,10 @@ package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.rep
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Release;
 
+@NullMarked
 public class GroupReplacer implements KeywordReplacer {
     @Override
     public void replace(Release release, Map<String, Integer> weights) {

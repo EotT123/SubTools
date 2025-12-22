@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.omdb.OmdbAdapter;
@@ -12,6 +13,7 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
     private final OmdbAdapter omdbAdapter;
 

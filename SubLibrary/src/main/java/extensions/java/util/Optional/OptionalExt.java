@@ -12,9 +12,11 @@ import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import name.falgout.jeffrey.throwing.ThrowingToIntFunction;
+import org.jspecify.annotations.NullMarked;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Extension
+@NullMarked
 public class OptionalExt {
 
     private OptionalExt() {

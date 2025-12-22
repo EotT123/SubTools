@@ -9,6 +9,7 @@ import java.util.Set;
 
 import extensions.java.nio.file.Path.PathExt;
 import manifold.ext.props.rt.api.set;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
@@ -16,6 +17,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class FileListAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);

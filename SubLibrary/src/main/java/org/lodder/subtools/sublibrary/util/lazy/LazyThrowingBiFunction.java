@@ -1,7 +1,9 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
 import name.falgout.jeffrey.throwing.ThrowingBiFunction;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class LazyThrowingBiFunction<T, U, R, X extends Exception> {
 
     private final Object lock = new Object();

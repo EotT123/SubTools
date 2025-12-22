@@ -2,9 +2,11 @@ package org.lodder.subtools.multisubdownloader;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public interface UserInteractionHandler extends org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler {
 
     default List<Subtitle> getAutomaticSelection(List<Subtitle> subtitles) {

@@ -4,7 +4,9 @@ import static manifold.ext.props.rt.api.PropOption.*;
 
 import manifold.ext.props.rt.api.var;
 import manifold.ext.rt.api.Self;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 abstract sealed class CLIProgress permits CLIFileIndexerProgress, CLISearchProgress {
 
     @var(Protected) int progress;

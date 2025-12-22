@@ -2,6 +2,9 @@ package org.lodder.subtools.sublibrary.exception;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ControlFactoryException extends Exception {
 
     @Serial

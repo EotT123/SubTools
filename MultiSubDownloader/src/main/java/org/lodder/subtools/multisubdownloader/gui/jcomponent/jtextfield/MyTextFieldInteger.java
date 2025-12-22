@@ -5,7 +5,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class MyTextFieldInteger extends MyTextFieldCommon<Integer, MyTextFieldInteger> {
     @Serial
     private static final long serialVersionUID = 1L;

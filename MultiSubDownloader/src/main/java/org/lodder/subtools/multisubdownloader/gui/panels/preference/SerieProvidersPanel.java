@@ -8,6 +8,7 @@ import java.io.Serial;
 import java.nio.file.Path;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -20,6 +21,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.PathMatchType;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
 
+@NullMarked
 public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial

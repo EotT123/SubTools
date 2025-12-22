@@ -6,8 +6,10 @@ import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TitlePanel extends JPanel {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -18,7 +20,7 @@ public class TitlePanel extends JPanel {
         boolean fillContents=true,
         BoxModelProperties margin=new BoxModelProperties(),
         BoxModelProperties padding=new BoxModelProperties(),
-        LayoutManager panelLayout=null,
+        @Nullable LayoutManager panelLayout=null,
         String panelColumnConstraints="") {
 
         super(new MigLayout("fillx, nogrid, " + margin.getInsets()));

@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class Menu extends JMenuBar {
 
     @Serial

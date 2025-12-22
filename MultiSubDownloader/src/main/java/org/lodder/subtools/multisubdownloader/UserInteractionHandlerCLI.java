@@ -9,11 +9,13 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import extensions.org.codehaus.plexus.components.interactivity.Prompter.PrompterExt;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandlerCLI
     implements UserInteractionHandler {
 
