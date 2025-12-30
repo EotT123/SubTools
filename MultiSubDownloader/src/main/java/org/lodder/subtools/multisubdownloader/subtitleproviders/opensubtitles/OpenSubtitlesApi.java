@@ -258,7 +258,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     }
 
 
-    public String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
+    public @Nullable String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
             .get(() -> {
                 try (HttpClient client = HttpClient.newHttpClient()) {

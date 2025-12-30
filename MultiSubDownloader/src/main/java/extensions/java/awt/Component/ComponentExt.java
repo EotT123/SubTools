@@ -23,7 +23,7 @@ public class ComponentExt {
         setRecursive(component, consumer, _ -> true);
     }
 
-    public static void setRecursive(@This Component component, Consumer<Component> consumer,
+    public static void setRecursive(@This @Nullable Component component, Consumer<Component> consumer,
             Predicate<Container> condition) {
         if (component != null) {
             consumer.accept(component);

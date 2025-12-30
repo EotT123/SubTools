@@ -21,7 +21,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 public abstract class Subtitle implements Serializable {
 
     @val @Nullable String fileName;
-    @val @Nullable Language language;
+    @val Language language;
     @val @Nullable String releaseGroup;
     @val @Nullable String uploader;
     @val SubtitleSource source;
@@ -31,8 +31,7 @@ public abstract class Subtitle implements Serializable {
     @var @Nullable SubtitleMatchType subtitleMatchType;
     @var int score;
 
-    public Subtitle(@Nullable String fileName=null,
-        @Nullable Language language=null,
+    public Subtitle(@Nullable String fileName=null, Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         SubtitleSource source,
@@ -45,11 +44,11 @@ public abstract class Subtitle implements Serializable {
         this.uploader = uploader;
         this.source = source;
         this.hearingImpaired = hearingImpaired;
-        this.quality = ifNullThenGet(quality, () -> ReleaseParser.getQualityKeyword(fileName));
+        this.quality = ifNullThenGet(quality, () -> ifNotNullOrElse(fileName, ReleaseParser::getQualityKeyword, ""));
     }
 
     public abstract List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException;
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException;
 
     @Override
     public String toString() {

@@ -21,11 +21,11 @@ public class SubsceneSubtitle extends Subtitle {
     private final ThrowingSupplier<String, ? extends SubsceneException> urlSupplier;
 
     public SubsceneSubtitle(ThrowingSupplier<String, ? extends SubsceneException> urlSupplier,
-        @Nullable String fileName=null,
-        @Nullable Language language=null,
-        @Nullable String releaseGroup=null,
-        @Nullable String uploader=null,
-        boolean hearingImpaired=false,
+        String fileName,
+        Language language,
+        String releaseGroup,
+        String uploader,
+        boolean hearingImpaired,
         String quality) {
 
         super(fileName, language, releaseGroup, uploader, SubtitleSource.SUBSCENE, hearingImpaired, quality);
@@ -34,7 +34,7 @@ public class SubsceneSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         try {
             String url = urlSupplier.get();
             Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));

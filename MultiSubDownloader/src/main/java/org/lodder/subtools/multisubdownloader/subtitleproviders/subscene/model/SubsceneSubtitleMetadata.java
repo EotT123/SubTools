@@ -13,17 +13,16 @@ import org.lodder.subtools.sublibrary.model.SeasonEpisode;
 @NullMarked
 public class SubsceneSubtitleMetadata implements Serializable {
 
-    @val @Nullable Language language;
-    @val @Nullable String name;
+    @val Language language;
+    @val String name;
     @val boolean hearingImpaired;
-    @val @Nullable String uploader;
-    @val @Nullable String comment;
+    @val String uploader;
+    @val String comment;
     @val @Nullable SeasonEpisode seasonEpisode;
     @val ThrowingSupplier<String, ? extends SubsceneException> urlSupplier;
 
-    public SubsceneSubtitleMetadata(@Nullable Language language,
-        @Nullable String name, boolean hearingImpaired,@Nullable String uploader, @Nullable String comment,
-        ThrowingSupplier<String, ? extends SubsceneException> urlSupplier) {
+    public SubsceneSubtitleMetadata(Language language, String name, boolean hearingImpaired, String uploader,
+        String comment, ThrowingSupplier<String, ? extends SubsceneException> urlSupplier) {
         this.language = language;
         this.name = name;
         this.hearingImpaired = hearingImpaired;

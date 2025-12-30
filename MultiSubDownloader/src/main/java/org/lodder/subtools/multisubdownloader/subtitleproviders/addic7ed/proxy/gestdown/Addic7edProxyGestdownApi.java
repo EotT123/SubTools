@@ -126,7 +126,6 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             language:language,
             quality:extraInfoParser.getQualityKeyword(),
             releaseGroup:extraInfoParser.getReleaseGroupBestEffort(),
-            uploader:"",
             hearingImpaired:false);
     }
 

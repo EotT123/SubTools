@@ -22,12 +22,12 @@ public class Addic7edSubtitle extends Subtitle {
     @val String version;
 
     public Addic7edSubtitle(String url,
-        @Nullable String fileName=null,
-        @Nullable Language language=null,
+        String fileName,
+        Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         boolean hearingImpaired=false,
-        @Nullable String quality=null,
+        String quality,
         String version) {
 
         super(fileName, language, releaseGroup, uploader, SubtitleSource.ADDIC7ED, hearingImpaired, quality);
@@ -37,7 +37,7 @@ public class Addic7edSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
         ThrowingConsumer<String, IOException> validateFunction = content -> {
             if (content.contains("Daily Download count exceeded")) {

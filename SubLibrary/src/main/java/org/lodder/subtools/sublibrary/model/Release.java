@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import extensions.java.nio.file.Path.PathExt;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
@@ -45,7 +46,7 @@ public abstract sealed class Release permits MovieRelease, TvRelease {
     }
 
     public @Nullable String getFileName() {
-        return filePath != null ? filePath.getFileName().toString() : null;
+        return ifNotNull(filePath, PathExt::getFileNameAsString);
     }
 
     public @Nullable Path getPath() {

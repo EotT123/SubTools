@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 @NullMarked
@@ -94,8 +96,8 @@ public final class SearchTextInputPanel extends InputPanel {
         return episode;
     }
 
-    public String getQuality() {
-        return txtQualityVersion.getText().trim();
+    public @Nullable String getQuality() {
+        return StringUtils.trimToNull(txtQualityVersion.getText());
     }
 
     public String getReleaseName() {

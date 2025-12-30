@@ -104,22 +104,22 @@ public final class SubdlAdapter extends
     public SubdlSubtitle convertToSubtitle(Release originalRelease, SubdlSubtitleMetadata sub) {
         return ReleaseParser.parse(sub.title).orElseMapEx(() -> ReleaseParser.parse(sub.fileName))
             .map(release -> new SubdlSubtitle(
-                url:sub.url,
-                title:sub.title,
-                language:sub.language,
-                quality:release.quality,
-                releaseGroup:release.releaseGroup,
-                uploader:sub.uploader,
-                hearingImpaired:sub.hearingImpaired,
-                forRelease:originalRelease))
+                sub.url,
+                sub.title,
+                sub.language,
+                release.releaseGroup,
+                sub.uploader,
+                sub.hearingImpaired,
+                release.quality,
+                originalRelease))
             .orElseGet(() -> new SubdlSubtitle(
-                url:sub.url,
-                title:sub.title,
-                language:sub.language,
-                quality:ReleaseParser.getQualityKeyword(sub.title + " " + sub.fileName),
-                releaseGroup:ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".zip")),
-                uploader:sub.uploader,
-                hearingImpaired:sub.hearingImpaired,
-                forRelease:originalRelease));
+                sub.url,
+                sub.title,
+                sub.language,
+                ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".zip")),
+                sub.uploader,
+                sub.hearingImpaired,
+                ReleaseParser.getQualityKeyword(sub.title + " " + sub.fileName),
+                originalRelease));
     }
 }

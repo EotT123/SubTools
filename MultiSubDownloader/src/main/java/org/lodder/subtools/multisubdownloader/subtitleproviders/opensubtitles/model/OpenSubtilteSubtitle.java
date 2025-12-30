@@ -20,9 +20,9 @@ public class OpenSubtilteSubtitle extends Subtitle {
 
     private final ThrowingSupplier<String, OpenSubtitleException> urlSupplier;
 
-    public OpenSubtilteSubtitle(ThrowingSupplier<String, OpenSubtitleException> urlSupplier,
+    public OpenSubtilteSubtitle(ThrowingSupplier<@Nullable String, OpenSubtitleException> urlSupplier,
         @Nullable String fileName=null,
-        @Nullable Language language=null,
+         Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         @Nullable String quality=null,
@@ -34,7 +34,7 @@ public class OpenSubtilteSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         try {
             String url = urlSupplier.get();
             Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));

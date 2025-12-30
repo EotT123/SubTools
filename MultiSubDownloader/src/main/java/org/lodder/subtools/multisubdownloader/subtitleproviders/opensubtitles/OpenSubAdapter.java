@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import static util.Utils.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.Subtitle;
 import org.opensubtitles.model.SubtitleAttributes;
+import org.opensubtitles.model.SubtitleAttributesUploader;
 
 @NullMarked
 public final class OpenSubAdapter
@@ -128,6 +131,7 @@ public final class OpenSubAdapter
     public OpenSubtilteSubtitle convertToSubtitle(Release release, org.opensubtitles.model.Subtitle sub) {
         SubtitleAttributes attr = sub.getAttributes();
         Language language = Language.ofIso639_1(attr.language);
+        String uploader = ifNotNull(attr.getUploader(), SubtitleAttributesUploader::getName);
         int fileId = attr.files.stream().findFirst().orElseThrow().fileId.intValue();
         return ReleaseParser.parse(attr.release)
             .map(r -> new OpenSubtilteSubtitle(
@@ -135,7 +139,7 @@ public final class OpenSubAdapter
                 fileName:attr.release,
                 language:language,
                 releaseGroup:r.releaseGroup,
-                uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                uploader:uploader,
                 quality:r.quality,
                 hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
             .orElseGet(() -> {
@@ -143,9 +147,9 @@ public final class OpenSubAdapter
                 return new OpenSubtilteSubtitle(
                     urlSupplier:() -> api.getDownloadUrl(fileId),
                     fileName:attr.release,
-                    language:Language.ofIso639_1(attr.language),
+                    language:language,
                     releaseGroup:extraInfo.getReleaseGroupBestEffort(),
-                    uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                    uploader:uploader,
                     quality:extraInfo.qualityKeyword,
                     hearingImpaired:Boolean.TRUE == attr.isHearingImpaired());
             });

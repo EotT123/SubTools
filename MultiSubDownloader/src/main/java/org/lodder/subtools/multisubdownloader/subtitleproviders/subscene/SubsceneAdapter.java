@@ -142,12 +142,12 @@ public final class SubsceneAdapter
     @Override
     public SubsceneSubtitle convertToSubtitle(Release release, SubsceneSubtitleMetadata sub) {
         return new SubsceneSubtitle(
-            urlSupplier:sub.urlSupplier,
-            fileName:sub.name.removeIllegalFilenameChars(),
-            language:sub.language,
-            quality:ReleaseParser.getQualityKeyword(sub.name),
-            releaseGroup:ReleaseParser.extractReleaseGroup(sub.name, false),
-            uploader:sub.uploader,
-            hearingImpaired:sub.hearingImpaired);
+            sub.urlSupplier,
+            sub.name.removeIllegalFilenameChars(),
+            sub.language,
+            ReleaseParser.extractReleaseGroup(sub.name, false),
+            sub.uploader,
+            sub.hearingImpaired,
+            ReleaseParser.getQualityKeyword(sub.name));
     }
 }

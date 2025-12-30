@@ -19,11 +19,11 @@ public class PodnapisiSubtitle extends Subtitle {
     private final String url;
 
     public PodnapisiSubtitle(String url,
-        @Nullable String fileName=null,
-        @Nullable Language language=null,
+        String fileName,
+        Language language,
         @Nullable String releaseGroup=null,
-        @Nullable String uploader=null,
-        boolean hearingImpaired=false,
+        String uploader,
+        boolean hearingImpaired,
         @Nullable String quality=null) {
 
         super(fileName, language, releaseGroup, uploader, SubtitleSource.PODNAPISI, hearingImpaired, quality);
@@ -32,7 +32,7 @@ public class PodnapisiSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
         manager.downloadAndExtractFile(url, subPath);
         return List.of(subPath);

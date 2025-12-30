@@ -19,12 +19,12 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
     private final String url;
 
     public Addic7edProxyGestdownSubtitle(String url,
-        @Nullable String fileName=null,
-        @Nullable Language language=null,
+        String fileName,
+        Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         boolean hearingImpaired=false,
-        @Nullable String quality=null) {
+        String quality) {
 
         super(fileName, language, releaseGroup, uploader, SubtitleSource.ADDIC7ED, hearingImpaired, quality);
         this.url = url;
@@ -32,7 +32,7 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
         manager.downloadAndExtractFile(url, subPath);
         return List.of(subPath);

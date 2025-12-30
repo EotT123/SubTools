@@ -19,7 +19,7 @@ public class LocalSubtitle extends Subtitle {
     private final Path path;
 
     public LocalSubtitle(Path path,
-        @Nullable Language language=null,
+        Language language,
         @Nullable String releaseGroup=null,
         @Nullable String quality=null) {
 
@@ -29,7 +29,7 @@ public class LocalSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(path.fileName);
         path.copyToDir(subPath);
         return List.of(subPath);

@@ -24,12 +24,12 @@ public class TvSubtiltesSubtitle extends Subtitle {
     private final String url;
 
     public TvSubtiltesSubtitle(String url,
-        @Nullable String fileName=null,
-        @Nullable Language language=null,
-        @Nullable String releaseGroup=null,
+        String fileName,
+        Language language,
+        String releaseGroup,
         @Nullable String uploader=null,
         boolean hearingImpaired=false,
-        @Nullable String quality=null) {
+        String quality) {
 
         super(fileName, language, releaseGroup, uploader, SubtitleSource.TVSUBTITLES, hearingImpaired, quality);
         this.url = url;
@@ -37,7 +37,7 @@ public class TvSubtiltesSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
         manager.downloadAndExtractFile(getForwardUrl(url), subPath);
         return List.of(subPath);

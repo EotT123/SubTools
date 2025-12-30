@@ -23,6 +23,7 @@ public class JComboBoxExt {
         // hide utility class constructor
     }
 
+
     public static <E> JComboBox<E> create(@ThisClass Class<JComboBox<E>> thisClass, E... values) {
         return new JComboBox<>(values);
     }

@@ -32,14 +32,8 @@ public class SubdlSubtitle extends Subtitle {
     private final String url;
     private final Release forRelease;
 
-    public SubdlSubtitle(String url,
-        @Nullable String title=null,
-        @Nullable Language language=null,
-        @Nullable String releaseGroup=null,
-        @Nullable String uploader=null,
-        boolean hearingImpaired=false,
-        @Nullable String quality=null,
-        Release forRelease) {
+    public SubdlSubtitle(String url, String title, Language language, @Nullable String releaseGroup, String uploader,
+        boolean hearingImpaired, @Nullable String quality, Release forRelease) {
 
         super(title, language, releaseGroup, uploader, SubtitleSource.SUBDL, hearingImpaired, quality);
         this.url = url;
@@ -48,7 +42,7 @@ public class SubdlSubtitle extends Subtitle {
 
     @Override
     public List<Path> download(Manager manager, Path destinationFolder,
-        Function<AtomicInteger, String> fileNameFunction) throws IOException {
+        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir")).resolve("multisubdownloader").resolve("subdl");
         Files.createDirectories(tempDir);
         String zipFileName = url.contains("/") ? StringUtils.substringAfterLast(url, "/").removeIllegalWindowsChars() :
