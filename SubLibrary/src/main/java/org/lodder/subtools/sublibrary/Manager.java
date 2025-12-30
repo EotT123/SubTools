@@ -269,7 +269,7 @@ public class Manager {
             manager.getCache(cacheType).remove(key);
         }
 
-        public <V, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
+        public <V extends @Nullable Object, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
             @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
             ProviderCache<V> cache = manager.getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
@@ -331,7 +331,7 @@ public class Manager {
             return optionalCache.flatMap(cache -> (Optional<V>) cache.get(key));
         }
 
-        public <V, X extends Exception> Optional<V> getOptional(
+        public <V extends @Nullable Object, X extends Exception> Optional<V> getOptional(
             ThrowingSupplier<Optional<V>, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
             boolean storeTempNullValue=false) throws X {
             Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
@@ -350,7 +350,7 @@ public class Manager {
                         object.ifPresentOrElse(v -> cache.put(key, v, timeToLive), () -> {
                             switch (cache) {
                                 case ProviderCacheDisk<V> dCache -> dCache.putWithoutPersist(key, null);
-                                case ProviderCacheMemory<@Nullable V> mCache -> mCache.put(key, null);
+                                case ProviderCacheMemory<V> mCache -> mCache.put(key, null);
                             }
                         });
                         return object;
@@ -388,8 +388,9 @@ public class Manager {
                         OptionalInt object = executeSupplier(supplier, retry);
                         object.ifPresentOrElse(v -> cache.put(key, v), () -> {
                             switch (cache) {
-                                case ProviderCacheDisk dCache -> dCache.putWithoutPersist(key, null);
-                                case ProviderCacheMemory mCache -> mCache.put(key, null);
+                                case ProviderCacheDisk<? extends @Nullable Object> dCache ->
+                                    dCache.putWithoutPersist(key, null);
+                                case ProviderCacheMemory<? extends @Nullable Object> mCache -> mCache.put(key, null);
                             }
                         });
                         return object;
@@ -409,7 +410,7 @@ public class Manager {
             }).orElseGetEx(supplier);
         }
 
-        public <V, X extends Exception> void store(Value<V, X> value,
+        public <V extends @Nullable Object, X extends Exception> void store(Value<V, X> value,
             boolean storeTempNullValue=false, @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
 
             V object = value.getValue(retry);
@@ -445,7 +446,7 @@ public class Manager {
         return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
     }
 
-    private <V> Optional<ProviderCache<V>> getOptionalCache(CacheType cacheType) {
+    private <V> Optional<ProviderCache<@Nullable V>> getOptionalCache(CacheType cacheType) {
         return switch (cacheType) {
             case NONE -> Optional.empty();
             case MEMORY -> (Optional) Optional.of(inMemoryCache);
@@ -549,7 +550,8 @@ public class Manager {
     // ############## \\
 
     @SuppressWarnings("unchecked")
-    private static <V, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier, Retry retry) throws X {
+    private static <V extends @Nullable Object, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier,
+        Retry retry) throws X {
         try {
             return supplier.get();
         } catch (Exception e) {
