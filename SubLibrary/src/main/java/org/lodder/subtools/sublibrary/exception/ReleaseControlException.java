@@ -9,7 +9,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 public class ReleaseControlException extends Exception {
 
     public ReleaseControlException(String string, Release release) {
-        super(string + ": " + release.toString());
+        super(string + ": " + release);
     }
 
     @Serial

@@ -3,7 +3,6 @@ package org.lodder.subtools.sublibrary;
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -148,12 +147,11 @@ public class Manager {
 
     public @Nullable Document getAsDocument(PageContentParams params,
         @Nullable Predicate<String> emptyResultPredicate=null)
-        throws ParserConfigurationException, ManagerException, IOException {
-        Optional<String> asStringDocument = getAsStringDocument(params, emptyResultPredicate);
-        return asStringDocument.isPresent() ? XMLHelper.getDocument(asStringDocument.get()) : null;
+        throws ManagerException, IOException {
+        return getAsStringDocument(params, emptyResultPredicate).mapEx(XMLHelper::getDocument).orElse(null);
     }
 
-    public @Nullable org.jsoup.nodes.Document getAsJsoupDocument(PageContentParams params,
+    public org.jsoup.nodes.@Nullable Document getAsJsoupDocument(PageContentParams params,
         @Nullable Predicate<String> emptyResultPredicate=null) throws ManagerException {
         return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
     }

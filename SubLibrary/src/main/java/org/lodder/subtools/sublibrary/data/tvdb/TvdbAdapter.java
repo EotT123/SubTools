@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
+import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.sublibrary.Manager.*;
 
@@ -84,7 +85,7 @@ public class TvdbAdapter implements AdapterIntf {
                 return Optional.of(serieIds.first).map(searchResult -> new TvdbSerie(serieName, searchResult));
             } else {
                 Comparator<SearchResult> comparator = Comparator.comparing(
-                    (SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, s.name));
+                    (SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, requireNonNull(s.name)));
                 tvdbSerie = userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
                     getText("Prompter.SelectTvdbMatchForSerie", serieName), provider,
                     s -> "${s.name} (${s.firstAirTime})").map(searchResult -> new TvdbSerie(serieName, searchResult));

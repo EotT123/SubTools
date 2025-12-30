@@ -134,7 +134,7 @@ public class ImdbAdapter implements AdapterIntf {
                                     lastYear = Integer.parseInt(matcher.group("year"));
                                 }
                                 if (lastYear != null) {
-                                    return Math.abs((year == null ? LocalDate.now().year : year) - lastYear);
+                                    return Math.abs((year == null ? LocalDate.now().getYear() : year) - lastYear);
                                 }
                             }
                             return 0;

@@ -35,7 +35,7 @@ public class Tags {
             while (matcher.find()) {
                 episodes.add(Integer.parseInt(matcher.group()));
             }
-            return episodes;
+            return List.copyOf(episodes);
         });
     public static Tag<Integer> ARABIC_NUMBER = new Tag<>("arabicnbr", Integer::parseInt);
     public static Tag<Integer> ROMAN_NUMBER = new Tag<>("romannbr", Roman::decode);

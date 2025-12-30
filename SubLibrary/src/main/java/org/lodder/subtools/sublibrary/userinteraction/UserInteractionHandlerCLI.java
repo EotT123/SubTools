@@ -32,8 +32,8 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message, @Nullable String title,
-        @Nullable Function<T, String> toStringMapper) {
+    public <T> Optional<T> selectFromList(Iterable<T> options, String message, @Nullable String title,
+        Function<T, String> toStringMapper=String::valueOf) {
         // TODO use extension method
         return PrompterExt.promptValueFromList(prompter,
             message,

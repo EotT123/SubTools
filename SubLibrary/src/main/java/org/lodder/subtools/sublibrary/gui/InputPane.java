@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.gui;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,10 +36,9 @@ public class InputPane<T> extends JDialog implements ActionListener, PropertyCha
     private final String okText;
     private final String cancelText;
 
-    //
-    private JTextField textField;
-    private JOptionPane optionPane;
-    private T input;
+    private @Nullable JTextField textField;
+    private @Nullable JOptionPane optionPane;
+    private @Nullable T input;
 
     public InputPane(@Nullable Frame owner=null,
         String title,
@@ -52,9 +52,9 @@ public class InputPane<T> extends JDialog implements ActionListener, PropertyCha
         super(owner, true);
         setTitle(title);
         this.message = message;
-        this.inputValidators = inputValidators == null ? List.of() : List.copyOf(inputValidators);
+        this.inputValidators = ifNotNullOrElse(inputValidators, List::copyOf, List.of());
         this.toObjectMapper = toObjectMapper;
-        this.objectValidators = objectValidators == null ? List.of() : List.copyOf(objectValidators);
+        this.objectValidators = ifNotNullOrElse(objectValidators, List::copyOf, List.of());
         this.okText = okText;
         this.cancelText = cancelText;
     }

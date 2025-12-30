@@ -22,7 +22,7 @@ public class TvReleaseAssert extends ReleaseAssert<TvRelease> {
 
     public @Self TvReleaseAssert hasEpisodes(Integer... episodeNumbers) {
         isNotNull();
-        assertThat(actual.episodes).containsExactly(episodeNumbers);
+        assertThat(actual.episodes).containsExactlyInAnyOrder(episodeNumbers);
         return this;
     }
 

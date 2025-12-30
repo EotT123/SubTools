@@ -37,7 +37,6 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
     private static final Object LOCK = new Object();
     private static final Gson GSON = new GsonBuilder().create();
 
-    private final @Nullable Time timeToLive;
     private final Set<ProviderCacheKey> doublesToRemove = new HashSet<>();
     private final Map<ProviderCacheKey, CacheObject<V>> removedToAdd = new HashMap<>();
     private final LazyBiFunction<ProviderCacheDisk<V>, String, Connection>
@@ -127,7 +126,6 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
         if (timeToLive != null && timeToLive.isNegative()) {
             throw new IllegalStateException("timeToLive should be a positive number");
         }
-        this.timeToLive = timeToLive;
         this.tableName = StringUtils.isBlank(tableName) ? "cacheobjects" : tableName;
         // initialize map in other thread
         new Thread(() -> {

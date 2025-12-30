@@ -9,7 +9,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <manifold.version>2025.1.27</manifold.version>
+        <manifold.version>2025.1.29</manifold.version>
         <maven.compiler.target>25</maven.compiler.target>
         <maven.compiler.source>25</maven.compiler.source>
     </properties>
@@ -354,7 +354,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.16.1</version>
+                <version>5.21.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
