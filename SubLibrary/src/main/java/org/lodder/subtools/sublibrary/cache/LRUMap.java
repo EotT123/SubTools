@@ -6,14 +6,17 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class LRUMap<K, V> extends LinkedHashMap<K, V> {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class LRUMap<K, V extends @Nullable Object> extends LinkedHashMap<K, V> {
+    @Serial private static final long serialVersionUID = 1L;
     private final int maxItems;
 
     public LRUMap(int maxItems) {
+        if (maxItems <= 0) {
+            throw new IllegalArgumentException("maxItems must be positive");
+        }
         this.maxItems = maxItems;
     }
 
@@ -24,8 +27,7 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
 
     @Override
     public boolean equals(Object o) {
-        return this == o || (o instanceof LRUMap lruMap && super.equals(lruMap)
-            && maxItems == lruMap.maxItems);
+        return this == o || (o instanceof LRUMap lruMap && super.equals(lruMap) && maxItems == lruMap.maxItems);
     }
 
     @Override

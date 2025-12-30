@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.model;
 
+import static util.Utils.*;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +26,7 @@ public class ProviderIds {
         return providerIdMap.get(providerIdType);
     }
     public OptionalInt getTvdbId(){
-        Object tvdbId = get(ProviderIdType.TVDB);
-        return tvdbId == null ? OptionalInt.empty() : OptionalInt.of((int) tvdbId);
+        return ifNotNullOrElseGet(get(ProviderIdType.TVDB), v -> OptionalInt.of((int) v), OptionalInt::empty);
     }
     public Optional<String> getImdbId(){
         return Optional.ofNullable((String) get(ProviderIdType.IMDB));

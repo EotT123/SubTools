@@ -1,11 +1,11 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class LazyThrowingSupplier<T, X extends Exception> {
+public class LazyThrowingSupplier<T extends @Nullable Object, X extends Exception> {
 
     private final ThrowingSupplier<T, X> supplier;
 
@@ -19,12 +19,6 @@ public class LazyThrowingSupplier<T, X extends Exception> {
         this.supplier = supplier;
     }
 
-    public LazyThrowingSupplier(T value) {
-        supplier = null;
-        object = value;
-        initialized = true;
-    }
-
     public T get() throws X {
         if (!initialized) {
             synchronized (lock) {
@@ -35,16 +29,6 @@ public class LazyThrowingSupplier<T, X extends Exception> {
             }
         }
         return object;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    public void doIfInitialized(ThrowingConsumer<T, X> consumer) throws X {
-        if (initialized) {
-            consumer.accept(object);
-        }
     }
 
     public void reset() {

@@ -47,8 +47,7 @@ public class VideoPatterns {
         public static @Nullable Quality fromValue(@Nullable String value) {
             return value == null ? null : Quality.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
     }
 
@@ -68,8 +67,7 @@ public class VideoPatterns {
         public static @Nullable VideoEncoding fromValue(@Nullable String value) {
             return value == null ? null : VideoEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
     }
 
@@ -95,8 +93,7 @@ public class VideoPatterns {
         public static @Nullable AudioEncoding fromValue(@Nullable String value) {
             return value == null ? null : AudioEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
     }
 
@@ -134,8 +131,7 @@ public class VideoPatterns {
         public static @Nullable Source fromValue(@Nullable String value) {
             return value == null ? null : Source.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
 
         public boolean isTypeForValue(String value) {

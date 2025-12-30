@@ -2,9 +2,10 @@ package org.lodder.subtools.sublibrary.util.lazy;
 
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class LazyThrowingFunction<T, S, X extends Exception> {
+public class LazyThrowingFunction<T extends @Nullable Object, S extends @Nullable Object, X extends Exception> {
 
     private final ThrowingFunction<T, S, X> function;
 
@@ -28,10 +29,6 @@ public class LazyThrowingFunction<T, S, X extends Exception> {
             }
         }
         return object;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
     }
 
     public void reset() {

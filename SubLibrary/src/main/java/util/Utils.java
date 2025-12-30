@@ -5,10 +5,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import name.falgout.jeffrey.throwing.ThrowingConsumer;
+import name.falgout.jeffrey.throwing.ThrowingFunction;
+import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -50,23 +53,45 @@ public class Utils {
             });
     }
 
-    public static <T, R> @Nullable R ifNotNull(@Nullable T value, Function<T, R> mapper) {
+    public static <T, X extends Exception> void ifNotNullDo(@Nullable T value, ThrowingConsumer<T, X> consumer)
+        throws X {
+        if (value != null) {
+            consumer.accept(value);
+        }
+    }
+
+    public static <T, R extends @Nullable Object, X extends Exception> @Nullable R ifNotNull(@Nullable T value,
+        ThrowingFunction<T, R, X> mapper) throws X {
         return value != null ? mapper.apply(value) : null;
     }
 
-    public static <T, R> R ifNotNullOrElse(@Nullable T value, Function<T, R> mapper, R orElseValue) {
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElse(@Nullable T value,
+        ThrowingFunction<T, R, X> mapper, R orElseValue) throws X {
         return value != null ? mapper.apply(value) : orElseValue;
     }
 
-    public static <T, R> R ifNotNullOrElseGet(@Nullable T value, Function<T, R> mapper, Supplier<R> orElseSupplier) {
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGet(@Nullable T value,
+        ThrowingFunction<T, R, X> mapper, Supplier<R> orElseSupplier) throws X {
         return value != null ? mapper.apply(value) : orElseSupplier.get();
     }
 
+    @Contract("!null,_ -> param1; null,!null -> param2; null,null -> null")
     public static <T> T ifNullThen(@Nullable T value, T orElseValue) {
         return value != null ? value : orElseValue;
     }
 
-    public static <T> T ifNullThenGet(@Nullable T value, Supplier<T> orElseSupplier) {
+    @Contract("!null,_ -> param1; null,!null -> param2; null,null -> null")
+    public static <T> @Nullable T ifNullThenNullable(@Nullable T value, @Nullable T orElseValue) {
+        return value != null ? value : orElseValue;
+    }
+
+    public static <T, X extends Exception> T ifNullThenGet(@Nullable T value, ThrowingSupplier<T, X> orElseSupplier)
+        throws X {
+        return value != null ? value : orElseSupplier.get();
+    }
+
+    public static <T, X extends Exception> @Nullable T ifNullThenGetNullable(@Nullable T value,
+        ThrowingSupplier<@Nullable T, X> orElseSupplier) throws X {
         return value != null ? value : orElseSupplier.get();
     }
 }

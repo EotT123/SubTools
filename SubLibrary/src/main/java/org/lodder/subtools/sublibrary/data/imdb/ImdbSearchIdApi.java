@@ -101,9 +101,10 @@ record ImdbSearchIdApi(Manager manager) {
                 try {
                     Elements searchResults = manager.getAsJsoupDocument(new PageContentParams(url))
                         .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
-                    Function<Element, String> toStringMapper = e -> Optional.ofNullable((Element) e.selectFirst("h3"))
-                        .map(e2 -> e2.text().replace(" - IMDb", ""))
-                        .orElse(null);
+                    Function<Element, @Nullable String> toStringMapper =
+                        e -> Optional.ofNullable((Element) e.selectFirst("h3"))
+                            .map(e2 -> e2.text().replace(" - IMDb", ""))
+                            .orElse(null);
                     Function<Element, String> toHrefMapper =
                         e -> URLDecoder.decode(e.attr("href"), StandardCharsets.UTF_8);
                     return getImdbIdCommon(searchResults, toStringMapper, toHrefMapper);
@@ -139,10 +140,10 @@ record ImdbSearchIdApi(Manager manager) {
             });
     }
 
-    private Set<ImdbId> getImdbIdCommon(Elements searchResults, Function<Element, String> toNameMapper,
-        Function<Element, String> toHrefMapper, Function<Element, String> toYearMapper=e -> null,
-        Function<Element, String> toOtherInfoMapper=e -> null,
-        Function<Element, VideoType> toVideoTypeMapper=e -> null) {
+    private Set<ImdbId> getImdbIdCommon(Elements searchResults, Function<Element, @Nullable String> toNameMapper,
+        Function<Element, String> toHrefMapper, Function<Element, String> toYearMapper=_ -> null,
+        Function<Element, String> toOtherInfoMapper=_ -> null,
+        Function<Element, VideoType> toVideoTypeMapper=_ -> null) {
         return searchResults.stream().collect(Utils.setCollector(
             (set, element) -> {
                 String name = toNameMapper.apply(element);

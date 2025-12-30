@@ -27,10 +27,6 @@ public class LazyThrowingRunnable<X extends Exception> {
         }
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
     public void reset() {
         initialized = false;
     }

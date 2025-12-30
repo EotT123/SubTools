@@ -92,12 +92,12 @@ public class PrompterExt {
         @Nullable Comparator<T> sorter=null) {
 
         Validator<@Nullable String> inputValidator =
-            new Validator<>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt).isPresent());
+            new Validator<@Nullable String>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt).isPresent());
         Function<@Nullable String, @Nullable Integer> toObjectMapper =
             v -> v == null ? null : Integer.parseUnsignedInt(v);
         int numberOfElements = elements.size();
-        List<Validator<@Nullable Integer>> objectValidators =
-            List.of(new Validator<>(number -> number == null || (number > 0 && number <= numberOfElements),
+        List<Validator<@Nullable Integer>> objectValidators = List.of(
+            new Validator<@Nullable Integer>(number -> number == null || (number > 0 && number <= numberOfElements),
                 getText("Prompter.ValueNotInRange", numberOfElements)));
 
         TriFunction<String, List<Validator<String>>, List<T>, Optional<T>> promptFunction = (choicesMessage,
@@ -118,7 +118,7 @@ public class PrompterExt {
         @Nullable TableDisplayer<T> tableDisplayer=null,
         @Nullable Comparator<T> sorter=null) {
 
-        Validator<@Nullable String> inputValidator = new Validator<>(v -> v == null ||
+        Validator<@Nullable String> inputValidator = new Validator<@Nullable String>(v -> v == null ||
             v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt).isPresent()));
         Function<String, int[]> toObjectsMapper =
             v -> Arrays.stream(v.split(",")).mapToInt(Integer::parseUnsignedInt).toArray();
@@ -133,8 +133,7 @@ public class PrompterExt {
             inputValidators, sortedElements) ->
             // TODO use extension method
             PrompterExt.promptValues(prompter, choicesMessage, inputValidators, toObjectsMapper, objectValidators)
-                .stream()
-                .map(idx -> sortedElements.get(idx - 1)).toList();
+                .stream().map(idx -> sortedElements.get(idx - 1)).toList();
 
         return promptFromList(message, elements, toStringMapper, includeNull, tableDisplayer, sorter,
             List.of(inputValidator), promptFunction);

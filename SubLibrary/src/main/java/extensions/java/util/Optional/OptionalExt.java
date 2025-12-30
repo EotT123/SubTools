@@ -2,6 +2,7 @@ package extensions.java.util.Optional;
 
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import manifold.ext.rt.api.Extension;
@@ -12,15 +13,17 @@ import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import name.falgout.jeffrey.throwing.ThrowingToIntFunction;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 @Extension
 @NullMarked
 public class OptionalExt {
 
     private OptionalExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
 //    /**
@@ -36,6 +39,20 @@ public class OptionalExt {
 //    }
 
     /**
+     * Applies the given {@link Function} to the value if present.
+     *
+     * @param optional the input {@code Optional} for the extension method
+     * @param mapper the function to apply
+     * @param <T> the type of the input value
+     * @param <U> the type of the output value
+     * @return an {@code Optional} describing the result of the function, or empty if not present
+     */
+    public static <T, U> Optional<@NonNull U> mapNullable(@This Optional<T> optional,
+        Function<? super T, @Nullable U> mapper) {
+        return optional.map(mapper::apply);
+    }
+
+    /**
      * Applies the given {@link ThrowingFunction} to the value if present.
      *
      * @param optional the input {@code Optional} for the extension method
@@ -45,29 +62,12 @@ public class OptionalExt {
      * @return an {@code Optional} describing the result of the function, or empty if not present
      * @throws X if the function throws an exception
      */
-    public static <T, R, X extends Exception> Optional<R> mapEx(@This Optional<T> optional,
-        ThrowingFunction<? super T, ? extends R, X> function) throws X {
+    public static <T extends @Nullable Object, R extends @Nullable Object, X extends Exception> Optional<R> mapEx(
+        @This Optional<T> optional, ThrowingFunction<? super T, ? extends R, X> function) throws X {
         return optional.isPresent() ? Optional.ofNullable(function.apply(optional.get())) : Optional.empty();
     }
 
     /**
-     * Applies the given {@link ThrowingFunction} to the value if present. If an exception is thrown, consume it.
-     *
-     * @param optional the input {@code Optional} for the extension method
-     * @param function the function to apply
-     * @param <T> the type of the input value
-     * @return an {@code Optional} describing the result of the function, or empty if not present
-     */
-    public static <T, R, X extends Exception> Optional<R> mapConsumeEx(@This Optional<T> optional,
-        ThrowingFunction<? super T, ? extends R, X> function) {
-        try {
-            return optional.mapEx(function);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * Applies the given {@link ThrowingFunction} to the value if present.
      *
      * @param optional the input {@code Optional} for the extension method
@@ -77,8 +77,8 @@ public class OptionalExt {
      * @return an {@code Optional} describing the result of the function, or empty if not present
      * @throws X if the function throws an exception
      */
-    public static <T, R, X extends Exception> Optional<R> flatMapEx(@This Optional<T> optional,
-        ThrowingFunction<? super T, ? extends Optional<R>, X> function) throws X {
+    public static <T extends @Nullable Object, R extends @Nullable Object, X extends Exception> Optional<R> flatMapEx(
+        @This Optional<T> optional, ThrowingFunction<? super T, ? extends Optional<R>, X> function) throws X {
         return optional.isPresent() ? function.apply(optional.get()) : Optional.empty();
     }
 
@@ -90,7 +90,8 @@ public class OptionalExt {
      * @param <T> the type of the value
      * @return the current value or the result of the supplier
      */
-    public static <T> Optional<T> orElseMap(@This Optional<T> optional, Supplier<Optional<T>> supplier) {
+    public static <T extends @Nullable Object> Optional<T> orElseMap(@This Optional<T> optional,
+        Supplier<Optional<T>> supplier) {
         return optional.isPresent() ? optional : supplier.get();
     }
 
@@ -104,7 +105,7 @@ public class OptionalExt {
      * @return the current value or the result of the supplier
      * @throws X if the supplier throws an exception
      */
-    public static <T, X extends Exception> Optional<T> orElseMapEx(@This Optional<T> optional,
+    public static <T extends @Nullable Object, X extends Exception> Optional<T> orElseMapEx(@This Optional<T> optional,
         ThrowingSupplier<Optional<T>, X> supplier) throws X {
         return optional.isPresent() ? optional : supplier.get();
     }
@@ -116,7 +117,7 @@ public class OptionalExt {
      * @param runnable the action to perform if the value is absent
      * @param <T> the type of the value
      */
-    public static <T> void ifNotPresent(@This Optional<T> optional, Runnable runnable) {
+    public static <T extends @Nullable Object> void ifNotPresent(@This Optional<T> optional, Runnable runnable) {
         if (optional.isEmpty()) {
             runnable.run();
         }
@@ -131,36 +132,60 @@ public class OptionalExt {
      * @param <X> the type of exception the runnable may throw
      * @throws X if the runnable throws an exception
      */
-    public static <T, X extends Throwable> void ifNotPresentEx(@This Optional<T> optional,
+    public static <T extends @Nullable Object, X extends Throwable> void ifNotPresentEx(@This Optional<T> optional,
         ThrowingRunnable<X> runnable) throws X {
         if (optional.isEmpty()) {
             runnable.run();
         }
     }
 
-    public static <T, X extends Exception> OptionalInt mapToIntEx(@This Optional<T> optional,
+    public static <T extends @Nullable Object, X extends Exception> OptionalInt mapToIntEx(@This Optional<T> optional,
         ThrowingToIntFunction<T, X> mapper) throws X {
         return optional.isPresent() ? OptionalInt.of(mapper.applyAsInt(optional.get())) : OptionalInt.empty();
     }
 
 
-    public static <T, X extends Exception> @Self Optional<T> useIfPresentEx(@This Optional<T> optional,
-        ThrowingConsumer<T, X> consumer) throws X {
+    public static <T extends @Nullable Object, X extends Exception> @Self Optional<T> useIfPresentEx(
+        @This Optional<T> optional, ThrowingConsumer<T, X> consumer) throws X {
         if (optional.isPresent()) {
             consumer.accept(optional.get());
         }
         return optional;
     }
 
-    public static <T, X extends Throwable> T orElseGetEx(@This Optional<T> optional,
+    public static <T extends @Nullable Object, X extends Throwable> T orElseGetEx(@This Optional<T> optional,
         ThrowingSupplier<T, X> supplier) throws X {
         return optional.isPresent() ? optional.get() : supplier.get();
     }
 
-    public static <T, X extends Exception> void ifPresentEx(@This Optional<T> optional,
-        ThrowingConsumer<T, X> supplier) throws X {
+    public static <T extends @Nullable Object, X extends Exception> void ifPresentEx(@This Optional<T> optional,
+        ThrowingConsumer<T, X> consumer) throws X {
         if (optional.isPresent()) {
-            supplier.accept(optional.get());
+            consumer.accept(optional.get());
+        }
+    }
+
+    /**
+     * If a value is present in the given {@link Optional}, performs the provided
+     * {@code consumer} with the value; otherwise performs the provided
+     * {@code elseRunnable}.
+     *
+     * <p>This method is similar to {@link Optional#ifPresentOrElse}, but allows
+     * both actions to throw checked exceptions.</p>
+     *
+     * @param <T> the type of the value contained in the optional
+     * @param <X> the type of exception that may be thrown by either action
+     * @param optional the optional to inspect
+     * @param consumer the action to execute if a value is present
+     * @param elseRunnable the action to execute if no value is present
+     * @throws X if the consumer or elseRunnable throws an exception
+     */
+    public static <T extends @Nullable Object, X extends Exception> void ifPresentOrElseEx(@This Optional<T> optional,
+        ThrowingConsumer<T, X> consumer, ThrowingRunnable<X> elseRunnable) throws X {
+        if (optional.isPresent()) {
+            consumer.accept(optional.get());
+        } else {
+            elseRunnable.run();
         }
     }
 }

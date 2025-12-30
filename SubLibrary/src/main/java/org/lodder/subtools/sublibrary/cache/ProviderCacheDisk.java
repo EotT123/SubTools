@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public final class ProviderCacheDisk<V> extends ProviderCache<V> {
+public final class ProviderCacheDisk<V extends @Nullable Object> extends ProviderCache<V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProviderCacheDisk.class);
     private static final Object LOCK = new Object();
@@ -163,7 +163,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
     }
 
     @Override
-    public void put(ProviderCacheKey key, @Nullable V value, @Nullable Time timeToLive) {
+    public void put(ProviderCacheKey key, V value, @Nullable Time timeToLive) {
         synchronized (LOCK) {
             super.put(key, value, timeToLive);
             putFromMemoryCache(key);
@@ -186,7 +186,7 @@ public final class ProviderCacheDisk<V> extends ProviderCache<V> {
         }
     }
 
-    public void putWithoutPersist(ProviderCacheKey key, @Nullable V value) {
+    public void putWithoutPersist(ProviderCacheKey key, V value) {
         super.put(key, value);
     }
 }

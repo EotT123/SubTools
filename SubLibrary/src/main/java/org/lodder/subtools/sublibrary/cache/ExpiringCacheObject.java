@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class ExpiringCacheObject<V> implements CacheObject<V> {
+public final class ExpiringCacheObject<V extends @Nullable Object> implements CacheObject<V> {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -26,15 +26,15 @@ public final class ExpiringCacheObject<V> implements CacheObject<V> {
 
     @override @val Time created;
     @var @set(Private) Time lastAccessed = Time.now();
-    @override @var @Nullable V value;
+    @override @var V value;
 
-    public ExpiringCacheObject(Time created, Time lastAccessed, @Nullable V value) {
+    public ExpiringCacheObject(Time created, Time lastAccessed, V value) {
         this.created = created;
         this.lastAccessed = lastAccessed;
         this.value = value;
     }
 
-    ExpiringCacheObject(@Nullable V value) {
+    ExpiringCacheObject(V value) {
         this.created = Time.now();
         this.value = value;
     }
@@ -50,7 +50,7 @@ public final class ExpiringCacheObject<V> implements CacheObject<V> {
     }
 
     @Override
-    public String toString(Function<@Nullable V, String> valueToStringMapper) {
+    public String toString(Function<V, String> valueToStringMapper) {
         return "created:$created|lastAccessed:$lastAccessed|value:${valueToStringMapper.apply(value)}";
     }
 

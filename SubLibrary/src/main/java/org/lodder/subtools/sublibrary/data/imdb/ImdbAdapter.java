@@ -48,34 +48,29 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     public Optional<ImdbDetails> getDetails(String imdbId) {
-        return getCache("details", b -> b.add("imdbId", imdbId))
-            .getOptional(() -> {
-                try {
-                    return imdbApi.getDetails(imdbId);
-                } catch (ImdbException e) {
-                    LOGGER.error("$provider: error while fetching details for id [$imdbId]", e);
-                    return Optional.empty();
-                }
-            });
+        return getCache("details", b -> b.add("imdbId", imdbId)).getOptional(() -> {
+            try {
+                return imdbApi.getDetails(imdbId);
+            } catch (ImdbException e) {
+                LOGGER.error("$provider: error while fetching details for id [$imdbId]", e);
+                return Optional.empty();
+            }
+        });
     }
 
     public Optional<String> getImdbId(String title, VideoType videoType, @Nullable Integer year=null) {
         try {
-            @SuppressWarnings("unchecked")
-            Optional<ReleaseMapping> releaseMapping =
+            @SuppressWarnings("unchecked") Optional<ReleaseMapping> releaseMapping =
                 (Optional<ReleaseMapping>) getCache(videoType.name() + "mapping",
-                    b -> b.add("title", title).add("videoType", videoType).add("year", year))
-                    .getOptional(
-                        () -> getImdbIdOnImdb(title, year, videoType)
-                            .orElseMap(() -> getImdbIdOnGoogle(title, year, videoType))
-                            .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType))
-                            .orElseMap(
-                                () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId)))
-                            .map(imdbId -> switch (videoType) {
-                                case EPISODE -> new SerieMapping(title, imdbId.id, imdbId.name);
-                                case MOVIE -> new MovieMapping(title, imdbId.id, imdbId.name, year);
-                            }),
-                        storeTempNullValue:true);
+                    b -> b.add("title", title).add("videoType", videoType).add("year", year)).getOptional(
+                    () -> getImdbIdOnImdb(title, year, videoType).orElseMap(
+                            () -> getImdbIdOnGoogle(title, year, videoType))
+                        .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType)).orElseMap(
+                            () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId)))
+                        .map(imdbId -> switch (videoType) {
+                            case EPISODE -> new SerieMapping(title, imdbId.id, imdbId.name);
+                            case MOVIE -> new MovieMapping(title, imdbId.id, imdbId.name, year);
+                        }), storeTempNullValue:true);
             return releaseMapping.map(ReleaseMapping::getProviderId);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(provider, title, e.getMessage()), e);
@@ -107,13 +102,14 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     private Optional<ImdbId> getImdbIdCommon(String title, @Nullable Integer year, VideoType videoType,
-        ThrowingTriFunction<String, Integer, VideoType, Collection<ImdbId>, ImdbSearchIdException> providerSerieIdSupplier) {
+        ThrowingTriFunction<String, @Nullable Integer, VideoType, Collection<ImdbId>, ImdbSearchIdException> providerSerieIdSupplier) {
         Collection<ImdbId> providerIds;
         try {
             providerIds = providerSerieIdSupplier.apply(title, year, videoType);
         } catch (ImdbSearchIdException e) {
-            LOGGER.error("API %s getImdbId for title [%s] and year [%s] (%s)".formatted(provider, title, year,
-                e.getMessage()), e);
+            LOGGER.error(
+                "API %s getImdbId for title [%s] and year [%s] (%s)".formatted(provider, title, year, e.getMessage()),
+                e);
             return Optional.empty();
         }
         if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerIds.size() == 1) {
@@ -121,27 +117,23 @@ public class ImdbAdapter implements AdapterIntf {
             return Optional.of(providerIds.iterator().next());
         }
         Pattern yearPattern = Pattern.compile("(?<year>[1-2]\\d{3})");
-        return userInteractionHandler
-            .selectFromList(
-                providerIds.stream().sorted(
-                    Comparator.comparing((ImdbId imdbPID) -> imdbPID.videoType == videoType ? -1 : 1)
-                        .thenComparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title))
-                        .thenComparing(imdbPID -> {
-                            if (imdbPID.year != null) {
-                                Matcher matcher = yearPattern.matcher(imdbPID.year);
-                                Integer lastYear = null;
-                                while (matcher.find()) {
-                                    lastYear = Integer.parseInt(matcher.group("year"));
-                                }
-                                if (lastYear != null) {
-                                    return Math.abs((year == null ? LocalDate.now().getYear() : year) - lastYear);
-                                }
+        return userInteractionHandler.selectFromList(providerIds.stream().sorted(
+                Comparator.comparing((ImdbId imdbPID) -> imdbPID.videoType == videoType ? -1 : 1)
+                    .thenComparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title)).thenComparing(imdbPID -> {
+                        if (imdbPID.year != null) {
+                            Matcher matcher = yearPattern.matcher(imdbPID.year);
+                            Integer lastYear = null;
+                            while (matcher.find()) {
+                                lastYear = Integer.parseInt(matcher.group("year"));
                             }
-                            return 0;
-                        })).toList(),
-                getText("Prompter.SelectImdbMatchForSerie", title),
-                provider, providerId -> providerId.name + (StringUtils.isNotBlank(providerId.otherInfo) ?
-                    " (" + providerId.otherInfo + ")" : ""));
+                            if (lastYear != null) {
+                                return Math.abs((year == null ? LocalDate.now().getYear() : year) - lastYear);
+                            }
+                        }
+                        return 0;
+                    })).toList(), getText("Prompter.SelectImdbMatchForSerie", title), provider,
+            providerId -> providerId.name +
+                (StringUtils.isNotBlank(providerId.otherInfo) ? " (" + providerId.otherInfo + ")" : ""));
     }
 
     private Optional<String> promptUserToEnterImdbId(String title) {

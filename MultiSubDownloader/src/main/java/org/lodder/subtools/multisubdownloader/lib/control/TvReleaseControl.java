@@ -57,7 +57,7 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
 
     private void processTvdbInfo(TvRelease release) {
         release.providerIds.getTvdbId()
-            .flatMap(tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode))
+            .flatMapToObj(tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode))
             .ifPresent(episode -> release.title = episode.name);
     }
 

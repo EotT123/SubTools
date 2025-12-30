@@ -207,9 +207,9 @@ public class Manager {
     }
 
     @NullMarked
-    public record Retry(int retries, @Nullable Predicate<Exception> predicate, Time waitTime) {
+    public record Retry(int retries, Predicate<Exception> predicate, Time waitTime) {
 
-        public static final Retry NONE = new Retry(0, null, 0 Second);
+        public static final Retry NONE = new Retry(0, _ -> false, 0Second);
 
         public Retry {
             if (retries < 0) {
@@ -350,7 +350,7 @@ public class Manager {
                         object.ifPresentOrElse(v -> cache.put(key, v, timeToLive), () -> {
                             switch (cache) {
                                 case ProviderCacheDisk<V> dCache -> dCache.putWithoutPersist(key, null);
-                                case ProviderCacheMemory<V> mCache -> mCache.put(key, null);
+                                case ProviderCacheMemory<@Nullable V> mCache -> mCache.put(key, null);
                             }
                         });
                         return object;
@@ -463,7 +463,7 @@ public class Manager {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @NullMarked
-    public record Value<V, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
+    public record Value<V extends @Nullable Object, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
         public static <V> Value<V, Nothing> of(V value) {
             return new Value<>(_ -> value);
         }
@@ -472,19 +472,21 @@ public class Manager {
             return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 
-        public static <V> Value<V, Nothing> ofOptional(Optional<V> value) {
-            return new Value<>(_ -> value.orElse(null));
+        public static <V extends @Nullable Object> Value<V, Nothing> ofOptional(Optional<V> value) {
+            return new Value<@Nullable V, Nothing>(_ -> value.orElse(null));
         }
 
-        public static <V, X extends Exception> Value<V, X> ofOptional(ThrowingSupplier<Optional<V>, X> supplier) {
-            return new Value<>(retry -> executeSupplier(supplier, retry).orElse(null));
+        public static <V extends @Nullable Object, X extends Exception> Value<V, X> ofOptional(
+            ThrowingSupplier<Optional<V>, X> supplier) {
+            return new Value<@Nullable V, X>(retry -> executeSupplier(supplier, retry).orElse(null));
         }
 
-        public static Value<Integer, Nothing> ofOptionalInt(OptionalInt value) {
+        public static Value<@Nullable Integer, Nothing> ofOptionalInt(OptionalInt value) {
             return ofOptional(() -> value.mapToObj(i -> i));
         }
 
-        public static <X extends Exception> Value<Integer, X> ofOptionalInt(ThrowingSupplier<OptionalInt, X> supplier) {
+        public static <X extends Exception> Value<@Nullable Integer, X> ofOptionalInt(
+            ThrowingSupplier<OptionalInt, X> supplier) {
             return ofOptional(() -> supplier.get().mapToObj(i -> i));
         }
 
@@ -497,7 +499,7 @@ public class Manager {
             return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 
-        public @Nullable V getValue(Retry retry=Retry.NONE) throws X {
+        public V getValue(Retry retry=Retry.NONE) throws X {
             return supplier.apply(retry);
         }
     }
@@ -546,8 +548,8 @@ public class Manager {
     // HELPER METHODS \\
     // ############## \\
 
-    private static <V, X extends Exception> @Nullable V executeSupplier(ThrowingSupplier<@Nullable V, X> supplier,
-        Retry retry) throws X {
+    @SuppressWarnings("unchecked")
+    private static <V, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier, Retry retry) throws X {
         try {
             return supplier.get();
         } catch (Exception e) {

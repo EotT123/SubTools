@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
-import extensions.java.io.InputStream.InputStreamExt;
 import extensions.java.nio.file.Path.PathExt;
 import jakarta.ws.rs.core.HttpHeaders;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
@@ -47,7 +46,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
                 conn.setRequestProperty(HttpHeaders.USER_AGENT, userAgent);
             }
             if (conn.responseCode == 200) {
-                return InputStreamExt.asString(conn.getInputStream(), StandardCharsets.UTF_8);
+                return conn.getInputStream().asString(StandardCharsets.UTF_8);
             }
             throw new HttpClientException(conn);
         } finally {
@@ -90,7 +89,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
             if (conn.responseCode == 302 && isUrl(conn.getHeaderField(HttpHeaders.LOCATION))) {
                 return doGet(new URI(conn.getHeaderField(HttpHeaders.LOCATION)).toURL(), userAgent, cookieManager);
             }
-            return InputStreamExt.asString(conn.getInputStream(), StandardCharsets.UTF_8);
+            return conn.getInputStream().asString(StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new HttpClientException(e, conn);
         } finally {

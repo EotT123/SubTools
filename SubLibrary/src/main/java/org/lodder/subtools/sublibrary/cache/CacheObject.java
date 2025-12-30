@@ -9,10 +9,11 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public sealed interface CacheObject<V> extends Serializable permits ExpiringCacheObject, TemporaryCacheObject {
+public sealed interface CacheObject<V extends @Nullable Object> extends Serializable
+    permits ExpiringCacheObject, TemporaryCacheObject {
 
     @val Time created;
-    @val @Nullable V value;
+    @val V value;
     @val Time age;
 
     void updateLastAccessed();

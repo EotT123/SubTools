@@ -4,13 +4,16 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
 @NullMarked
-public interface ThrowingTriFunction<T, U, V, R, E extends Exception> {
+public interface ThrowingTriFunction<T extends @Nullable Object, U extends @Nullable Object,
+    V extends @Nullable Object, R extends @Nullable Object, E extends Exception> {
     R apply(T var1, U var2, V var3) throws E;
 
-    static <T, U, V, R> TriFunction<T, U, V, R> sneaky(
+    static <T extends @Nullable Object, U extends @Nullable Object, V extends @Nullable Object,
+        R extends @Nullable Object> TriFunction<T, U, V, R> sneaky(
         ThrowingTriFunction<? super T, ? super U, ? super V, ? extends R, ?> function) {
         return (t1, t2, t3) -> {
             try {
@@ -21,7 +24,9 @@ public interface ThrowingTriFunction<T, U, V, R, E extends Exception> {
         };
     }
 
-    static <T, U, V, R> TriFunction<T, U, V, Optional<R>> lifted(ThrowingTriFunction<T, U, V, R, ?> f) {
+    static <T extends @Nullable Object, U extends @Nullable Object, V extends @Nullable Object,
+        R extends @Nullable Object> TriFunction<T, U, V, Optional<R>> lifted(
+        ThrowingTriFunction<T, U, V, R, ?> f) {
         return ((ThrowingTriFunction) f).lift();
     }
 

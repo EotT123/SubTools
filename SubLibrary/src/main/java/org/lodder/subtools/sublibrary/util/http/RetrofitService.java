@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.util.http;
 
+import static java.util.Objects.*;
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
@@ -10,7 +11,6 @@ import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
@@ -150,11 +150,11 @@ public class RetrofitService {
                 throw defaultExceptionCreator.apply(BAD_GATEWAY, e.getMessage(), CACHE_TEMPORARY, ERROR);
             }
             if (response.isSuccessful()) {
-                return Objects.requireNonNull(response.body());
+                return requireNonNull(response.body());
             } else {
                 String errorBody;
                 try {
-                    errorBody = Objects.requireNonNull(response.errorBody()).string();
+                    errorBody = requireNonNull(response.errorBody()).string();
                 } catch (IOException e) {
                     errorBody = "";
                 }

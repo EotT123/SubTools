@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 
 import manifold.ext.props.rt.api.override;
@@ -65,17 +66,22 @@ public class PodnapisiApi implements SubtitleApi {
      */
     public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language, ProviderIds providerIds) throws PodnapisiApiException {
-        return providerIds.getImdbId()
-            .mapConsumeEx(imdbId -> getSubtitles(
-                MapUtil.create(
-                    SearchParam.IMDB, imdbId,
-                    SearchParam.LANGUAGE, language.iso639_1,
-                    SearchParam.YEAR, year)))
-            .orElseGetEx(() -> getSubtitles(
-                MapUtil.create(
-                    SearchParam.KEYWORDS, URLEncoder.encode(title.trim().toLowerCase(), UTF_8),
-                    SearchParam.LANGUAGE, language.iso639_1,
-                    SearchParam.YEAR, year)));
+        Optional<List<PodnapisiSubtitleMetadata>> podnapisiSubtitleMetadata;
+        try {
+            podnapisiSubtitleMetadata = providerIds.getImdbId()
+                .mapEx(imdbId -> getSubtitles(
+                    MapUtil.create(
+                        SearchParam.IMDB, imdbId,
+                        SearchParam.LANGUAGE, language.iso639_1,
+                        SearchParam.YEAR, year)));
+        } catch (PodnapisiApiException e) {
+            podnapisiSubtitleMetadata = Optional.empty();
+        }
+        return podnapisiSubtitleMetadata.orElseGetEx(() -> getSubtitles(
+            MapUtil.create(
+                SearchParam.KEYWORDS, URLEncoder.encode(title.trim().toLowerCase(), UTF_8),
+                SearchParam.LANGUAGE, language.iso639_1,
+                SearchParam.YEAR, year)));
     }
 
     // ===== \\
@@ -129,11 +135,11 @@ public class PodnapisiApi implements SubtitleApi {
     public List<PodnapisiSubtitleMetadata> getSerieSubtitles(String serieName, int season, int episode,
         Language language) throws PodnapisiApiException {
         return getSubtitles(
-                MapUtil.create(
-                    SearchParam.KEYWORDS, URLEncoder.encode(serieName.trim().toLowerCase(), UTF_8),
-                    SearchParam.LANGUAGE, language.iso639_1,
-                    SearchParam.SEASON, season,
-                    SearchParam.EPISODE, episode));
+            MapUtil.create(
+                SearchParam.KEYWORDS, URLEncoder.encode(serieName.trim().toLowerCase(), UTF_8),
+                SearchParam.LANGUAGE, language.iso639_1,
+                SearchParam.SEASON, season,
+                SearchParam.EPISODE, episode));
     }
 
     // ====== \\
