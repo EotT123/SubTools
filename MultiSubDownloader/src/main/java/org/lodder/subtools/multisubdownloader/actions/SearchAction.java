@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
+import static java.util.Objects.*;
 import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
@@ -32,9 +34,9 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     @val(Protected) Settings settings;
     @val(Protected) SubtitleProviderStore subtitleProviderStore;
 
-    @get(Protected) @set(Private) StatusListener statusListener;
-    @get(Protected) @set(Private) SearchManager searchManager;
-    @get(Protected) @set(Private) List<R> releases;
+    @get(Protected) @set(Private) @Nullable StatusListener statusListener;
+    @get(Protected) @set(Private) @Nullable SearchManager searchManager;
+    @get(Protected) @set(Private) @Nullable List<R> releases;
     @get(Protected) abstract Language language;
     abstract @get(Protected) IndexingProgressListener indexingProgressListener;
     abstract @get(Protected) UserInteractionHandler userInteractionHandler;
@@ -114,7 +116,7 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     protected abstract List<R> createReleases();
 
     protected void setStatusMessage(String message) {
-        this.statusListener.onStatus(message);
+        requireNonNull(this.statusListener).onStatus(message);
     }
 
     @Override
