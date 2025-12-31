@@ -13,7 +13,7 @@ public sealed class MovieReleaseWithoutPath extends ReleaseWithoutPath implement
 
     public MovieReleaseWithoutPath(String name, @Nullable String releaseGroup=null,
         @Nullable String quality=null, @Nullable Integer year=null, String completeName) {
-        super(name, VideoType.MOVIE, releaseGroup, quality, completeName);
+        super(name, releaseGroup, quality, completeName);
         this.year = year;
     }
 

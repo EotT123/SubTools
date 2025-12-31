@@ -216,7 +216,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
             .withShowOnlyFound(settings.optionsShowOnlyFound)
             .withFileQuitAction(this::close)
             .withViewFilenameAction(() -> visibilityFunction.accept(FILENAME, menuBar.isViewFilenameSelected()))
-            .withViewTypeAction(() -> visibilityFunction.accept(TYPE, menuBar.isViewTypeSelected()))
             .withViewTitleAction(() -> visibilityFunction.accept(TITLE, menuBar.isViewTitleSelected()))
             .withViewSeasonAction(() -> visibilityFunction.accept(SEASON, menuBar.isViewSeasonSelected()))
             .withViewEpisodeAction(() -> visibilityFunction.accept(EPISODE, menuBar.isViewEpisodeSelected()))
@@ -317,7 +316,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
         customTable.hideColumn(SearchColumnName.OBJECT);
         customTable.hideColumn(SearchColumnName.SEASON);
         customTable.hideColumn(SearchColumnName.EPISODE);
-        customTable.hideColumn(SearchColumnName.TYPE);
         customTable.hideColumn(SearchColumnName.TITLE);
         return customTable;
     }
@@ -336,7 +334,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
             menuBar::withViewEpisodeSelected);
         visibilityConsumer.accept(FILENAME, screenSettings.hideFilename, menuBar::withViewFileNameSelected);
         visibilityConsumer.accept(SearchColumnName.SEASON, screenSettings.hideSeason, menuBar::withViewSeasonSelected);
-        visibilityConsumer.accept(SearchColumnName.TYPE, screenSettings.hideType, menuBar::withViewTypeSelected);
         visibilityConsumer.accept(SearchColumnName.TITLE, screenSettings.hideTitle, menuBar::withViewTitleSelected);
     }
 
@@ -492,7 +489,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
         settingsControl.settings.screenSettings.hideFilename = customTable.isHideColumn(FILENAME);
         settingsControl.settings.screenSettings.hideSeason = customTable.isHideColumn(SearchColumnName.SEASON);
         settingsControl.settings.screenSettings.hideTitle = customTable.isHideColumn(SearchColumnName.TITLE);
-        settingsControl.settings.screenSettings.hideType = customTable.isHideColumn(SearchColumnName.TYPE);
     }
 
     public ProgressDialog setProgressDialog(Cancelable worker) {

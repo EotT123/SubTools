@@ -20,7 +20,6 @@ public enum SearchColumnName implements CustomColumnName {
     OBJECT("App.EpisodeObject", Object.class, false),
     SEASON("App.Season", String.class, false),
     EPISODE("App.Episode", String.class, false),
-    TYPE("SearchColumnName.Type", String.class, false),
     TITLE("SearchColumnName.Title", String.class, false),
     SOURCE("SearchColumnName.Source", String.class, false),
     SCORE("SearchColumnName.Score", Integer.class, false);

@@ -8,4 +8,9 @@ import org.jspecify.annotations.Nullable;
 public sealed interface MovieRelease extends Release permits MovieReleaseWithPath, MovieReleaseWithoutPath {
 
     @var @Nullable Integer year;
+
+    @Override
+    default boolean isOfType(VideoType videoType) {
+        return videoType == VideoType.MOVIE;
+    }
 }

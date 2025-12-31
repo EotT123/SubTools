@@ -32,7 +32,7 @@ public sealed class TvReleaseWithoutPath extends ReleaseWithoutPath implements T
     public TvReleaseWithoutPath(String name, int season, Set<Integer> episodes, @Nullable String releaseGroup=null,
         @Nullable String quality=null, @Nullable String originalName=name, @Nullable String customName=null,
         @Nullable String title=null, boolean special=false, String completeName) {
-        super(name, VideoType.EPISODE, releaseGroup, quality, completeName);
+        super(name, releaseGroup, quality, completeName);
         this.title = title;
         this.season = season;
         this.episodes = Set.copyOf(episodes);

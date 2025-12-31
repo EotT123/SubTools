@@ -16,16 +16,14 @@ public abstract sealed class ReleaseWithoutPath implements Release permits Movie
 
     private final Set<Subtitle> matchingSubsSet = new HashSet<>();
     @var @override String name;
-    @val @override VideoType videoType;
     @val @override @Nullable String quality;
     @val @override @Nullable String releaseGroup;
     @val @override ProviderIds providerIds = new ProviderIds();
     @val @override String completeName;
 
-    protected ReleaseWithoutPath(String name, VideoType videoType, @Nullable String releaseGroup,
+    protected ReleaseWithoutPath(String name, @Nullable String releaseGroup,
         @Nullable String quality, String completeName) {
         this.name = name;
-        this.videoType = videoType;
         this.releaseGroup = releaseGroup;
         this.quality = quality;
         this.completeName = completeName;

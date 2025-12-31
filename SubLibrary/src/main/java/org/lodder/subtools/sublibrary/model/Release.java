@@ -11,7 +11,6 @@ import org.jspecify.annotations.Nullable;
 public sealed interface Release permits ReleaseWithoutPath, ReleaseWithPath, MovieRelease, TvRelease {
 
     @var String name;
-    @val VideoType videoType;
     @val @Nullable String quality;
     @val @Nullable String releaseGroup;
     @val ProviderIds providerIds = new ProviderIds();
@@ -26,4 +25,6 @@ public sealed interface Release permits ReleaseWithoutPath, ReleaseWithPath, Mov
     @val List<Subtitle> matchingSubs;
 
     void addMatchingSub(Subtitle sub);
+
+    boolean isOfType(VideoType videoType);
 }

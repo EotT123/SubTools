@@ -33,7 +33,7 @@ public class VideoTableModel extends DefaultTableModel {
     @Serial private static final long serialVersionUID = 1L;
 
     private static final List<SearchColumnName> SHOW_COLUMNS =
-        List.of(TYPE, RELEASE, FILENAME, TITLE, SEASON, EPISODE, FOUND, SELECT, OBJECT);
+        List.of(RELEASE, FILENAME, TITLE, SEASON, EPISODE, FOUND, SELECT, OBJECT);
 
     private static final List<SearchColumnName> SUBTITLE_COLUMNS = List.of(FILENAME, SOURCE, SCORE, SELECT, OBJECT);
 
@@ -111,7 +111,6 @@ public class VideoTableModel extends DefaultTableModel {
                 case OBJECT -> release;
                 case SEASON -> release instanceof TvReleaseWithoutPath tvRelease ? tvRelease.season : null;
                 case EPISODE -> release instanceof TvReleaseWithoutPath tvRelease ? tvRelease.firstEpisode : null;
-                case TYPE -> release.videoType;
                 case TITLE -> release instanceof TvReleaseWithoutPath tvRelease ? tvRelease.title : null;
                 default -> throw new IllegalArgumentException("Unexpected value: " + searchColumn);
             }).collect(Collectors.toCollection(Vector::new));

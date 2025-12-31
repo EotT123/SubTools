@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import manifold.ext.rt.api.Self;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.TvRelease;
-import org.lodder.subtools.sublibrary.model.VideoType;
 
 @NullMarked
 public class TvReleaseAssert extends ReleaseAssert<TvRelease> {
@@ -53,12 +52,6 @@ public class TvReleaseAssert extends ReleaseAssert<TvRelease> {
     public @Self TvReleaseAssert isNotSpecial() {
         isNotNull();
         assertThat(actual.special).isFalse();
-        return this;
-    }
-
-    public @Self TvReleaseAssert hasEpisodeVideoType() {
-        isNotNull();
-        assertThat(actual.videoType).isEqualTo(VideoType.EPISODE);
         return this;
     }
 }

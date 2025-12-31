@@ -53,7 +53,6 @@ class ReleaseParserTest {
 
                 assertThat(release)
                     .isSerie()
-                    .hasEpisodeVideoType()
                     .hasExtension("mkv")
                     .hasFileName("S04E02 - White Collar - Most Wanted.mkv")
                     .withoutReleaseGroup()
@@ -71,7 +70,6 @@ class ReleaseParserTest {
 
                 assertThat(release)
                     .isSerie()
-                    .hasEpisodeVideoType()
                     .hasExtension("mkv")
                     .hasFileName("(S04E02) - White Collar - Most Wanted.mkv")
                     .withoutReleaseGroup()
@@ -89,7 +87,6 @@ class ReleaseParserTest {
 
                 assertThat(release)
                     .isSerie()
-                    .hasEpisodeVideoType()
                     .hasExtension("mkv")
                     .hasFileName("(S04E02) White Collar - Most Wanted.mkv")
                     .withoutReleaseGroup()
@@ -109,7 +106,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv")
                 .hasReleaseGroup("DIMENSION")
@@ -127,7 +123,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Spartacus.Gods.of.The.Arena.Pt.IV.720p.HDTV.X264-DIMENSION.mkv")
                 .hasReleaseGroup("DIMENSION")
@@ -145,7 +140,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mp4")
                 .hasFileName("hawaii.five-0.2010.410.hdtv-lol.mp4")
                 .hasReleaseGroup("lol")
@@ -163,7 +157,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv")
                 .hasReleaseGroup("DIMENSION")
@@ -181,7 +174,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Greys.Anatomy.S10E01E02 Seal Our Fate 720p.HDTV.X264-DIMENSION.mkv")
                 .hasReleaseGroup("DIMENSION")
@@ -200,7 +192,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mkv")
                 .hasFileName("(2-11) Joey and the High School Friend.mkv")
                 .withoutReleaseGroup()
@@ -218,7 +209,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isSerie()
-                .hasEpisodeVideoType()
                 .hasExtension("mkv")
                 .hasFileName("The.Boys.S04E05.Beware.the.jabberwock.my.son.1080p.web.dl.hevc.x265.rmteam.mkv")
                 .hasReleaseGroup("rmteam")
@@ -246,7 +236,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isMovie()
-                .hasMovieVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv")
                 .hasReleaseGroup("AMIABLE")
@@ -262,7 +251,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isMovie()
-                .hasMovieVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Back.to.the.Future.Part.21.1989.720p.BluRay.X264-AMIABLE.mkv")
                 .hasReleaseGroup("AMIABLE")
@@ -278,7 +266,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isMovie()
-                .hasMovieVideoType()
                 .hasExtension("mkv")
                 .hasFileName("The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv")
                 .hasReleaseGroup("SPARKS")
@@ -294,7 +281,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isMovie()
-                .hasMovieVideoType()
                 .hasExtension("mkv")
                 .hasFileName("The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv")
                 .hasReleaseGroup("GECKOS")
@@ -310,7 +296,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isMovie()
-                .hasMovieVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Final.Destination.5.720p.Bluray.x264-TWiZTED.mkv")
                 .hasReleaseGroup("TWiZTED")
@@ -326,7 +311,6 @@ class ReleaseParserTest {
 
             assertThat(release)
                 .isMovie()
-                .hasMovieVideoType()
                 .hasExtension("mkv")
                 .hasFileName("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv")
                 .hasReleaseGroup("TWiZTED")

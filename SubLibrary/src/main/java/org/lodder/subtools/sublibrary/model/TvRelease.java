@@ -33,4 +33,9 @@ public sealed interface TvRelease extends Release permits TvReleaseWithPath, TvR
     }
 
     @val String displayName = StringUtils.defaultIfBlank(originalName, name);
+
+    @Override
+    default boolean isOfType(VideoType videoType) {
+        return videoType == VideoType.EPISODE;
+    }
 }
