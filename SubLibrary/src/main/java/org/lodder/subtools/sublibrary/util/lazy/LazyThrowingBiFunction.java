@@ -9,11 +9,8 @@ public class LazyThrowingBiFunction<T extends @Nullable Object, U extends @Nulla
     R extends @Nullable Object, X extends Exception> {
 
     private final Object lock = new Object();
-
     private final ThrowingBiFunction<T, U, R, X> function;
-
     private R object;
-
     private volatile boolean initialized = false;
 
     public LazyThrowingBiFunction(ThrowingBiFunction<T, U, R, X> function) {

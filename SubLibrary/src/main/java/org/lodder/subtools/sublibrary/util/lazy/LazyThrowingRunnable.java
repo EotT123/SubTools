@@ -7,9 +7,7 @@ import org.jspecify.annotations.NullMarked;
 public class LazyThrowingRunnable<X extends Exception> {
 
     private final ThrowingRunnable<X> runnable;
-
     private final Object lock = new Object();
-
     private volatile boolean initialized = false;
 
     public LazyThrowingRunnable(ThrowingRunnable<X> runnable) {

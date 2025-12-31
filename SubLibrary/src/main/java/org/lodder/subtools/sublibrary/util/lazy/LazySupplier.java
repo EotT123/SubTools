@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
-import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import java.util.function.Supplier;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Nothing;
@@ -8,8 +9,8 @@ import org.lodder.subtools.sublibrary.util.Nothing;
 @NullMarked
 public class LazySupplier<T extends @Nullable Object> extends LazyThrowingSupplier<T, Nothing> {
 
-    public LazySupplier(ThrowingSupplier<T, Nothing> supplier) {
-        super(supplier);
+    public LazySupplier(Supplier<T> supplier) {
+        super(supplier::get);
     }
 
     @Override

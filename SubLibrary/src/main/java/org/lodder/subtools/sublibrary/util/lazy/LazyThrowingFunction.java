@@ -8,11 +8,8 @@ import org.jspecify.annotations.Nullable;
 public class LazyThrowingFunction<T extends @Nullable Object, S extends @Nullable Object, X extends Exception> {
 
     private final ThrowingFunction<T, S, X> function;
-
     private S object;
-
     private final Object lock = new Object();
-
     private volatile boolean initialized = false;
 
     public LazyThrowingFunction(ThrowingFunction<T, S, X> function) {

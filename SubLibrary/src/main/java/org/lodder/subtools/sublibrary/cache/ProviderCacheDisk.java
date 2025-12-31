@@ -87,8 +87,8 @@ public final class ProviderCacheDisk<V extends @Nullable Object> extends Provide
                                 });
                             map.entrySet()
                                 .stream()
-                                .sorted(Comparator.comparing(entry -> entry.getValue().iterator().next().age))
-                                .forEach(entry -> put(entry.getKey(), entry.getValue().iterator().next()));
+                                .sorted(Comparator.comparing(entry -> entry.getValue().first().age))
+                                .forEach(entry -> put(entry.getKey(), entry.getValue().first()));
                         }
                     } catch (SQLException e) {
                         LOGGER.error("Unable while insert objects in disk cache! (${e.getMessage()})", e);
@@ -139,6 +139,7 @@ public final class ProviderCacheDisk<V extends @Nullable Object> extends Provide
         return connection.apply(this, tableName);
     }
 
+    @Override
     protected void removeFromCache(ProviderCacheKey key) {
         removeFromDisk(key);
     }

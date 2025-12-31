@@ -9,11 +9,8 @@ public class LazyThrowingQuadFunction<T extends @Nullable Object, U extends @Nul
     V extends @Nullable Object, W extends @Nullable Object, R extends @Nullable Object, X extends Exception> {
 
     private final Object lock = new Object();
-
     private final ThrowingQuadFunction<T, U, V, W, R, X> function;
-
     private R object;
-
     private volatile boolean initialized = false;
 
     public LazyThrowingQuadFunction(ThrowingQuadFunction<T, U, V, W, R, X> function) {
