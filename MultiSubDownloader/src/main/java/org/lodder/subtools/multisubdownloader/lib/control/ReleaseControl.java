@@ -10,11 +10,12 @@ import org.lodder.subtools.sublibrary.data.imdb.ImdbAdapter;
 import org.lodder.subtools.sublibrary.data.omdb.OmdbAdapter;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @NullMarked
-public abstract sealed class ReleaseControl<T extends Release> permits MovieReleaseControl, TvReleaseControl {
+public abstract sealed class ReleaseControl<T extends ReleaseWithoutPath>
+    permits MovieReleaseControl, TvReleaseControl {
 
     @val(Protected) Settings settings;
     @val(Protected) Manager manager;

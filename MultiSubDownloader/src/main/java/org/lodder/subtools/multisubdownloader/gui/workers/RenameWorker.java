@@ -5,14 +5,16 @@ import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
-import org.lodder.subtools.multisubdownloader.actions.RenameAction;
+import org.lodder.subtools.multisubdownloader.actions.MoveAndRenameAction;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @NullMarked
@@ -36,11 +38,11 @@ public class RenameWorker extends SwingWorker<Void, String> implements Cancelabl
         final VideoTableModel model = (VideoTableModel) table.getModel();
 
         model.executedSynchronized(() -> {
-            List<Release> selectedShows = model.getSelectedShows();
+            List<ReleaseWithPath> selectedShows = model.getSelectedShows();
             int selectedCount = selectedShows.size();
             int progress = 0;
             int k = 0;
-            for (Release selectedShow : selectedShows) {
+            for (ReleaseWithPath selectedShow : selectedShows) {
                 k++;
                 if (k > 0) {
                     progress = 100 * k / selectedCount;
@@ -50,11 +52,13 @@ public class RenameWorker extends SwingWorker<Void, String> implements Cancelabl
                 }
                 setProgress(progress);
 
-                RenameAction renameAction = switch (selectedShow.videoType) {
-                    case EPISODE -> new RenameAction(settings.episodeLibrarySettings, manager, userInteractionHandler);
-                    case MOVIE -> new RenameAction(settings.movieLibrarySettings, manager, userInteractionHandler);
+                MoveAndRenameAction moveAndRenameAction = switch (selectedShow) {
+                    case TvReleaseWithPath _ ->
+                        new MoveAndRenameAction(settings.episodeLibrarySettings, manager, userInteractionHandler);
+                    case MovieReleaseWithPath _ ->
+                        new MoveAndRenameAction(settings.movieLibrarySettings, manager, userInteractionHandler);
                 };
-                renameAction.rename(selectedShow.getPath().resolve(selectedShow.fileName), selectedShow);
+                moveAndRenameAction.moveAndRename(selectedShow.path.resolve(selectedShow.fileName), selectedShow);
                 model.removeShow(selectedShow);
             }
         });

@@ -9,6 +9,8 @@ public interface SearchProgressListener extends StatusListener {
 
     void progress(SubtitleProvider provider, int jobsLeft, Release release);
 
+    void done(SubtitleProvider provider);
+
     void progress(int progress);
 
     void completed();

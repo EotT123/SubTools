@@ -28,13 +28,13 @@ public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAsse
 
     public @Self ReleaseAssert<R> hasFileName(String fileName) {
         isNotNull();
-        assertThat(actual.fileName).isEqualTo(fileName);
+        assertThat(actual.fileNameOrName).isEqualTo(fileName);
         return this;
     }
 
     public @Self ReleaseAssert<R> hasExtension(String extension) {
         isNotNull();
-        assertThat(actual.hasExtension(extension)).isTrue();
+        assertThat(actual.fileNameOrName.endsWith(extension)).isTrue();
         return this;
     }
 

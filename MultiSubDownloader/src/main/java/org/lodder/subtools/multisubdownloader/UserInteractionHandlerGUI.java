@@ -19,8 +19,8 @@ public class UserInteractionHandlerGUI extends org.lodder.subtools.sublibrary.us
 
     @Override
     public List<Subtitle> selectSubtitles(Release release) {
-        List<Integer> selection = new SelectDialog(frame, release.getMatchingSubs(), release).getSelection();
-        return selection.stream().map(release.getMatchingSubs()::get).toList();
+        List<Integer> selection = new SelectDialog(frame, release.matchingSubs, release).getSelection();
+        return selection.stream().map(release.matchingSubs::get).toList();
 
     }
 

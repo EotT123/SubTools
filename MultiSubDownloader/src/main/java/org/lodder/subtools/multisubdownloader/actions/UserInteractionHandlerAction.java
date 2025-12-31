@@ -30,7 +30,7 @@ public class UserInteractionHandlerAction {
      * @param subtitleSelectionDialog subtitleSelectionDialog
      * @return integer which subtitle is selected for downloading
      */
-    public List<Subtitle> subtitleSelection(final Release release, final boolean subtitleSelectionDialog) {
+    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog) {
         return this.subtitleSelection(release, subtitleSelectionDialog, false);
     }
 
@@ -44,7 +44,7 @@ public class UserInteractionHandlerAction {
         final boolean dryRun) {
 
         // Sort subtitles by score
-        List<Subtitle> subs = release.getMatchingSubs().stream().sorted(new SubtitleComparator()).toList();
+        List<Subtitle> subs = release.matchingSubs.stream().sorted(new SubtitleComparator()).toList();
         if (dryRun) {
             if (!subs.isEmpty()) {
                 userInteractionHandler.dryRunOutput(release);
@@ -52,7 +52,7 @@ public class UserInteractionHandlerAction {
         } else {
             if (!subs.isEmpty()) {
                 LOGGER.debug("determineWhatSubtitleDownload for videoFile: [{}] # found subs: [{}]",
-                    release.fileName, subs.size());
+                    release.fileNameOrName, subs.size());
                 if (settings.optionsAlwaysConfirm) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (subs.size() == 1 && subs.first.subtitleMatchType == SubtitleMatchType.EXACT) {
@@ -78,14 +78,14 @@ public class UserInteractionHandlerAction {
                         return userInteractionHandler.selectSubtitles(release);
                     } else {
                         LOGGER.info("Multiple subs detected for: [{}] Unhandleable for CMD! switch to GUI or use " +
-                            "'--selection' as switch in de CMD", release.fileName);
+                            "'--selection' as switch in de CMD", release.fileNameOrName);
                     }
                 } else {
                     LOGGER.debug("determineWhatSubtitleDownload: only one sub taking it!!!!");
                     return List.of(subs.first);
                 }
             }
-            LOGGER.debug("determineWhatSubtitleDownload: No subs found for  [{}]", release.fileName);
+            LOGGER.debug("determineWhatSubtitleDownload: No subs found for  [{}]", release.fileNameOrName);
         }
         return List.of();
     }

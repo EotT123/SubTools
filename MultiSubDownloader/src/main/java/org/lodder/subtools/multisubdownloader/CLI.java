@@ -26,7 +26,7 @@ import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,9 +81,9 @@ public class CLI {
         this.search();
     }
 
-    public void download(List<Release> releases) {
+    public void download(List<ReleaseWithPath> releases) {
         Info.downloadOptions(this.settings, true);
-        for (Release release : releases) {
+        for (ReleaseWithPath release : releases) {
             try {
                 this.download(release);
             } catch (Exception e) {
@@ -114,18 +114,18 @@ public class CLI {
         }
     }
 
-    private void download(Release release) {
+    private void download(ReleaseWithPath release) {
         List<Subtitle> selection;
         if (downloadAll) {
-            selection = release.getMatchingSubs();
+            selection = release.matchingSubs;
             if (!selection.isEmpty()) {
-                System.out.println("Downloading ALL found subtitles for release: ${release.fileName}");
+                System.out.println("Downloading ALL found subtitles for release: ${release.fileNameOrName}");
             }
         } else {
             selection = userInteractionHandlerAction.subtitleSelection(release, subtitleSelection, dryRun);
         }
         if (selection.isEmpty()) {
-            System.out.println("No subtitles found for: ${release.fileName}");
+            System.out.println("No subtitles found for: ${release.fileNameOrName}");
         } else {
             AtomicInteger counter = new AtomicInteger(1);
             IntStream.range(0, selection.size()).forEach(j -> {

@@ -12,8 +12,5 @@ public interface SubtitleApi extends ApiIntf {
     @val SubtitleProviderFrontEnd subtitleProviderFrontEnd;
     @val SubtitleSource source = subtitleProviderFrontEnd.subtitleSource;
 
-    @Override
-    default String getProvider() {
-        return subtitleProviderFrontEnd.name;
-    }
+    @val String provider = subtitleProviderFrontEnd.name;
 }

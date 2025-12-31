@@ -347,4 +347,12 @@ public class PathExt {
         return data.length >= 2 && data[0] == (byte) GZIPInputStream.GZIP_MAGIC &&
             data[1] == (byte) GZIPInputStream.GZIP_MAGIC >> 8;
     }
+
+    public static Path resolve(@This Path path, String... subPaths) {
+        Path fullPath = path;
+        for (String subPath : subPaths) {
+            fullPath = fullPath.resolve(subPath);
+        }
+        return fullPath;
+    }
 }

@@ -21,9 +21,7 @@ public class VideoPatterns {
         @val Pattern pattern;
         @val String value;
 
-        default String getRegex() {
-            return pattern.pattern();
-        }
+        @val String regex = pattern.pattern();
     }
 
     @NullMarked
@@ -52,7 +50,7 @@ public class VideoPatterns {
     }
 
     @NullMarked
-    public enum VideoEncoding implements RegexPattern {
+    public enum VideoEncoding implements VideoPatterns.RegexPattern {
         X264("x264", "[xh][_|-|\\.]?264"),
         X265("x265", "[xh][_|-|\\.]?265|hevc");
 

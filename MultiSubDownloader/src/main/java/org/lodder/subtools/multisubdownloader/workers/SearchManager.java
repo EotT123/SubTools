@@ -14,6 +14,7 @@ import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.ScoreCalculator;
@@ -104,11 +105,11 @@ public class SearchManager implements Cancelable {
         return true;
     }
 
-    public Release getNextRelease(SubtitleProvider provider) {
+    public @Nullable Release getNextRelease(SubtitleProvider provider) {
         synchronized (provider) {
             if (!this.hasNextRelease(provider)) {
                 /* Tell the progressListener this provider is finished */
-                this.progressListener.progress(provider, queue.get(provider).size(), null);
+                this.progressListener.done(provider);
                 return null;
             }
 

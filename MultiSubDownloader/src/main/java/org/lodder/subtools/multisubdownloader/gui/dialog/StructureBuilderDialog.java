@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serial;
-import java.nio.file.Path;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
@@ -24,9 +23,9 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStru
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.model.MovieRelease;
-import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -42,14 +41,15 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
 
     private JTextField txtStructure;
     private JLabel lblPreview;
-    private TvRelease tvRelease;
-    private MovieRelease movieRelease;
+    private TvReleaseWithoutPath tvRelease;
+    private MovieReleaseWithoutPath movieRelease;
     private String oldStructure;
     private JPanel tagPanel;
 
     @NullMarked
     public enum StructureType {
-        FILE, FOLDER
+        FILE,
+        FOLDER
     }
 
     public StructureBuilderDialog(@Nullable JFrame frame=null, String title, boolean modal, VideoType videoType,
@@ -108,11 +108,11 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     private void generateVideoFiles(Manager manager) {
         ReleaseFactory releaseFactory = new ReleaseFactory(new Settings(), manager);
         switch (videoType) {
-            case EPISODE -> tvRelease = (TvRelease) releaseFactory.createRelease(
-                Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"),
+            case EPISODE -> tvRelease = (TvReleaseWithoutPath) releaseFactory.createRelease(
+                "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv",
                 userInteractionHandler, false).orElse(null);
-            case MOVIE -> movieRelease = (MovieRelease) releaseFactory.createRelease(
-                Path.of("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv"),
+            case MOVIE -> movieRelease = (MovieReleaseWithoutPath) releaseFactory.createRelease(
+                "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv",
                 userInteractionHandler, false).orElse(null);
         }
     }
@@ -137,10 +137,10 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     protected void parseText() {
-        lblPreview.setText(libraryBuilder.apply(txtStructure.getText()).build(getGeneratedRelease()).toString());
+        lblPreview.setText(libraryBuilder.apply(txtStructure.getText()).buildPathStructure(getGeneratedRelease()));
     }
 
-    private Release getGeneratedRelease() {
+    private ReleaseWithoutPath getGeneratedRelease() {
         return switch (videoType) {
             case EPISODE -> tvRelease;
             case MOVIE -> movieRelease;

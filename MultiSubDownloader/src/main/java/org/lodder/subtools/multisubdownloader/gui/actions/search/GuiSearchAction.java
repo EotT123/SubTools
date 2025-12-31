@@ -24,7 +24,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
 @NullMarked
-public abstract sealed class GuiSearchAction<P extends InputPanel> extends SearchAction
+public abstract sealed class GuiSearchAction<P extends InputPanel, R extends Release> extends SearchAction<R>
     permits FileGuiSearchAction, TextGuiSearchAction {
 
     @get(Protected) GUI mainWindow;
@@ -63,7 +63,7 @@ public abstract sealed class GuiSearchAction<P extends InputPanel> extends Searc
     }
 
     @Override
-    public void onFound(Release release, List<Subtitle> subtitles) {
+    public void onFound(R release, List<Subtitle> subtitles) {
         if (Thread.currentThread().isInterrupted()) {
             return;
         }

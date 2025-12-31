@@ -17,11 +17,11 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
-import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,18 +61,14 @@ public class SubdlSubtitle extends Subtitle {
                 .filter(Files::isRegularFile)
                 .filter(path -> path.toString().toLowerCase().endsWith(".srt"))
                 .map(path -> {
-                    if (multipleDirectories && forRelease instanceof TvRelease tvRelease) {
-                        try {
-                            Boolean matchingSub =
-                                ReleaseParser.parse(path).filter(TvRelease.class::isInstance).map(TvRelease.class::cast)
-                                    .map(release -> release.season == tvRelease.season &&
-                                        release.episodes.stream().anyMatch(tvRelease.episodes::contains))
-                                    .orElse(false);
-                            if (!matchingSub) {
-                                return null;
-                            }
-                        } catch (ReleaseParseException e) {
-                            LOGGER.warn("Could not parse subtitle file $path: " + e.getMessage());
+                    if (multipleDirectories && forRelease instanceof TvReleaseWithoutPath tvRelease) {
+                        Boolean matchingSub = ReleaseParser.parse(path).filter(TvReleaseWithPath.class::isInstance)
+                            .map(TvReleaseWithPath.class::cast)
+                            .map(release -> release.season == tvRelease.season &&
+                                release.episodes.stream().anyMatch(tvRelease.episodes::contains))
+                            .orElse(false);
+                        if (!matchingSub) {
+                            return null;
                         }
                     }
                     return path;

@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public abstract class SearchAction implements Runnable, Cancelable, SearchHandler {
+public abstract class SearchAction<R extends Release> implements Runnable, Cancelable, SearchHandler<R> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
@@ -34,7 +34,7 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
 
     @get(Protected) @set(Private) StatusListener statusListener;
     @get(Protected) @set(Private) SearchManager searchManager;
-    @get(Protected) @set(Private) List<Release> releases;
+    @get(Protected) @set(Private) List<R> releases;
     @get(Protected) abstract Language language;
     abstract @get(Protected) IndexingProgressListener indexingProgressListener;
     abstract @get(Protected) UserInteractionHandler userInteractionHandler;
@@ -111,7 +111,7 @@ public abstract class SearchAction implements Runnable, Cancelable, SearchHandle
 
     protected abstract void validate() throws SearchSetupException;
 
-    protected abstract List<Release> createReleases();
+    protected abstract List<R> createReleases();
 
     protected void setStatusMessage(String message) {
         this.statusListener.onStatus(message);

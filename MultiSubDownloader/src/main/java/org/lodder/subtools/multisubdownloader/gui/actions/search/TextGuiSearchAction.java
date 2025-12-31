@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
@@ -13,15 +12,14 @@ import org.lodder.subtools.multisubdownloader.gui.panels.SearchTextInputPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoExtensions;
-import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoSearchType;
 
 @NullMarked
-public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel> {
+public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel, Release> {
 
     public TextGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
         SearchPanel<SearchTextInputPanel> searchPanel, ReleaseFactory releaseFactory) {
@@ -46,11 +44,12 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
         // TODO: Redefine what a "release" is.
         return switch (type) {
             case EPISODE -> List.of(
-                new TvRelease(name:name, season:inputPanel.season, episode:inputPanel.episode, quality:inputPanel.quality));
-            case MOVIE -> List.of(new MovieRelease(name:name, quality:inputPanel.quality));
-            default -> releaseFactory.createRelease(Path.of(
-                    name + (VideoExtensions.values().stream().anyMatch(ext -> name.endsWith("." + ext)) ? "" : ".")),
-                userInteractionHandler).map(List::of).orElseGet(List::of);
+                new TvReleaseWithoutPath(name:name, season:inputPanel.season, episode:inputPanel.episode, quality:
+                    inputPanel.quality, completeName:name));
+            case MOVIE ->
+                List.of(new MovieReleaseWithoutPath(name:name, quality:inputPanel.quality, completeName:name));
+            default -> releaseFactory.createRelease(name, userInteractionHandler).map(Release.class::cast).map(List::of)
+                .orElseGet(List::of);
         };
     }
 

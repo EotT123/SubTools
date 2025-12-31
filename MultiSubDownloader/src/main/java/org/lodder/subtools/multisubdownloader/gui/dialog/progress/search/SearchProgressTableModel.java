@@ -39,7 +39,7 @@ public class SearchProgressTableModel extends DefaultTableModel {
 
     private void updateRow(int rowNr, int queue, String release) {
         this.setValueAt(queue, rowNr, 1); // Queue
-        this.setValueAt(release, rowNr, 2); // Release
+        this.setValueAt(release, rowNr, 2); // ReleaseWithoutPath
     }
 
     private void createRow(String source, int queue, String release) {

@@ -6,14 +6,14 @@ import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public final class TvReleaseControl extends ReleaseControl<TvRelease> {
+public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
 
@@ -22,7 +22,7 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
     }
 
     @Override
-    public TvRelease process(TvRelease release) throws ReleaseControlException {
+    public TvReleaseWithoutPath process(TvReleaseWithoutPath release) throws ReleaseControlException {
         if (StringUtils.isBlank(release.name)) {
             throw new ReleaseControlException("Unable to extract episode details, check file", release);
         }
@@ -34,7 +34,7 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
         return release;
     }
 
-    private void setImdbId(TvRelease release) {
+    private void setImdbId(TvReleaseWithoutPath release) {
         release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name, VideoType.EPISODE)
             .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
         release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchSerie(release.name)
@@ -46,7 +46,7 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
         }
     }
 
-    private void setTvdbId(TvRelease release) {
+    private void setTvdbId(TvReleaseWithoutPath release) {
         release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name, release.providerIds)
             .map(serie -> serie.providerId)
             .ifPresent(tvdbId -> release.providerIds.add(ProviderIdType.TVDB, Integer.parseInt(tvdbId))));
@@ -55,13 +55,13 @@ public final class TvReleaseControl extends ReleaseControl<TvRelease> {
         }
     }
 
-    private void processTvdbInfo(TvRelease release) {
+    private void processTvdbInfo(TvReleaseWithoutPath release) {
         release.providerIds.getTvdbId()
             .flatMapToObj(tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode))
             .ifPresent(episode -> release.title = episode.name);
     }
 
-    private void processImdbInfo(TvRelease release) {
+    private void processImdbInfo(TvReleaseWithoutPath release) {
         // TODO implement this
 //        release.providerIds.getImdbId().ifPresent(
 //            imdbId -> imdbAdapter.getSerieDetails(imdbId)

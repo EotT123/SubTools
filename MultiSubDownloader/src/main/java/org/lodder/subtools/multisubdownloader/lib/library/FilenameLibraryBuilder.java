@@ -13,9 +13,12 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @NullMarked
@@ -52,68 +55,93 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
             rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVE_AND_RENAME));
     }
 
+    /**
+     * Builds a relative Path (i.e. the new file name) based on a release object.
+     *
+     * @param release The ReleaseWithPath object.
+     * @return The new file name as a path
+     */
     @Override
-    public Path build(Release release) {
+    public Path buildPath(ReleaseWithPath release) {
         if (rename && StringUtils.isNotBlank(structure)) {
-            String filename = switch (release) {
-                case TvRelease tvRelease -> {
-                    String fName = structure;
-                    // order is important!
-                    fName = replace(fName, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
-                    fName =
-                        replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
-                    fName = replaceFormattedEpisodeNumber(fName, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes,
-                        false);
-                    fName = replace(fName, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
-                    fName = replace(fName, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
-                    fName = replace(fName, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
-                    fName =
-                        replace(fName, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
-                    fName = replace(fName, SerieStructureTag.TITLE, tvRelease.title);
-                    fName = replace(fName, SerieStructureTag.QUALITY, release.quality);
-                    fName = replace(fName, SerieStructureTag.RELEASE_GROUP, release.releaseGroup);
-
-                    fName += "." + StringUtils.substringAfterLast(release.fileName, ".");
-                    yield fName;
-                }
-                case MovieRelease movieRelease -> {
-                    String fName = structure;
-                    // order is important!
-                    fName = replace(fName, MovieStructureTag.MOVIE_TITLE, getShowName(movieRelease.name));
-                    fName = replace(fName, MovieStructureTag.YEAR, formatNumber(movieRelease.year, false));
-                    fName = replace(fName, MovieStructureTag.QUALITY, release.quality);
-                    fName = replace(fName, MovieStructureTag.RELEASE_GROUP, release.releaseGroup);
-
-                    fName += "." + StringUtils.substringAfterLast(release.fileName, ".");
-                    yield fName;
-                }
-            };
-
-            filename = filename.removeIllegalWindowsChars();
-            if (replaceSpace) {
-                filename = filename.replace(' ', replacingSpaceChar);
-            }
-            return Path.of(filename);
-        } else {
-            return Path.of(release.fileName);
+            return Path.of(switch (release) {
+                case TvReleaseWithPath tvRelease -> buildEpisodeFolderStructure(tvRelease);
+                case MovieReleaseWithPath movieRelease -> buildMovieFolderStructure(movieRelease);
+            });
         }
+        return release.path.fileName;
     }
 
-    public String buildSubtitle(Release release, Subtitle sub, String filename, @Nullable Integer version) {
-        return buildSubtitle(release, filename, sub.language, version);
+    @Override
+    public String buildPathStructure(Release release) {
+        if (rename && StringUtils.isNotBlank(structure)) {
+            return switch (release) {
+                case TvRelease tvRelease -> buildEpisodeFolderStructure(tvRelease);
+                case MovieRelease movieRelease -> buildMovieFolderStructure(movieRelease);
+            };
+        }
+        return release.fileNameOrName;
     }
 
-    public String buildSubtitle(Release release, String filename, Language language, @Nullable Integer version) {
-        String extension = "." + StringUtils.substringAfterLast(release.fileName, ".");
+    private String buildEpisodeFolderStructure(TvRelease tvRelease) {
+        String filename = structure;
+        // order is important!
+        filename = replace(filename, SerieStructureTag.SHOW_NAME, getShowName(tvRelease.name));
+        filename =
+            replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
+        filename = replaceFormattedEpisodeNumber(filename, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes,
+            false);
+        filename = replace(filename, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
+        filename = replace(filename, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
+        filename = replace(filename, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
+        filename =
+            replace(filename, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
+
+        filename = replace(filename, SerieStructureTag.TITLE, tvRelease.title);
+        filename = replace(filename, SerieStructureTag.QUALITY, tvRelease.quality);
+        filename = replace(filename, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
+
+        filename += "." + StringUtils.substringAfterLast(tvRelease.fileNameOrName, ".");
+        filename = filename.removeIllegalWindowsChars();
+        if (replaceSpace) {
+            filename = filename.replace(' ', replacingSpaceChar);
+        }
+        return filename;
+    }
+
+    private String buildMovieFolderStructure(MovieRelease movieRelease) {
+        String filename = structure;
+        // order is important!
+        filename = replace(filename, MovieStructureTag.MOVIE_TITLE, getShowName(movieRelease.name));
+        filename = replace(filename, MovieStructureTag.YEAR, formatNumber(movieRelease.year, false));
+        filename = replace(filename, MovieStructureTag.QUALITY, movieRelease.quality);
+        filename = replace(filename, MovieStructureTag.RELEASE_GROUP, movieRelease.releaseGroup);
+
+        filename += "." + StringUtils.substringAfterLast(movieRelease.fileNameOrName, ".");
+
+        filename = filename.removeIllegalWindowsChars();
+        if (replaceSpace) {
+            filename = filename.replace(' ', replacingSpaceChar);
+        }
+        return filename;
+    }
+
+    public String buildSubtitle(ReleaseWithPath release, Subtitle sub, String filename, @Nullable Integer version) {
+        return buildSubtitle(release.fileName, filename, sub.language, version);
+    }
+
+    public String buildSubtitle(String name, String filename, @Nullable Language language,
+        @Nullable Integer version) {
+        String extension = "." + StringUtils.substringAfterLast(name, ".");
         String subFileName = filename;
         if (version != null) {
             subFileName =
                 subFileName.substring(0, subFileName.indexOf(extension)) + "-v$version." +
-                    StringUtils.substringAfterLast(release.fileName, ".");
+                    StringUtils.substringAfterLast(name, ".");
         }
         if (includeLanguageCode) {
             String langCode = language == null ? "" : languageTags.getOrDefault(language, language.iso639_3);
-            subFileName = changeExtension(subFileName, !"".equals(langCode) ? ".$langCode.srt" : ".srt");
+            subFileName = changeExtension(subFileName, !langCode.isEmpty() ? ".$langCode.srt" : ".srt");
         } else {
             subFileName = changeExtension(subFileName, ".srt");
         }

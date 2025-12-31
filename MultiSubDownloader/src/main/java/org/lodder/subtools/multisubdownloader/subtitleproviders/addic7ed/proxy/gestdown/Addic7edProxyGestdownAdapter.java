@@ -29,7 +29,8 @@ import org.slf4j.LoggerFactory;
 
 @NullMarked
 public final class Addic7edProxyGestdownAdapter extends
-    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, Addic7edException> {
+    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId,
+        Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownAdapter.class);
 
@@ -103,7 +104,8 @@ public final class Addic7edProxyGestdownAdapter extends
     @Override
     public Collection<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws Addic7edException {
-        LOGGER.debug("$provider - getSubtitles: {}", TvRelease.formatName(serieMapping.providerName, season, episode));
+        LOGGER.debug("$provider - getSubtitles: {}",
+            TvRelease.formatName(serieMapping.providerName, season, episode));
         return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 

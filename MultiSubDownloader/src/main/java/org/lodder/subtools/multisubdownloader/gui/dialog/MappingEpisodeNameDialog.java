@@ -31,7 +31,7 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
 @NullMarked
@@ -101,12 +101,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                 currentName);
                             selectedSubtitleProvider.ifPresent(provider ->
                                 userInteractionHandler.enter(message).ifPresent(newName -> {
-                                    TvRelease tvRelease = new TvRelease(
+                                    TvReleaseWithoutPath tvRelease = new TvReleaseWithoutPath(
                                         name:currentName,
                                         season:row.serieMapping.season,
                                         episode:1,
                                         originalName:currentName,
-                                        customName:newName);
+                                        customName:newName,
+                                        completeName:currentName);
                                     try {
                                         provider.getProviderSerieMapping(tvRelease).ifPresentOrElse(serieId -> {
                                             row.serieMapping =

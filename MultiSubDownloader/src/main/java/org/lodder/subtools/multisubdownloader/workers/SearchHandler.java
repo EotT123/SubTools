@@ -7,6 +7,6 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
 @NullMarked
-public interface SearchHandler {
-    void onFound(Release release, List<Subtitle> subtitles);
+public interface SearchHandler<R extends Release> {
+    void onFound(R release, List<Subtitle> subtitles);
 }

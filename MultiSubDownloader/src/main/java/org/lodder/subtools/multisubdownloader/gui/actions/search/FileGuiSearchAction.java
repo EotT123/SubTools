@@ -17,11 +17,11 @@ import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
 @NullMarked
-public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel> {
+public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel, ReleaseWithPath> {
 
     private final @NonNull FileListAction filelistAction;
 
@@ -40,7 +40,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
     }
 
     @Override
-    public void onFound(Release release, List<Subtitle> subtitles) {
+    public void onFound(ReleaseWithPath release, List<Subtitle> subtitles) {
         VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
         List<Subtitle> filteredSubtitles = filtering != null ?
@@ -55,7 +55,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
     }
 
     @Override
-    protected List<Release> createReleases() {
+    protected List<ReleaseWithPath> createReleases() {
         SearchFileInputPanel inputPanel = getInputPanel();
         String filePath = inputPanel.getIncomingPath();
         Language language = inputPanel.getSelectedLanguage();
@@ -72,9 +72,9 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
         return createReleases(files);
     }
 
-    private List<Release> createReleases(List<Path> files) {
+    private List<ReleaseWithPath> createReleases(List<Path> files) {
         /* parse every video file */
-        List<Release> releases = new ArrayList<>();
+        List<ReleaseWithPath> releases = new ArrayList<>();
 
         int total = files.size();
         int index = 0;
