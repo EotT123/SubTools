@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static manifold.ext.props.rt.api.PropOption.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,12 +23,13 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.gsonfire.GsonFireBuilder;
+import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +42,10 @@ public final class ProviderCacheDisk<V extends @Nullable Object> extends Provide
 
     private final Set<ProviderCacheKey> doublesToRemove = new HashSet<>();
     private final Map<ProviderCacheKey, CacheObject<V>> removedToAdd = new HashMap<>();
-    private final LazyBiFunction<ProviderCacheDisk<V>, String, Connection>
-        connection =
-        new LazyBiFunction<>((cache, tableName) -> {
+    @val(Private) String tableName;
+    private final LazySupplier<Connection> connection = new LazySupplier<>(() -> {
             try {
-                synchronized (cache.cacheMap) {
+                synchronized (this.cacheMap) {
                     Path path = Path.of(System.getProperty("user.home")).resolve(".MultiSubDownloader");
                     if (!Files.exists(path)) {
                         try {
@@ -58,17 +60,18 @@ public final class ProviderCacheDisk<V extends @Nullable Object> extends Provide
                         "user", "pass");
 
                     try (Statement stmt = connection.createStatement()) {
-                        stmt.execute("create table IF NOT EXISTS $tableName (key VARCHAR(32768), cacheobject OBJECT);");
+                        stmt.execute(
+                            "create table IF NOT EXISTS ${getTableName()} (key VARCHAR(32768), cacheobject OBJECT);");
                     }
 
                     boolean errorWhileReadingCacheFile = false;
                     try (Statement stmt = connection.createStatement();
-                         ResultSet rs = stmt.executeQuery("SELECT key, cacheobject FROM $tableName;")) {
+                         ResultSet rs = stmt.executeQuery("SELECT key, cacheobject FROM ${getTableName()};")) {
                         Multimap<ProviderCacheKey, CacheObject<V>> tempCache = MultimapBuilder.hashKeys()
                             .treeSetValues(Comparator.comparing((CacheObject<V> value) -> value.age).reversed())
                             .build();
                         Gson gson = new GsonFireBuilder().enableHooks(SerieMapping.class).createGson();
-                        synchronized (cache.cacheMap) {
+                        synchronized (this.cacheMap) {
                             while (rs.next()) {
                                 try {
                                     tempCache.put(gson.fromJson((String) rs.getObject("key"), ProviderCacheKey.class),
@@ -114,7 +117,6 @@ public final class ProviderCacheDisk<V extends @Nullable Object> extends Provide
                 throw new RuntimeException(e);
             }
         });
-    private final String tableName;
 
     @NullMarked
     public ProviderCacheDisk(
@@ -136,7 +138,7 @@ public final class ProviderCacheDisk<V extends @Nullable Object> extends Provide
     }
 
     private Connection getConnection() {
-        return connection.apply(this, tableName);
+        return connection.get();
     }
 
     @Override
