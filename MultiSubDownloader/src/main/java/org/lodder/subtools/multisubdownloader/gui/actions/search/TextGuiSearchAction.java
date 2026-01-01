@@ -57,8 +57,8 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
     public void onFound(Release release, List<Subtitle> subtitles) {
         VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
-        List<Subtitle> subtitlesFiltered = filtering != null ?
-            subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
+        List<Subtitle> subtitlesFiltered =
+            subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList();
         subtitlesFiltered.forEach(release::addMatchingSub);
 
         // use automatic selection to reduce the selection for the user

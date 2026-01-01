@@ -134,8 +134,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     private void selectMappingType(MappingType mappingType) {
         this.selectedMappingType = mappingType;
-        this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
-            .stream()
+        this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders().stream()
             .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
             .findAny();
         btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
@@ -217,9 +216,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         void setMappingType(MappingType mappingType) {
             setDataVector(null,
                 new String[]{mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn});
-            mappingType.getValues(manager)
-                .stream()
-                .map(serieMappingPair -> {
+            mappingType.getValues(manager).stream()
+                .mapFilterNonNull(serieMappingPair -> {
                     SerieMapping serieMapping = serieMappingPair.getValue();
                     if (serieMapping == null) {
                         return null;
@@ -231,7 +229,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                     providerId = providerId.replace(".html", "");
                     return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
                         serieMapping.providerName, serieMapping);
-                }).filter(Objects::nonNull)
+                })
                 .sorted(Comparator.comparing(
                     row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
                         row.serieMapping.name))

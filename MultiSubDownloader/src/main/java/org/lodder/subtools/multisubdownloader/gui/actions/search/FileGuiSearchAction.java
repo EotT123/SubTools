@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
@@ -23,7 +22,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 @NullMarked
 public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPanel, ReleaseWithPath> {
 
-    private final @NonNull FileListAction filelistAction;
+    private final FileListAction filelistAction;
 
     public FileGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
         SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
@@ -43,8 +42,8 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
     public void onFound(ReleaseWithPath release, List<Subtitle> subtitles) {
         VideoTableModel model = (VideoTableModel) this.searchPanel.resultPanel.getTable().getModel();
 
-        List<Subtitle> filteredSubtitles = filtering != null ?
-            subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList() : subtitles;
+        List<Subtitle> filteredSubtitles =
+            subtitles.stream().filter(subtitle -> filtering.useSubtitle(subtitle, release)).toList();
         filteredSubtitles.forEach(release::addMatchingSub);
 
         model.addRow(release);

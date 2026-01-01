@@ -23,9 +23,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStru
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
-import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -34,17 +32,13 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final VideoType videoType;
-    private final StructureType structureType;
-    private final UserInteractionHandler userInteractionHandler;
     private final Function<String, ? extends LibraryBuilder> libraryBuilder;
 
-    private JTextField txtStructure;
-    private JLabel lblPreview;
-    private TvReleaseWithoutPath tvRelease;
-    private MovieReleaseWithoutPath movieRelease;
+    private final JTextField txtStructure;
+    private final JLabel lblPreview;
+    private final ReleaseWithoutPath release;
+    private final JPanel tagPanel;
     private String oldStructure;
-    private JPanel tagPanel;
 
     @NullMarked
     public enum StructureType {
@@ -56,15 +50,16 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         StructureType structureType, Manager manager, UserInteractionHandler userInteractionHandler,
         Function<String, ? extends LibraryBuilder> filenameLibraryBuilder) {
         super(frame, title, modal);
-        this.videoType = videoType;
-        this.structureType = structureType;
-        this.userInteractionHandler = userInteractionHandler;
         this.libraryBuilder = filenameLibraryBuilder;
-        initializeUI();
-        generateVideoFiles(manager);
-    }
+        this.release = switch (videoType) {
+            case EPISODE -> new ReleaseFactory(new Settings(), manager).createRelease(
+                "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv", userInteractionHandler, false).orElseThrow();
+            case MOVIE -> new ReleaseFactory(new Settings(), manager).createRelease(
+                "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv", userInteractionHandler, false).orElseThrow();
+        };
 
-    private void initializeUI() {
+        // Initialize GUI
+
         setBounds(100, 100, 600, 300);
         setMinimumSize(new Dimension(600, 300));
 
@@ -105,18 +100,6 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         }
     }
 
-    private void generateVideoFiles(Manager manager) {
-        ReleaseFactory releaseFactory = new ReleaseFactory(new Settings(), manager);
-        switch (videoType) {
-            case EPISODE -> tvRelease = (TvReleaseWithoutPath) releaseFactory.createRelease(
-                "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv",
-                userInteractionHandler, false).orElse(null);
-            case MOVIE -> movieRelease = (MovieReleaseWithoutPath) releaseFactory.createRelease(
-                "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv",
-                userInteractionHandler, false).orElse(null);
-        }
-    }
-
     private void buildLabelTable(StructureTag[] structureTags) {
         structureTags.forEach(this::addTag);
     }
@@ -137,14 +120,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     protected void parseText() {
-        lblPreview.setText(libraryBuilder.apply(txtStructure.getText()).buildPathStructure(getGeneratedRelease()));
-    }
-
-    private ReleaseWithoutPath getGeneratedRelease() {
-        return switch (videoType) {
-            case EPISODE -> tvRelease;
-            case MOVIE -> movieRelease;
-        };
+        lblPreview.setText(libraryBuilder.apply(txtStructure.getText()).buildPathStructure(release));
     }
 
     @Override
