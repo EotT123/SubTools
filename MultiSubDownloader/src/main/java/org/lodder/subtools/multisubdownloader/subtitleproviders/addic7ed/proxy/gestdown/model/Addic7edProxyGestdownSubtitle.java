@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
@@ -17,6 +19,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class Addic7edProxyGestdownSubtitle extends Subtitle {
 
     private final String url;
+    @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
 
     public Addic7edProxyGestdownSubtitle(String url,
         String fileName,
@@ -26,7 +29,7 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
         boolean hearingImpaired=false,
         String quality) {
 
-        super(fileName, language, releaseGroup, uploader, SubtitleSource.ADDIC7ED, hearingImpaired, quality);
+        super(fileName, language, releaseGroup, uploader, hearingImpaired, quality);
         this.url = url;
     }
 

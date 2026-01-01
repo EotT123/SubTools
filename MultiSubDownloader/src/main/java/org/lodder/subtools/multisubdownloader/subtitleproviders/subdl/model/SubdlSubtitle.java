@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -31,11 +33,12 @@ public class SubdlSubtitle extends Subtitle {
 
     private final String url;
     private final Release forRelease;
+    @val @override SubtitleSource source = SubtitleSource.SUBDL;
 
     public SubdlSubtitle(String url, String title, Language language, @Nullable String releaseGroup, String uploader,
         boolean hearingImpaired, @Nullable String quality, Release forRelease) {
 
-        super(title, language, releaseGroup, uploader, SubtitleSource.SUBDL, hearingImpaired, quality);
+        super(title, language, releaseGroup, uploader, hearingImpaired, quality);
         this.url = url;
         this.forRelease = forRelease;
     }

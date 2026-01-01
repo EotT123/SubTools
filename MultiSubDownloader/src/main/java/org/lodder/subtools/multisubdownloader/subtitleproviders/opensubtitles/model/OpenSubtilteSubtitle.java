@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -19,6 +21,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class OpenSubtilteSubtitle extends Subtitle {
 
     private final ThrowingSupplier<String, OpenSubtitleException> urlSupplier;
+    @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
 
     public OpenSubtilteSubtitle(ThrowingSupplier<@Nullable String, OpenSubtitleException> urlSupplier,
         @Nullable String fileName=null,
@@ -28,7 +31,7 @@ public class OpenSubtilteSubtitle extends Subtitle {
         @Nullable String quality=null,
         boolean hearingImpaired=false) {
 
-        super(fileName, language, releaseGroup, uploader, SubtitleSource.OPENSUBTITLES, hearingImpaired, quality);
+        super(fileName, language, releaseGroup, uploader, hearingImpaired, quality);
         this.urlSupplier = urlSupplier;
     }
 

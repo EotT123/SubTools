@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import org.jspecify.annotations.NullMarked;
@@ -20,6 +21,7 @@ public class Addic7edSubtitle extends Subtitle {
 
     @val String url;
     @val String version;
+    @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
 
     public Addic7edSubtitle(String url,
         String fileName,
@@ -30,7 +32,7 @@ public class Addic7edSubtitle extends Subtitle {
         String quality,
         String version) {
 
-        super(fileName, language, releaseGroup, uploader, SubtitleSource.ADDIC7ED, hearingImpaired, quality);
+        super(fileName, language, releaseGroup, uploader, hearingImpaired, quality);
         this.url = url;
         this.version = version;
     }

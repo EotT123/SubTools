@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
@@ -17,13 +19,14 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class LocalSubtitle extends Subtitle {
 
     private final Path path;
+    @val @override SubtitleSource source = SubtitleSource.LOCAL;
 
     public LocalSubtitle(Path path,
         Language language,
         @Nullable String releaseGroup=null,
         @Nullable String quality=null) {
 
-        super(path.fileNameAsString, language, releaseGroup, null, SubtitleSource.LOCAL, false, quality);
+        super(path.fileNameAsString, language, releaseGroup, null, false, quality);
         this.path = path;
     }
 

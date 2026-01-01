@@ -11,6 +11,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import manifold.ext.props.rt.api.override;
+import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
@@ -22,6 +24,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 public class TvSubtiltesSubtitle extends Subtitle {
 
     private final String url;
+    @val @override SubtitleSource source = SubtitleSource.TVSUBTITLES;
 
     public TvSubtiltesSubtitle(String url,
         String fileName,
@@ -31,7 +34,7 @@ public class TvSubtiltesSubtitle extends Subtitle {
         boolean hearingImpaired=false,
         String quality) {
 
-        super(fileName, language, releaseGroup, uploader, SubtitleSource.TVSUBTITLES, hearingImpaired, quality);
+        super(fileName, language, releaseGroup, uploader, hearingImpaired, quality);
         this.url = url;
     }
 
