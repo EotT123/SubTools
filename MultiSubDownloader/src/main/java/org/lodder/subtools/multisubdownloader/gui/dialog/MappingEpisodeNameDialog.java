@@ -11,7 +11,6 @@ import java.awt.*;
 import java.io.Serial;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -134,7 +133,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     private void selectMappingType(MappingType mappingType) {
         this.selectedMappingType = mappingType;
-        this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders().stream()
+        this.selectedSubtitleProvider = subtitleProviderStore.allProviders.stream()
             .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
             .findAny();
         btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();

@@ -63,6 +63,7 @@ public final class SubdlAdapter extends
     // SERIE \\
     // ===== \\
 
+    @Override
     public List<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws SubdlException {
         return providerIds.getImdbId().flatMapEx(imdbId -> api.getProviderIdUsingImdbId(imdbId).map(List::of))

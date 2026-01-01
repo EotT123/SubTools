@@ -20,6 +20,6 @@ import org.lodder.subtools.sublibrary.Language;
  */
 @NullMarked
 public record SubdlSubtitleMetadata(String title, String fileName, String url, int season, List<Integer> episodes,
-                                    String uploader, boolean hearingImpaired, Language language)
+    String uploader, boolean hearingImpaired, Language language)
     implements Serializable {
 }
