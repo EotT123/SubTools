@@ -24,62 +24,56 @@ public class FileHasher {
     /**
      * Size of the chunks that will be hashed in bytes (64 KB)
      */
-    private static final int HASH_CHUNK_SIZE = 64 * 1024;
+    private static final int CHUNK_SIZE = 64 * 1024;
 
     public static String computeHash(Path path) throws IOException {
         long size = Files.size(path);
-        long chunkSizeForFile = Math.min(HASH_CHUNK_SIZE, size);
+        long chunkSize = Math.min(CHUNK_SIZE, size);
 
         try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.READ)) {
-            long head = computeHashForChunk(fileChannel.map(MapMode.READ_ONLY, 0, chunkSizeForFile));
-            long tail = computeHashForChunk(
-                    fileChannel.map(MapMode.READ_ONLY, Math.max(size - HASH_CHUNK_SIZE, 0), chunkSizeForFile));
+            long head = hash(fileChannel.map(MapMode.READ_ONLY, 0, chunkSize));
+            long tail = hash(
+                fileChannel.map(MapMode.READ_ONLY, Math.max(size - CHUNK_SIZE, 0), chunkSize));
             return "%016x".formatted(size + head + tail);
         }
     }
 
-    public static String computeHash(InputStream stream, long length) throws IOException {
+    public static String computeHash(InputStream in, long length) throws IOException {
 
-        int chunkSizeForFile = (int) Math.min(HASH_CHUNK_SIZE, length);
+        int chunkSize = (int) Math.min(CHUNK_SIZE, length);
 
         // buffer that will contain the head and the tail chunk, chunks will overlap if length is smaller than two
         // chunks
-        byte[] chunkBytes = new byte[(int) Math.min(2 * HASH_CHUNK_SIZE, length)];
+        byte[] buffer = new byte[(int) Math.min(2 * CHUNK_SIZE, length)];
 
-        try (DataInputStream in = new DataInputStream(stream)) {
+        try (DataInputStream data = new DataInputStream(in)) {
 
             // first chunk
-            in.readFully(chunkBytes, 0, chunkSizeForFile);
+            data.readFully(buffer, 0, chunkSize);
 
-            long position = chunkSizeForFile;
-            long tailChunkPosition = length - chunkSizeForFile;
-
+            long position = chunkSize;
+            long tailChunkPosition = length - chunkSize;
             // seek to position of the tail chunk, or not at all if length is smaller than two chunks
-            while (position < tailChunkPosition && (position += in.skip(tailChunkPosition - position)) >= 0) {
-
+            while (position < tailChunkPosition && (position += data.skip(tailChunkPosition - position)) >= 0) {
             }
+            //data.skipNBytes(Math.max(0, length - 2L * chunkSize));
 
             // second chunk, or the rest of the data if length is smaller than two chunks
-            in.readFully(chunkBytes, chunkSizeForFile, chunkBytes.length - chunkSizeForFile);
+            data.readFully(buffer, chunkSize, buffer.length - chunkSize);
 
-            long head = computeHashForChunk(ByteBuffer.wrap(chunkBytes, 0, chunkSizeForFile));
-            long tail = computeHashForChunk(
-                    ByteBuffer.wrap(chunkBytes, chunkBytes.length - chunkSizeForFile, chunkSizeForFile));
+            long head = hash(ByteBuffer.wrap(buffer, 0, chunkSize));
+            long tail = hash(ByteBuffer.wrap(buffer, buffer.length - chunkSize, chunkSize));
 
             return "%016x".formatted(length + head + tail);
         }
     }
 
-    private static long computeHashForChunk(ByteBuffer buffer) {
-
+    private static long hash(ByteBuffer buffer) {
         LongBuffer longBuffer = buffer.order(ByteOrder.LITTLE_ENDIAN).asLongBuffer();
         long hash = 0;
-
         while (longBuffer.hasRemaining()) {
             hash += longBuffer.get();
         }
-
         return hash;
     }
-
 }
