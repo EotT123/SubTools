@@ -51,11 +51,7 @@ public class LogTextAppender extends AppenderBase<ILoggingEvent> {
             out.flush();
             final String line = out.toString(StandardCharsets.UTF_8);
 
-            SwingUtilities.invokeLater(() -> {
-                if (jTextArea != null) {
-                    jTextArea.append(line);
-                }
-            });
+            SwingUtilities.invokeLater(() -> jTextArea.append(line));
             out.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);

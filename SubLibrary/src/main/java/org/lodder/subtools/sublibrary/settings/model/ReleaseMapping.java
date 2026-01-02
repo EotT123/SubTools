@@ -8,6 +8,7 @@ import io.gsonfire.annotations.PostDeserialize;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public abstract class ReleaseMapping implements Serializable {
@@ -18,10 +19,10 @@ public abstract class ReleaseMapping implements Serializable {
     private static final UnaryOperator<String> NAME_FORMATTER = n -> n.replaceAll("[^A-Za-z]", "");
     @val String name;
     @val String providerId;
-    @val String providerName;
+    @val @Nullable String providerName;
     @var transient String formattedName;
 
-    public ReleaseMapping(String name, String providerId, String providerName) {
+    public ReleaseMapping(String name, String providerId, @Nullable String providerName) {
         this.name = name;
         this.providerId = providerId;
         this.providerName = providerName;

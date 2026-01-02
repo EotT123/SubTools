@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
+import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType.*;
 
 import java.util.Collection;
@@ -74,8 +75,8 @@ public final class SubsceneAdapter
     @Override
     public List<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, Integer season)
         throws SubsceneException {
-        return providerIds.getImdbId().mapEx(imdbId -> getSortedSerieProviderIds(imdbId,
-            Objects.requireNonNull(season))).orElseGet(List::of);
+        return providerIds.getImdbId().mapEx(imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)))
+            .orElseGet(List::of);
     }
 
     /**
@@ -87,7 +88,7 @@ public final class SubsceneAdapter
     @Override
     public List<SubSceneSerieId> getSortedSerieProviderIds(String searchQuery, Integer season)
         throws SubsceneException {
-        ToIntFunction<SearchResultType> providerTypeFunction = value -> switch (value) {
+        ToIntFunction<@Nullable SearchResultType> providerTypeFunction = value -> switch (value) {
             case EXACT -> 2;
             case TV_SERIE -> 1;
             case CLOSE -> 3;
@@ -95,8 +96,8 @@ public final class SubsceneAdapter
         };
         Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(searchQuery);
         List<SubSceneSerieId> filteredResults =
-            serieProviderIds.get(TV_SERIE).stream().filter(subSceneSerieId -> Objects.equals(subSceneSerieId.season,
-                season)).toList();
+            serieProviderIds.get(TV_SERIE).stream()
+                .filter(subSceneSerieId -> Objects.equals(subSceneSerieId.season, season)).toList();
         if (filteredResults.size() == 1) {
             return filteredResults;
         }

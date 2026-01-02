@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
 import static java.util.function.Predicate.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.ArrowButton;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
@@ -62,12 +64,12 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
             this(header, (Collection<E>) null);
         }
 
-        public ScrollTable(String header, Collection<E> items) {
-            this(header, items == null ? null : items.stream());
+        public ScrollTable(String header, @Nullable Collection<E> items) {
+            this(header, (Stream<E>) ifNotNull(items, Collection::stream));
         }
 
-        private ScrollTable(String header, Stream<E> items) {
-            this.table = new JTable(new DefaultTableModel(new String[]{ header }, 1));
+        private ScrollTable(String header, @Nullable Stream<E> items) {
+            this.table = new JTable(new DefaultTableModel(new String[]{header}, 1));
             this.scrollPane = new JScrollPane().viewportView(table);
             this.model = (DefaultTableModel) table.getModel();
             model.removeRow(0);
@@ -78,7 +80,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
         }
 
         public void addItem(E item) {
-            model.addRow(new Object[]{ item });
+            model.addRow(new Object[]{item});
         }
 
         public int getSelectedRow() {
@@ -139,7 +141,7 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
         @Override
         public Component[] getComponents() {
-            return new Component[]{ scrollPane, table };
+            return new Component[]{scrollPane, table};
         }
 
         @Override

@@ -229,9 +229,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                     return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
                         serieMapping.providerName, serieMapping);
                 })
-                .sorted(Comparator.comparing(
-                    row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
-                        row.serieMapping.name))
+                .sorted(
+                    Comparator.comparing(row -> row.serieMapping.providerName == null ? "zzz" : row.serieMapping.name))
                 .forEach(this::addRow);
         }
 

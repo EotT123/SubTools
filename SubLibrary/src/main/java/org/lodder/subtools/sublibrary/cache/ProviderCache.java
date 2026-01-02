@@ -107,7 +107,7 @@ public abstract sealed class ProviderCache<V extends @Nullable Object> permits P
 
     public Optional<Time> getTemporaryTimeToLive(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).map(v -> v instanceof TemporaryCacheObject<?> t ? t.timeToLive : null);
+            return get(key).filterCast(TemporaryCacheObject.class).map(TemporaryCacheObject::getTimeToLive);
         }
     }
 

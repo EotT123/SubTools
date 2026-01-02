@@ -38,6 +38,10 @@ public class OptionalExt {
 //        return optional.map(function);
 //    }
 
+    public static <T extends @Nullable Object, R> Optional<R> filterCast(@This Optional<T> optional, Class<R> type) {
+        return optional.filter(type::isInstance).map(type::cast);
+    }
+
     /**
      * Applies the given {@link Function} to the value if present.
      *

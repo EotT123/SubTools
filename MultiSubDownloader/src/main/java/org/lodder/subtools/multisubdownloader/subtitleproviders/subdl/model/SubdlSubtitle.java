@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -58,45 +57,47 @@ public class SubdlSubtitle extends Subtitle {
 
         // find all extracted subtitle files and move them to the destination folder, renaming them using the
         // provided function
-        boolean multipleDirectories = Files.list(unzipPath).filter(Files::isDirectory).count() > 1;
-        try (Stream<Path> stream = Files.walk(unzipPath)) {
-            List<Path> subtitlesToCopy = stream
-                .filter(Files::isRegularFile)
-                .filter(path -> path.toString().toLowerCase().endsWith(".srt"))
-                .map(path -> {
-                    if (multipleDirectories && forRelease instanceof TvReleaseWithoutPath tvRelease) {
-                        Boolean matchingSub = ReleaseParser.parse(path).filter(TvReleaseWithPath.class::isInstance)
-                            .map(TvReleaseWithPath.class::cast)
-                            .map(release -> release.season == tvRelease.season &&
-                                release.episodes.stream().anyMatch(tvRelease.episodes::contains))
-                            .orElse(false);
-                        if (!matchingSub) {
-                            return null;
+        try (Stream<Path> files = Files.list(unzipPath)) {
+            boolean multipleDirectories = files.filter(Files::isDirectory).count() > 1;
+            try (Stream<Path> stream = Files.walk(unzipPath)) {
+                List<Path> subtitlesToCopy = stream
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().toLowerCase().endsWith(".srt"))
+                    .mapFilterNonNull(path -> {
+                        if (multipleDirectories && forRelease instanceof TvReleaseWithoutPath tvRelease) {
+                            Boolean matchingSub = ReleaseParser.parse(path).filter(TvReleaseWithPath.class::isInstance)
+                                .map(TvReleaseWithPath.class::cast)
+                                .map(release -> release.season == tvRelease.season &&
+                                    release.episodes.stream().anyMatch(tvRelease.episodes::contains))
+                                .orElse(false);
+                            if (!matchingSub) {
+                                return null;
+                            }
                         }
-                    }
-                    return path;
-                })
-                .filter(Objects::nonNull)
-                .toList();
+                        return path;
+                    })
+                    .toList();
 
-            AtomicInteger counter = subtitlesToCopy.size() > 1 ? new AtomicInteger(0) : null;
-            return subtitlesToCopy.stream().map(path -> {
-                    Path destination = destinationFolder.resolve(fileNameFunction.apply(counter));
-                    while (Files.exists(destination)) {
-                        Path destinationNew = destinationFolder.resolve(fileNameFunction.apply(counter));
-                        if (destinationNew.equals(destination)) {
-                            LOGGER.warn("Could not copy subtitle $path to $destinationNew, because it already exists");
+                AtomicInteger counter = subtitlesToCopy.size() > 1 ? new AtomicInteger(0) : null;
+                return subtitlesToCopy.stream().mapFilterNonNull(path -> {
+                        Path destination = destinationFolder.resolve(fileNameFunction.apply(counter));
+                        while (Files.exists(destination)) {
+                            Path destinationNew = destinationFolder.resolve(fileNameFunction.apply(counter));
+                            if (destinationNew.equals(destination)) {
+                                LOGGER.warn("Could not copy subtitle $path to $destinationNew, because it already " +
+                                    "exists");
+                                return null;
+                            }
+                        }
+                        try {
+                            return Files.copy(path, destination, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            LOGGER.error("Could not copy subtitle file $path to $destination: " + e.getMessage());
                             return null;
                         }
-                    }
-                    try {
-                        return Files.copy(path, destination, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        LOGGER.error("Could not copy subtitle file $path to $destination: " + e.getMessage());
-                        return null;
-                    }
-                }).filter(Objects::nonNull)
-                .toList();
+                    })
+                    .toList();
+            }
         }
     }
 }

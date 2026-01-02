@@ -21,7 +21,8 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @NullMarked
-public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> extends JTextField implements
+public abstract sealed class MyTextFieldCommon<T extends @Nullable Object, R extends MyTextFieldCommon<T, R>>
+    extends JTextField implements
     MyTextFieldToStringMapperIntf<T, R>,
     MyTextFieldToObjectMapperIntf<T, R>,
     MyTextFieldOthersIntf<T, R>
@@ -98,7 +99,7 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
     }
 
     @NullMarked
-    private static class ObjectWrapper<S> {
+    private static class ObjectWrapper<S extends @Nullable Object> {
         private S value;
 
         public boolean setValue(S value) {
@@ -202,7 +203,7 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
     public void setObject(T object) {
         super.setText(ifNotNull(object, toStringMapper::apply));
         valueWrapper.setValue(object);
-        validWrapper.setValue(completeValueVerifier.test(ifNotNull(object, toStringMapper::apply)));
+        validWrapper.setValue(completeValueVerifier.test(toStringMapper.apply(object)));
     }
 
     public boolean hasValidValue() {

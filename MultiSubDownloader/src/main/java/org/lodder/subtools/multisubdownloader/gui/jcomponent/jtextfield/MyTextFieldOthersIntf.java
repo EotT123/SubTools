@@ -4,10 +4,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @NullMarked
-public interface MyTextFieldOthersIntf<T, R extends MyTextFieldCommon<T, R>> {
+public interface MyTextFieldOthersIntf<T extends @Nullable Object, R extends MyTextFieldCommon<T, R>> {
     MyTextFieldOthersIntf<T, R> withValueVerifier(Predicate<String> verifier);
 
     default MyTextFieldOthersIntf<T, R> requireValue() {
