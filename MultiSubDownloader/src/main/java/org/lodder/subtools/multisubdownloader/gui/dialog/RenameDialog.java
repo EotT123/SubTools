@@ -60,7 +60,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             fillContents:true)
             .addToPanel(contentPane, "span, grow, wrap")
             .addComponent("shrink", new JLabel(getText("PreferenceDialog.Location")))
-            .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().columns(20))
+            .addComponent("grow", this.txtFolder = new MyTextFieldPath(true).columns(20))
             .addComponent("shrink, wrap", new JButton(getText("App.Browse")).actionListener(
                 () -> MemoryFolderChooser.getInstance()
                     .selectDirectory(contentPane,

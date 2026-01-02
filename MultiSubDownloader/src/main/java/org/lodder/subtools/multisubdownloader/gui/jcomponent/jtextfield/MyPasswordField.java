@@ -7,6 +7,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.Serial;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -28,7 +29,7 @@ public class MyPasswordField extends JPasswordField {
     public final Predicate<String> valueVerifier;
 
     private @Nullable Consumer<String> valueChangedCallbackListener;
-    private BooleanConsumer @Nullable [] validityChangedCallbackListeners;
+    private List<BooleanConsumer> validityChangedCallbackListeners;
 
     private final ObjectWrapper<String> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();
@@ -36,7 +37,7 @@ public class MyPasswordField extends JPasswordField {
 
     public MyPasswordField(boolean requireValue=false, Predicate<String> verifier=StringUtils::isNotEmpty,
         @Nullable Consumer<String> valueChangedCallbackListener=null,
-        BooleanConsumer @Nullable ... validityChangedCallbackListeners) {
+        List<BooleanConsumer> validityChangedCallbackListeners=(List) List.of()) {
         super();
         putClientProperty(DEFAULT_BORDER_PROPERTY, getBorder());
         this.valueVerifier = verifier;
@@ -46,7 +47,7 @@ public class MyPasswordField extends JPasswordField {
         this.completeValueVerifier =
             requireValue ? text -> (StringUtils.isNotEmpty(text) && valueVerifier.test(text)) : valueVerifier;
 
-        if (requireValue || valueChangedCallbackListener != null || validityChangedCallbackListeners != null) {
+        if (requireValue || valueChangedCallbackListener != null || !validityChangedCallbackListeners.isEmpty()) {
             checkValidity(getRawText());
             getDocument().addDocumentListener(new DocumentListener() {
 
@@ -112,7 +113,7 @@ public class MyPasswordField extends JPasswordField {
 
         boolean changedValidity = Objects.equals(validWrapper.value, valid);
         validWrapper.value = valid;
-        if (changedValidity && validityChangedCallbackListeners != null) {
+        if (changedValidity) {
             validityChangedCallbackListeners.forEach(listener -> listener.accept(valid));
         }
 

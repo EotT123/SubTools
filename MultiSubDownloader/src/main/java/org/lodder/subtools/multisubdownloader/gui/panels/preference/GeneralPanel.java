@@ -156,14 +156,13 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 )
                 .addToPanel(proxyPanel)
                 .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
-                .addComponent("wrap",
-                    this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))
+                .addComponent("wrap", this.txtProxyHost = new MyTextFieldString(true).columns(30))
                 .addComponent(new JLabel(getText("PreferenceDialog.Port")))
-                .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
+                .addComponent(this.txtProxyPort = new MyTextFieldInteger(true).columns(5));
         }
 
         // loadPreferenceSettings
-        
+
         cbxLanguage.setSelectedItem(settingsCtrl.settings.language);
         defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.image, settingsCtrl.settings.defaultIncomingFolders);
         settingsCtrl.settings.excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));

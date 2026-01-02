@@ -48,8 +48,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
-        this.txtLibraryFolder =
-            MyTextFieldPath.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+        this.txtLibraryFolder = new MyTextFieldPath(true).columns(20).addTo(titlePanel, "grow");
         new JButton(getText("App.Browse"))
             .actionListener(() -> MemoryFolderChooser.getInstance()
                 .selectDirectory(getRootPane(), getText("PreferenceDialog.LibraryFolder"))
@@ -57,8 +56,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .addTo(titlePanel, "shrink, wrap");
 
         new JLabel(getText("StructureBuilderDialog.Structure")).addTo(titlePanel, "shrink");
-        this.txtFolderStructure =
-            MyTextFieldString.builder().requireValue().build().columns(20).disabled().addTo(titlePanel, "grow");
+        this.txtFolderStructure = new MyTextFieldString(true).columns(20).disabled().addTo(titlePanel, "grow");
         JButton btnStructure = new JButton(getText("StructureBuilderDialog.Structure"))
             .actionListener(() -> {
                 StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
@@ -84,7 +82,8 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .addComponent(this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         // behaviour
-        txtLibraryFolder.withValidityChangedCallback(txtFolderStructure::setEnabled, btnStructure::setEnabled);
+        txtLibraryFolder.addValidityChangedCallbackListeners(txtFolderStructure::setEnabled)
+            .addValidityChangedCallbackListeners(btnStructure::setEnabled);
 
         loadPreferenceSettings();
     }

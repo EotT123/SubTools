@@ -5,6 +5,7 @@ import static util.Utils.*;
 import java.io.Serial;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -28,14 +29,12 @@ public final class MyTextFieldPath extends MyTextFieldCommon<@Nullable Path, MyT
         }
     };
 
-    private MyTextFieldPath() {
-
-    }
-
-    public static MyTextFieldOthersIntf<@Nullable Path, MyTextFieldPath> builder() {
-        return new MyTextFieldPath()
-            .withToStringMapper(TO_STRING_MAPPER)
-            .withToObjectMapper(TO_OBJECT_MAPPER)
-            .withValueVerifier(ABSOLUTE_PATH_VERIFIER);
+    public MyTextFieldPath(
+        boolean requireValue=false,
+        Function<@Nullable Path, @Nullable String> toStringMapper=TO_STRING_MAPPER,
+        Function<@Nullable String, @Nullable Path> toObjectMapper=TO_OBJECT_MAPPER,
+        Predicate<String> valueVerifier=ABSOLUTE_PATH_VERIFIER,
+        @Nullable Consumer<Path> valueChangedCallbackListener=null) {
+        super(requireValue, toStringMapper, toObjectMapper, valueVerifier, valueChangedCallbackListener);
     }
 }

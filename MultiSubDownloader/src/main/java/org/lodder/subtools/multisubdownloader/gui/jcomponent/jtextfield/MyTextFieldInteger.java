@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield;
 import static util.Utils.*;
 
 import java.io.Serial;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -31,14 +32,12 @@ public final class MyTextFieldInteger extends MyTextFieldCommon<@Nullable Intege
         }
     };
 
-    private MyTextFieldInteger() {
-
-    }
-
-    public static MyTextFieldOthersIntf<@Nullable Integer, MyTextFieldInteger> builder() {
-        return new MyTextFieldInteger()
-            .withToStringMapper(TO_STRING_MAPPER)
-            .withToObjectMapper(TO_OBJECT_MAPPER)
-            .withValueVerifier(INT_VERIFIER);
+    public MyTextFieldInteger(
+        boolean requireValue=false,
+        Function<@Nullable Integer, @Nullable String> toStringMapper=TO_STRING_MAPPER,
+        Function<@Nullable String, @Nullable Integer> toObjectMapper=TO_OBJECT_MAPPER,
+        Predicate<String> valueVerifier=INT_VERIFIER,
+        @Nullable Consumer<Integer> valueChangedCallbackListener=null) {
+        super(requireValue, toStringMapper, toObjectMapper, valueVerifier, valueChangedCallbackListener);
     }
 }

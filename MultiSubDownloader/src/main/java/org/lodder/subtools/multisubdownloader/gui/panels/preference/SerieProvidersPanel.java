@@ -66,8 +66,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     panelLayout:new MigLayout("insets 0, novisualpadding")
                     )
                     .addComponent(new JLabel(getText("PreferenceDialog.Username")))
-                    .addComponent("wrap", this.txtAddic7edUsername =
-                        MyTextFieldString.builder().requireValue().build().columns(20))
+                    .addComponent("wrap", this.txtAddic7edUsername = new MyTextFieldString(true).columns(20))
                     .addComponent(new JLabel(getText("PreferenceDialog.Password")))
                     .addComponent(this.txtAddic7edPassword = new MyPasswordField(true).columns(20)));
 
@@ -88,8 +87,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     panelLayout:new MigLayout("insets 0, novisualpadding")
                     )
                     .addComponent(new JLabel(getText("PreferenceDialog.Username")))
-                    .addComponent("wrap", txtOpenSubtitlesUsername =
-                        MyTextFieldString.builder().requireValue().build().columns(20))
+                    .addComponent("wrap", txtOpenSubtitlesUsername = new MyTextFieldString(true).columns(20))
                     .addComponent(new JLabel(getText("PreferenceDialog.Password")))
                     .addComponent(txtOpenSubtitlesPassword = new MyPasswordField(true).columns(20)));
 

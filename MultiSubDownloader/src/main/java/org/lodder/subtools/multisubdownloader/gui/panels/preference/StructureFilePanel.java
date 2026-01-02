@@ -57,8 +57,7 @@ public class StructureFilePanel extends JPanel {
             .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
-        this.txtFileStructure =
-            MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+        this.txtFileStructure = new MyTextFieldString(true).columns(20).addTo(titlePanel, "grow");
         new JButton(getText("StructureBuilderDialog.Structure"))
             .actionListener(() -> {
                 StructureBuilderDialog sDialog =
@@ -102,7 +101,7 @@ public class StructureFilePanel extends JPanel {
                 int id = langId.getAndIncrement();
                 JComboBox<Language> cmbLanguage = new JComboBox<>(Language.values())
                     .toMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
-                MyTextFieldString txtLanguage = MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
+                MyTextFieldString txtLanguage = new MyTextFieldString(true).columns(20).addTo(languagePanel);
                 JButton btnDelete = new JButton(getText("StructureFilePanel.Delete"))
                     .actionListenerSelf(delBtn -> {
                         languagePanel.remove(cmbLanguage);
