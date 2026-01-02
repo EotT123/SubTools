@@ -52,7 +52,7 @@ public class UserInteractionHandlerAction {
         } else {
             if (!subs.isEmpty()) {
                 LOGGER.debug("determineWhatSubtitleDownload for videoFile: [{}] # found subs: [{}]",
-                    release.fileNameOrName, subs.size());
+                    release.folderNameOrName, subs.size());
                 if (settings.optionsAlwaysConfirm) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (subs.size() == 1 && subs.first.subtitleMatchType == SubtitleMatchType.EXACT) {
@@ -78,14 +78,14 @@ public class UserInteractionHandlerAction {
                         return userInteractionHandler.selectSubtitles(release);
                     } else {
                         LOGGER.info("Multiple subs detected for: [{}] Unhandleable for CMD! switch to GUI or use " +
-                            "'--selection' as switch in de CMD", release.fileNameOrName);
+                            "'--selection' as switch in de CMD", release.folderNameOrName);
                     }
                 } else {
                     LOGGER.debug("determineWhatSubtitleDownload: only one sub taking it!!!!");
                     return List.of(subs.first);
                 }
             }
-            LOGGER.debug("determineWhatSubtitleDownload: No subs found for  [{}]", release.fileNameOrName);
+            LOGGER.debug("determineWhatSubtitleDownload: No subs found for  [{}]", release.folderNameOrName);
         }
         return List.of();
     }

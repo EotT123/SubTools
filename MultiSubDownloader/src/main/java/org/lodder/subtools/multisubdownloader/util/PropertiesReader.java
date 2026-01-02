@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class PropertiesReader {
@@ -31,7 +32,7 @@ public class PropertiesReader {
         return propertiesReaderInstance;
     }
 
-    public static String getProperty(PomProperty property) {
+    public static @Nullable String getProperty(PomProperty property) {
         return PropertiesReader.getPropertiesReader().properties.getProperty(property.value);
     }
 

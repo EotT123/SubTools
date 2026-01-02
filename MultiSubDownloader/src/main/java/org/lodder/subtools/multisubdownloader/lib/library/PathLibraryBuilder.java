@@ -63,7 +63,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
             };
             return libraryFolder.resolve(pathStructure.split(FolderStructureTag.SEPARATOR.label));
         } else {
-            return release.path;
+            return release.path.parent;
         }
     }
 
@@ -75,7 +75,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
                 case MovieRelease movieRelease -> buildMovieFolderStructure(movieRelease);
             };
         } else {
-            return release.fileNameOrName;
+            return release.folderNameOrName;
         }
     }
 

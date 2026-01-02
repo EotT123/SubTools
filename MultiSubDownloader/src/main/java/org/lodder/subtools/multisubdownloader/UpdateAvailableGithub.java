@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader;
 
 import static java.time.temporal.ChronoUnit.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -89,7 +90,7 @@ public class UpdateAvailableGithub {
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
-                        .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
+                            .selectFirstByCss("#repo-content-turbo-frame .box a[href='$REPO_URI/releases/latest']");
                     Pattern versionPattern = Pattern.compile("\\d*\\.\\d\\.\\d");
                     String versionText = element.parentElement().selectFirst("a").text();
                     Matcher matcher = versionPattern.matcher(versionText);
@@ -152,8 +153,8 @@ public class UpdateAvailableGithub {
     }
 
     private LocalDateTime getBuildTista() {
-        String timestamp = PropertiesReader.getProperty(PomProperty.BUILD_TIMESTAMP);
-        return zonedDateTimeStringToLocalDateTime(timestamp);
+        return ifNotNullOrElseGet(PropertiesReader.getProperty(PomProperty.BUILD_TIMESTAMP),
+            this::zonedDateTimeStringToLocalDateTime, LocalDateTime::now);
     }
 
     private String getVersion() {

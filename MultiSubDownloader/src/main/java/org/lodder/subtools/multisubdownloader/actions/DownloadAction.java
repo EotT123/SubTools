@@ -89,7 +89,7 @@ public class DownloadAction {
         }
 
         if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {
-            Path oldLocationFile = release.path.resolve(ifNullThen(release.fileName, release.name));
+            Path oldLocationFile = release.path.parent.resolve(ifNullThen(release.fileName, release.name));
             if (oldLocationFile.exists()) {
                 LOGGER.info("Moving/Renaming [{}] to folder [{}] this might take a while... ", videoFileName, path);
                 oldLocationFile.moveToDir(path);
@@ -97,8 +97,8 @@ public class DownloadAction {
                     CleanAction cleanAction = new CleanAction(librarySettings);
                     cleanAction.cleanUpFiles(release, path, videoFileName);
                 }
-                if (librarySettings.removeEmptyFolders && release.path.isEmptyDir()) {
-                    release.path.deletePath();
+                if (librarySettings.removeEmptyFolders && release.path.parent.isEmptyDir()) {
+                    release.path.parent.deletePath();
                 }
             }
         }

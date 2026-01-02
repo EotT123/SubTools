@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.data.imdb;
 
+import static util.Utils.*;
+
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -8,9 +10,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import extensions.org.jsoup.nodes.Element.ElementExt;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -46,14 +51,19 @@ record ImdbSearchIdApi(Manager manager) {
                 });
                 String url = sb.toString().replace("+", "%20");
                 try {
-                    Elements searchResults =
-                        manager.getAsJsoupDocument(new PageContentParams(url)).select(".find-result-item");
+                    Elements searchResults = manager.getAsJsoupDocument(new PageContentParams(url))
+                        .select(".ipc-metadata-list-summary-item .cli-children");
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirst("a").text(),
-                        e -> e.selectFirst("a").attr("href"), e -> e.selectFirst("span").text(),
-                        e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text()).findFirst().orElse(""),
-                        e -> e.selectFirst("a").siblingElements().stream().map(s -> s.text().contains("Series") ?
-                            VideoType.EPISODE : VideoType.MOVIE).findFirst().orElse(null));
+                        e -> e.selectFirst("a").attr("href"),
+                        e -> e.selectFirst(".cli-title-metadata .cli-title-metadata-item").text().split("–")[0],
+                        e -> Stream.of(e.selectFirst(".cli-title-metadata .cli-title-type-data"),
+                                e.selectFirst(".cli-title-metadata .cli-title-metadata-item:nth-child(2)"))
+                            .map(ElementExt::text)
+                            .mapFilterNonNull(StringUtils::trimToNull).collect(Collectors.joining(" - ")),
+                        e -> ifNotNull(
+                            StringUtils.trimToNull(e.selectFirst(".cli-title-metadata .cli-title-type-data").text()),
+                            t -> t.contains("Series") ? VideoType.EPISODE : VideoType.MOVIE));
                 } catch (Exception e) {
                     throw new ImdbSearchIdException("Error getImdbIdOnImdb", url, e);
                 }
@@ -141,9 +151,9 @@ record ImdbSearchIdApi(Manager manager) {
     }
 
     private Set<ImdbId> getImdbIdCommon(Elements searchResults, Function<Element, @Nullable String> toNameMapper,
-        Function<Element, String> toHrefMapper, Function<Element, String> toYearMapper=_ -> null,
-        Function<Element, String> toOtherInfoMapper=_ -> null,
-        Function<Element, VideoType> toVideoTypeMapper=_ -> null) {
+        Function<Element, String> toHrefMapper, Function<Element, @Nullable String> toYearMapper=_ -> null,
+        Function<Element, @Nullable String> toOtherInfoMapper=_ -> null,
+        Function<Element, @Nullable VideoType> toVideoTypeMapper=_ -> null) {
         return searchResults.stream().collect(Utils.setCollector(
             (set, element) -> {
                 String name = toNameMapper.apply(element);

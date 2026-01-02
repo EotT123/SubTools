@@ -52,9 +52,7 @@ public final class SearchFileInputPanel extends InputPanel {
     }
 
     public void addSelectFolderAction(ActionListener selectFolderAction) {
-        if (selectFolderAction != null) {
-            btnBrowse.addActionListener(selectFolderAction);
-        }
+        btnBrowse.addActionListener(selectFolderAction);
     }
 
     public void setIncomingPath(String path) {
@@ -72,5 +70,4 @@ public final class SearchFileInputPanel extends InputPanel {
     public boolean isForceOverwrite() {
         return chkForceSubtitleOverwrite.isSelected();
     }
-
 }
