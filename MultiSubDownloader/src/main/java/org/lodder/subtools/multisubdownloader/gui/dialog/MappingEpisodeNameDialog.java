@@ -191,9 +191,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private static class Row extends Vector<String> {
         @Serial private static final long serialVersionUID = 1L;
         @val ProviderCacheKey key;
-        @var SerieMapping serieMapping;
+        @var @Nullable SerieMapping serieMapping;
 
-        public Row(ProviderCacheKey key, String name, String providerId, String providerName,
+        public Row(ProviderCacheKey key, String name, String providerId, @Nullable String providerName,
             SerieMapping serieMapping) {
             this.key = key;
             this.serieMapping = serieMapping;
@@ -229,8 +229,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                     return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
                         serieMapping.providerName, serieMapping);
                 })
-                .sorted(
-                    Comparator.comparing(row -> row.serieMapping.providerName == null ? "zzz" : row.serieMapping.name))
+                .sorted(Comparator.comparing(row -> row.serieMapping.name))
                 .forEach(this::addRow);
         }
 
