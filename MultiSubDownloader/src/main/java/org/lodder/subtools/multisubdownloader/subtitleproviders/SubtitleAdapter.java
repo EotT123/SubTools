@@ -52,18 +52,22 @@ import org.slf4j.LoggerFactory;
  */
 @NullMarked
 public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extends ProviderId, X extends Exception>
-    implements
-    SubtitleProvider<SUB>, AdapterIntf {
+    implements SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
 
     @val @override Manager manager;
     @val UserInteractionHandler userInteractionHandler;
     @val(Abstract) boolean useSeasonForSerieId;
-    @val @override String provider = subtitleProviderFrontEnd.name();
+    //@val @override String provider = subtitleProviderFrontEnd.name();
 
     protected SubtitleAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
+    }
+
+    @Override
+    public String getProvider() {
+        return subtitleProviderFrontEnd.name();
     }
 
     // ===== \\
