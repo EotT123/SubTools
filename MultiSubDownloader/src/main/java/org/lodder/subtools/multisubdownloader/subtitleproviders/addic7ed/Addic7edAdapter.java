@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -25,6 +26,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
+@NullMarked
 public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Addic7edSubtitle, ProviderId,
     Addic7edException> {
 
@@ -32,7 +34,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = true;
 
-    public Addic7edAdapter(Manager manager, boolean speedy, Credentials credentials=null,
+    public Addic7edAdapter(Manager manager, boolean speedy, @Nullable Credentials credentials=null,
         UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         if (api == null) {

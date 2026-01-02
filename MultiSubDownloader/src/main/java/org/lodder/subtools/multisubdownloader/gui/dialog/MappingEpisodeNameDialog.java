@@ -11,7 +11,6 @@ import java.awt.*;
 import java.io.Serial;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -20,6 +19,7 @@ import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
@@ -30,9 +30,10 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
+@NullMarked
 public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -99,12 +100,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                 currentName);
                             selectedSubtitleProvider.ifPresent(provider ->
                                 userInteractionHandler.enter(message).ifPresent(newName -> {
-                                    TvRelease tvRelease = new TvRelease(
+                                    TvReleaseWithoutPath tvRelease = new TvReleaseWithoutPath(
                                         name:currentName,
                                         season:row.serieMapping.season,
                                         episode:1,
                                         originalName:currentName,
-                                        customName:newName);
+                                        customName:newName,
+                                        completeName:currentName);
                                     try {
                                         provider.getProviderSerieMapping(tvRelease).ifPresentOrElse(serieId -> {
                                             row.serieMapping =
@@ -131,8 +133,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     private void selectMappingType(MappingType mappingType) {
         this.selectedMappingType = mappingType;
-        this.selectedSubtitleProvider = subtitleProviderStore.getAllProviders()
-            .stream()
+        this.selectedSubtitleProvider = subtitleProviderStore.allProviders.stream()
             .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
             .findAny();
         btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
@@ -140,6 +141,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         repaint();
     }
 
+    @NullMarked
     public enum MappingType {
         TVDB("TVDB", "TVDB", "EPISODEmapping"),
         IMDB("IMDB", "IMDB", "EPISODEmapping"),
@@ -185,12 +187,13 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         }
     }
 
+    @NullMarked
     private static class Row extends Vector<String> {
         @Serial private static final long serialVersionUID = 1L;
         @val ProviderCacheKey key;
-        @var SerieMapping serieMapping;
+        @var @Nullable SerieMapping serieMapping;
 
-        public Row(ProviderCacheKey key, String name, String providerId, String providerName,
+        public Row(ProviderCacheKey key, String name, String providerId, @Nullable String providerName,
             SerieMapping serieMapping) {
             this.key = key;
             this.serieMapping = serieMapping;
@@ -200,6 +203,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         }
     }
 
+    @NullMarked
     private static class MappingTableModel extends DefaultTableModel {
         @Serial private static final long serialVersionUID = 1L;
         @val Manager manager;
@@ -211,9 +215,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         void setMappingType(MappingType mappingType) {
             setDataVector(null,
                 new String[]{mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn});
-            mappingType.getValues(manager)
-                .stream()
-                .map(serieMappingPair -> {
+            mappingType.getValues(manager).stream()
+                .mapFilterNonNull(serieMappingPair -> {
                     SerieMapping serieMapping = serieMappingPair.getValue();
                     if (serieMapping == null) {
                         return null;
@@ -225,10 +228,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                     providerId = providerId.replace(".html", "");
                     return new Row(serieMappingPair.getKey(), serieMapping.name, providerId,
                         serieMapping.providerName, serieMapping);
-                }).filter(Objects::nonNull)
-                .sorted(Comparator.comparing(
-                    row -> row.serieMapping == null || row.serieMapping.providerName == null ? "zzz" :
-                        row.serieMapping.name))
+                })
+                .sorted(Comparator.comparing(row -> row.serieMapping.name))
                 .forEach(this::addRow);
         }
 

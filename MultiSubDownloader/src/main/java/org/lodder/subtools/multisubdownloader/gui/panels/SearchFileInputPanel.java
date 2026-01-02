@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class SearchFileInputPanel extends InputPanel {
 
     @Serial

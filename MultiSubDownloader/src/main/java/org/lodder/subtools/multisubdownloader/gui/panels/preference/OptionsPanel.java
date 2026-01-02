@@ -6,12 +6,14 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 
+@NullMarked
 public class OptionsPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial private static final long serialVersionUID = 1L;

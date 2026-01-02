@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
@@ -13,6 +14,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldPath;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 
+@NullMarked
 public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -33,7 +35,7 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
             .addToPanel(this, "span, growx");
         
         {
-            this.txtBackupSubtitlePath = MyTextFieldPath.builder().requireValue().build().columns(20);
+            this.txtBackupSubtitlePath = new MyTextFieldPath(true).columns(20);
 
             new PanelCheckBox(
                 checkbox:this.chkBackupSubtitle = new JCheckBox(getText("PreferenceDialog.BackupSubtitles")),

@@ -6,9 +6,9 @@ import static org.mockito.Mockito.*;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 
 class ScoreCalculatorTest {
 
@@ -53,7 +53,7 @@ class ScoreCalculatorTest {
 
     private SortWeight createWeights(String quality, String group) {
         // Arrested.Development.S01E01.DVDRip.XviD-MEDiEVAL
-        Release release = mock(TvRelease.class);
+        ReleaseWithoutPath release = mock(TvReleaseWithoutPath.class);
         when(release.quality).thenReturn(quality);
         when(release.releaseGroup).thenReturn(group);
 

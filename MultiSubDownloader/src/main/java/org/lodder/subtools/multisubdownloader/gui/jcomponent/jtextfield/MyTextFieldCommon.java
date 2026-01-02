@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield;
 
+import static util.Utils.*;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -7,19 +9,22 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.Serial;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import manifold.ext.rt.api.Self;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
-public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T, R>> extends JTextField implements
-    MyTextFieldToStringMapperIntf<T, R>,
-    MyTextFieldToObjectMapperIntf<T, R>,
-    MyTextFieldOthersIntf<T, R>
+@NullMarked
+public abstract sealed class MyTextFieldCommon<T extends @Nullable Object, R extends MyTextFieldCommon<T, R>>
+    extends JTextField
     permits MyTextFieldInteger, MyTextFieldPath, MyTextFieldString {
 
     @Serial
@@ -27,19 +32,64 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
     private static final String DEFAULT_BORDER_PROPERTY = "DefaultBorder";
     private static final Border ERROR_BORDER = new LineBorder(Color.RED, 1);
 
-    private Function<T, String> toStringMapper;
-    private Function<String, T> toObjectMapper;
-    private Predicate<String> valueVerifier;
-    private boolean requireValue;
-    private Consumer<T> valueChangedCallbackListener;
-    private BooleanConsumer[] validityChangedCallbackListeners;
+    private final boolean requireValue;
+    private final Function<T, String> toStringMapper;
+    private final Function<String, T> toObjectMapper;
+    private final @Nullable Consumer<T> valueChangedCallbackListener;
+    private List<BooleanConsumer> validityChangedCallbackListeners = new ArrayList<>();
 
     private final ObjectWrapper<T> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();
-    private Predicate<String> completeValueVerifier;
+    private final Predicate<String> completeValueVerifier;
 
-    MyTextFieldCommon() {
+    MyTextFieldCommon(boolean requireValue=false, Function<T, String> toStringMapper,
+        Function<String, T> toObjectMapper, Predicate<String> valueVerifier,
+        @Nullable Consumer<T> valueChangedCallbackListener) {
         putClientProperty(DEFAULT_BORDER_PROPERTY, getBorder());
+        this.requireValue = requireValue;
+        this.toStringMapper = toStringMapper;
+        this.toObjectMapper = toObjectMapper;
+
+        this.valueChangedCallbackListener = valueChangedCallbackListener;
+
+        completeValueVerifier =
+            requireValue ? text -> (StringUtils.isNotEmpty(text) && valueVerifier.test(text)) : valueVerifier;
+
+        if (requireValue || valueChangedCallbackListener != null) {
+            configureCallback();
+        }
+    }
+
+
+    private void configureCallback() {
+        checkValidity(getText());
+        getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkValidity(getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkValidity(getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkValidity(getText());
+            }
+
+        });
+    }
+
+
+    public @Self MyTextFieldCommon<T, R> addValidityChangedCallbackListeners(
+        BooleanConsumer validityChangedCallbackListener) {
+        if (!requireValue && valueChangedCallbackListener == null && validityChangedCallbackListeners.isEmpty()) {
+            configureCallback();
+        }
+        return this;
     }
 
     @Override
@@ -56,43 +106,8 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
         super.setBorder(border);
     }
 
-    @Override
-    public R withToStringMapper(Function<T, String> toStringMapper) {
-        this.toStringMapper = toStringMapper;
-        return self();
-    }
-
-    @Override
-    public R withToObjectMapper(Function<String, T> toObjectMapper) {
-        this.toObjectMapper = toObjectMapper;
-        return self();
-    }
-
-    @Override
-    public R withValueVerifier(Predicate<String> verifier) {
-        this.valueVerifier = verifier;
-        return self();
-    }
-
-    @Override
-    public R requireValue(boolean requireValue) {
-        this.requireValue = requireValue;
-        return self();
-    }
-
-    @Override
-    public R withValueChangedCallback(Consumer<T> valueChangedCallbackListener) {
-        this.valueChangedCallbackListener = valueChangedCallbackListener;
-        return self();
-    }
-
-    @Override
-    public final R withValidityChangedCallback(BooleanConsumer... validityChangedCallbackListeners) {
-        this.validityChangedCallbackListeners = validityChangedCallbackListeners;
-        return self();
-    }
-
-    private static class ObjectWrapper<S> {
+    @NullMarked
+    private static class ObjectWrapper<S extends @Nullable Object> {
         private S value;
 
         public boolean setValue(S value) {
@@ -124,50 +139,13 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
         return (Border) thisTextField.getClientProperty(DEFAULT_BORDER_PROPERTY);
     }
 
-    @Override
-    public R build() {
-        if (valueVerifier != null && requireValue) {
-            completeValueVerifier = text -> (StringUtils.isNotEmpty(text) && valueVerifier.test(text));
-        } else if (valueVerifier != null) {
-            completeValueVerifier = valueVerifier;
-        } else if (requireValue) {
-            completeValueVerifier = StringUtils::isNotEmpty;
-        } else {
-            completeValueVerifier = _ -> true;
-        }
-
-        if (valueVerifier != null || requireValue || valueChangedCallbackListener != null ||
-            validityChangedCallbackListeners != null) {
-            checkValidity(getText());
-            getDocument().addDocumentListener(new DocumentListener() {
-
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-                    checkValidity(getText());
-                }
-
-                @Override
-                public void removeUpdate(DocumentEvent e) {
-                    checkValidity(getText());
-                }
-
-                @Override
-                public void changedUpdate(DocumentEvent e) {
-                    checkValidity(getText());
-                }
-
-            });
-        }
-        return self();
-    }
-
     private void checkValidity(String text) {
         boolean valid = completeValueVerifier.test(text);
         setSuperBorder(valid ? MyTextFieldCommon.getDefaultBorder(self()) : ERROR_BORDER);
 
         boolean changedValidity = validWrapper.setValue(valid);
-        if (changedValidity && validityChangedCallbackListeners != null) {
-            Arrays.stream(validityChangedCallbackListeners).forEach(listener -> listener.accept(valid));
+        if (changedValidity) {
+            validityChangedCallbackListeners.forEach(listener -> listener.accept(valid));
         }
 
         if (valueChangedCallbackListener != null) {
@@ -194,9 +172,9 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
     }
 
     public void setObject(T object) {
-        super.setText(object == null ? null : toStringMapper.apply(object));
+        super.setText(ifNotNull(object, toStringMapper::apply));
         valueWrapper.setValue(object);
-        validWrapper.setValue(completeValueVerifier.test(object == null ? null : toStringMapper.apply(object)));
+        validWrapper.setValue(completeValueVerifier.test(toStringMapper.apply(object)));
     }
 
     public boolean hasValidValue() {

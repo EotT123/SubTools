@@ -1,8 +1,8 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStructureTag;
@@ -11,10 +11,14 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStru
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public final class PathLibraryBuilder extends LibraryBuilder {
 
     private final String structure;
@@ -44,51 +48,68 @@ public final class PathLibraryBuilder extends LibraryBuilder {
             move:libSettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVE_AND_RENAME));
     }
 
+    /**
+     * Builds an absolute Path object based on a release object.
+     *
+     * @param release The ReleaseWithPath object.
+     * @return The created absolute path
+     */
     @Override
-    public Path build(Release release) {
+    public Path buildPath(ReleaseWithPath release) {
         if (move) {
-            Path subpath = switch (release) {
-                case TvRelease tvRelease -> buildEpisode(tvRelease);
-                case MovieRelease movieRelease -> buildMovie(movieRelease);
+            String pathStructure = switch (release) {
+                case TvReleaseWithPath tvRelease -> buildEpisodeFolderStructure(tvRelease);
+                case MovieReleaseWithPath movieRelease -> buildMovieFolderStructure(movieRelease);
             };
-            return libraryFolder.resolve(subpath);
+            return libraryFolder.resolve(pathStructure.split(FolderStructureTag.SEPARATOR.label));
         } else {
-            return release.getPath();
+            return release.path;
         }
     }
 
-    private Path buildEpisode(TvRelease tvRelease) {
-        String folder = structure;
+    @Override
+    public String buildPathStructure(Release release) {
+        if (move) {
+            return switch (release) {
+                case TvRelease tvRelease -> buildEpisodeFolderStructure(tvRelease);
+                case MovieRelease movieRelease -> buildMovieFolderStructure(movieRelease);
+            };
+        } else {
+            return release.fileNameOrName;
+        }
+    }
 
-        folder = folder.replace(SerieStructureTag.SHOW_NAME.label, getShowName(tvRelease.name))
+    private String buildEpisodeFolderStructure(TvRelease tvRelease) {
+        String structure = this.structure;
+
+        structure = structure.replace(SerieStructureTag.SHOW_NAME.label, getShowName(tvRelease.name))
             .removeIllegalWindowsChars();
         // order is important!
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
-        folder = replaceFormattedEpisodeNumber(folder, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes, false);
-        folder = replace(folder, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
-        folder = replace(folder, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
-        folder = replace(folder, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
-        folder = replace(folder, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
-        folder = replace(folder, SerieStructureTag.TITLE, tvRelease.title);
-        folder = replace(folder, SerieStructureTag.QUALITY, tvRelease.quality);
-        folder = replace(folder, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
+        structure = replaceFormattedEpisodeNumber(structure, SerieStructureTag.EPISODES_LONG, tvRelease.episodes, true);
+        structure =
+            replaceFormattedEpisodeNumber(structure, SerieStructureTag.EPISODES_SHORT, tvRelease.episodes, false);
+        structure = replace(structure, SerieStructureTag.SEASON_LONG, formatNumber(tvRelease.season, true));
+        structure = replace(structure, SerieStructureTag.SEASON_SHORT, formatNumber(tvRelease.season, false));
+        structure = replace(structure, SerieStructureTag.EPISODE_LONG, formatNumber(tvRelease.firstEpisode, true));
+        structure = replace(structure, SerieStructureTag.EPISODE_SHORT, formatNumber(tvRelease.firstEpisode, false));
+        structure = replace(structure, SerieStructureTag.TITLE, tvRelease.title);
+        structure = replace(structure, SerieStructureTag.QUALITY, tvRelease.quality);
+        structure = replace(structure, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
         if (replaceSpace) {
-            folder = folder.replace(' ', replacingSpaceChar);
+            structure = structure.replace(' ', replacingSpaceChar);
         }
-        folder = folder.trim();
-        return Paths.get("", folder.split(FolderStructureTag.SEPARATOR.label));
+        return structure.trim();
     }
 
-    private Path buildMovie(MovieRelease movieRelease) {
-        String folder = structure;
+    private String buildMovieFolderStructure(MovieRelease movieRelease) {
+        String structure = this.structure;
 
-        folder = replace(folder, MovieStructureTag.MOVIE_TITLE, movieRelease.name.removeIllegalWindowsChars());
-        folder = replace(folder, MovieStructureTag.YEAR, Integer.toString(movieRelease.year));
-        folder = replace(folder, MovieStructureTag.QUALITY, movieRelease.quality);
+        structure = replace(structure, MovieStructureTag.MOVIE_TITLE, movieRelease.name.removeIllegalWindowsChars());
+        structure = replace(structure, MovieStructureTag.YEAR, Integer.toString(movieRelease.year));
+        structure = replace(structure, MovieStructureTag.QUALITY, movieRelease.quality);
         if (replaceSpace) {
-            folder = folder.replace(' ', replacingSpaceChar);
+            structure = structure.replace(' ', replacingSpaceChar);
         }
-        folder = folder.trim();
-        return Paths.get("", folder.split(FolderStructureTag.SEPARATOR.label));
+        return structure.trim();
     }
 }

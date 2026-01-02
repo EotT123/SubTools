@@ -3,6 +3,7 @@ package org.lodder.subtools.sublibrary;
 import java.util.Locale;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * helper class to check the operating system this Java VM runs in
@@ -13,10 +14,12 @@ import manifold.ext.props.rt.api.val;
  * http://svn.terracotta.org/svn/tc/dso/tags/2.6.4/code/base/common/src/com/tc/util/runtime/Os.java
  * http://www.docjar.com/html/api/org/apache/commons/lang/SystemUtils.java.html
  */
+@NullMarked
 public final class OsCheck {
     /**
      * types of Operating Systems
      */
+    @NullMarked
     public enum OSType {
         WINDOWS, MAC, LINUX, OTHER
     }

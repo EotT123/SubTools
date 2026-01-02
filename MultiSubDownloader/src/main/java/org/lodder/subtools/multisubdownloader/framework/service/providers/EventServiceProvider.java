@@ -2,11 +2,13 @@ package org.lodder.subtools.multisubdownloader.framework.service.providers;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
+@NullMarked
 public class EventServiceProvider implements ServiceProvider {
 
     @val @override int priority = 0;

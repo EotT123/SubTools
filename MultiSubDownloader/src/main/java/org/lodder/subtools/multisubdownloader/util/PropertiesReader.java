@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PropertiesReader {
 
     private static PropertiesReader propertiesReaderInstance;
@@ -33,6 +35,7 @@ public class PropertiesReader {
         return PropertiesReader.getPropertiesReader().properties.getProperty(property.value);
     }
 
+    @NullMarked
     public enum PomProperty {
         BUILD_TIMESTAMP("build.timestamp");
 

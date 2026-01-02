@@ -9,11 +9,13 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import extensions.org.codehaus.plexus.components.interactivity.Prompter.PrompterExt;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandlerCLI
     implements UserInteractionHandler {
 
@@ -24,10 +26,10 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
     @Override
     public List<Subtitle> selectSubtitles(Release release) {
         System.out.printf("\n%s : %s%n", getText("SelectDialog.SelectCorrectSubtitleThisRelease"),
-            release.fileName);
+            release.fileNameOrName);
         return PrompterExt.promptValuesFromList(prompter,
             getText("SelectDialog.EnterListSelectedSubtitles"),
-            release.getMatchingSubs(),
+            release.matchingSubs,
             Subtitle::getFileName,
             true,
             createTableDisplayer(),
@@ -42,7 +44,7 @@ public class UserInteractionHandlerCLI extends org.lodder.subtools.sublibrary.us
 
     @Override
     public void dryRunOutput(Release release) {
-        createTableDisplayer().display(release.getMatchingSubs());
+        createTableDisplayer().display(release.matchingSubs);
     }
 
     private PrompterExt.TableDisplayer<Subtitle> createTableDisplayer() {

@@ -4,9 +4,12 @@ package org.lodder.subtools.sublibrary.xml;
 import java.text.Normalizer;
 import java.util.HashMap;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <a href="http://www.rgagnon.com/javadetails/java-0307.html">Source</a>
  */
+@NullMarked
 public class StringUtils {
     private StringUtils() {
     }

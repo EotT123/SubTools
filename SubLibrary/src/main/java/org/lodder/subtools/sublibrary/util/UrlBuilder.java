@@ -3,6 +3,9 @@ package org.lodder.subtools.sublibrary.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class UrlBuilder {
     private final String baseUrl;
     private final List<String> params = new ArrayList<>();

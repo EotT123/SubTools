@@ -2,6 +2,9 @@ package org.lodder.subtools.multisubdownloader.exceptions;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class CliException extends Exception {
 
     @Serial

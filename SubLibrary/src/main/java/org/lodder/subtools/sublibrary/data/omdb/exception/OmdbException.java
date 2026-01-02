@@ -2,6 +2,10 @@ package org.lodder.subtools.sublibrary.data.omdb.exception;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class OmdbException extends Exception {
 
     @Serial
@@ -11,7 +15,7 @@ public class OmdbException extends Exception {
         super(message);
     }
 
-    public OmdbException(String message, Throwable cause) {
+    public OmdbException(String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 

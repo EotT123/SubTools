@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.Serial;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
@@ -17,6 +18,7 @@ import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.model.Release;
 
+@NullMarked
 public class SearchProgressDialog extends MultiSubDialog implements SearchProgressListener {
 
     @Serial
@@ -61,9 +63,15 @@ public class SearchProgressDialog extends MultiSubDialog implements SearchProgre
     @Override
     public void progress(SubtitleProvider provider, int jobsLeft, Release release) {
         this.setVisible();
-        this.tableModel.update(provider.subtitleProviderFrontEnd.name, jobsLeft, release == null ? "Done" :
-            release.fileName);
+        this.tableModel.update(provider.subtitleProviderFrontEnd.name, jobsLeft, release.fileNameOrName);
     }
+
+    @Override
+    public void done(SubtitleProvider provider) {
+        this.setVisible();
+        this.tableModel.update(provider.subtitleProviderFrontEnd.name, 0, "Done");
+    }
+
 
     @Override
     public void progress(int progress) {

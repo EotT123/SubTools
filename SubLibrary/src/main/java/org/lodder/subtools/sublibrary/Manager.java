@@ -3,7 +3,6 @@ package org.lodder.subtools.sublibrary;
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -32,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCache;
@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+@NullMarked
 public class Manager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
@@ -66,7 +67,7 @@ public class Manager {
     }
 
     public void downloadAndExtractFile(String downloadLink, Path file,
-        ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
+        @Nullable ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
         try {
             httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file, validateFunction);
             if (!Files.exists(file)) {
@@ -93,6 +94,7 @@ public class Manager {
         return new PostBuilder(httpClient, url, userAgent);
     }
 
+    @NullMarked
     public static class PostBuilder {
         @val HttpClient httpClient;
         @val String url;
@@ -123,7 +125,6 @@ public class Manager {
         public org.jsoup.nodes.Document postAsJsoupDocument() throws ManagerException {
             return Jsoup.parse(post());
         }
-
     }
 
     // ================ \\
@@ -146,12 +147,11 @@ public class Manager {
 
     public @Nullable Document getAsDocument(PageContentParams params,
         @Nullable Predicate<String> emptyResultPredicate=null)
-        throws ParserConfigurationException, ManagerException, IOException {
-        Optional<String> asStringDocument = getAsStringDocument(params, emptyResultPredicate);
-        return asStringDocument.isPresent() ? XMLHelper.getDocument(asStringDocument.get()) : null;
+        throws ManagerException, IOException {
+        return getAsStringDocument(params, emptyResultPredicate).mapEx(XMLHelper::getDocument).orElse(null);
     }
 
-    public org.jsoup.nodes.Document getAsJsoupDocument(PageContentParams params,
+    public org.jsoup.nodes.@Nullable Document getAsJsoupDocument(PageContentParams params,
         @Nullable Predicate<String> emptyResultPredicate=null) throws ManagerException {
         return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
     }
@@ -186,7 +186,7 @@ public class Manager {
     }
 
     private String getContentWithoutCache(String url, String userAgent, Retry retry,
-        CookieManager cookieManager) throws ManagerException {
+        @Nullable CookieManager cookieManager) throws ManagerException {
         try {
             return httpClient.doGet(new URI(url).toURL(), userAgent, cookieManager);
         } catch (HttpClientException e) {
@@ -206,9 +206,10 @@ public class Manager {
         }
     }
 
+    @NullMarked
     public record Retry(int retries, Predicate<Exception> predicate, Time waitTime) {
 
-        public static final Retry NONE = new Retry(0, null, 0Second);
+        public static final Retry NONE = new Retry(0, _ -> false, 0Second);
 
         public Retry {
             if (retries < 0) {
@@ -231,7 +232,7 @@ public class Manager {
     }
 
     public <V> List<Pair<ProviderCacheKey, V>> getEntries(CacheType cacheType,
-        @Nullable Predicate<ProviderCacheKey> keyFilter, Class<V> type=null) {
+        Predicate<ProviderCacheKey> keyFilter, @Nullable Class<V> type=null) {
         return getCache(cacheType, keyFilter).getEntries(type);
     }
 
@@ -240,6 +241,7 @@ public class Manager {
     // CACHE METHODS \\
     // ============= \\
 
+    @NullMarked
     public record CacheKey(Manager manager, CacheType cacheType, ProviderCacheKey key) {
 
         public boolean isPresent() {
@@ -260,15 +262,15 @@ public class Manager {
 
         public Optional<Time> getTemporaryTimeToLive() {
             return manager.getOptionalCache(cacheType).map(cache -> cache.getTemporaryTimeToLive(key))
-                .orElseGet(() -> Optional.of(0Second));
+                .orElseGet(() -> Optional.of(0 Second));
         }
 
         public void remove() {
             manager.getCache(cacheType).remove(key);
         }
 
-        public <V, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
-            Retry retry=Retry.NONE, Time timeToLive=null) throws X {
+        public <V extends @Nullable Object, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
+            @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
             ProviderCache<V> cache = manager.getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
                 return cache.get(key).orElseThrow();
@@ -329,8 +331,8 @@ public class Manager {
             return optionalCache.flatMap(cache -> (Optional<V>) cache.get(key));
         }
 
-        public <V, X extends Exception> Optional<V> getOptional(
-            ThrowingSupplier<Optional<V>, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
+        public <V extends @Nullable Object, X extends Exception> Optional<V> getOptional(
+            ThrowingSupplier<Optional<V>, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
             boolean storeTempNullValue=false) throws X {
             Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
 
@@ -338,7 +340,7 @@ public class Manager {
                 ProviderCache<V> cache = optionalCache.get();
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
-                    store(Value.ofOptional(supplier), retry, storeTempNullValue, timeToLive);
+                    store(Value.ofOptional(supplier), storeTempNullValue, timeToLive, retry);
                     return cache.get(key);
                 } else if (containsKey && !isExpiredTemporary()) {
                     return cache.get(key);
@@ -371,13 +373,13 @@ public class Manager {
         }
 
         public <X extends Exception> OptionalInt getOptionalInt(
-            ThrowingSupplier<OptionalInt, X> supplier, Retry retry=Retry.NONE, @Nullable Time timeToLive=null,
+            ThrowingSupplier<OptionalInt, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
             boolean storeTempNullValue=false) throws X {
 
             return manager.getOptionalCache(cacheType).mapEx(cache -> {
                 boolean containsKey = cache.contains(key);
                 if (!containsKey && storeTempNullValue) {
-                    store(Value.ofOptionalInt(supplier), retry, storeTempNullValue, timeToLive);
+                    store(Value.ofOptionalInt(supplier), storeTempNullValue, timeToLive, retry);
                     return cache.get(key).mapToIntEx(t -> (int) t);
                 } else if (containsKey && !isExpiredTemporary()) {
                     return cache.get(key).mapToIntEx(t -> (int) t);
@@ -386,8 +388,9 @@ public class Manager {
                         OptionalInt object = executeSupplier(supplier, retry);
                         object.ifPresentOrElse(v -> cache.put(key, v), () -> {
                             switch (cache) {
-                                case ProviderCacheDisk dCache -> dCache.putWithoutPersist(key, null);
-                                case ProviderCacheMemory mCache -> mCache.put(key, null);
+                                case ProviderCacheDisk<? extends @Nullable Object> dCache ->
+                                    dCache.putWithoutPersist(key, null);
+                                case ProviderCacheMemory<? extends @Nullable Object> mCache -> mCache.put(key, null);
                             }
                         });
                         return object;
@@ -407,20 +410,21 @@ public class Manager {
             }).orElseGetEx(supplier);
         }
 
-        public <V, X extends Exception> void store(Value<V, X> value,
-            Retry retry=Retry.NONE, boolean storeTempNullValue=false, @Nullable Time timeToLive=null) throws X {
+        public <V extends @Nullable Object, X extends Exception> void store(Value<V, X> value,
+            boolean storeTempNullValue=false, @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
 
             V object = value.getValue(retry);
-            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12hr) * 2 : timeToLive;
+            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
             manager.getCache(cacheType).put(key, object, ttl);
         }
 
         public <V, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
-            Time ttl = getTemporaryTimeToLive().orElse(1hr) * 2;
+            Time ttl = getTemporaryTimeToLive().orElse(1 hr) * 2;
             manager.getCache(cacheType).put(key, value.getValue(), ttl);
         }
     }
 
+    @NullMarked
     public record CacheKeyFilter(Manager manager, CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
         public void clearExpiredCache() {
             Time now = Time.now();
@@ -431,7 +435,7 @@ public class Manager {
             manager.getCache(cacheType).deleteEntries(keyFilter);
         }
 
-        public <V> List<Pair<ProviderCacheKey, V>> getEntries(Class<V> valueType=null) {
+        public <V> List<Pair<ProviderCacheKey, V>> getEntries(@Nullable Class<V> valueType=null) {
             Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
             return optionalCache.map(cache -> cache.getEntries(keyFilter)).orElseGet(List::of);
         }
@@ -442,7 +446,7 @@ public class Manager {
         return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
     }
 
-    private <V> Optional<ProviderCache<V>> getOptionalCache(CacheType cacheType) {
+    private <V> Optional<ProviderCache<@Nullable V>> getOptionalCache(CacheType cacheType) {
         return switch (cacheType) {
             case NONE -> Optional.empty();
             case MEMORY -> (Optional) Optional.of(inMemoryCache);
@@ -459,7 +463,8 @@ public class Manager {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public record Value<V, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
+    @NullMarked
+    public record Value<V extends @Nullable Object, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
         public static <V> Value<V, Nothing> of(V value) {
             return new Value<>(_ -> value);
         }
@@ -468,19 +473,21 @@ public class Manager {
             return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 
-        public static <V> Value<V, Nothing> ofOptional(Optional<V> value) {
-            return new Value<>(_ -> value.orElse(null));
+        public static <V extends @Nullable Object> Value<V, Nothing> ofOptional(Optional<V> value) {
+            return new Value<@Nullable V, Nothing>(_ -> value.orElse(null));
         }
 
-        public static <V, X extends Exception> Value<V, X> ofOptional(ThrowingSupplier<Optional<V>, X> supplier) {
-            return new Value<>(retry -> executeSupplier(supplier, retry).orElse(null));
+        public static <V extends @Nullable Object, X extends Exception> Value<V, X> ofOptional(
+            ThrowingSupplier<Optional<V>, X> supplier) {
+            return new Value<@Nullable V, X>(retry -> executeSupplier(supplier, retry).orElse(null));
         }
 
-        public static Value<Integer, Nothing> ofOptionalInt(OptionalInt value) {
+        public static Value<@Nullable Integer, Nothing> ofOptionalInt(OptionalInt value) {
             return ofOptional(() -> value.mapToObj(i -> i));
         }
 
-        public static <X extends Exception> Value<Integer, X> ofOptionalInt(ThrowingSupplier<OptionalInt, X> supplier) {
+        public static <X extends Exception> Value<@Nullable Integer, X> ofOptionalInt(
+            ThrowingSupplier<OptionalInt, X> supplier) {
             return ofOptional(() -> supplier.get().mapToObj(i -> i));
         }
 
@@ -493,11 +500,12 @@ public class Manager {
             return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 
-        public @Nullable V getValue(Retry retry=Retry.NONE) throws X {
+        public V getValue(Retry retry=Retry.NONE) throws X {
             return supplier.apply(retry);
         }
     }
 
+    @NullMarked
     public static class CacheKeyBuilder {
         @val String source;
         @val String operation;
@@ -514,12 +522,12 @@ public class Manager {
             this.operation = operation;
         }
 
-        public CacheKeyBuilder addIdParam(String name, Object value) {
+        public CacheKeyBuilder addIdParam(String name, @Nullable Object value) {
             idParams.add(new ProviderCacheKeyParam(name, value));
             return this;
         }
 
-        public CacheKeyBuilder add(String name, Object value) {
+        public CacheKeyBuilder add(String name, @Nullable Object value) {
             params.add(new ProviderCacheKeyParam(name, value));
             return this;
         }
@@ -541,7 +549,9 @@ public class Manager {
     // HELPER METHODS \\
     // ############## \\
 
-    private static <V, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier, Retry retry) throws X {
+    @SuppressWarnings("unchecked")
+    private static <V extends @Nullable Object, X extends Exception> V executeSupplier(ThrowingSupplier<V, X> supplier,
+        Retry retry) throws X {
         try {
             return supplier.get();
         } catch (Exception e) {

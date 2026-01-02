@@ -2,6 +2,9 @@ package org.lodder.subtools.sublibrary.data.imdb.exception;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ImdbException extends Exception {
 
     @Serial
@@ -18,5 +21,4 @@ public class ImdbException extends Exception {
     public ImdbException(Throwable cause) {
         super(cause);
     }
-
 }

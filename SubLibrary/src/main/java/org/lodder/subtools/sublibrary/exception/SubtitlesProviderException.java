@@ -3,7 +3,10 @@ package org.lodder.subtools.sublibrary.exception;
 import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class SubtitlesProviderException extends Exception {
 
     @Serial
@@ -19,7 +22,7 @@ public abstract class SubtitlesProviderException extends Exception {
         super(cause);
     }
 
-    protected SubtitlesProviderException(String message, Throwable cause) {
+    protected SubtitlesProviderException(String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 }

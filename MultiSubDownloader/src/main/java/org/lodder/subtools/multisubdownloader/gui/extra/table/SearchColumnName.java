@@ -7,8 +7,10 @@ import java.util.stream.Collectors;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 
+@NullMarked
 public enum SearchColumnName implements CustomColumnName {
 
     RELEASE("App.Release", String.class, false),
@@ -18,7 +20,6 @@ public enum SearchColumnName implements CustomColumnName {
     OBJECT("App.EpisodeObject", Object.class, false),
     SEASON("App.Season", String.class, false),
     EPISODE("App.Episode", String.class, false),
-    TYPE("SearchColumnName.Type", String.class, false),
     TITLE("SearchColumnName.Title", String.class, false),
     SOURCE("SearchColumnName.Source", String.class, false),
     SCORE("SearchColumnName.Score", Integer.class, false);

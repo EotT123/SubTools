@@ -3,9 +3,12 @@ package org.lodder.subtools.multisubdownloader.gui.extra.table;
 import java.awt.*;
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A JTable that draws a zebra striped background.
  */
+@NullMarked
 public class ZebraJTable extends javax.swing.JTable {
 
     @Serial

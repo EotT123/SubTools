@@ -3,16 +3,20 @@ package org.lodder.subtools.sublibrary.cache;
 import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class LRUMap<K, V> extends LinkedHashMap<K, V> {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class LRUMap<K, V extends @Nullable Object> extends LinkedHashMap<K, V> {
+    @Serial private static final long serialVersionUID = 1L;
     private final int maxItems;
 
     public LRUMap(int maxItems) {
+        if (maxItems <= 0) {
+            throw new IllegalArgumentException("maxItems must be positive");
+        }
         this.maxItems = maxItems;
     }
 
@@ -22,12 +26,12 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
     }
 
     @Override
-    public int hashCode() {
-        return maxItems + super.hashCode();
+    public boolean equals(Object o) {
+        return this == o || (o instanceof LRUMap lruMap && super.equals(lruMap) && maxItems == lruMap.maxItems);
     }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof LRUMap map && this.maxItems == map.maxItems && super.equals(map);
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), maxItems);
     }
 }

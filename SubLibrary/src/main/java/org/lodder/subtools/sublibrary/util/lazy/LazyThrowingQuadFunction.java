@@ -1,15 +1,16 @@
 package org.lodder.subtools.sublibrary.util.lazy;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingQuadFunction;
 
-public class LazyThrowingQuadFunction<T, U, V, W, R, X extends Exception> {
+@NullMarked
+public class LazyThrowingQuadFunction<T extends @Nullable Object, U extends @Nullable Object,
+    V extends @Nullable Object, W extends @Nullable Object, R extends @Nullable Object, X extends Exception> {
 
     private final Object lock = new Object();
-
     private final ThrowingQuadFunction<T, U, V, W, R, X> function;
-
     private R object;
-
     private volatile boolean initialized = false;
 
     public LazyThrowingQuadFunction(ThrowingQuadFunction<T, U, V, W, R, X> function) {
@@ -26,10 +27,6 @@ public class LazyThrowingQuadFunction<T, U, V, W, R, X extends Exception> {
             }
         }
         return object;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
     }
 
     public void reset() {

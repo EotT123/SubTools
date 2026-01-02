@@ -7,9 +7,11 @@ import javax.swing.*;
 import java.io.Serial;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public abstract sealed class InputPanel extends JPanel permits SearchFileInputPanel, SearchTextInputPanel {
 
     @Serial

@@ -1,5 +1,8 @@
 package org.lodder.subtools.sublibrary.util.throwingfunction;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 final class SneakyThrowUtil {
 
     private SneakyThrowUtil() {

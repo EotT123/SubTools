@@ -5,8 +5,10 @@ import javax.swing.*;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class JTextFieldExt {
 
     private JTextFieldExt() {

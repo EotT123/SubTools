@@ -17,13 +17,11 @@ public class VideoPatterns {
     }
 
     @NullMarked
-    public interface RegexPattern {
+    public sealed interface RegexPattern {
         @val Pattern pattern;
         @val String value;
 
-        default String getRegex() {
-            return pattern.pattern();
-        }
+        @val String regex = pattern.pattern();
     }
 
     @NullMarked
@@ -47,13 +45,12 @@ public class VideoPatterns {
         public static @Nullable Quality fromValue(@Nullable String value) {
             return value == null ? null : Quality.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
     }
 
     @NullMarked
-    public enum VideoEncoding implements RegexPattern {
+    public enum VideoEncoding implements VideoPatterns.RegexPattern {
         X264("x264", "[xh][_|-|\\.]?264"),
         X265("x265", "[xh][_|-|\\.]?265|hevc");
 
@@ -68,8 +65,7 @@ public class VideoPatterns {
         public static @Nullable VideoEncoding fromValue(@Nullable String value) {
             return value == null ? null : VideoEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
     }
 
@@ -95,8 +91,7 @@ public class VideoPatterns {
         public static @Nullable AudioEncoding fromValue(@Nullable String value) {
             return value == null ? null : AudioEncoding.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
     }
 
@@ -134,8 +129,7 @@ public class VideoPatterns {
         public static @Nullable Source fromValue(@Nullable String value) {
             return value == null ? null : Source.values().stream()
                 .filter(v -> v.pattern.matcher(value).find())
-                .findAny()
-                .orElse(null);
+                .findAny().orElse(null);
         }
 
         public boolean isTypeForValue(String value) {

@@ -7,8 +7,8 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 
 class GroupReplacerTest {
 
@@ -21,7 +21,7 @@ class GroupReplacerTest {
 
     @Test
     void test_it_replaces_the_keyword_group_to_a_releasename() {
-        Release release = mock(TvRelease.class);
+        ReleaseWithoutPath release = mock(TvReleaseWithoutPath.class);
         when(release.releaseGroup).thenReturn("Acme");
 
         HashMap<String, Integer> definedWeights = new HashMap<>();
@@ -38,7 +38,7 @@ class GroupReplacerTest {
 
     @Test
     void testEmptyWeights() {
-        Release release = mock(TvRelease.class);
+        ReleaseWithoutPath release = mock(TvReleaseWithoutPath.class);
         when(release.releaseGroup).thenReturn("Acme");
 
         HashMap<String, Integer> definedWeights = new HashMap<>();

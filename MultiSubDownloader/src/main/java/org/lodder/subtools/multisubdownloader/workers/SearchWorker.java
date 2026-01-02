@@ -7,6 +7,7 @@ import java.util.Set;
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
@@ -15,6 +16,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class SearchWorker extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
@@ -54,7 +56,7 @@ public class SearchWorker extends Thread {
 
                 this.busy = false;
                 LOGGER.debug("[Search] {} found {} subtitles for {} ", this.provider.provider, subtitles.size(),
-                        release);
+                    release);
 
                 if (!this.isInterrupted()) {
                     this.scheduler.onCompleted(this);

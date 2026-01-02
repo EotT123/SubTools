@@ -1,7 +1,9 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class ScoreCalculator {
 
     private final SortWeight weights;

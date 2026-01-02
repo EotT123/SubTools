@@ -11,6 +11,7 @@ import java.util.Set;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -21,16 +22,18 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
-import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class Local implements SubtitleProvider<LocalSubtitle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
@@ -63,7 +66,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 ReleaseParser.parse(fileSub).stream()
-                    .filterCast(TvRelease.class)
+                    .filterCast(TvReleaseWithoutPath.class)
                     .filter(release -> release.season == tvRelease.season)
                     .filter(release -> release.episodes.containsAll(tvRelease.episodes))
                     .mapEx(tvReleaseControl::process)
@@ -76,7 +79,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
                             .orElseGet(() -> new LocalSubtitle(fileSub, language,
                                 ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
                                 ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true)))));
-            } catch (ReleaseParseException | ReleaseControlException e) {
+            } catch (ReleaseControlException e) {
                 LOGGER.error(e.getMessage(), LOGGER.isDebugEnabled() ? e : null);
             }
         }
@@ -94,7 +97,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 ReleaseParser.parse(fileSub).stream()
-                    .filterCast(MovieRelease.class)
+                    .filterCast(MovieReleaseWithPath.class)
                     .mapEx(movieCtrl::process)
                     .filter(release -> release.hasSameId(movieRelease, ProviderIdType.IMDB))
                     .filter(_ -> DetectLanguage.execute(fileSub) == language)
@@ -105,7 +108,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
                             .orElseGet(() -> new LocalSubtitle(fileSub, language,
                                 ReleaseParser.getQualityKeyword(fileSub.fileNameAsString),
                                 ReleaseParser.extractReleaseGroup(fileSub.fileNameAsString, true)))));
-            } catch (ReleaseParseException | ReleaseControlException e) {
+            } catch (ReleaseControlException e) {
                 LOGGER.error(e.getMessage(), LOGGER.isDebugEnabled() ? e : null);
             }
         }

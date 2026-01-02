@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
+import static java.util.Objects.*;
+
 import java.awt.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,8 +13,9 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.val;
-import manifold.ext.rt.api.Self;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PathOrRegex implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -61,12 +64,15 @@ public class PathOrRegex implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value);
+    public boolean equals(Object o) {
+        return this == o || (o instanceof PathOrRegex that
+            && Objects.equals(value, that.value)
+            && Objects.equals(image, that.image)
+            && Objects.equals(isExcludedPathPredicate, that.isExcludedPathPredicate));
     }
 
     @Override
-    public boolean equals(@Self Object obj) {
-        return obj instanceof PathOrRegex other && Objects.equals(value, other.value);
+    public int hashCode() {
+        return hash(value, image, isExcludedPathPredicate);
     }
 }

@@ -7,7 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class SeasonEpisode {
 
     private static final Pattern SEASON_EPISODE_PATTERN_1 = Pattern.compile("S(\\d{1,2})E(\\d{1,2})");

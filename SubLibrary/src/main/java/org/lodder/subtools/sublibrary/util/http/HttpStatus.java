@@ -3,7 +3,9 @@ package org.lodder.subtools.sublibrary.util.http;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status.Family;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public enum  HttpStatus {
     // 1xx Informational
     CONTINUE(100, "Continue: The client should continue with its request."),

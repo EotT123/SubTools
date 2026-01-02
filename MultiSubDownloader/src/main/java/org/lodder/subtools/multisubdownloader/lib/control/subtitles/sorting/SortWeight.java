@@ -11,11 +11,13 @@ import java.util.regex.Pattern;
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.GroupReplacer;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.KeywordReplacer;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
 
+@NullMarked
 public class SortWeight {
 
     private static final List<KeywordReplacer> KEYWORD_REPLACERS = List.of(new GroupReplacer());

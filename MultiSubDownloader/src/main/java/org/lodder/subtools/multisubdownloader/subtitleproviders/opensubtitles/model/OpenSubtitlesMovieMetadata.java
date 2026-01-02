@@ -1,10 +1,14 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model;
 
+import static java.util.Objects.*;
+
 import java.util.Objects;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OpenSubtitlesMovieMetadata {
 
     @var String name;
@@ -22,14 +26,16 @@ public class OpenSubtitlesMovieMetadata {
     }
 
     @Override
-    public boolean equals(Object object) {
-        return object instanceof OpenSubtitlesMovieMetadata other
-                && imdbId == other.imdbId && year == other.year && name.equals(other.name);
+    public boolean equals(Object o) {
+        return this == o || (o instanceof OpenSubtitlesMovieMetadata that
+            && year == that.year
+            && imdbId == that.imdbId
+            && Objects.equals(name, that.name));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, year, imdbId);
+        return hash(name, year, imdbId);
     }
 
     @Override

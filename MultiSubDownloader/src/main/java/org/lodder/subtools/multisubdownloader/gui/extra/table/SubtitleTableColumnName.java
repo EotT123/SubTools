@@ -4,9 +4,11 @@ import java.util.function.Function;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public enum SubtitleTableColumnName implements CustomColumnName {
     SELECT("App.Select", Boolean.class, true, _ -> false),
     SCORE("SubtitleTableColumnName.Score", Integer.class, false, Subtitle::getScore),

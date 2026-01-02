@@ -3,9 +3,10 @@ package org.lodder.subtools.sublibrary.assertions;
 import static org.assertj.core.api.Assertions.*;
 
 import manifold.ext.rt.api.Self;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
-import org.lodder.subtools.sublibrary.model.VideoType;
 
+@NullMarked
 public class MovieReleaseAssert extends ReleaseAssert<MovieRelease> {
 
     public MovieReleaseAssert(MovieRelease actual) {
@@ -27,12 +28,6 @@ public class MovieReleaseAssert extends ReleaseAssert<MovieRelease> {
     public @Self MovieReleaseAssert hasName(String name) {
         isNotNull();
         assertThat(actual.name).isEqualTo(name);
-        return this;
-    }
-
-    public @Self MovieReleaseAssert hasMovieVideoType() {
-        isNotNull();
-        assertThat(actual.videoType).isEqualTo(VideoType.MOVIE);
         return this;
     }
 }

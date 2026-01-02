@@ -16,6 +16,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import com.google.gson.GsonBuilder;
 import io.gsonfire.GsonFireBuilder;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -30,6 +31,7 @@ import org.lodder.subtools.sublibrary.util.filefilter.ExtensionFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.JsonFileFilter;
 import org.lodder.subtools.sublibrary.util.filefilter.XmlFileFilter;
 
+@NullMarked
 public class ExportImport {
 
     private final Manager manager;
@@ -45,6 +47,7 @@ public class ExportImport {
         this.parent = parent;
     }
 
+    @NullMarked
     public enum SettingsType {
         PREFERENCES(FileType.XML), SERIE_MAPPING(FileType.JSON);
 
@@ -55,6 +58,7 @@ public class ExportImport {
         }
     }
 
+    @NullMarked
     private enum FileType {
         XML(".xml", new XmlFileFilter()), JSON(".json", new JsonFileFilter());
 
@@ -109,6 +113,7 @@ public class ExportImport {
             });
     }
 
+    @NullMarked
     public static class ExportImportPreferences {
 
         private ExportImportPreferences() {
@@ -129,6 +134,7 @@ public class ExportImport {
         }
     }
 
+    @NullMarked
     public static class ExportImportSerieMapping {
 
         private ExportImportSerieMapping() {
@@ -171,6 +177,7 @@ public class ExportImport {
                 });
         }
 
+        @NullMarked
         private record SerieMappingWithKey(ProviderCacheKey key, SerieMapping serieMapping) {
         }
     }
@@ -188,10 +195,12 @@ public class ExportImport {
         }
     }
 
+    @NullMarked
     private enum ImportStyle {
         OVERWRITE, APPEND
     }
 
+    @NullMarked
     public static class CorruptSettingsFileException extends Exception {
         public CorruptSettingsFileException(Throwable cause) {
             super(cause);

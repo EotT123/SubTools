@@ -3,9 +3,11 @@ package extensions.org.apache.commons.cli.CommandLine;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.apache.commons.cli.CommandLine;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
 
 @Extension
+@NullMarked
 public class CommandLineExt {
 
     private CommandLineExt() {

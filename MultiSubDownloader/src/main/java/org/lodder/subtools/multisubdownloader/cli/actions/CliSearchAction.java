@@ -8,6 +8,7 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.CLI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -22,12 +23,13 @@ import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CliSearchAction extends SearchAction {
+@NullMarked
+public class CliSearchAction extends SearchAction<ReleaseWithPath> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CliSearchAction.class);
 
@@ -65,7 +67,7 @@ public class CliSearchAction extends SearchAction {
     }
 
     @Override
-    protected List<Release> createReleases() {
+    protected List<ReleaseWithPath> createReleases() {
         fileListAction.indexingProgressListener = this.indexingProgressListener;
 
         List<Path> files = this.folders.stream()
@@ -85,7 +87,7 @@ public class CliSearchAction extends SearchAction {
         System.out.println(Messages.getText("CliSearchAction.ParsingFoundFiles"));
         this.indexingProgressListener.progress(progress);
 
-        List<Release> releases = new ArrayList<>();
+        List<ReleaseWithPath> releases = new ArrayList<>();
         for (Path file : files) {
             index++;
             progress = (int) Math.floor((float) index / total * 100);
@@ -103,7 +105,7 @@ public class CliSearchAction extends SearchAction {
     }
 
     @Override
-    public void onFound(Release release, List<Subtitle> subtitles) {
+    public void onFound(ReleaseWithPath release, List<Subtitle> subtitles) {
         subtitles.stream()
             .filter(subtitle -> filtering.useSubtitle(subtitle, release))
             .forEach(release::addMatchingSub);

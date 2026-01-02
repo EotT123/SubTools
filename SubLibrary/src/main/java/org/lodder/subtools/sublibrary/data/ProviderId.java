@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.data;
 
+import static java.util.Objects.*;
 import static org.lodder.subtools.sublibrary.xml.StringUtils.*;
 
 import java.io.Serial;
@@ -8,7 +9,9 @@ import java.util.Objects;
 
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ProviderId implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -21,23 +24,22 @@ public class ProviderId implements Serializable {
     }
 
     public static int calculateLevenshteinDistance(String name, String otherName) {
-        return new LevenshteinDistance(100).apply(normalize(name.keepLettersOnly()),
-            normalize(otherName.keepLettersOnly()));
+        return new LevenshteinDistance(100).apply(normalize(requireNonNull(name.keepLettersOnly())),
+            normalize(requireNonNull(otherName.keepLettersOnly())));
     }
 
     public int calculateLevenshteinDistance(String name) {
         return calculateLevenshteinDistance(name, this.name);
     }
 
-    @Override public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProviderId that = (ProviderId) o;
-        return Objects.equals(name, that.name) && Objects.equals(id, that.id);
+    @Override
+    public boolean equals(Object o) {
+        return this == o || (o instanceof ProviderId that
+            && Objects.equals(name, that.name) && Objects.equals(id, that.id));
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(name, id);
     }
 }

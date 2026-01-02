@@ -6,11 +6,13 @@ import java.nio.file.StandardCopyOption;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CleanAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanAction.class);
@@ -23,13 +25,13 @@ public class CleanAction {
         this.librarySettings = librarySettings;
     }
 
-    public void cleanUpFiles(Release release, Path destination, String videoFileName) throws IOException {
+    public void cleanUpFiles(ReleaseWithPath release, Path destination, String videoFileName) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryOtherFileAction {}", librarySettings.otherFileAction);
         if (!destination.isDirectory()) {
             throw new IllegalArgumentException("Destination [%s] is not a folder".formatted(destination));
         }
 
-        release.getPath().list()
+        release.path.list()
             .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
                 || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
             .forEachEx(p -> {

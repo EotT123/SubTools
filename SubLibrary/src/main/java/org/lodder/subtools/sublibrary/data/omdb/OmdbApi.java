@@ -11,10 +11,13 @@ import Omdb.Release;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.json.rt.api.Requester;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbApiException;
 
+@NullMarked
 class OmdbApi implements ApiIntf {
 
     private static final String API_KEY = "74473b06";
@@ -31,7 +34,7 @@ class OmdbApi implements ApiIntf {
             .getOptional(() -> search(req -> req.withParam(IMDB_ID, imdbId)));
     }
 
-    public Optional<Release> searchMovie(String title, Integer year=null) throws OmdbApiException {
+    public Optional<Release> searchMovie(String title, @Nullable Integer year=null) throws OmdbApiException {
         return getCache("movie", b -> b.add("title", title).add("year", year))
             .getOptional(
                 () -> search(req -> req.withParam(TITLE, title.replace(" ", "+")).withParam(RESULT_TYPE, MOVIE)));
@@ -59,6 +62,7 @@ class OmdbApi implements ApiIntf {
     /* API PARAMETERS */
     /*----------------*/
 
+    @NullMarked
     private static class RequesterWrapper<T> {
 
         @val Requester<T> requester;
@@ -77,14 +81,17 @@ class OmdbApi implements ApiIntf {
         }
     }
 
+    @NullMarked
     private interface SearchParamIntf {
         @val String value;
     }
 
+    @NullMarked
     private interface ParamIntf {
         @val String value;
     }
 
+    @NullMarked
     enum SearchParamCommon implements SearchParamIntf {
         TITLE("t"),
         RESULT_TYPE("type"),
@@ -100,6 +107,7 @@ class OmdbApi implements ApiIntf {
         }
     }
 
+    @NullMarked
     enum SearchParamByIdTitle implements SearchParamIntf {
         IMDB_ID("i"),
         PLOT("plot");
@@ -111,6 +119,7 @@ class OmdbApi implements ApiIntf {
         }
     }
 
+    @NullMarked
     enum SearchParamBySearch implements SearchParamIntf {
         PAGE("page");
 
@@ -121,6 +130,7 @@ class OmdbApi implements ApiIntf {
         }
     }
 
+    @NullMarked
     enum ParamType implements ParamIntf {
         MOVIE("movie"), SERIE("series"), EPISODE("episode");
 
@@ -131,6 +141,7 @@ class OmdbApi implements ApiIntf {
         }
     }
 
+    @NullMarked
     enum ParamPlot implements ParamIntf {
         SHORT("short"), FULL("full");
 
@@ -141,6 +152,7 @@ class OmdbApi implements ApiIntf {
         }
     }
 
+    @NullMarked
     enum ParamDataReturnType implements ParamIntf {
         JSON("json"), XML("xml");
 

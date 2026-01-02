@@ -1,29 +1,16 @@
 package org.lodder.subtools.sublibrary.model;
 
-import java.nio.file.Path;
-
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class MovieRelease extends Release {
+public sealed interface MovieRelease extends Release permits MovieReleaseWithPath, MovieReleaseWithoutPath {
 
     @var @Nullable Integer year;
 
-    public MovieRelease(String name, @Nullable Path file=null, @Nullable String releaseGroup=null,
-        @Nullable String quality=null, @Nullable Integer year=null) {
-        super(name, VideoType.MOVIE, file, releaseGroup, quality);
-        this.year = year;
-    }
-
     @Override
-    public String toString() {
-        return "${getClass().getSimpleName()}: $name ${quality} ${releaseGroup}";
-    }
-
-    @Override
-    public String getReleaseDescription() {
-        return name;
+    default boolean isOfType(VideoType videoType) {
+        return videoType == VideoType.MOVIE;
     }
 }

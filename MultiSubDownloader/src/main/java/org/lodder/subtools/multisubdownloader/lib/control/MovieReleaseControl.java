@@ -1,18 +1,20 @@
 package org.lodder.subtools.multisubdownloader.lib.control;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.omdb.OmdbAdapter;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
-import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.ProviderIdType;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
+@NullMarked
+public final class MovieReleaseControl extends ReleaseControl<MovieReleaseWithoutPath> {
     private final OmdbAdapter omdbAdapter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieReleaseControl.class);
@@ -23,7 +25,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
     }
 
     @Override
-    public MovieRelease process(MovieRelease release) throws ReleaseControlException {
+    public MovieReleaseWithoutPath process(MovieReleaseWithoutPath release) throws ReleaseControlException {
         if (StringUtils.isBlank(release.name)) {
             throw new ReleaseControlException("Unable to extract title, check file", release);
         }
@@ -34,7 +36,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
         return release;
     }
 
-    private void setImdbId(MovieRelease release) {
+    private void setImdbId(MovieReleaseWithoutPath release) {
         release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchMovie(release.name)
             .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
         release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name, VideoType.MOVIE)
@@ -46,7 +48,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
         }
     }
 
-    private void setTvdbId(MovieRelease release) {
+    private void setTvdbId(MovieReleaseWithoutPath release) {
         release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
             .ifPresent(movie -> release.providerIds.add(ProviderIdType.TVDB, movie.id)));
         // TODO enable this, also use imdbId if present
@@ -54,7 +56,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieRelease> {
 //            .ifPresent(imdbDetails -> release.providerIds.add(ProviderIdType.TVDB, imdbDetails.tvdbId)));
     }
 
-    private void processInfo(MovieRelease release) {
+    private void processInfo(MovieReleaseWithoutPath release) {
         release.providerIds.getImdbId().ifPresentOrElse(
             imdbId -> imdbAdapter.getDetails(imdbId).ifPresent(details -> {
                 release.year = details.year;

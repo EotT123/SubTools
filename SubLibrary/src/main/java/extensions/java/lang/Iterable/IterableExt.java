@@ -9,8 +9,10 @@ import java.util.stream.StreamSupport;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class IterableExt {
 
     private IterableExt() {

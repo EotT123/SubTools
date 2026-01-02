@@ -7,8 +7,10 @@ import manifold.ext.rt.api.This;
 import manifold.science.measures.Time;
 import manifold.science.measures.TimeUnit;
 import manifold.science.util.Rational;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class TimeExt {
 
     public static boolean isPositive(@This Time time) {

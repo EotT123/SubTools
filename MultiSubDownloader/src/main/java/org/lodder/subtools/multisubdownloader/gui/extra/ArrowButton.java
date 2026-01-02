@@ -5,7 +5,9 @@ import java.awt.*;
 import java.io.Serial;
 
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ArrowButton extends JButton {
 
     @Serial private static final long serialVersionUID = 1L;

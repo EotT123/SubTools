@@ -14,12 +14,14 @@ import org.codehaus.plexus.components.interactivity.DefaultInputHandler;
 import org.codehaus.plexus.components.interactivity.DefaultOutputHandler;
 import org.codehaus.plexus.components.interactivity.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.Prompter;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.util.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class UserInteractionHandlerCLI implements UserInteractionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInteractionHandlerCLI.class);
     @val Prompter prompter = new DefaultPrompter(new DefaultOutputHandler(), new DefaultInputHandler());
@@ -30,8 +32,8 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     }
 
     @Override
-    public <T> Optional<T> selectFromList(Iterable<T> options, @Nullable String message, @Nullable String title,
-        @Nullable Function<T, String> toStringMapper) {
+    public <T> Optional<T> selectFromList(Iterable<T> options, String message, @Nullable String title,
+        Function<T, String> toStringMapper=String::valueOf) {
         // TODO use extension method
         return PrompterExt.promptValueFromList(prompter,
             message,
@@ -53,14 +55,14 @@ public class UserInteractionHandlerCLI implements UserInteractionHandler {
     public Optional<String> enter(String message, @Nullable String title,
         @Nullable List<Validator<String>> inputValidators) {
         // TODO use extension method
-        return PrompterExt.promptString(prompter, message, inputValidators:inputValidators);
+        return PrompterExt.promptString(prompter, message, inputValidators);
     }
 
     @Override
     public OptionalInt enterNumber(String title, String message,
         @Nullable List<Validator<Integer>> objectValidators) {
         // TODO use extension method
-        return PrompterExt.promptInt(prompter, message, objectValidators:objectValidators);
+        return PrompterExt.promptInt(prompter, message, null, null, objectValidators);
     }
 
     @Override

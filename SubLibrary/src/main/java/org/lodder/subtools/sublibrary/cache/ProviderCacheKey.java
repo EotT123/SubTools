@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class ProviderCacheKey extends ProviderCacheKeyCommon {
 
     private final List<ProviderCacheKeyParam> idParams;
@@ -27,18 +30,14 @@ public final class ProviderCacheKey extends ProviderCacheKeyCommon {
                     .toList()));
     }
 
-    @Override public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        ProviderCacheKey that = (ProviderCacheKey) o;
-        return Objects.equals(idParams, that.idParams) && Objects.equals(otherParams, that.otherParams);
+    @Override
+    public boolean equals(Object o) {
+        return this == o || (o instanceof ProviderCacheKey that
+            && Objects.equals(idParams, that.idParams) && Objects.equals(otherParams, that.otherParams));
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(super.hashCode(), idParams, otherParams);
     }
 }

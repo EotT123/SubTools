@@ -4,9 +4,11 @@ import java.io.Serial;
 import java.time.YearMonth;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 
+@NullMarked
 public class Addic7edMovieSubtitleId extends ProviderId {
 
     @Serial private static final long serialVersionUID = 1L;

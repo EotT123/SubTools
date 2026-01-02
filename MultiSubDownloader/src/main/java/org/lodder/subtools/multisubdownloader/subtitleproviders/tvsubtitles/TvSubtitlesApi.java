@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Api for retrieving serie information from tvsubtitles.net
  */
+@NullMarked
 public class TvSubtitlesApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
@@ -120,7 +121,8 @@ public class TvSubtitlesApi implements SubtitleApi {
                             Map<MetadataType, String> metadataMap =
                                 subtitleElement.select(".subtitle_grid > div").stream().gather(Gatherers.windowFixed(3))
                                     .map(values -> new Metadata(MetadataType.of(values.get(1).text()),
-                                        values.get(2).text())).filter(metadata -> metadata.metadataType != null)
+                                        values.get(2).text()))
+                                    .filter(metadata -> metadata.metadataType != null)
                                     .toMap(Metadata::metadataType, Metadata::value);
                             return new TVSubtitlesSubtitleMetadata(
                                 metadataMap.get(MetadataType.TITLE),
@@ -137,6 +139,7 @@ public class TvSubtitlesApi implements SubtitleApi {
             });
     }
 
+    @NullMarked
     private record Metadata(@Nullable MetadataType metadataType, String value) {
     }
 

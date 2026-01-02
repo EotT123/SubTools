@@ -7,7 +7,9 @@ import java.util.function.UnaryOperator;
 import io.gsonfire.annotations.PostDeserialize;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class ReleaseMapping implements Serializable {
 
     @Serial

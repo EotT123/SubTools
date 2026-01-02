@@ -2,6 +2,9 @@ package org.lodder.subtools.sublibrary.cache;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class ProviderCacheKeySub extends ProviderCacheKeyCommon {
 
     public ProviderCacheKeySub(String provider, String type, ProviderCacheKeyParam providerCacheKeyParam) {

@@ -3,8 +3,10 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import java.util.Optional;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public enum TVSubtitlesLanguage {
     ENGLISH(Language.ENGLISH, "en"),
     SPANISH(Language.SPANISH_CASTILIAN, "es"),

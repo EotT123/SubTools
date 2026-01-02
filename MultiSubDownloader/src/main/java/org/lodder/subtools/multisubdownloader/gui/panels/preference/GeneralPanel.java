@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
@@ -27,6 +28,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -154,16 +156,13 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 )
                 .addToPanel(proxyPanel)
                 .addComponent(new JLabel(getText("PreferenceDialog.Hostname")))
-                .addComponent("wrap",
-                    this.txtProxyHost = MyTextFieldString.builder().requireValue().build().columns(30))
+                .addComponent("wrap", this.txtProxyHost = new MyTextFieldString(true).columns(30))
                 .addComponent(new JLabel(getText("PreferenceDialog.Port")))
-                .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
+                .addComponent(this.txtProxyPort = new MyTextFieldInteger(true).columns(5));
         }
 
-        loadPreferenceSettings();
-    }
+        // loadPreferenceSettings
 
-    public void loadPreferenceSettings() {
         cbxLanguage.setSelectedItem(settingsCtrl.settings.language);
         defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.image, settingsCtrl.settings.defaultIncomingFolders);
         settingsCtrl.settings.excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));

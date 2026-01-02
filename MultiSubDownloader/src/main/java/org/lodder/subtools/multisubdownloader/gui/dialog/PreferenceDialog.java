@@ -3,11 +3,12 @@ package org.lodder.subtools.multisubdownloader.gui.dialog;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.Serial;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
 import org.lodder.subtools.multisubdownloader.framework.event.Event;
@@ -21,6 +22,7 @@ import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class PreferenceDialog extends MultiSubDialog {
 
     @Serial private static final long serialVersionUID = 1L;

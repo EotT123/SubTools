@@ -3,7 +3,9 @@ package org.lodder.subtools.multisubdownloader.settings.model;
 import java.awt.*;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public enum PathMatchType {
     FOLDER("/folder.png"),
     REGEX("/regex.gif"),

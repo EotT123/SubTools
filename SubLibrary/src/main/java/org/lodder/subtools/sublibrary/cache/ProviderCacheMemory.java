@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class ProviderCacheMemory<V> extends ProviderCache<V> {
+public final class ProviderCacheMemory<V extends @Nullable Object> extends ProviderCache<V> {
 
     @val(Protected) @Nullable Time timeToLive;
 
@@ -37,7 +37,7 @@ public final class ProviderCacheMemory<V> extends ProviderCache<V> {
         Thread t = new Thread(() -> {
             while (true) {
                 sleep(timerInterval);
-                cleanup((k, v) -> v.isExpired(timeToLive));
+                cleanup((_, v) -> v.isExpired(timeToLive));
             }
         });
 
@@ -45,6 +45,7 @@ public final class ProviderCacheMemory<V> extends ProviderCache<V> {
         t.start();
     }
 
+    @Override
     protected void removeFromCache(ProviderCacheKey key) {
         remove(key);
     }

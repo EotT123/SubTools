@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
@@ -13,28 +14,30 @@ import org.lodder.subtools.sublibrary.DetectLanguage;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RenameAction {
+@NullMarked
+public class MoveAndRenameAction {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RenameAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveAndRenameAction.class);
 
     private final LibrarySettings librarySettings;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public RenameAction(LibrarySettings librarySettings, Manager manager,
+    public MoveAndRenameAction(LibrarySettings librarySettings, Manager manager,
         UserInteractionHandler userInteractionHandler) {
         this.librarySettings = librarySettings;
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
     }
 
-    public void rename(Path f, Release release) {
+    public void moveAndRename(Path f, ReleaseWithPath release) {
         String filename = switch (librarySettings.action) {
-            case MOVE, NOTHING -> f.getFileNameAsString();
+            case MOVE, NOTHING -> f.fileNameAsString;
             case MOVE_AND_RENAME, RENAME -> getNewFilename(f, release);
         };
         LOGGER.trace("rename: filename [{}]", filename);
@@ -42,8 +45,8 @@ public class RenameAction {
 
         Path newDir = switch (librarySettings.action) {
             case MOVE, MOVE_AND_RENAME ->
-                PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
-            case RENAME, NOTHING -> release.getPath();
+                PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).buildPath(release);
+            case RENAME, NOTHING -> release.path;
         };
         if (!newDir.exists()) {
             LOGGER.debug("Creating dir [{}]", newDir.toAbsolutePath());
@@ -56,7 +59,7 @@ public class RenameAction {
         }
         LOGGER.trace("rename: newDir [{}]", newDir);
 
-        Path file = release.getPath().resolve(release.fileName);
+        Path file = release.path.resolve(release.fileName);
 
         try {
             if (librarySettings.hasLibraryAction(LibraryActionType.MOVE) ||
@@ -65,15 +68,15 @@ public class RenameAction {
                 file.moveToDirAndRename(newDir, filename);
             } else {
                 LOGGER.info("Moving [{}] to the library folder [{}] , this might take a while... ", filename,
-                    release.getPath());
-                file.moveToDirAndRename(release.getPath(), filename);
+                    release.path);
+                file.moveToDirAndRename(release.path, filename);
             }
             if (!librarySettings.hasLibraryOtherFileAction(LibraryOtherFileActionType.NOTHING)) {
                 new CleanAction(librarySettings).cleanUpFiles(release, newDir, filename);
             }
 
-            if (librarySettings.removeEmptyFolders && release.getPath().isEmptyDir()) {
-                Files.delete(release.getPath());
+            if (librarySettings.removeEmptyFolders && release.path.isEmptyDir()) {
+                Files.delete(release.path);
             }
         } catch (IOException e) {
             LOGGER.error("Unsuccessful in moving the file to the library", e);
@@ -83,8 +86,8 @@ public class RenameAction {
     private String getNewFilename(Path f, Release release) {
         FilenameLibraryBuilder filenameLibraryBuilder =
             FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
-        String filename = filenameLibraryBuilder.build(release).toString();
-        if (release.hasExtension("srt")) {
+        String filename = filenameLibraryBuilder.buildPathStructure(release);
+        if (release.fileNameOrName.endsWith(".srt")) {
             Language language = null;
             if (librarySettings.includeLanguageCode) {
                 language = DetectLanguage.execute(f);
@@ -92,7 +95,7 @@ public class RenameAction {
                     LOGGER.error("Unable to detect language, leaving language code blank");
                 }
             }
-            return filenameLibraryBuilder.buildSubtitle(release, filename, language, 0);
+            return filenameLibraryBuilder.buildSubtitle(release.fileNameOrName, filename, language, 0);
         }
         return filename;
     }

@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.cache.LRUMap;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -10,6 +11,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class ExactNameFilter extends SubtitleFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExactNameFilter.class);

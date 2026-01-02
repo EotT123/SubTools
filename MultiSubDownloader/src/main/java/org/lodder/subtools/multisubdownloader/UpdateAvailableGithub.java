@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
@@ -29,6 +30,7 @@ import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class UpdateAvailableGithub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);

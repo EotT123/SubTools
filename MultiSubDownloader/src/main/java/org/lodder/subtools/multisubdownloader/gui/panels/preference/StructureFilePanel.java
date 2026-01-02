@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
@@ -31,6 +32,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class StructureFilePanel extends JPanel {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -55,8 +57,7 @@ public class StructureFilePanel extends JPanel {
             .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Structure")).addTo(titlePanel, "shrink");
-        this.txtFileStructure =
-            MyTextFieldString.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+        this.txtFileStructure = new MyTextFieldString(true).columns(20).addTo(titlePanel, "grow");
         new JButton(getText("StructureBuilderDialog.Structure"))
             .actionListener(() -> {
                 StructureBuilderDialog sDialog =
@@ -100,7 +101,7 @@ public class StructureFilePanel extends JPanel {
                 int id = langId.getAndIncrement();
                 JComboBox<Language> cmbLanguage = new JComboBox<>(Language.values())
                     .toMessageStringRenderer(Language::getMsgCode).addTo(languagePanel);
-                MyTextFieldString txtLanguage = MyTextFieldString.builder().build().columns(20).addTo(languagePanel);
+                MyTextFieldString txtLanguage = new MyTextFieldString(true).columns(20).addTo(languagePanel);
                 JButton btnDelete = new JButton(getText("StructureFilePanel.Delete"))
                     .actionListenerSelf(delBtn -> {
                         languagePanel.remove(cmbLanguage);
@@ -126,6 +127,7 @@ public class StructureFilePanel extends JPanel {
         loadPreferenceSettings();
     }
 
+    @NullMarked
     private record LanguageComponents(JComboBox<Language> cmbLanguage, MyTextFieldString txtLanguage,
         JButton btnDelete) {
 
@@ -180,6 +182,7 @@ public class StructureFilePanel extends JPanel {
         librarySettings.langCodeMap = languageMapping.toSettingsMap();
     }
 
+    @NullMarked
     private static class LanguageMapping {
         private final Map<Integer, LanguageComponents> languageComponentsMap = new LinkedHashMap<>();
         private static final String DEFAULT_BORDER_PROPERTY = "DefaultBorder";

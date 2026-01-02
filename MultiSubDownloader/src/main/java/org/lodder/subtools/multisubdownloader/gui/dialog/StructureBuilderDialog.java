@@ -10,10 +10,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serial;
-import java.nio.file.Path;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryBuilder;
@@ -23,45 +23,43 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStru
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.model.MovieRelease;
-import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class StructureBuilderDialog extends MultiSubDialog implements DocumentListener {
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final VideoType videoType;
-    private final StructureType structureType;
-    private final UserInteractionHandler userInteractionHandler;
     private final Function<String, ? extends LibraryBuilder> libraryBuilder;
 
-    private JTextField txtStructure;
-    private JLabel lblPreview;
-    private TvRelease tvRelease;
-    private MovieRelease movieRelease;
+    private final JTextField txtStructure;
+    private final JLabel lblPreview;
+    private final ReleaseWithoutPath release;
+    private final JPanel tagPanel;
     private String oldStructure;
-    private JPanel tagPanel;
 
+    @NullMarked
     public enum StructureType {
-        FILE, FOLDER
+        FILE,
+        FOLDER
     }
 
     public StructureBuilderDialog(@Nullable JFrame frame=null, String title, boolean modal, VideoType videoType,
         StructureType structureType, Manager manager, UserInteractionHandler userInteractionHandler,
         Function<String, ? extends LibraryBuilder> filenameLibraryBuilder) {
         super(frame, title, modal);
-        this.videoType = videoType;
-        this.structureType = structureType;
-        this.userInteractionHandler = userInteractionHandler;
         this.libraryBuilder = filenameLibraryBuilder;
-        initializeUI();
-        generateVideoFiles(manager);
-    }
+        this.release = switch (videoType) {
+            case EPISODE -> new ReleaseFactory(new Settings(), manager).createRelease(
+                "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv", userInteractionHandler, false).orElseThrow();
+            case MOVIE -> new ReleaseFactory(new Settings(), manager).createRelease(
+                "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv", userInteractionHandler, false).orElseThrow();
+        };
 
-    private void initializeUI() {
+        // Initialize GUI
+
         setBounds(100, 100, 600, 300);
         setMinimumSize(new Dimension(600, 300));
 
@@ -102,18 +100,6 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         }
     }
 
-    private void generateVideoFiles(Manager manager) {
-        ReleaseFactory releaseFactory = new ReleaseFactory(new Settings(), manager);
-        switch (videoType) {
-            case EPISODE -> tvRelease = (TvRelease) releaseFactory.createRelease(
-                Path.of("Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv"),
-                userInteractionHandler, false).orElse(null);
-            case MOVIE -> movieRelease = (MovieRelease) releaseFactory.createRelease(
-                Path.of("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv"),
-                userInteractionHandler, false).orElse(null);
-        }
-    }
-
     private void buildLabelTable(StructureTag[] structureTags) {
         structureTags.forEach(this::addTag);
     }
@@ -134,14 +120,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     protected void parseText() {
-        lblPreview.setText(libraryBuilder.apply(txtStructure.getText()).build(getGeneratedRelease()).toString());
-    }
-
-    private Release getGeneratedRelease() {
-        return switch (videoType) {
-            case EPISODE -> tvRelease;
-            case MOVIE -> movieRelease;
-        };
+        lblPreview.setText(libraryBuilder.apply(txtStructure.getText()).buildPathStructure(release));
     }
 
     @Override
@@ -161,6 +140,7 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         parseText();
     }
 
+    @NullMarked
     private class InsertTag implements MouseListener {
 
         @Override

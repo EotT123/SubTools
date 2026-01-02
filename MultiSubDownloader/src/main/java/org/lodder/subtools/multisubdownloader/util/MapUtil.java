@@ -3,6 +3,9 @@ package org.lodder.subtools.multisubdownloader.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class MapUtil {
 
     private MapUtil(){

@@ -2,6 +2,9 @@ package org.lodder.subtools.sublibrary.data.tvdb.exception;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class TvdbException extends Exception {
 
     @Serial

@@ -1,9 +1,11 @@
 package org.lodder.subtools.sublibrary.assertions;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 
+@NullMarked
 public class SubLibraryAssertions {
 
     private SubLibraryAssertions() {

@@ -8,9 +8,11 @@ import extensions.java.awt.Component.ComponentExt;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @Extension
+@NullMarked
 public class JComponentExt {
     
     private JComponentExt() {

@@ -1,7 +1,9 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public enum LibraryActionType {
     NOTHING("PreferenceDialog.Action.Nothing"),
     RENAME("PreferenceDialog.Action.Rename"),

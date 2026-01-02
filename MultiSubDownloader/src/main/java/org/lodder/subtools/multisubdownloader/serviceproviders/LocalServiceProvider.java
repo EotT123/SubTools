@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.serviceproviders;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
@@ -9,6 +10,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.local.Local;
 
+@NullMarked
 public class LocalServiceProvider implements ServiceProvider {
 
     private UserInteractionHandler userInteractionHandler;

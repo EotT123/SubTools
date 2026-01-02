@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class Menu extends JMenuBar {
 
     @Serial
@@ -254,9 +257,6 @@ public class Menu extends JMenuBar {
     }
 
     private void addActionListener(JMenuItem menuItem, ActionListener actionListener) {
-        if (actionListener != null) {
-            menuItem.addActionListener(actionListener);
-        }
+        menuItem.addActionListener(actionListener);
     }
-
 }
