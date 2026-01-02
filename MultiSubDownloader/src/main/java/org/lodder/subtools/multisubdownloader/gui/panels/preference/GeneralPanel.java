@@ -162,10 +162,8 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
                 .addComponent(this.txtProxyPort = MyTextFieldInteger.builder().requireValue().build().columns(5));
         }
 
-        loadPreferenceSettings();
-    }
-
-    public void loadPreferenceSettings() {
+        // loadPreferenceSettings
+        
         cbxLanguage.setSelectedItem(settingsCtrl.settings.language);
         defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.image, settingsCtrl.settings.defaultIncomingFolders);
         settingsCtrl.settings.excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));

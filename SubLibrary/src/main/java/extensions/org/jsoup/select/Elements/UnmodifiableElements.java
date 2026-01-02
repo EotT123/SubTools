@@ -34,51 +34,63 @@ public class UnmodifiableElements extends Elements {
         super(Arrays.asList(elements));
     }
 
+    @Override
     public Elements removeAttr(String attributeKey) {
         return this;
     }
 
+    @Override
     public Elements addClass(String className) {
         return this;
     }
 
+    @Override
     public Elements removeClass(String className) {
         return this;
     }
 
+    @Override
     public Elements toggleClass(String className) {
         return this;
     }
 
 
+    @Override
     public Elements prepend(String html) {
         return this;
     }
 
+    @Override
     public Elements append(String html) {
         return this;
     }
 
+    @Override
     public Elements before(String html) {
         return this;
     }
 
+    @Override
     public Elements after(String html) {
         return this;
     }
 
+    @Override
     public Elements wrap(String html) {
         return this;
     }
 
+    @Override
     public Elements unwrap() {
         return this;
     }
 
+    @Override
     public Elements empty() {
         return this;
     }
 
+    @Override
     public Elements remove() {
         return this;
     }

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield;
 
+import static util.Utils.*;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -15,6 +17,7 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 
 @NullMarked
@@ -31,10 +34,10 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
 
     private Function<T, String> toStringMapper;
     private Function<String, T> toObjectMapper;
-    private Predicate<String> valueVerifier;
+    private @Nullable Predicate<String> valueVerifier;
     private boolean requireValue;
-    private Consumer<T> valueChangedCallbackListener;
-    private BooleanConsumer[] validityChangedCallbackListeners;
+    private @Nullable Consumer<T> valueChangedCallbackListener;
+    private @Nullable BooleanConsumer[] validityChangedCallbackListeners;
 
     private final ObjectWrapper<T> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();
@@ -197,9 +200,9 @@ public abstract sealed class MyTextFieldCommon<T, R extends MyTextFieldCommon<T,
     }
 
     public void setObject(T object) {
-        super.setText(object == null ? null : toStringMapper.apply(object));
+        super.setText(ifNotNull(object, toStringMapper::apply));
         valueWrapper.setValue(object);
-        validWrapper.setValue(completeValueVerifier.test(object == null ? null : toStringMapper.apply(object)));
+        validWrapper.setValue(completeValueVerifier.test(ifNotNull(object, toStringMapper::apply)));
     }
 
     public boolean hasValidValue() {

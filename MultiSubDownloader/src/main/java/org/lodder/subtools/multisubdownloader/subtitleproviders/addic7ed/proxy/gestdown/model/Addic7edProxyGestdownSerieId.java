@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model;
 
+import static util.Utils.*;
+
 import java.io.Serial;
 import java.util.OptionalInt;
 import java.util.UUID;
@@ -21,7 +23,7 @@ public class Addic7edProxyGestdownSerieId extends ProviderId {
     public Addic7edProxyGestdownSerieId(String text, UUID id, @Nullable Integer tvdbId=null,
         @Nullable Integer tmdbId=null) {
         super(text, id.toString());
-        this.tvdbId = tvdbId == null ? OptionalInt.empty() : OptionalInt.of(tvdbId);
-        this.tmdbId = tmdbId == null ? OptionalInt.empty() : OptionalInt.of(tmdbId);
+        this.tvdbId = ifNotNullOrElseGet(tvdbId, OptionalInt::of, OptionalInt::empty);
+        this.tmdbId = ifNotNullOrElseGet(tmdbId, OptionalInt::of, OptionalInt::empty);
     }
 }

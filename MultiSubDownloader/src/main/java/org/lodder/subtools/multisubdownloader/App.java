@@ -16,6 +16,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.exceptions.CliException;
 import org.lodder.subtools.multisubdownloader.framework.Bootstrapper;
@@ -38,9 +39,9 @@ public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     private static SettingsControl prefCtrl;
-    private static Splash splash;
+    private static @Nullable Splash splash;
 
-    public static void main(String[] args) throws ReflectiveOperationException, UnsupportedLookAndFeelException {
+    static void main(String[] args) throws ReflectiveOperationException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         CommandLineParser parser = new DefaultParser();
@@ -54,9 +55,7 @@ public class App {
             return;
         }
 
-        if (!line.hasCliOption(CliOption.NO_GUI)) {
-            splash = new Splash().showSplash();
-        }
+        splash = line.hasCliOption(CliOption.NO_GUI) ? null : new Splash().showSplash();
 
         Preferences preferences = Preferences.userRoot();
         preferences.putBoolean(CliOption.SPEEDY.value, line.hasCliOption(CliOption.SPEEDY));

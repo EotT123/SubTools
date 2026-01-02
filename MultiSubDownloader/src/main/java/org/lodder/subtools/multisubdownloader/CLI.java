@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -145,7 +144,7 @@ public class CLI {
         if (line.hasCliOption(CliOption.FOLDER)) {
             return List.of(Path.of(line.getCliOptionValue(CliOption.FOLDER)));
         } else {
-            return new ArrayList<>(this.settings.defaultFolders);
+            return List.copyOf(this.settings.defaultFolders);
         }
     }
 

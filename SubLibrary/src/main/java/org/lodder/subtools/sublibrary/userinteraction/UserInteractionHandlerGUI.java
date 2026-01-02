@@ -19,9 +19,9 @@ public class UserInteractionHandlerGUI implements UserInteractionHandler {
 
     private static final Object LOCK = new Object();
     @val @override UserInteractionSettingsIntf settings;
-    @val JFrame frame;
+    @val @Nullable JFrame frame;
 
-    public UserInteractionHandlerGUI(UserInteractionSettingsIntf settings, JFrame frame) {
+    public UserInteractionHandlerGUI(UserInteractionSettingsIntf settings, @Nullable JFrame frame) {
         this.settings = settings;
         this.frame = frame;
     }

@@ -45,6 +45,7 @@ public final class ProviderCacheMemory<V extends @Nullable Object> extends Provi
         t.start();
     }
 
+    @Override
     protected void removeFromCache(ProviderCacheKey key) {
         remove(key);
     }

@@ -16,7 +16,6 @@ import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.repl
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.KeywordReplacer;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 
 @NullMarked
 public class SortWeight {

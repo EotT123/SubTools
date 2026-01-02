@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Release;
-import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 
 @NullMarked
 public interface KeywordReplacer {
