@@ -69,8 +69,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     .addComponent("wrap", this.txtAddic7edUsername =
                         MyTextFieldString.builder().requireValue().build().columns(20))
                     .addComponent(new JLabel(getText("PreferenceDialog.Password")))
-                    .addComponent(this.txtAddic7edPassword =
-                        MyPasswordField.builder().requireValue().build().columns(20)));
+                    .addComponent(this.txtAddic7edPassword = new MyPasswordField(true).columns(20)));
 
             // TV SUBTITLES
             this.chkSourceTvSubtitles = new JCheckBox("Tv Subtitles").addTo(titlePanel, "wrap");
@@ -92,8 +91,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     .addComponent("wrap", txtOpenSubtitlesUsername =
                         MyTextFieldString.builder().requireValue().build().columns(20))
                     .addComponent(new JLabel(getText("PreferenceDialog.Password")))
-                    .addComponent(txtOpenSubtitlesPassword =
-                        MyPasswordField.builder().requireValue().build().columns(20)));
+                    .addComponent(txtOpenSubtitlesPassword = new MyPasswordField(true).columns(20)));
 
             // SUBDL
             this.chkSourceSubdl = new JCheckBox("SubDL").addTo(titlePanel, "wrap");

@@ -7,7 +7,6 @@ import java.util.ResourceBundle;
 
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 
 @NullMarked
@@ -19,7 +18,7 @@ public class Messages {
     private Messages() {
     }
 
-    public static String getText(String key, @Nullable Object... replacements) {
+    public static String getText(String key, Object... replacements) {
         try {
             String text = resourceBundle.getString(key);
             return replacements.isEmpty() ? text : text.formatted(replacements);
@@ -28,7 +27,7 @@ public class Messages {
         }
     }
 
-    public static String getText(String key, Language language, @Nullable Object... replacements) {
+    public static String getText(String key, Language language, Object... replacements) {
         try {
             String text = getMessageBundle(language).getString(key);
             return replacements.isEmpty() ? text : text.formatted(replacements);
