@@ -1,12 +1,14 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import static util.Utils.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -26,7 +28,9 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.opensubtitles.model.Subtitle;
 import org.opensubtitles.model.SubtitleAttributes;
+import org.opensubtitles.model.SubtitleAttributesUploader;
 
+@NullMarked
 public final class OpenSubAdapter
     extends
     SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId, OpenSubtitleException> {
@@ -94,7 +98,7 @@ public final class OpenSubAdapter
     }
 
     @Override
-    public Optional<Collection<Subtitle>> searchSubtitles(ProviderIds providerIds, int season,
+    public Collection<Subtitle> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws OpenSubtitleException {
         return providerIds.getImdbId()
             .mapEx(imdbId ->
@@ -103,18 +107,19 @@ public final class OpenSubAdapter
                     season:season,
                     episode:episode,
                     language:language,
-                    type:TypeEnum.EPISODE));
+                    type:TypeEnum.EPISODE))
+            .orElse(List.of());
     }
 
     @Override
-    public Optional<Collection<org.opensubtitles.model.Subtitle>> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<org.opensubtitles.model.Subtitle> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws OpenSubtitleException {
-        return Optional.of(api.searchSubtitles(
+        return api.searchSubtitles(
             query:serieMapping.name,
             season:season,
             episode:episode,
             language:language,
-            type:TypeEnum.EPISODE));
+            type:TypeEnum.EPISODE);
     }
 
 
@@ -126,6 +131,7 @@ public final class OpenSubAdapter
     public OpenSubtilteSubtitle convertToSubtitle(Release release, org.opensubtitles.model.Subtitle sub) {
         SubtitleAttributes attr = sub.getAttributes();
         Language language = Language.ofIso639_1(attr.language);
+        String uploader = ifNotNull(attr.getUploader(), SubtitleAttributesUploader::getName);
         int fileId = attr.files.stream().findFirst().orElseThrow().fileId.intValue();
         return ReleaseParser.parse(attr.release)
             .map(r -> new OpenSubtilteSubtitle(
@@ -133,7 +139,7 @@ public final class OpenSubAdapter
                 fileName:attr.release,
                 language:language,
                 releaseGroup:r.releaseGroup,
-                uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                uploader:uploader,
                 quality:r.quality,
                 hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
             .orElseGet(() -> {
@@ -141,9 +147,9 @@ public final class OpenSubAdapter
                 return new OpenSubtilteSubtitle(
                     urlSupplier:() -> api.getDownloadUrl(fileId),
                     fileName:attr.release,
-                    language:Language.ofIso639_1(attr.language),
+                    language:language,
                     releaseGroup:extraInfo.getReleaseGroupBestEffort(),
-                    uploader:attr.getUploader() != null ? attr.getUploader().getName() : null,
+                    uploader:uploader,
                     quality:extraInfo.qualityKeyword,
                     hearingImpaired:Boolean.TRUE == attr.isHearingImpaired());
             });

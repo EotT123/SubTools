@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Api for retrieving serie information from tvsubtitles.net
  */
+@NullMarked
 public class TvSubtitlesApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
@@ -88,7 +89,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                 try {
                     CookieManager cookieManager = providerLang == null ? null :
                         new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
-                    return manager.getAsJsoupDocument(PageContentParams.params(
+                    return manager.getAsJsoupDocument(new PageContentParams(
                             DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
                             cookieManager:cookieManager))
                         .select("#table5 tr[bgcolor]")
@@ -114,13 +115,14 @@ public class TvSubtitlesApi implements SubtitleApi {
         return getCache("subtitles", b -> b.add("url", episodeUrl))
             .getCollection(() -> {
                 try {
-                    return manager.getAsJsoupDocument(PageContentParams.url(episodeUrl))
+                    return manager.getAsJsoupDocument(new PageContentParams(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")
                         .stream().map(subtitleElement -> {
                             Map<MetadataType, String> metadataMap =
                                 subtitleElement.select(".subtitle_grid > div").stream().gather(Gatherers.windowFixed(3))
                                     .map(values -> new Metadata(MetadataType.of(values.get(1).text()),
-                                        values.get(2).text())).filter(metadata -> metadata.metadataType != null)
+                                        values.get(2).text()))
+                                    .filter(metadata -> metadata.metadataType != null)
                                     .toMap(Metadata::metadataType, Metadata::value);
                             return new TVSubtitlesSubtitleMetadata(
                                 metadataMap.get(MetadataType.TITLE),
@@ -137,6 +139,7 @@ public class TvSubtitlesApi implements SubtitleApi {
             });
     }
 
+    @NullMarked
     private record Metadata(@Nullable MetadataType metadataType, String value) {
     }
 

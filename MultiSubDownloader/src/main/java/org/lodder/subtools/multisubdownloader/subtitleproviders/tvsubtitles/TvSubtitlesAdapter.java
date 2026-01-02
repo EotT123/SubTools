@@ -3,12 +3,12 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -25,6 +25,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
+@NullMarked
 public final class TvSubtitlesAdapter
     extends SubtitleAdapter<TVSubtitlesSubtitleMetadata, TvSubtiltesSubtitle, ProviderId, TvSubtitleException> {
 
@@ -71,22 +72,19 @@ public final class TvSubtitlesAdapter
     // ===== \\
 
     @Override
-    public Optional<Collection<TVSubtitlesSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
-        int episode,
-        Language language) throws TvSubtitleException {
-        return Optional.empty();
+    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws TvSubtitleException {
+        return List.of();
     }
 
     @Override
-    public Optional<Collection<TVSubtitlesSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode,
-        Language language) throws TvSubtitleException {
-        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
+    public Collection<TVSubtitlesSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws TvSubtitleException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override
-    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
-        throws TvSubtitleException {
+    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) {
         return List.of();
     }
 

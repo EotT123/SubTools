@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edApiException;
@@ -34,6 +35,7 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraIn
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 
+@NullMarked
 public class Addic7edApi implements SubtitleApi {
 
     private static final Time RATE_DURATION = 1Second; // seconds
@@ -47,7 +49,8 @@ public class Addic7edApi implements SubtitleApi {
     private final boolean speedy;
     private Time lastRequest = Time.now();
 
-    public Addic7edApi(Manager manager, boolean speedy, Credentials credentials=null) throws Addic7edApiException {
+    public Addic7edApi(Manager manager, boolean speedy, @Nullable Credentials credentials=null)
+        throws Addic7edApiException {
         this.manager = manager;
         this.speedy = speedy;
         if (credentials != null) {
@@ -249,7 +252,7 @@ public class Addic7edApi implements SubtitleApi {
                 }
                 lastRequest = Time.now();
             }
-            return manager.getAsJsoupDocument(PageContentParams.params(url:url, userAgent:""));
+            return manager.getAsJsoupDocument(new PageContentParams(url:url, userAgent:""));
         } catch (Exception e) {
             throw Addic7edApiException.error(e);
         }

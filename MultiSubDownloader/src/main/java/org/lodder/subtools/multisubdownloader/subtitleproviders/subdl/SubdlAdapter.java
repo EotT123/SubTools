@@ -3,10 +3,10 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -23,6 +23,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import subdl.Serie.ReleaseType;
 
+@NullMarked
 public final class SubdlAdapter extends
     SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId, SubdlException> {
 
@@ -62,6 +63,7 @@ public final class SubdlAdapter extends
     // SERIE \\
     // ===== \\
 
+    @Override
     public List<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws SubdlException {
         return providerIds.getImdbId().flatMapEx(imdbId -> api.getProviderIdUsingImdbId(imdbId).map(List::of))
@@ -83,16 +85,16 @@ public final class SubdlAdapter extends
     }
 
     @Override
-    public Optional<Collection<SubdlSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season, int episode,
+    public Collection<SubdlSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
         Language language) throws SubdlException {
         return providerIds.getImdbId().mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode,
-            language));
+            language)).orElse(List.of());
     }
 
     @Override
-    public Optional<Collection<SubdlSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<SubdlSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws SubdlException {
-        return Optional.of(api.getSerieSubtitles(serieMapping.providerId, season, episode, language));
+        return api.getSerieSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     // ====== \\
@@ -103,22 +105,22 @@ public final class SubdlAdapter extends
     public SubdlSubtitle convertToSubtitle(Release originalRelease, SubdlSubtitleMetadata sub) {
         return ReleaseParser.parse(sub.title).orElseMapEx(() -> ReleaseParser.parse(sub.fileName))
             .map(release -> new SubdlSubtitle(
-                url:sub.url,
-                title:sub.title,
-                language:sub.language,
-                quality:release.quality,
-                releaseGroup:release.releaseGroup,
-                uploader:sub.uploader,
-                hearingImpaired:sub.hearingImpaired,
-                forRelease:originalRelease))
+                sub.url,
+                sub.title,
+                sub.language,
+                release.releaseGroup,
+                sub.uploader,
+                sub.hearingImpaired,
+                release.quality,
+                originalRelease))
             .orElseGet(() -> new SubdlSubtitle(
-                url:sub.url,
-                title:sub.title,
-                language:sub.language,
-                quality:ReleaseParser.getQualityKeyword(sub.title + " " + sub.fileName),
-                releaseGroup:ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".zip")),
-                uploader:sub.uploader,
-                hearingImpaired:sub.hearingImpaired,
-                forRelease:originalRelease));
+                sub.url,
+                sub.title,
+                sub.language,
+                ReleaseParser.extractReleaseGroup(sub.title, sub.title.endsWith(".zip")),
+                sub.uploader,
+                sub.hearingImpaired,
+                ReleaseParser.getQualityKeyword(sub.title + " " + sub.fileName),
+                originalRelease));
     }
 }

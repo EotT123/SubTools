@@ -1,10 +1,12 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public abstract sealed class SubtitleFilter permits ExactNameFilter, KeywordFilter, ReleaseGroupFilter {
 
     public abstract boolean useSubtitle(Release release, Subtitle subtitle);
@@ -14,7 +16,7 @@ public abstract sealed class SubtitleFilter permits ExactNameFilter, KeywordFilt
     }
 
     protected String getReleaseName(Release release) {
-        return release.fileName == null ? "" : StringUtils.substringBeforeLast(release.fileName, ".");
+        return StringUtils.substringBeforeLast(release.fileNameOrName, ".");
     }
 
     protected boolean checkKeywordSubtitleMatch(Subtitle subtitle, String keywordsFile) {

@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
+import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType.*;
 
 import java.util.Collection;
@@ -8,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.ToIntFunction;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -29,6 +30,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
+@NullMarked
 public final class SubsceneAdapter
     extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneSerieId, SubsceneException> {
 
@@ -73,8 +75,8 @@ public final class SubsceneAdapter
     @Override
     public List<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, Integer season)
         throws SubsceneException {
-        return providerIds.getImdbId().mapEx(imdbId -> getSortedSerieProviderIds(imdbId,
-            Objects.requireNonNull(season))).orElseGet(List::of);
+        return providerIds.getImdbId().mapEx(imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)))
+            .orElseGet(List::of);
     }
 
     /**
@@ -86,7 +88,7 @@ public final class SubsceneAdapter
     @Override
     public List<SubSceneSerieId> getSortedSerieProviderIds(String searchQuery, Integer season)
         throws SubsceneException {
-        ToIntFunction<SearchResultType> providerTypeFunction = value -> switch (value) {
+        ToIntFunction<@Nullable SearchResultType> providerTypeFunction = value -> switch (value) {
             case EXACT -> 2;
             case TV_SERIE -> 1;
             case CLOSE -> 3;
@@ -94,8 +96,8 @@ public final class SubsceneAdapter
         };
         Map<SearchResultType, List<SubSceneSerieId>> serieProviderIds = api.getSerieProviderIds(searchQuery);
         List<SubSceneSerieId> filteredResults =
-            serieProviderIds.get(TV_SERIE).stream().filter(subSceneSerieId -> Objects.equals(subSceneSerieId.season,
-                season)).toList();
+            serieProviderIds.get(TV_SERIE).stream()
+                .filter(subSceneSerieId -> Objects.equals(subSceneSerieId.season, season)).toList();
         if (filteredResults.size() == 1) {
             return filteredResults;
         }
@@ -110,17 +112,15 @@ public final class SubsceneAdapter
     }
 
     @Override
-    public Optional<Collection<SubsceneSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
-        int episode,
-        Language language) throws SubsceneException {
-        return Optional.empty();
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
+        int episode, Language language) throws SubsceneException {
+        return List.of();
     }
 
     @Override
-    public Optional<Collection<SubsceneSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
-        int episode,
-        Language language) throws SubsceneException {
-        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
+    public Collection<SubsceneSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
+        int episode, Language language) throws SubsceneException {
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     @Override
@@ -143,12 +143,12 @@ public final class SubsceneAdapter
     @Override
     public SubsceneSubtitle convertToSubtitle(Release release, SubsceneSubtitleMetadata sub) {
         return new SubsceneSubtitle(
-            urlSupplier:sub.urlSupplier,
-            fileName:sub.name.removeIllegalFilenameChars(),
-            language:sub.language,
-            quality:ReleaseParser.getQualityKeyword(sub.name),
-            releaseGroup:ReleaseParser.extractReleaseGroup(sub.name, false),
-            uploader:sub.uploader,
-            hearingImpaired:sub.hearingImpaired);
+            sub.urlSupplier,
+            sub.name.removeIllegalFilenameChars(),
+            sub.language,
+            ReleaseParser.extractReleaseGroup(sub.name, false),
+            sub.uploader,
+            sub.hearingImpaired,
+            ReleaseParser.getQualityKeyword(sub.name));
     }
 }

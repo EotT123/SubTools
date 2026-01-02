@@ -8,9 +8,11 @@ import java.util.function.Predicate;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @Extension
+@NullMarked
 public class ComponentExt {
 
     private ComponentExt() {
@@ -21,7 +23,7 @@ public class ComponentExt {
         setRecursive(component, consumer, _ -> true);
     }
 
-    public static void setRecursive(@This Component component, Consumer<Component> consumer,
+    public static void setRecursive(@This @Nullable Component component, Consumer<Component> consumer,
             Predicate<Container> condition) {
         if (component != null) {
             consumer.accept(component);

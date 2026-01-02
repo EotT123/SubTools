@@ -24,7 +24,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, ProviderCacheDisk {
+public abstract sealed class ProviderCache<V extends @Nullable Object> permits ProviderCacheMemory, ProviderCacheDisk {
 
     @val(Protected) final Map<ProviderCacheKey, CacheObject<V>> cacheMap;
     @val(Protected) final Map<ProviderCacheKeySub, ProviderCacheKey> keyMapperCache = new HashMap<>();
@@ -36,7 +36,7 @@ public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, Provi
         this.cacheMap = maxItems != null ? new LRUMap<>(maxItems) : new HashMap<>();
     }
 
-    public void put(ProviderCacheKey key, @Nullable V value, @Nullable Time timeToLive=null) {
+    public void put(ProviderCacheKey key, V value, @Nullable Time timeToLive=null) {
         if (timeToLive == null) {
             put(key, new ExpiringCacheObject<>(value));
         } else {
@@ -107,11 +107,11 @@ public abstract sealed class ProviderCache<V> permits ProviderCacheMemory, Provi
 
     public Optional<Time> getTemporaryTimeToLive(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).map(v -> v instanceof TemporaryCacheObject<?> t ? t.timeToLive : null);
+            return get(key).filterCast(TemporaryCacheObject.class).map(TemporaryCacheObject::getTimeToLive);
         }
     }
 
-    public <X extends Exception> @Nullable V getOrPut(ProviderCacheKey key, ThrowingSupplier<V, X> supplier) throws X {
+    public <X extends Exception> V getOrPut(ProviderCacheKey key, ThrowingSupplier<V, X> supplier) throws X {
         synchronized (cacheMap) {
             if (contains(key)) {
                 return get(key).orElseThrow();

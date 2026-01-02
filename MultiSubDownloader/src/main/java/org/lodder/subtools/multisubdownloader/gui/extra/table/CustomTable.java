@@ -1,12 +1,15 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
-import javax.swing.table.*;
+import javax.swing.table.TableColumn;
 import java.awt.event.MouseEvent;
 import java.io.Serial;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class CustomTable extends ZebraJTable {
 
     @Serial

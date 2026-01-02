@@ -7,6 +7,7 @@ import java.io.Serial;
 import java.util.function.Function;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.dialog.StructureBuilderDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -20,6 +21,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class StructureFolderPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
@@ -46,8 +48,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .addToPanel(this, "span, grow");
 
         new JLabel(getText("PreferenceDialog.Location")).addTo(titlePanel, "shrink");
-        this.txtLibraryFolder =
-            MyTextFieldPath.builder().requireValue().build().columns(20).addTo(titlePanel, "grow");
+        this.txtLibraryFolder = new MyTextFieldPath(true).columns(20).addTo(titlePanel, "grow");
         new JButton(getText("App.Browse"))
             .actionListener(() -> MemoryFolderChooser.getInstance()
                 .selectDirectory(getRootPane(), getText("PreferenceDialog.LibraryFolder"))
@@ -55,8 +56,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .addTo(titlePanel, "shrink, wrap");
 
         new JLabel(getText("StructureBuilderDialog.Structure")).addTo(titlePanel, "shrink");
-        this.txtFolderStructure =
-            MyTextFieldString.builder().requireValue().build().columns(20).disabled().addTo(titlePanel, "grow");
+        this.txtFolderStructure = new MyTextFieldString(true).columns(20).disabled().addTo(titlePanel, "grow");
         JButton btnStructure = new JButton(getText("StructureBuilderDialog.Structure"))
             .actionListener(() -> {
                 StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
@@ -82,7 +82,8 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .addComponent(this.cbxReplaceSpaceChar = JComboBox.create('-', '.', '_'));
 
         // behaviour
-        txtLibraryFolder.withValidityChangedCallback(txtFolderStructure::setEnabled, btnStructure::setEnabled);
+        txtLibraryFolder.addValidityChangedCallbackListeners(txtFolderStructure::setEnabled)
+            .addValidityChangedCallbackListeners(btnStructure::setEnabled);
 
         loadPreferenceSettings();
     }

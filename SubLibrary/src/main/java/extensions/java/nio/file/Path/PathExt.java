@@ -21,11 +21,13 @@ import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
 import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
 
 @Extension
 @ExtensionSource(source = Files.class, methods = {@MethodSignature(name = "size", paramTypes = {Path.class})})
+@NullMarked
 public class PathExt {
 
     private PathExt() {
@@ -48,6 +50,7 @@ public class PathExt {
         return changeExtension(path, "");
     }
 
+    @NullMarked
     public record FilenameAndExtension(String filename, String extension) {
     }
 
@@ -343,5 +346,13 @@ public class PathExt {
     public static boolean isGZipCompressed(byte[] data) {
         return data.length >= 2 && data[0] == (byte) GZIPInputStream.GZIP_MAGIC &&
             data[1] == (byte) GZIPInputStream.GZIP_MAGIC >> 8;
+    }
+
+    public static Path resolve(@This Path path, String... subPaths) {
+        Path fullPath = path;
+        for (String subPath : subPaths) {
+            fullPath = fullPath.resolve(subPath);
+        }
+        return fullPath;
     }
 }

@@ -6,10 +6,12 @@ import java.util.OptionalInt;
 import java.util.function.Function;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.UserInteractionSettingsIntf;
 import org.lodder.subtools.sublibrary.util.Validator;
 
+@NullMarked
 public interface UserInteractionHandler {
 
     @val UserInteractionSettingsIntf settings;
@@ -17,7 +19,7 @@ public interface UserInteractionHandler {
     boolean confirm(String message, String title);
 
     <T> Optional<T> selectFromList(Iterable<T> options, String message, @Nullable String title=null,
-        @Nullable Function<T, String> toStringMapper=null);
+        Function<T, String> toStringMapper=String::valueOf);
 
     Optional<String> enter(String message, @Nullable String title=null,
         @Nullable List<Validator<String>> inputValidators=null);

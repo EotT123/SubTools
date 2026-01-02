@@ -124,9 +124,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
             .get(() -> getBearerTokenWithoutCache(username, password)
-                .orElseThrow(() -> OpenSubtitleApiException.noResult("Could not acquire a bearer token, " +
-                    "invalid username/password?")),
-                timeToLive:23.5hr);
+                    .orElseThrow(() -> OpenSubtitleApiException.noResult("Could not acquire a bearer token, " +
+                        "invalid username/password?")),
+                23.5 hr);
     }
 
     private static Optional<String> getBearerTokenWithoutCache(String username, String password)
@@ -159,7 +159,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
             .getCollection(() -> {
                 try {
-                    return manager.getAsJsonArray(PageContentParams.params(
+                    return manager.getAsJsonArray(new PageContentParams(
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                                 + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
                             cacheType:CacheType.MEMORY,
@@ -167,7 +167,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5Second)
+                                5 Second)
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -234,28 +234,31 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .add("trustedSources", trustedSources)
                 .add("type", type)
                 .add("userId", userId)
-                .add("year", year)).getCollection(() -> {
-            Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) : null;
-            return apiCall(
-                () -> subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
-                    language != null ? language.iso639_1 : null, movieHash, userId, getValue(hearingImpaired),
-                    getValue(foreignPartsOnly), getValue(trustedSources), getValue(machineTranslated),
-                    getValue(aiTranslated), orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
-                    parentFeatureId, parentImdbId, parentTmdbId, season, episode, year, getValue(movieHashMatch), page,
-                    USER_AGENT)).execute().getData();
-            // TODO is this filtering needed?
-            // String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
-            // String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName, "[^A-Za-z]", ""));
-            //     .filter(file -> {
-            //     String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
-            //     return subFileName.contains(name) ||
-            //         (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
-            // })
-        });
+                .add("year", year))
+            .getCollection(() -> {
+                Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) : null;
+                return apiCall(
+                    () -> subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
+                        language != null ? language.iso639_1 : null, movieHash, userId, getValue(hearingImpaired),
+                        getValue(foreignPartsOnly), getValue(trustedSources), getValue(machineTranslated),
+                        getValue(aiTranslated), orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
+                        parentFeatureId, parentImdbId, parentTmdbId, season, episode, year, getValue(movieHashMatch),
+                        page,
+                        USER_AGENT)).execute().getData();
+                // TODO is this filtering needed?
+                // String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
+                // String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName,
+                // "[^A-Za-z]", ""));
+                //     .filter(file -> {
+                //     String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
+                //     return subFileName.contains(name) ||
+                //         (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
+                // })
+            });
     }
 
 
-    public String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
+    public @Nullable String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
             .get(() -> {
                 try (HttpClient client = HttpClient.newHttpClient()) {

@@ -2,7 +2,9 @@ package org.lodder.subtools.multisubdownloader.settings.model;
 
 
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ScreenSettings {
 
     @var boolean hideEpisode;

@@ -26,7 +26,6 @@ public class TvdbApiException extends TvdbException implements ApiExceptionIntf 
         this.logLevel = logLevel;
     }
 
-
     private TvdbApiException(HttpStatus errorCode, Exception cause, String message, CacheStrategy cacheStrategy,
         LogLevel logLevel) {
         super(message, cause);
@@ -39,7 +38,6 @@ public class TvdbApiException extends TvdbException implements ApiExceptionIntf 
         LogLevel logLevel=WARN) {
         return new TvdbApiException(NO_CONTENT, message, cacheStrategy, logLevel);
     }
-
 
     public static TvdbApiException error(Exception cause, String message=cause.getMessage(),
         CacheStrategy cacheStrategy=CACHE_TEMPORARY) {

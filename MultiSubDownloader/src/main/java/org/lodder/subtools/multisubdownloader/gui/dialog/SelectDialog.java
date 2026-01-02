@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName;
@@ -20,6 +21,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableModel
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class SelectDialog extends MultiSubDialog {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -32,14 +34,14 @@ public class SelectDialog extends MultiSubDialog {
     /**
      * Create the dialog.
      */
-    public SelectDialog(@Nullable JFrame frame = null, List<Subtitle> subtitles, Release release) {
+    public SelectDialog(@Nullable JFrame frame=null, List<Subtitle> subtitles, Release release) {
         super(frame, getText("SelectDialog.SelectCorrectSubtitle"), true);
         this.subtitles =
             subtitles.stream().distinct().sorted(Comparator.comparing(Subtitle::getScore).reversed()).toList();
         contentPane
             .layout(new MigLayout("", "[1000px:n,grow,fill]", "[][::100px,fill][grow]"))
             .addComponent("cell 0 0",
-                new JLabel(getText("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileName))
+                new JLabel(getText("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileNameOrName))
             .addComponent("cell 0 1,grow", new JScrollPane().viewportView(customTable = createCustomTable()))
             .addComponent("cell 0 2,grow", new JPanel()
                 .layout(new FlowLayout(FlowLayout.RIGHT))
@@ -52,7 +54,7 @@ public class SelectDialog extends MultiSubDialog {
                     .actionCommand(getText("App.OK")))
                 .addComponent(new JButton(getText("SelectDialog.Everything"))
                     .actionListener(() -> {
-                        selectedSubtitleIdxs = IntStream.range(0, release.getMatchingSubs().size()).boxed().toList();
+                        selectedSubtitleIdxs = IntStream.range(0, release.matchingSubCount).boxed().toList();
                         setVisible(false);
                     })
                     .actionCommand(getText("App.All")))

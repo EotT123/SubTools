@@ -2,13 +2,15 @@ package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
 import static org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTableColumnName.*;
 
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.Serial;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class SubtitleTableModel extends DefaultTableModel {
 
     @Serial

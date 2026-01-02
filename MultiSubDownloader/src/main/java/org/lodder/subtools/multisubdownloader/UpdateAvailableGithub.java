@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader;
 
 import static java.time.temporal.ChronoUnit.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
-import static org.lodder.subtools.sublibrary.PageContentParams.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -14,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
@@ -30,6 +30,7 @@ import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class UpdateAvailableGithub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
@@ -84,7 +85,7 @@ public class UpdateAvailableGithub {
                 try {
                     String currentVersion = getVersion();
                     Element element =
-                        manager.getAsJsoupDocument(PageContentParams.params(
+                        manager.getAsJsoupDocument(new PageContentParams(
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
@@ -99,7 +100,7 @@ public class UpdateAvailableGithub {
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
                     Element artifactElement = manager.getAsJsoupDocument(
-                            PageContentParams.params(url:versionBlockUrl, userAgent:null))
+                            new PageContentParams(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
@@ -122,7 +123,7 @@ public class UpdateAvailableGithub {
                     LocalDateTime buildTista = getBuildTista();
 
                     Element rowElement =
-                        manager.getAsJsoupDocument(PageContentParams.params(
+                        manager.getAsJsoupDocument(new PageContentParams(
                                 url:"$REPO_URL/actions?query=branch%3Amaster",
                                 cacheType:CacheType.MEMORY,
                                 userAgent:null))
@@ -134,7 +135,7 @@ public class UpdateAvailableGithub {
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getAsJsoupDocument(params(url, CacheType.MEMORY))
+                    String downloadUrl = manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();

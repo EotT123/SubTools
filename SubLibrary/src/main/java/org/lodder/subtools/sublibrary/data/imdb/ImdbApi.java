@@ -12,11 +12,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbApiException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 
+@NullMarked
 public class ImdbApi implements ApiIntf {
 
     private static final String DOMAIN = "https://www.imdb.com";
@@ -27,7 +29,6 @@ public class ImdbApi implements ApiIntf {
     public ImdbApi(Manager manager) {
         this.manager = manager;
     }
-
 
     public Optional<ImdbDetails> getDetails(String imdbId) throws ImdbApiException {
         return getCache("details", b -> b.add("imdbId", imdbId))

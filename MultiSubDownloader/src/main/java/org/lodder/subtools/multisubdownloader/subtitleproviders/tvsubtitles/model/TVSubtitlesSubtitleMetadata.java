@@ -2,9 +2,12 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.mod
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
-public record TVSubtitlesSubtitleMetadata(String title, String filename, String url, Source source, String releaseGroup,
-    Language language) implements Serializable {
+@NullMarked
+public record TVSubtitlesSubtitleMetadata(String title, String filename, String url, @Nullable Source source,
+    String releaseGroup, @Nullable Language language) implements Serializable {
 }

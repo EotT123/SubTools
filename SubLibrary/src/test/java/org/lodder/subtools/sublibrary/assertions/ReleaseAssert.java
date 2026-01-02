@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 
 import manifold.ext.rt.api.Self;
 import org.assertj.core.api.AbstractAssert;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 
+@NullMarked
 public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAssert<R>, R> {
 
     public ReleaseAssert(R actual) {
@@ -26,13 +28,13 @@ public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAsse
 
     public @Self ReleaseAssert<R> hasFileName(String fileName) {
         isNotNull();
-        assertThat(actual.fileName).isEqualTo(fileName);
+        assertThat(actual.fileNameOrName).isEqualTo(fileName);
         return this;
     }
 
     public @Self ReleaseAssert<R> hasExtension(String extension) {
         isNotNull();
-        assertThat(actual.hasExtension(extension)).isTrue();
+        assertThat(actual.fileNameOrName.endsWith(extension)).isTrue();
         return this;
     }
 

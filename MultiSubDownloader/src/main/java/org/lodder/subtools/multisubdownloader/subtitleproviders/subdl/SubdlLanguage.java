@@ -4,8 +4,10 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public enum SubdlLanguage {
 
     ARABIC(Language.ARABIC, "AR"),

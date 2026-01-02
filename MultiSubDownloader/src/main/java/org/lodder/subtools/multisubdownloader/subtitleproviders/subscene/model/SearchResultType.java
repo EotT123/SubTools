@@ -1,7 +1,9 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public enum SearchResultType {
     EXACT("Exact"),
     TV_SERIE("TV-Serie"),

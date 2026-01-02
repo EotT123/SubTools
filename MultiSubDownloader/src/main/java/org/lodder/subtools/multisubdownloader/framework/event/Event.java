@@ -3,7 +3,9 @@ package org.lodder.subtools.multisubdownloader.framework.event;
 import java.util.Collection;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Event {
     @val String eventName;
     private final EventBag eventBag;

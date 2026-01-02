@@ -2,6 +2,9 @@ package org.lodder.subtools.sublibrary;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ManagerException extends Exception {
 
     @Serial

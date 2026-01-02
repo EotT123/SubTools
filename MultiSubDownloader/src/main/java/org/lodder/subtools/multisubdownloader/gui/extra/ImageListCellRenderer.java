@@ -4,9 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ImageListCellRenderer extends JLabel implements ListCellRenderer<Object> {
 
     @Serial

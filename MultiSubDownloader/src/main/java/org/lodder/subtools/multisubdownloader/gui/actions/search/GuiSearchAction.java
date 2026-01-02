@@ -6,6 +6,7 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
@@ -22,7 +23,8 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-public abstract sealed class GuiSearchAction<P extends InputPanel> extends SearchAction
+@NullMarked
+public abstract sealed class GuiSearchAction<P extends InputPanel, R extends Release> extends SearchAction<R>
     permits FileGuiSearchAction, TextGuiSearchAction {
 
     @get(Protected) GUI mainWindow;
@@ -61,7 +63,7 @@ public abstract sealed class GuiSearchAction<P extends InputPanel> extends Searc
     }
 
     @Override
-    public void onFound(Release release, List<Subtitle> subtitles) {
+    public void onFound(R release, List<Subtitle> subtitles) {
         if (Thread.currentThread().isInterrupted()) {
             return;
         }

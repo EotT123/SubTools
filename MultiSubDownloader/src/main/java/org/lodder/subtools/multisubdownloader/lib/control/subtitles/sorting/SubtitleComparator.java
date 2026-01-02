@@ -4,8 +4,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
+@NullMarked
 public class SubtitleComparator implements Comparator<Subtitle>, Serializable {
 
     @Serial

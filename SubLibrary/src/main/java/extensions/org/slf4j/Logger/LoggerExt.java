@@ -2,10 +2,12 @@ package extensions.org.slf4j.Logger;
 
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.LogLevel;
 import org.slf4j.Logger;
 
 @Extension
+@NullMarked
 public class LoggerExt {
 
     public static void log(@This Logger logger, LogLevel logLevel, String message, Object arg){

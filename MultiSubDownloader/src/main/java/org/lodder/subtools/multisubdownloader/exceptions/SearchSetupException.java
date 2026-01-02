@@ -2,8 +2,10 @@ package org.lodder.subtools.multisubdownloader.exceptions;
 
 import java.io.Serial;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 
+@NullMarked
 public class SearchSetupException extends ActionException {
 
     @Serial

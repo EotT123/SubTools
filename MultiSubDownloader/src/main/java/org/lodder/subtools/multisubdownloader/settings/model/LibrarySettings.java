@@ -5,10 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.sublibrary.Language;
 
+@NullMarked
 public class LibrarySettings {
 
     @var String filenameStructure = "";

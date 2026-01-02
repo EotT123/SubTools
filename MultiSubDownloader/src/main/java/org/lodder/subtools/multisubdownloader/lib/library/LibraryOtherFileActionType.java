@@ -1,7 +1,9 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.Messages;
 
+@NullMarked
 public enum LibraryOtherFileActionType {
 
     NOTHING("PreferenceDialog.Action.Nothing"),

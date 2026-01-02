@@ -17,8 +17,9 @@ import java.util.stream.Stream;
 import com.google.common.collect.Streams;
 import manifold.ext.props.rt.api.set;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.actions.RenameAction;
+import org.lodder.subtools.multisubdownloader.actions.MoveAndRenameAction;
 import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
@@ -35,6 +36,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
+@NullMarked
 public class RenameDialog extends MultiSubDialog implements PropertyChangeListener {
 
     @Serial private static final long serialVersionUID = 1L;
@@ -58,7 +60,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             fillContents:true)
             .addToPanel(contentPane, "span, grow, wrap")
             .addComponent("shrink", new JLabel(getText("PreferenceDialog.Location")))
-            .addComponent("grow", this.txtFolder = MyTextFieldPath.builder().requireValue().build().columns(20))
+            .addComponent("grow", this.txtFolder = new MyTextFieldPath(true).columns(20))
             .addComponent("shrink, wrap", new JButton(getText("App.Browse")).actionListener(
                 () -> MemoryFolderChooser.getInstance()
                     .selectDirectory(contentPane,
@@ -122,6 +124,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         }
     }
 
+    @NullMarked
     private static class TypedRenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
         private final UserInteractionHandler userInteractionHandler;
@@ -129,7 +132,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         private final VideoType videoType;
         private final Set<String> extensions;
         private final boolean isRecursive;
-        private final RenameAction renameAction;
+        private final MoveAndRenameAction moveAndRenameAction;
         @set ReleaseFactory releaseFactory;
 
         public TypedRenameWorker(Path dir, LibrarySettings librarySettings, VideoType videoType, boolean isRecursive,
@@ -140,7 +143,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             this.dir = dir;
             this.videoType = videoType;
             this.isRecursive = isRecursive;
-            this.renameAction = new RenameAction(librarySettings, manager, userInteractionHandler);
+            this.moveAndRenameAction = new MoveAndRenameAction(librarySettings, manager, userInteractionHandler);
         }
 
         @Override
@@ -154,9 +157,9 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
                 if (file.isRegularFile()) {
                     if (!file.fileNameContainsIgnoreCase("sample") && extensions.contains(file.getExtension())) {
                         releaseFactory.createRelease(file, userInteractionHandler).ifPresent(release -> {
-                            publish(release.fileName);
-                            if (release.videoType == videoType) {
-                                renameAction.rename(file, release);
+                            publish(release.fileNameOrName);
+                            if (release.isOfType(videoType)) {
+                                moveAndRenameAction.moveAndRename(file, release);
                             }
                         });
                     }

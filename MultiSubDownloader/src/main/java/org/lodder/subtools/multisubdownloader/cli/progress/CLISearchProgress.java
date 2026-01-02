@@ -1,12 +1,14 @@
 package org.lodder.subtools.multisubdownloader.cli.progress;
 
 import dnl.utils.text.table.TextTable;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.gui.dialog.progress.search.SearchProgressTableModel;
 import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.model.Release;
 
+@NullMarked
 public final class CLISearchProgress extends CLIProgress implements SearchProgressListener {
 
     private final TextTable table;
@@ -19,7 +21,13 @@ public final class CLISearchProgress extends CLIProgress implements SearchProgre
 
     @Override
     public void progress(SubtitleProvider provider, int jobsLeft, Release release) {
-        this.tableModel.update(provider.provider, jobsLeft, release == null ? "Done" : release.fileName);
+        this.tableModel.update(provider.provider, jobsLeft, release.fileNameOrName);
+        this.printProgress();
+    }
+
+    @Override
+    public void done(SubtitleProvider provider) {
+        this.tableModel.update(provider.provider, 0, "Done");
         this.printProgress();
     }
 

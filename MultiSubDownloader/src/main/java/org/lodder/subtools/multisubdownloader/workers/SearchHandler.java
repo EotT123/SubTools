@@ -2,9 +2,11 @@ package org.lodder.subtools.multisubdownloader.workers;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 
-public interface SearchHandler {
-    void onFound(Release release, List<Subtitle> subtitles);
+@NullMarked
+public interface SearchHandler<R extends Release> {
+    void onFound(R release, List<Subtitle> subtitles);
 }

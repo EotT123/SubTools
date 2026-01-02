@@ -11,7 +11,10 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Objects;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
 
     @Serial
@@ -46,11 +49,11 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         }
     }
 
-    public T getObject(int index) {
+    public @Nullable T getObject(int index) {
         return getLabelPanel(index).map(LabelPanel::getObject).orElse(null);
     }
 
-    public Image getImage(int index) {
+    public @Nullable Image getImage(int index) {
         return getLabelPanel(index).map(LabelPanel::getImage).orElse(null);
     }
 
@@ -66,6 +69,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         return Optional.ofNullable(getModel().getElementAt(index));
     }
 
+    @NullMarked
     public static class LabelPanel<T> extends JPanel {
 
         @Serial private static final long serialVersionUID = 1L;
@@ -86,6 +90,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         }
     }
 
+    @NullMarked
     private static class Label<T> extends JLabel {
         @Serial private static final long serialVersionUID = 1L;
         @val T object;
@@ -97,7 +102,7 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
             this.image = image;
         }
 
-        private static ImageIcon getImageIcon(Image image) {
+        private static ImageIcon getImageIcon(@Nullable Image image) {
             return image == null ? new ImageIcon() : resizeIcon(new ImageIcon(image), 20, 20);
         }
 

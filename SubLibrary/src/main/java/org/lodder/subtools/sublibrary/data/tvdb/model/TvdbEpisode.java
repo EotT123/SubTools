@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.data.tvdb.model;
 
+import static java.util.Objects.*;
+
 import java.io.Serializable;
 
 import com.tvdb.model.SeriesBaseRecord;
@@ -11,8 +13,8 @@ public record TvdbEpisode(@Nullable Integer id, @Nullable Long seriesId, @Nullab
     @Nullable Integer number, @Nullable Integer seasonNumber, @Nullable String year) implements Serializable {
 
     public TvdbEpisode(SeriesBaseRecord seriesBaseRecord) {
-        this(seriesBaseRecord.id, seriesBaseRecord.getEpisodes().first().seriesId, seriesBaseRecord.name,
-            seriesBaseRecord.getEpisodes().first().number, seriesBaseRecord.getEpisodes().first().seasonNumber,
-            seriesBaseRecord.getEpisodes().first().year);
+        this(seriesBaseRecord.id, requireNonNull(seriesBaseRecord.getEpisodes()).first().seriesId,
+            seriesBaseRecord.name, seriesBaseRecord.getEpisodes().first().number,
+            seriesBaseRecord.getEpisodes().first().seasonNumber, seriesBaseRecord.getEpisodes().first().year);
     }
 }

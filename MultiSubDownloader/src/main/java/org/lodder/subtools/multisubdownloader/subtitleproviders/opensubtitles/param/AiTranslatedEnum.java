@@ -2,7 +2,9 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.p
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public enum AiTranslatedEnum implements ParamIntf {
     EXCLUDE("exclude"), INCLUDE("include");
 

@@ -1,9 +1,11 @@
 package org.lodder.subtools.sublibrary;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 
+@NullMarked
 public enum Language {
 
     ABKHAZIAN("App.Language.Abkhazian", "abk", "ab"),

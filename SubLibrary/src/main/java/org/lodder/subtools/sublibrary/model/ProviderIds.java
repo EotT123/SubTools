@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.model;
 
+import static util.Utils.*;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,20 +10,23 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProviderIds {
-    private final Map<ProviderIdType, Object> providerIdMap = new LinkedHashMap<>();
+    private final Map<ProviderIdType, @Nullable Object> providerIdMap = new LinkedHashMap<>();
 
     public ProviderIds add(ProviderIdType providerIdType, Object value){
         providerIdMap.put(providerIdType, value);
         return this;
     }
 
-    public Object get(ProviderIdType providerIdType){
+    public @Nullable Object get(ProviderIdType providerIdType) {
         return providerIdMap.get(providerIdType);
     }
     public OptionalInt getTvdbId(){
-        Object tvdbId = get(ProviderIdType.TVDB);
-        return tvdbId == null ? OptionalInt.empty() : OptionalInt.of((int) tvdbId);
+        return ifNotNullOrElseGet(get(ProviderIdType.TVDB), v -> OptionalInt.of((int) v), OptionalInt::empty);
     }
     public Optional<String> getImdbId(){
         return Optional.ofNullable((String) get(ProviderIdType.IMDB));

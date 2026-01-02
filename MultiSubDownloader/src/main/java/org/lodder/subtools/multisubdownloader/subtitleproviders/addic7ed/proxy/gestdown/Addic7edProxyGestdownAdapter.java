@@ -3,13 +3,13 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.gestdown.model.ShowDto;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -27,8 +27,10 @@ import org.lodder.subtools.sublibrary.util.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class Addic7edProxyGestdownAdapter extends
-    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId, Addic7edException> {
+    SubtitleAdapter<Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSubtitle, Addic7edProxyGestdownSerieId,
+        Addic7edException> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownAdapter.class);
 
@@ -94,16 +96,17 @@ public final class Addic7edProxyGestdownAdapter extends
     }
 
     @Override
-    public Optional<Collection<Addic7edProxyGestdownSubtitle>> searchSubtitles(ProviderIds providerIds, int season,
+    public Collection<Addic7edProxyGestdownSubtitle> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws Addic7edException {
-        return Optional.empty();
+        return List.of();
     }
 
     @Override
-    public Optional<Collection<Addic7edProxyGestdownSubtitle>> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<Addic7edProxyGestdownSubtitle> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws Addic7edException {
-        LOGGER.debug("$provider - getSubtitles: {}", TvRelease.formatName(serieMapping.providerName, season, episode));
-        return Optional.of(api.getSubtitles(serieMapping.providerId, season, episode, language));
+        LOGGER.debug("$provider - getSubtitles: {}",
+            TvRelease.formatName(serieMapping.providerName, season, episode));
+        return api.getSubtitles(serieMapping.providerId, season, episode, language);
     }
 
     // ====== \\
@@ -116,6 +119,7 @@ public final class Addic7edProxyGestdownAdapter extends
     }
 
 
+    @NullMarked
     private enum ReturnCode {
         NOT_FOUND((code, _) -> code == HttpStatus.NOT_FOUND),
         RATE_LIMIT_REACHED((code, _) -> code == HttpStatus.TOO_MANY_REQUESTS),

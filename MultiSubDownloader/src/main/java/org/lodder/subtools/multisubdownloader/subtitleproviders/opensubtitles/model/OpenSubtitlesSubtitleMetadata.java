@@ -1,7 +1,9 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.model;
 
 import manifold.ext.props.rt.api.var;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OpenSubtitlesSubtitleMetadata {
     @var String userNickName;
     @var String subFormat;

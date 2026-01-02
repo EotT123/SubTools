@@ -8,6 +8,7 @@ import java.io.Serial;
 import java.nio.file.Path;
 
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages;
 import org.lodder.subtools.multisubdownloader.gui.extra.JListWithImages.LabelPanel;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
@@ -20,6 +21,7 @@ import org.lodder.subtools.multisubdownloader.settings.model.PathMatchType;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubtitlesApi;
 
+@NullMarked
 public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial
@@ -64,11 +66,9 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     panelLayout:new MigLayout("insets 0, novisualpadding")
                     )
                     .addComponent(new JLabel(getText("PreferenceDialog.Username")))
-                    .addComponent("wrap", this.txtAddic7edUsername =
-                        MyTextFieldString.builder().requireValue().build().columns(20))
+                    .addComponent("wrap", this.txtAddic7edUsername = new MyTextFieldString(true).columns(20))
                     .addComponent(new JLabel(getText("PreferenceDialog.Password")))
-                    .addComponent(this.txtAddic7edPassword =
-                        MyPasswordField.builder().requireValue().build().columns(20)));
+                    .addComponent(this.txtAddic7edPassword = new MyPasswordField(true).columns(20)));
 
             // TV SUBTITLES
             this.chkSourceTvSubtitles = new JCheckBox("Tv Subtitles").addTo(titlePanel, "wrap");
@@ -87,11 +87,9 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
                     panelLayout:new MigLayout("insets 0, novisualpadding")
                     )
                     .addComponent(new JLabel(getText("PreferenceDialog.Username")))
-                    .addComponent("wrap", txtOpenSubtitlesUsername =
-                        MyTextFieldString.builder().requireValue().build().columns(20))
+                    .addComponent("wrap", txtOpenSubtitlesUsername = new MyTextFieldString(true).columns(20))
                     .addComponent(new JLabel(getText("PreferenceDialog.Password")))
-                    .addComponent(txtOpenSubtitlesPassword =
-                        MyPasswordField.builder().requireValue().build().columns(20)));
+                    .addComponent(txtOpenSubtitlesPassword = new MyPasswordField(true).columns(20)));
 
             // SUBDL
             this.chkSourceSubdl = new JCheckBox("SubDL").addTo(titlePanel, "wrap");

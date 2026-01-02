@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
+import static util.Utils.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,7 +9,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
@@ -15,14 +19,17 @@ import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileAction
 import org.lodder.subtools.multisubdownloader.lib.library.PathLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
+import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.Nothing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class DownloadAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadAction.class);
@@ -37,19 +44,20 @@ public class DownloadAction {
         this.userInteractionHandler = userInteractionHandler;
     }
 
-    public void download(Release release, Subtitle subtitle, @Nullable AtomicInteger counter=null) throws IOException {
+    public void download(ReleaseWithPath release, Subtitle subtitle,
+        @Nullable AtomicInteger counter=null) throws IOException {
         LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
-        switch (release.videoType) {
-            case EPISODE -> download(release, subtitle, settings.episodeLibrarySettings, counter);
-            case MOVIE -> download(release, subtitle, settings.movieLibrarySettings, counter);
-            default -> throw new IllegalArgumentException("Unexpected value: " + release.videoType);
+        switch (release) {
+            case TvReleaseWithPath _ -> download(release, subtitle, settings.episodeLibrarySettings, counter);
+            case MovieReleaseWithPath _ -> download(release, subtitle, settings.movieLibrarySettings, counter);
         }
     }
 
-    private void download(Release release, Subtitle subtitle, LibrarySettings librarySettings,
+    private void download(ReleaseWithPath release, Subtitle subtitle, LibrarySettings librarySettings,
         @Nullable AtomicInteger counter) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
-        Path path = PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).build(release);
+        Path path =
+            PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).buildPath(release);
         if (!path.exists()) {
             LOGGER.debug("Download creating folder [{}] ", path.toAbsolutePath());
             try {
@@ -61,13 +69,12 @@ public class DownloadAction {
 
         FilenameLibraryBuilder filenameLibraryBuilder =
             FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
-        String videoFileName = filenameLibraryBuilder.build(release).toString();
+        String videoFileName = filenameLibraryBuilder.buildPath(release).toString();
 
-        Function<AtomicInteger, String> fileNameFunction = counterOverride ->
+        ThrowingFunction<AtomicInteger, @Nullable Integer, Nothing> incrementCounter = AtomicInteger::incrementAndGet;
+        Function<@Nullable AtomicInteger, String> fileNameFunction = counterOverride ->
             filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName,
-                counter == null ?
-                    (counterOverride == null ? null : counterOverride.incrementAndGet()) :
-                    Integer.valueOf(counter.incrementAndGet()));
+                ifNotNullOrElseGet(counter, incrementCounter, () -> ifNotNull(counterOverride, incrementCounter)));
 
         List<Path> downloadedSubtitles;
         try {
@@ -82,7 +89,7 @@ public class DownloadAction {
         }
 
         if (!librarySettings.hasLibraryAction(LibraryActionType.NOTHING)) {
-            Path oldLocationFile = release.getPath().resolve(release.fileName);
+            Path oldLocationFile = release.path.resolve(ifNullThen(release.fileName, release.name));
             if (oldLocationFile.exists()) {
                 LOGGER.info("Moving/Renaming [{}] to folder [{}] this might take a while... ", videoFileName, path);
                 oldLocationFile.moveToDir(path);
@@ -96,8 +103,7 @@ public class DownloadAction {
             }
         }
         if (librarySettings.backupSubtitle) {
-            String langFolder = subtitle.language == null ? Language.ENGLISH.iso639_3 : subtitle.language.iso639_3;
-            Path backupPath = librarySettings.backupSubtitlePath.resolve(langFolder);
+            Path backupPath = librarySettings.backupSubtitlePath.resolve(subtitle.language.iso639_3);
 
             if (!backupPath.exists()) {
                 try {

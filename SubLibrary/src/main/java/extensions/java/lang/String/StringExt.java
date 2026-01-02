@@ -11,9 +11,11 @@ import java.util.function.Function;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @Extension
+@NullMarked
 public class StringExt {
 
     private StringExt() {

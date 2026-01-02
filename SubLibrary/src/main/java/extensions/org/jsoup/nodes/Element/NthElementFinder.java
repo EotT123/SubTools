@@ -7,12 +7,14 @@ import org.jsoup.nodes.Node;
 import org.jsoup.select.Evaluator;
 import org.jsoup.select.NodeFilter;
 import org.jsoup.select.NodeTraversor;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 class NthElementFinder implements NodeFilter {
     private final Evaluator eval;
     private Element evalRoot;
-    private Element match;
+    private @Nullable Element match;
     private int index;
     private int currentIdx;
 

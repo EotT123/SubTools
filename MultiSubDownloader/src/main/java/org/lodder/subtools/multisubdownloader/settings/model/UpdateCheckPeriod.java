@@ -1,7 +1,9 @@
 package org.lodder.subtools.multisubdownloader.settings.model;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public enum UpdateCheckPeriod {
     MANUAL("InputPanel.UpdateInterval.Manual"),
     DAILY("InputPanel.UpdateInterval.Daily"),

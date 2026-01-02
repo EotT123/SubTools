@@ -7,8 +7,10 @@ import java.util.stream.Stream;
 
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
+import org.jspecify.annotations.NullMarked;
 
 @Extension
+@NullMarked
 public class IteratorExt {
 
     private IteratorExt() {

@@ -4,24 +4,25 @@ import java.io.Serializable;
 
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.exception.SubsceneException;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.SeasonEpisode;
 
+@NullMarked
 public class SubsceneSubtitleMetadata implements Serializable {
 
-    @val @Nullable Language language;
-    @val @Nullable String name;
+    @val Language language;
+    @val String name;
     @val boolean hearingImpaired;
-    @val @Nullable String uploader;
-    @val @Nullable String comment;
+    @val String uploader;
+    @val String comment;
     @val @Nullable SeasonEpisode seasonEpisode;
     @val ThrowingSupplier<String, ? extends SubsceneException> urlSupplier;
 
-    public SubsceneSubtitleMetadata(@Nullable Language language,
-        @Nullable String name, boolean hearingImpaired,@Nullable String uploader, @Nullable String comment,
-        ThrowingSupplier<String, ? extends SubsceneException> urlSupplier) {
+    public SubsceneSubtitleMetadata(Language language, String name, boolean hearingImpaired, String uploader,
+        String comment, ThrowingSupplier<String, ? extends SubsceneException> urlSupplier) {
         this.language = language;
         this.name = name;
         this.hearingImpaired = hearingImpaired;

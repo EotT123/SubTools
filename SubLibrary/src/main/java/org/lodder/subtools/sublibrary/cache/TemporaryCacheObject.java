@@ -15,20 +15,21 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-final class TemporaryCacheObject<V> implements CacheObject<V> {
+public final class TemporaryCacheObject<V extends @Nullable Object> implements CacheObject<V> {
 
     @Serial
     private static final long serialVersionUID = 1L;
     private static final Pattern PATTERN = Pattern.compile("created:(.*?)|expire:(.*?)|value:(.*)");
+
     @override @val Time created;
     @val Time timeToLive;
-    @override @val @Nullable V value;
+    @override @val V value;
 
-    TemporaryCacheObject(Time timeToLive, @Nullable V value) {
+    TemporaryCacheObject(Time timeToLive, V value) {
         this(Time.now(), timeToLive, value);
     }
 
-    private TemporaryCacheObject(Time created, Time timeToLive, @Nullable V value) {
+    private TemporaryCacheObject(Time created, Time timeToLive, V value) {
         this.created = created;
         this.timeToLive = timeToLive;
         this.value = value;

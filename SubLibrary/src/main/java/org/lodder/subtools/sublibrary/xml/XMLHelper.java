@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -15,6 +16,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+@NullMarked
 public class XMLHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XMLHelper.class);
@@ -49,17 +51,18 @@ public class XMLHelper {
         return nValue == null ? 0 : Integer.parseInt(nValue.getNodeValue());
     }
 
-    public static Document getDocument(String string) throws ParserConfigurationException, IOException {
+    public static Document getDocument(String string) throws IOException {
         return getDocument(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public static Document getDocument(InputStream inputStream) throws ParserConfigurationException, IOException {
+    public static Document getDocument(InputStream inputStream) throws IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // Use the factory to create a builder
-        DocumentBuilder builder;
-        builder = factory.newDocumentBuilder();
         try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(inputStream);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
         } catch (SAXException | IOException e) {
             throw new IOException("XML input could not be converted to a document");
         }

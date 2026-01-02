@@ -5,7 +5,10 @@ import java.io.Serial;
 import java.net.HttpURLConnection;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class HttpClientException extends Exception {
 
     @Serial
@@ -17,27 +20,29 @@ public class HttpClientException extends Exception {
         this(null, connection);
     }
 
-    public HttpClientException(Throwable cause, HttpURLConnection connection) {
+    public HttpClientException(@Nullable Throwable cause, @Nullable HttpURLConnection connection) {
         super(cause);
         this.responseCode = getResponseCode(connection);
         this.responseMessage = getResponseMessage(connection);
     }
 
-    private int getResponseCode(HttpURLConnection connection) {
+    private int getResponseCode(@Nullable HttpURLConnection connection) {
         if (connection != null) {
             try {
                 return connection.getResponseCode();
             } catch (IOException e) {
+                // continue
             }
         }
         return -1;
     }
 
-    private String getResponseMessage(HttpURLConnection connection) {
+    private String getResponseMessage(@Nullable HttpURLConnection connection) {
         if (connection != null) {
             try {
                 return connection.getResponseMessage();
             } catch (IOException e) {
+                // continue
             }
         }
         return "";

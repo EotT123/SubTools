@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class ConfigProperties {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigProperties.class);
@@ -27,6 +29,7 @@ public final class ConfigProperties {
         return instance.prop.getProperty(property.value);
     }
 
+    @NullMarked
     public enum Property {
         NAME("name"),
         VERSION("version");

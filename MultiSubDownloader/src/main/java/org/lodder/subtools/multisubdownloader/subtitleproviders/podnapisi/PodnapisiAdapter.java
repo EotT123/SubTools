@@ -2,11 +2,11 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleAdapter;
@@ -22,6 +22,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 
+@NullMarked
 public final class PodnapisiAdapter
     extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
 
@@ -60,7 +61,7 @@ public final class PodnapisiAdapter
     // SERIE \\
     // ===== \\
 
-
+    @Override
     public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws PodnapisiException {
         return List.of();
@@ -78,16 +79,17 @@ public final class PodnapisiAdapter
     }
 
     @Override
-    public Optional<Collection<PodnapisiSubtitleMetadata>> searchSubtitles(ProviderIds providerIds, int season,
+    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws PodnapisiException {
         return providerIds.getImdbId()
-            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language));
+            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language))
+            .orElse(List.of());
     }
 
     @Override
-    public Optional<Collection<PodnapisiSubtitleMetadata>> searchSubtitles(SerieMapping serieMapping, int season,
+    public Collection<PodnapisiSubtitleMetadata> searchSubtitles(SerieMapping serieMapping, int season,
         int episode, Language language) throws PodnapisiException {
-        return Optional.of(api.getSerieSubtitles(serieMapping.providerName, season, episode, language));
+        return api.getSerieSubtitles(serieMapping.providerName, season, episode, language);
     }
 
     // ====== \\

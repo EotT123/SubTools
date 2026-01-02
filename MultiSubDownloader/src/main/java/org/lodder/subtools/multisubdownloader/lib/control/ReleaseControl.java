@@ -3,16 +3,19 @@ package org.lodder.subtools.multisubdownloader.lib.control;
 import static manifold.ext.props.rt.api.PropOption.*;
 
 import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.imdb.ImdbAdapter;
 import org.lodder.subtools.sublibrary.data.omdb.OmdbAdapter;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
-import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
-public abstract sealed class ReleaseControl<T extends Release> permits MovieReleaseControl, TvReleaseControl {
+@NullMarked
+public abstract sealed class ReleaseControl<T extends ReleaseWithoutPath>
+    permits MovieReleaseControl, TvReleaseControl {
 
     @val(Protected) Settings settings;
     @val(Protected) Manager manager;
