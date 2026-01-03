@@ -8,6 +8,8 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -63,9 +65,10 @@ public class ImdbAdapter implements AdapterIntf {
             @SuppressWarnings("unchecked") Optional<ReleaseMapping> releaseMapping =
                 (Optional<ReleaseMapping>) getCache(videoType.name() + "mapping",
                     b -> b.add("title", title).add("videoType", videoType).add("year", year)).getOptional(
-                    () -> getImdbIdOnImdb(title, year, videoType).orElseMap(
-                            () -> getImdbIdOnGoogle(title, year, videoType))
-                        .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType)).orElseMap(
+                    () -> getImdbIdOnImdb(title, year, videoType)
+                        .orElseMap(() -> getImdbIdOnGoogle(title, year, videoType))
+                        .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType))
+                        .orElseMap(
                             () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId)))
                         .map(imdbId -> switch (videoType) {
                             case EPISODE -> new SerieMapping(title, imdbId.id, imdbId.name);
@@ -119,7 +122,8 @@ public class ImdbAdapter implements AdapterIntf {
         Pattern yearPattern = Pattern.compile("(?<year>[1-2]\\d{3})");
         return userInteractionHandler.selectFromList(providerIds.stream().sorted(
                 Comparator.comparing((ImdbId imdbPID) -> imdbPID.videoType == videoType ? -1 : 1)
-                    .thenComparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title)).thenComparing(imdbPID -> {
+                    .thenComparing(imdbPID -> imdbPID.calculateLevenshteinDistance(title))
+                    .thenComparing(imdbPID -> {
                         if (imdbPID.year != null) {
                             Matcher matcher = yearPattern.matcher(imdbPID.year);
                             Integer lastYear = null;
@@ -133,7 +137,8 @@ public class ImdbAdapter implements AdapterIntf {
                         return 0;
                     })).toList(), getText("Prompter.SelectImdbMatchForSerie", title), provider,
             providerId -> providerId.name +
-                (StringUtils.isNotBlank(providerId.otherInfo) ? " (" + providerId.otherInfo + ")" : ""));
+                Stream.of(providerId.year, providerId.otherInfo).mapFilterNonNull(StringUtils::trimToNull).collect(
+                    Collectors.joining(" - ", " (", ")")));
     }
 
     private Optional<String> promptUserToEnterImdbId(String title) {

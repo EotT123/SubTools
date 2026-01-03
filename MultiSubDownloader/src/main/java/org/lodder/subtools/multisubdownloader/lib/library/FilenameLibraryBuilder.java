@@ -80,7 +80,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
                 case MovieRelease movieRelease -> buildMovieFolderStructure(movieRelease);
             };
         }
-        return release.fileNameOrName;
+        return release.folderNameOrName;
     }
 
     private String buildEpisodeFolderStructure(TvRelease tvRelease) {
@@ -101,7 +101,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         filename = replace(filename, SerieStructureTag.QUALITY, tvRelease.quality);
         filename = replace(filename, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
 
-        filename += "." + StringUtils.substringAfterLast(tvRelease.fileNameOrName, ".");
+        filename += "." + StringUtils.substringAfterLast(tvRelease.folderNameOrName, ".");
         filename = filename.removeIllegalWindowsChars();
         if (replaceSpace) {
             filename = filename.replace(' ', replacingSpaceChar);
@@ -117,7 +117,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         filename = replace(filename, MovieStructureTag.QUALITY, movieRelease.quality);
         filename = replace(filename, MovieStructureTag.RELEASE_GROUP, movieRelease.releaseGroup);
 
-        filename += "." + StringUtils.substringAfterLast(movieRelease.fileNameOrName, ".");
+        filename += "." + StringUtils.substringAfterLast(movieRelease.folderNameOrName, ".");
 
         filename = filename.removeIllegalWindowsChars();
         if (replaceSpace) {

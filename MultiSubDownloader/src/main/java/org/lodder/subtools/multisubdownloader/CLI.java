@@ -118,13 +118,13 @@ public class CLI {
         if (downloadAll) {
             selection = release.matchingSubs;
             if (!selection.isEmpty()) {
-                System.out.println("Downloading ALL found subtitles for release: ${release.fileNameOrName}");
+                System.out.println("Downloading ALL found subtitles for release: ${release.folderNameOrName}");
             }
         } else {
             selection = userInteractionHandlerAction.subtitleSelection(release, subtitleSelection, dryRun);
         }
         if (selection.isEmpty()) {
-            System.out.println("No subtitles found for: ${release.fileNameOrName}");
+            System.out.println("No subtitles found for: ${release.folderNameOrName}");
         } else {
             AtomicInteger counter = new AtomicInteger(1);
             IntStream.range(0, selection.size()).forEach(j -> {

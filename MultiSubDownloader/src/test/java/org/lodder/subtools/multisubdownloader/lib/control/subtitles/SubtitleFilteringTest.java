@@ -119,7 +119,7 @@ class SubtitleFilteringTest {
     private ReleaseWithoutPath createRelease(String filename, String releasegroup) {
         ReleaseWithoutPath release = mock(TvReleaseWithoutPath.class);
 
-        when(release.fileNameOrName).thenReturn(filename);
+        when(release.folderNameOrName).thenReturn(filename);
         when(release.releaseGroup).thenReturn(releasegroup);
 
         return release;

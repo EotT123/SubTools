@@ -70,7 +70,12 @@ public class Utils {
         return value != null ? mapper.apply(value) : orElseValue;
     }
 
-    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGet(@Nullable T value,
+    public static <T, R, X extends Exception> R ifNotNullOrElseGet(@Nullable T value,
+        ThrowingFunction<T, R, X> mapper, Supplier<R> orElseSupplier) throws X {
+        return value != null ? mapper.apply(value) : orElseSupplier.get();
+    }
+
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGetNullable(@Nullable T value,
         ThrowingFunction<T, R, X> mapper, Supplier<R> orElseSupplier) throws X {
         return value != null ? mapper.apply(value) : orElseSupplier.get();
     }

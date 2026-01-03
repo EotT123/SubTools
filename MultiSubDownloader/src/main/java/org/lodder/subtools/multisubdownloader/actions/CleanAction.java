@@ -31,7 +31,7 @@ public class CleanAction {
             throw new IllegalArgumentException("Destination [%s] is not a folder".formatted(destination));
         }
 
-        release.path.list()
+        release.path.parent.list()
             .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
                 || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
             .forEachEx(p -> {

@@ -16,7 +16,7 @@ public abstract sealed class SubtitleFilter permits ExactNameFilter, KeywordFilt
     }
 
     protected String getReleaseName(Release release) {
-        return StringUtils.substringBeforeLast(release.fileNameOrName, ".");
+        return StringUtils.substringBeforeLast(release.folderNameOrName, ".");
     }
 
     protected boolean checkKeywordSubtitleMatch(Subtitle subtitle, String keywordsFile) {

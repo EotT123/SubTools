@@ -94,7 +94,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
         if (subtitles.isEmpty()) {
             if (movieRelease instanceof MovieReleaseWithPath release) {
-                Path file = release.path.resolve(release.fileName);
+                Path file = release.path.parent.resolve(release.fileName);
                 if (file.exists()) {
                     try {
                         subtitles.addAll(searchMovieSubtitlesWithHash(FileHasher.computeHash(file), language));

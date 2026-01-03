@@ -21,7 +21,7 @@ public final class CLISearchProgress extends CLIProgress implements SearchProgre
 
     @Override
     public void progress(SubtitleProvider provider, int jobsLeft, Release release) {
-        this.tableModel.update(provider.provider, jobsLeft, release.fileNameOrName);
+        this.tableModel.update(provider.provider, jobsLeft, release.folderNameOrName);
         this.printProgress();
     }
 

@@ -58,7 +58,8 @@ public class RenameWorker extends SwingWorker<Void, String> implements Cancelabl
                     case MovieReleaseWithPath _ ->
                         new MoveAndRenameAction(settings.movieLibrarySettings, manager, userInteractionHandler);
                 };
-                moveAndRenameAction.moveAndRename(selectedShow.path.resolve(selectedShow.fileName), selectedShow);
+                moveAndRenameAction.moveAndRename(selectedShow.path.parent.resolve(selectedShow.fileName),
+                    selectedShow);
                 model.removeShow(selectedShow);
             }
         });
