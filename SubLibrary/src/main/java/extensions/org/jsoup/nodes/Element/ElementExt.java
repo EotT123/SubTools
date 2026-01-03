@@ -245,9 +245,12 @@ public class ElementExt {
 //        return amount > 1 ? element.parent(amount - 1) : ElementExt.parent(element);
 //    }
 
-    @Intercept
     public static @Nullable Element nextElementSibling(@This @Nullable Element element) {
-        return element == null ? null : element.nextElementSibling();
+        if (element == null) {
+            return null;
+        }
+        Elements elements = element.nextElementSiblings();
+        return elements.isEmpty() ? null : elements.first;
     }
 
     // TODO replace by Function<Element, @Nullable T>
