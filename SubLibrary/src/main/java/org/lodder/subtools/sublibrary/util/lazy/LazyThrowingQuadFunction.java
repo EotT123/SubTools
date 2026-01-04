@@ -8,7 +8,6 @@ import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingQuadFunction
 public class LazyThrowingQuadFunction<T extends @Nullable Object, U extends @Nullable Object,
     V extends @Nullable Object, W extends @Nullable Object, R extends @Nullable Object, X extends Exception> {
 
-    private final Object lock = new Object();
     private final ThrowingQuadFunction<T, U, V, W, R, X> function;
     private R object;
     private volatile boolean initialized = false;
@@ -19,7 +18,7 @@ public class LazyThrowingQuadFunction<T extends @Nullable Object, U extends @Nul
 
     public R apply(T arg1, U arg2, V arg3, W arg4) throws X {
         if (!initialized) {
-            synchronized (lock) {
+            synchronized (this) {
                 if (!initialized) {
                     object = function.apply(arg1, arg2, arg3, arg4);
                     initialized = true;

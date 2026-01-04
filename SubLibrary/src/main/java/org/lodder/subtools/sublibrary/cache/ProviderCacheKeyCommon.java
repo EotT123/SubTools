@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static java.util.Objects.*;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +34,7 @@ public abstract sealed class ProviderCacheKeyCommon implements Serializable perm
 
     @Override
     public int hashCode() {
-        return Objects.hash(provider, type, params);
+        return hash(provider, type, params);
     }
 
     @Override

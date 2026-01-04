@@ -25,14 +25,15 @@ public abstract class Subtitle implements Serializable {
     @val Language language;
     @val @Nullable String releaseGroup;
     @val @Nullable String uploader;
-    @val(Abstract) SubtitleSource source;
     @val boolean hearingImpaired;
     @val String quality;
+    @val(Abstract) SubtitleSource source;
 
     @var @Nullable SubtitleMatchType subtitleMatchType;
     @var int score;
 
-    public Subtitle(@Nullable String fileName=null, Language language,
+    public Subtitle(@Nullable String fileName=null,
+        Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         boolean hearingImpaired=false,

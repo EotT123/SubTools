@@ -8,7 +8,6 @@ import org.jspecify.annotations.Nullable;
 public class LazyThrowingBiFunction<T extends @Nullable Object, U extends @Nullable Object,
     R extends @Nullable Object, X extends Exception> {
 
-    private final Object lock = new Object();
     private final ThrowingBiFunction<T, U, R, X> function;
     private R object;
     private volatile boolean initialized = false;
@@ -19,7 +18,7 @@ public class LazyThrowingBiFunction<T extends @Nullable Object, U extends @Nulla
 
     public R apply(T arg1, U arg2) throws X {
         if (!initialized) {
-            synchronized (lock) {
+            synchronized (this) {
                 if (!initialized) {
                     object = function.apply(arg1, arg2);
                     initialized = true;

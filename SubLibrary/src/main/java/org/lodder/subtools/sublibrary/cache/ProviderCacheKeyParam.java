@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static java.util.Objects.*;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
@@ -33,6 +35,6 @@ public record ProviderCacheKeyParam(String key, @Nullable String value) implemen
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, value);
+        return hash(key, value);
     }
 }

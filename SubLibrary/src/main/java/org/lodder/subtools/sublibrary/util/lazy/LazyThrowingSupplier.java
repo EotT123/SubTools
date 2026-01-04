@@ -9,7 +9,6 @@ public class LazyThrowingSupplier<T extends @Nullable Object, X extends Exceptio
 
     private final ThrowingSupplier<T, X> supplier;
     private T object;
-    private final Object lock = new Object();
     private volatile boolean initialized = false;
 
     public LazyThrowingSupplier(ThrowingSupplier<T, X> supplier) {
@@ -18,7 +17,7 @@ public class LazyThrowingSupplier<T extends @Nullable Object, X extends Exceptio
 
     public T get() throws X {
         if (!initialized) {
-            synchronized (lock) {
+            synchronized (this) {
                 if (!initialized) {
                     object = supplier.get();
                     initialized = true;

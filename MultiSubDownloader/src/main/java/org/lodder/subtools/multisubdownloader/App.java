@@ -1,9 +1,11 @@
 package org.lodder.subtools.multisubdownloader;
 
 import static manifold.science.util.UnitConstants.*;
+import static util.Utils.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -12,9 +14,9 @@ import ch.qos.logback.classic.Level;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
@@ -25,6 +27,7 @@ import org.lodder.subtools.multisubdownloader.gui.Splash;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
+import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheDisk;
@@ -38,14 +41,13 @@ public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
-    private static SettingsControl prefCtrl;
     private static @Nullable Splash splash;
 
     static void main(String[] args) throws ReflectiveOperationException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
+        HelpFormatter formatter = HelpFormatter.builder().get();
 
         CommandLine line;
         try {
@@ -55,17 +57,15 @@ public class App {
             return;
         }
 
-        splash = line.hasCliOption(CliOption.NO_GUI) ? null : new Splash().showSplash();
-
         Preferences preferences = Preferences.userRoot();
         preferences.putBoolean(CliOption.SPEEDY.value, line.hasCliOption(CliOption.SPEEDY));
         preferences.putBoolean(CliOption.CONFIRM_PROVIDER_MAPPING.value,
             line.hasCliOption(CliOption.CONFIRM_PROVIDER_MAPPING));
 
-        final Container app = new Container();
-        final Manager manager = createManager(!line.hasCliOption(CliOption.NO_GUI));
-        prefCtrl = new SettingsControl(manager);
-        Messages.language = prefCtrl.settings.language;
+        Container app = new Container();
+        Manager manager = createManager();
+        SettingsControl prefCtrl = new SettingsControl(manager);
+        Messages.language = ifNullThen(prefCtrl.settings.language, Language.ENGLISH);
         Bootstrapper bootstrapper = new Bootstrapper(app, prefCtrl.settings, preferences, manager);
 
         if (line.hasCliOption(CliOption.TRACE)) {
@@ -78,22 +78,25 @@ public class App {
             bootstrapper.initialize(new UserInteractionHandlerCLI(prefCtrl.settings));
 
             /* Defined here so there is output on console */
-            importPreferences(line);
+            importPreferences(line, prefCtrl);
 
             try {
                 CLI cmd = new CLI(prefCtrl, app, line);
                 if (line.hasCliOption(CliOption.HELP)) {
-                    formatter.printHelp(ConfigProperties.getProperty(Property.NAME), getCLIOptions());
+                    formatter.printHelp(ConfigProperties.getProperty(Property.NAME), "help", getCLIOptions(), "",
+                        false);
                     return;
                 }
                 cmd.run();
-            } catch (CliException e) {
+            } catch (IOException | CliException e) {
                 System.out.println("Error: " + e.getMessage());
                 return;
             }
         } else {
+            splash = new Splash(Messages.getText("App.Starting")).showSplash();
+
             /* Defined here so there is output in the splash */
-            importPreferences(line);
+            importPreferences(line, prefCtrl);
 
             bootstrapper.initialize(new UserInteractionHandlerGUI(prefCtrl.settings, null));
             EventQueue.invokeLater(() -> {
@@ -124,7 +127,7 @@ public class App {
         root.setLevel(level);
     }
 
-    private static void importPreferences(CommandLine line) {
+    private static void importPreferences(CommandLine line, SettingsControl prefCtrl) {
         if (!line.hasCliOption(CliOption.IMPORT_PREFERENCES)) {
             return;
         }
@@ -140,18 +143,13 @@ public class App {
 
     public static Options getCLIOptions() {
         Options options = new Options();
-        CliOption.values().forEach(cliOption -> options.addOption(cliOption.value, cliOption.longValue,
-            cliOption.hasArg, cliOption.description));
+        CliOption.values().stream().map(CliOption::toOption).forEach(options::addOption);
         return options;
     }
 
-    private static Manager createManager(boolean useGui) {
-        if (splash != null) {
-            splash.progressMsg = Messages.getText("App.Starting");
-        }
+    private static Manager createManager() {
         ProviderCacheDisk diskCache = new ProviderCacheDisk(500 day, 5000);
-
-        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10 min, 100ms, 2500);
+        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10min, 100ms, 2500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }

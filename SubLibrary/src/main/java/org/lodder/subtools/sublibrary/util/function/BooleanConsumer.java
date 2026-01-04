@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.util.function;
 
-import java.util.Objects;
+import static java.util.Objects.*;
+
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NullMarked;
@@ -53,7 +54,7 @@ public interface BooleanConsumer extends Consumer<Boolean> {
      *          conversions).
      */
     default BooleanConsumer andThen(final BooleanConsumer after) {
-        Objects.requireNonNull(after);
+        requireNonNull(after);
         return t -> {
             accept(t);
             after.accept(t);

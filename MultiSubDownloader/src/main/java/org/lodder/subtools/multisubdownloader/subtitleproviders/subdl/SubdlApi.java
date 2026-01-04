@@ -63,7 +63,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language) throws SubdlApiException {
-        Map<SearchParam, Serializable> params = MapUtil.create(
+        Map<SearchParam, @Nullable Serializable> params = MapUtil.create(
             SearchParam.FILM_NAME, title,
             SearchParam.YEAR, year,
             SearchParam.TYPE, ReleaseType.movie);
@@ -196,7 +196,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlApiException if the API call fails
      */
     private List<SubdlSubtitleMetadata> getSubtitles(Language language,
-        Map<SearchParam, Serializable> extraParams) throws SubdlApiException {
+        Map<SearchParam, @Nullable Serializable> extraParams) throws SubdlApiException {
         extraParams.put(SearchParam.LANGUAGES,
             SubdlLanguage.of(language).map(SubdlLanguage::getLangCode).collect(Collectors.joining(",")));
         return getSerie(extraParams).subtitles.stream().map(this::convertToSubtitleMetadata).toList();
@@ -226,7 +226,7 @@ public class SubdlApi implements SubtitleApi {
      * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws SubdlApiException if the API call fails
      */
-    private Serie getSerie(Map<SearchParam, Serializable> paramMap) throws SubdlApiException {
+    private Serie getSerie(Map<SearchParam, @Nullable Serializable> paramMap) throws SubdlApiException {
         List<ProviderCacheKeyParam> params = paramMap.entrySet().stream()
             .map(entry -> new ProviderCacheKeyParam(entry.getKey().name(), entry.getValue())).toList();
         return getCache("serieSubtitles", b -> b.add(params))
@@ -239,11 +239,11 @@ public class SubdlApi implements SubtitleApi {
                             String.valueOf(entry.value)));
                     Serie serie = request.getOne("/subtitles");
                     if (!serie.status) {
-                        throw SubdlApiException.error(null, String.valueOf(serie.get("error")));
+                        throw SubdlApiException.error(String.valueOf(serie.get("error")));
                     }
                     return serie;
                 } catch (Exception e) {
-                    throw SubdlApiException.error(e, cacheStrategy:CACHE_DISABLED);
+                    throw SubdlApiException.error(e, e.getMessage(), CACHE_DISABLED);
                 }
             });
     }

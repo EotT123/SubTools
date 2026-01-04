@@ -74,7 +74,8 @@ public class DownloadAction {
         ThrowingFunction<AtomicInteger, @Nullable Integer, Nothing> incrementCounter = AtomicInteger::incrementAndGet;
         Function<@Nullable AtomicInteger, String> fileNameFunction = counterOverride ->
             filenameLibraryBuilder.buildSubtitle(release, subtitle, videoFileName,
-                ifNotNullOrElseGet(counter, incrementCounter, () -> ifNotNull(counterOverride, incrementCounter)));
+                ifNotNullOrElseGetNullable(counter, incrementCounter,
+                    () -> ifNotNull(counterOverride, incrementCounter)));
 
         List<Path> downloadedSubtitles;
         try {

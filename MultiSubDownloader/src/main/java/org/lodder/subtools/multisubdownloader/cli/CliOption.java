@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.cli;
 
 import manifold.ext.props.rt.api.val;
+import org.apache.commons.cli.Option;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
@@ -37,5 +38,9 @@ public enum CliOption {
 
     public String getDescription() {
         return Messages.getText(msgCode);
+    }
+
+    public Option toOption() {
+        return new Option(value, longValue, hasArg, description);
     }
 }

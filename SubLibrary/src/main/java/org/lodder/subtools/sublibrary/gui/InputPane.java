@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.Validator;
@@ -124,7 +124,7 @@ public class InputPane<T> extends JDialog implements ActionListener, PropertyCha
             // If this isn't done, no property change event will be fired when the button is pressed again.
             optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 
-            if (StringUtils.equals(okText, String.valueOf(value))) {
+            if (Strings.CS.equals(okText, String.valueOf(value))) {
                 String text = textField.getText();
                 for (Validator<String> validator : inputValidators) {
                     if (validator.isInvalid(text)) {

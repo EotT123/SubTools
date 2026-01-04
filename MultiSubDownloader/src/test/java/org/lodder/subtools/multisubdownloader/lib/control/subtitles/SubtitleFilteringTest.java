@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
@@ -116,11 +117,11 @@ class SubtitleFilteringTest {
         return settings;
     }
 
-    private ReleaseWithoutPath createRelease(String filename, String releasegroup) {
+    private ReleaseWithoutPath createRelease(String filename, String releaseGroup) {
         ReleaseWithoutPath release = mock(TvReleaseWithoutPath.class);
 
         when(release.folderNameOrName).thenReturn(filename);
-        when(release.releaseGroup).thenReturn(releasegroup);
+        when(release.releaseGroup).thenReturn(releaseGroup);
 
         return release;
     }
@@ -160,9 +161,9 @@ class SubtitleFilteringTest {
     @NullMarked
     private static class TestSetupFiltering
         implements TestSetupSubtitlesIntf, TestSetupReleaseIntf, TestSetupMatchesIntf {
-        private SubtitleFiltering filter;
-        private List<Subtitle> subtitles;
-        private ReleaseWithoutPath release;
+        private @Nullable SubtitleFiltering filter;
+        private @Nullable List<Subtitle> subtitles;
+        private @Nullable ReleaseWithoutPath release;
 
         public TestSetupFiltering assertThatFilter(SubtitleFiltering filter) {
             this.filter = filter;

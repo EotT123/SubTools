@@ -2,11 +2,11 @@ package org.lodder.subtools.sublibrary.util.http;
 
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status.Family;
-import manifold.ext.props.rt.api.var;
+import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public enum  HttpStatus {
+public enum HttpStatus {
     // 1xx Informational
     CONTINUE(100, "Continue: The client should continue with its request."),
     SWITCHING_PROTOCOLS(101, "Switching Protocols: The server is changing protocols as requested by the client."),
@@ -80,9 +80,9 @@ public enum  HttpStatus {
     NOT_EXTENDED(510, "Not Extended: Further extensions to the request are required for the server to fulfill it."),
     NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required: The client needs to authenticate to gain network access.");
 
-    @var int code;
-    @var String description;
-    @var Family family;
+    @val int code;
+    @val String description;
+    @val Family family;
 
     HttpStatus(int code, String description) {
         this.code = code;

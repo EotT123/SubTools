@@ -62,7 +62,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing four mappings.
+     * Returns a map containing four mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -88,7 +88,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing five mappings.
+     * Returns a map containing five mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type

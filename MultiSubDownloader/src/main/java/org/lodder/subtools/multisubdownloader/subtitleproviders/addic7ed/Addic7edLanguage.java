@@ -3,7 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 import java.util.List;
 
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 
@@ -87,7 +87,7 @@ public enum Addic7edLanguage {
     }
 
     public static Addic7edLanguage of(String value) {
-        return Addic7edLanguage.values().stream().filter(l -> StringUtils.equals(l.value, value)).findFirst()
+        return Addic7edLanguage.values().stream().filter(l -> Strings.CS.equals(l.value, value)).findFirst()
             .orElse(null);
     }
 

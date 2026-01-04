@@ -9,7 +9,6 @@ public class LazyThrowingFunction<T extends @Nullable Object, S extends @Nullabl
 
     private final ThrowingFunction<T, S, X> function;
     private S object;
-    private final Object lock = new Object();
     private volatile boolean initialized = false;
 
     public LazyThrowingFunction(ThrowingFunction<T, S, X> function) {
@@ -18,7 +17,7 @@ public class LazyThrowingFunction<T extends @Nullable Object, S extends @Nullabl
 
     public S apply(T arg) throws X {
         if (!initialized) {
-            synchronized (lock) {
+            synchronized (this) {
                 if (!initialized) {
                     object = function.apply(arg);
                     initialized = true;

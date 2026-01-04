@@ -16,6 +16,7 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -236,8 +237,8 @@ public class Addic7edApi implements SubtitleApi {
     }
 
     public boolean isDuplicate(List<Addic7edSubtitle> lSubtitles, Addic7edSubtitle sub) {
-        return lSubtitles.stream().anyMatch(s -> s.language == sub.language && StringUtils.equals(s.url, sub.url) &&
-            StringUtils.equals(s.version, sub.version));
+        return lSubtitles.stream().anyMatch(s -> s.language == sub.language && Strings.CS.equals(s.url, sub.url) &&
+            Strings.CS.equals(s.version, sub.version));
     }
 
     private Document getContent(String url) throws Addic7edApiException {

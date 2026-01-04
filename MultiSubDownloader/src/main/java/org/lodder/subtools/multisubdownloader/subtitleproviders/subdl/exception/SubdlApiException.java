@@ -27,8 +27,8 @@ public class SubdlApiException extends SubdlException implements ApiExceptionInt
         this.logLevel = logLevel;
     }
 
-    private SubdlApiException(HttpStatus errorCode, Exception cause, String message=
-        cause.getMessage(), CacheStrategy cacheStrategy, LogLevel logLevel) {
+    private SubdlApiException(HttpStatus errorCode, Exception cause, String message=cause.getMessage(),
+        CacheStrategy cacheStrategy, LogLevel logLevel) {
         super(message, cause);
         this.errorCode = errorCode;
         this.cacheStrategy = cacheStrategy;
@@ -37,6 +37,10 @@ public class SubdlApiException extends SubdlException implements ApiExceptionInt
 
     public static SubdlApiException noResult(String message) {
         return new SubdlApiException(NO_CONTENT, message, CACHE_TEMPORARY, WARN);
+    }
+
+    public static SubdlApiException error(String message, CacheStrategy cacheStrategy=CACHE_TEMPORARY) {
+        return new SubdlApiException(SERVER_ERROR, message, cacheStrategy, ERROR);
     }
 
     public static SubdlApiException error(Exception cause, String message=cause.getMessage(),

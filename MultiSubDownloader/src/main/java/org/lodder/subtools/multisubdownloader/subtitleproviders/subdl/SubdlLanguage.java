@@ -3,7 +3,6 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 import java.util.List;
 
 import manifold.ext.props.rt.api.val;
-import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
 
@@ -75,7 +74,7 @@ public enum SubdlLanguage {
 //    UKRANIAN(Language.UKRANIAN,"UK"),
 //    URDU(Language.URDU,"UR");
 
-    @var Language language;
+    @val Language language;
     @val String langCode;
 
     SubdlLanguage(Language language, String langCode) {

@@ -22,6 +22,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.control.Roman.RomanNumeral;
@@ -131,7 +132,7 @@ public class ReleaseParser {
                 // MovieReleaseWithoutPath object
                 if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE).stream()
                     .anyMatch(source -> source.likelyMovieRelease || !source.likelyTvRelease)) {
-                    if (StringUtils.equals(parserResults.parts.first, text)) {
+                    if (Strings.CS.equals(parserResults.parts.first, text)) {
                         return Optional.empty();
                     }
                     return Optional.of(new MovieReleaseWithoutPath(
@@ -179,7 +180,7 @@ public class ReleaseParser {
                 .endOfText());
         name = parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
 
-        if (StringUtils.equals(name, text)) {
+        if (Strings.CS.equals(name, text)) {
             return Optional.empty();
         }
         return Optional.of(new TvReleaseWithoutPath(

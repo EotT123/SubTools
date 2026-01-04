@@ -17,7 +17,7 @@ public enum SubtitleProviderFrontEnd {
     @val SubtitleSource subtitleSource;
     @val String name;
 
-    SubtitleProviderFrontEnd(SubtitleSource subtitleSource, String name = subtitleSource.name) {
+    SubtitleProviderFrontEnd(SubtitleSource subtitleSource, String name=subtitleSource.name) {
         this.subtitleSource = subtitleSource;
         this.name = name;
     }

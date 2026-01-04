@@ -13,7 +13,7 @@ class InMemoryCacheTest {
 
     @Test
     void testAddRemoveObjects() {
-        ProviderCacheMemory cache = new ProviderCacheMemory<>(maxItems:6);
+        ProviderCacheMemory<String> cache = new ProviderCacheMemory<>(maxItems:6);
 
         cache.put(new ProviderCacheKey("provider", "eBay"), "eBay");
         cache.put(new ProviderCacheKey("provider", "Paypal"), "Paypal");
@@ -35,7 +35,7 @@ class InMemoryCacheTest {
     @Test
     void testExpiredCacheObjects() {
 
-        ProviderCacheMemory cache = new ProviderCacheMemory<>(
+        ProviderCacheMemory<String> cache = new ProviderCacheMemory<>(
             timeToLive:1ms, timerInterval:1000ms, maxItems:10);
 
         cache.put(new ProviderCacheKey("provider", "eBay"), "eBay");
@@ -52,7 +52,7 @@ class InMemoryCacheTest {
     void testObjectsCleanupTime() {
         int size = 500;
 
-        ProviderCacheMemory cache = new ProviderCacheMemory<>(
+        ProviderCacheMemory<String> cache = new ProviderCacheMemory<>(
             timeToLive:100s, timerInterval:100ms, maxItems:500);
 
         for (int i = 0; i < size; i++) {

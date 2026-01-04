@@ -65,7 +65,12 @@ public class Utils {
         return value != null ? mapper.apply(value) : null;
     }
 
-    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElse(@Nullable T value,
+    public static <T, R, X extends Exception> R ifNotNullOrElse(@Nullable T value,
+        ThrowingFunction<T, R, X> mapper, R orElseValue) throws X {
+        return value != null ? mapper.apply(value) : orElseValue;
+    }
+
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseNullable(@Nullable T value,
         ThrowingFunction<T, R, X> mapper, R orElseValue) throws X {
         return value != null ? mapper.apply(value) : orElseValue;
     }

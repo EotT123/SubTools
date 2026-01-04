@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.var;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
@@ -28,8 +29,8 @@ public class MyPasswordField extends JPasswordField {
 
     public final Predicate<String> valueVerifier;
 
-    private @Nullable Consumer<String> valueChangedCallbackListener;
-    private List<BooleanConsumer> validityChangedCallbackListeners;
+    private final @Nullable Consumer<String> valueChangedCallbackListener;
+    private final List<BooleanConsumer> validityChangedCallbackListeners;
 
     private final ObjectWrapper<String> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();
@@ -118,7 +119,7 @@ public class MyPasswordField extends JPasswordField {
         }
 
         if (valueChangedCallbackListener != null) {
-            boolean valueChanged = !StringUtils.equals(valueWrapper.value, text);
+            boolean valueChanged = !Strings.CS.equals(valueWrapper.value, text);
             valueWrapper.value = text;
             if (valueChanged) {
                 valueChangedCallbackListener.accept(text);

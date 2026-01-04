@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 import static java.nio.charset.StandardCharsets.*;
 import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
+import static util.Utils.*;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -12,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
+import extensions.org.jsoup.nodes.Element.ElementExt;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
@@ -155,7 +157,7 @@ public class PodnapisiApi implements SubtitleApi {
      * @throws PodnapisiApiException if the API call fails
      */
 
-    private List<PodnapisiSubtitleMetadata> getSubtitles(Map<SearchParam, Serializable> paramMap)
+    private List<PodnapisiSubtitleMetadata> getSubtitles(Map<SearchParam, @Nullable Serializable> paramMap)
         throws PodnapisiApiException {
         List<ProviderCacheKeyParam> params = paramMap.entrySet().stream().sorted(Entry.comparingByKey())
             .map(entry -> new ProviderCacheKeyParam(entry.getKey().name(), entry.getValue())).toList();
@@ -221,7 +223,7 @@ public class PodnapisiApi implements SubtitleApi {
     }
 
     private PodnapisiSubtitleMetadata parsePodnapisiSubtitle(Element elem) {
-        Function<Element, String> getText = e -> e == null ? null : e.text();
+        Function<@Nullable Element, String> getText = e -> ifNotNullOrElse(e, ElementExt::text, "");
         return new PodnapisiSubtitleMetadata(
             subtitleId:elem.selectFirst("id").text(),
             name:elem.selectFirst("title").text(),

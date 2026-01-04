@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.cache;
 
+import static java.util.Objects.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +40,6 @@ public final class ProviderCacheKey extends ProviderCacheKeyCommon {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), idParams, otherParams);
+        return hash(super.hashCode(), idParams, otherParams);
     }
 }
