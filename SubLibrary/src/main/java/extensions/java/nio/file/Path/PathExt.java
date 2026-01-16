@@ -21,6 +21,7 @@ import manifold.ext.rt.api.This;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.util.CopyDirVisitor;
 import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
@@ -247,7 +248,7 @@ public class PathExt {
     }
 
     public static boolean fileNameContainsIgnoreCase(@This Path path, String text) {
-        return StringUtils.containsIgnoreCase(path.getFileName().toString(), text);
+        return Strings.CI.contains(path.getFileName().toString(), text);
     }
 
     public static boolean isEmptyDir(@This Path path) throws IOException {

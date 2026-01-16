@@ -463,12 +463,12 @@ public class ReleaseParser {
         private final ParserResults parserResults;
 
         private ReleaseParserExtraInfo(String extraInfo) {
-            String info = StringUtils.endsWithAny(extraInfo, ".srt", ".zip", ".rar") ? extraInfo.substring(0,
-                extraInfo.length() - 4) : extraInfo;
-            info = StringUtils.replaceIgnoreCase(info, "REPACK.", "");
-            info = StringUtils.replaceIgnoreCase(info, "REPACK-", "");
-            info = StringUtils.replaceIgnoreCase(info, "INTERNAL.", "");
-            info = StringUtils.replaceIgnoreCase(info, "INTERNAL-", "");
+            String info = Strings.CS.endsWithAny(extraInfo, ".srt", ".zip", ".rar") ?
+                extraInfo.substring(0, extraInfo.length() - 4) : extraInfo;
+            info = Strings.CI.replace(info, "REPACK.", "");
+            info = Strings.CI.replace(info, "REPACK-", "");
+            info = Strings.CI.replace(info, "INTERNAL.", "");
+            info = Strings.CI.replace(info, "INTERNAL-", "");
             this.text = info;
             this.parserResults = new ParserResults(extraInfo);
             parseReleaseType(parserResults);
@@ -486,7 +486,7 @@ public class ReleaseParser {
             if (parserResults.parts.isEmpty()) {
                 return null;
             }
-            if (StringUtils.containsIgnoreCase(text, "retail")) {
+            if (Strings.CI.contains(text, "retail")) {
                 return "RETAIL";
             }
             return parserResults.parts.getLast();
