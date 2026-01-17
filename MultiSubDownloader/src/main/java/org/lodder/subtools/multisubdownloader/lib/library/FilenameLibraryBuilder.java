@@ -101,7 +101,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         filename = replace(filename, SerieStructureTag.QUALITY, tvRelease.quality);
         filename = replace(filename, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
 
-        filename += "." + StringUtils.substringAfterLast(tvRelease.folderNameOrName, ".");
+        filename += "." + StringUtils.substringAfterLast(tvRelease.fileNameOrName, ".");
         filename = filename.removeIllegalWindowsChars();
         if (replaceSpace) {
             filename = filename.replace(' ', replacingSpaceChar);
@@ -117,7 +117,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         filename = replace(filename, MovieStructureTag.QUALITY, movieRelease.quality);
         filename = replace(filename, MovieStructureTag.RELEASE_GROUP, movieRelease.releaseGroup);
 
-        filename += "." + StringUtils.substringAfterLast(movieRelease.folderNameOrName, ".");
+        filename += "." + StringUtils.substringAfterLast(movieRelease.fileNameOrName, ".");
 
         filename = filename.removeIllegalWindowsChars();
         if (replaceSpace) {

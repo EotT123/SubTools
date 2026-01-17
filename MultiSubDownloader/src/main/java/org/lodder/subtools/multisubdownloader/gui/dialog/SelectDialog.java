@@ -41,7 +41,7 @@ public class SelectDialog extends MultiSubDialog {
         contentPane
             .layout(new MigLayout("", "[1000px:n,grow,fill]", "[][::100px,fill][grow]"))
             .addComponent("cell 0 0",
-                new JLabel(getText("SelectDialog.SelectCorrectSubtitleThisRelease") + release.folderNameOrName))
+                new JLabel(getText("SelectDialog.SelectCorrectSubtitleThisRelease") + release.fileNameOrName))
             .addComponent("cell 0 1,grow", new JScrollPane().viewportView(customTable = createCustomTable()))
             .addComponent("cell 0 2,grow", new JPanel()
                 .layout(new FlowLayout(FlowLayout.RIGHT))

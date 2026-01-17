@@ -87,7 +87,7 @@ public class MoveAndRenameAction {
         FilenameLibraryBuilder filenameLibraryBuilder =
             FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
         String filename = filenameLibraryBuilder.buildPathStructure(release);
-        if (release.folderNameOrName.endsWith(".srt")) {
+        if (release.fileNameOrName.endsWith(".srt")) {
             Language language = null;
             if (librarySettings.includeLanguageCode) {
                 language = DetectLanguage.execute(f);

@@ -21,6 +21,10 @@ public sealed interface Release permits ReleaseWithoutPath, ReleaseWithPath, Mov
         case ReleaseWithPath r -> r.path.parent.toString();
         case ReleaseWithoutPath r -> r.completeName;
     };
+    @val String fileNameOrName = switch (this) {
+        case ReleaseWithPath r -> r.path.fileNameAsString;
+        case ReleaseWithoutPath r -> r.completeName;
+    };
     @val int matchingSubCount = matchingSubs.size();
     @val List<Subtitle> matchingSubs;
 
