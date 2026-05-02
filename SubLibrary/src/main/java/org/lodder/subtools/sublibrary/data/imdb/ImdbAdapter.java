@@ -27,6 +27,7 @@ import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingTriFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,8 @@ import org.slf4j.LoggerFactory;
 public class ImdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImdbAdapter.class);
-    private static ImdbAdapter instance;
+    private static final LazyBiFunction<Manager, UserInteractionHandler, ImdbAdapter> INSTANCE =
+        new LazyBiFunction<>(ImdbAdapter::new);
     @val @override Manager manager;
     @val @override String provider = "IMDB";
     private final UserInteractionHandler userInteractionHandler;
@@ -146,9 +148,6 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
-        if (instance == null) {
-            instance = new ImdbAdapter(manager, userInteractionHandler);
-        }
-        return instance;
+        return INSTANCE.apply(manager, userInteractionHandler);
     }
 }

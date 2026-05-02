@@ -31,3 +31,4 @@ public class BoxModelProperties {
         return padding == null ? "n" : String.valueOf(padding);
     }
 }
+

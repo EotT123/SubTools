@@ -13,9 +13,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import manifold.ext.props.rt.api.override;
@@ -270,7 +272,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
                         .header("Authorization", "Bearer " + getBearerToken(credentials.username, credentials.password))
                         .header("Content-Type", "application/json")
                         .header("User-Agent", "Test v1.0")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
+                        .POST(HttpRequest.BodyPublishers.ofString(
+                            new ObjectMapper().writeValueAsString(Map.of("file_id", fileId))))
+                        //.POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
                         .build();
 
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

@@ -22,8 +22,7 @@ public class Utils {
         // hide utility class constructor
     }
 
-    public static <T, K, V> Collector<T, Map<K, V>, Map<K, V>> mapCollector(
-        BiConsumer<Map<K, V>, T> accumulator) {
+    public static <T, K, V> Collector<T, Map<K, V>, Map<K, V>> mapCollector(BiConsumer<Map<K, V>, T> accumulator) {
         return mapCollector(HashMap::new, accumulator);
     }
 
@@ -85,7 +84,7 @@ public class Utils {
         return value != null ? mapper.apply(value) : orElseSupplier.get();
     }
 
-    @Contract("!null,_ -> param1; null,!null -> param2; null,null -> null")
+    @Contract("!null,_ -> param1; null,_ -> param2")
     public static <T> T ifNullThen(@Nullable T value, T orElseValue) {
         return value != null ? value : orElseValue;
     }

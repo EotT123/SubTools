@@ -11,7 +11,7 @@ public sealed interface ReleaseWithPath extends Release permits MovieReleaseWith
 
     @val Path path;
 
-    @val String fileName = path.getFileNameAsString();
+    @val String fileName = path.fileNameAsString;
 
     @val @override String releaseDescription = fileName;
 

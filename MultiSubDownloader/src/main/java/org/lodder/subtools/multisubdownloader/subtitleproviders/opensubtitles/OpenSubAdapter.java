@@ -35,18 +35,16 @@ public final class OpenSubAdapter
     extends
     SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId, OpenSubtitleException> {
 
-    private static OpenSubtitlesApi api;
+    private final OpenSubtitlesApi api;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
     public OpenSubAdapter(Manager manager, Credentials credentials, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
-        if (api == null) {
-            try {
-                api = new OpenSubtitlesApi(manager, credentials);
-            } catch (OpenSubtitleException e) {
-                throw new SubtitlesProviderInitException(provider, e);
-            }
+        try {
+            api = new OpenSubtitlesApi(manager, credentials);
+        } catch (OpenSubtitleException e) {
+            throw new SubtitlesProviderInitException(provider, e);
         }
     }
 
@@ -136,7 +134,7 @@ public final class OpenSubAdapter
         return ReleaseParser.parse(attr.release)
             .map(r -> new OpenSubtilteSubtitle(
                 urlSupplier:() -> api.getDownloadUrl(fileId),
-                fileName:attr.release,
+                fileName:ifNullThenGet(attr.release, release::getFileNameOrName),
                 language:language,
                 releaseGroup:r.releaseGroup,
                 uploader:uploader,
@@ -146,7 +144,7 @@ public final class OpenSubAdapter
                 ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
                 return new OpenSubtilteSubtitle(
                     urlSupplier:() -> api.getDownloadUrl(fileId),
-                    fileName:attr.release,
+                    fileName:ifNullThenGet(attr.release, release::getFileNameOrName),
                     language:language,
                     releaseGroup:extraInfo.getReleaseGroupBestEffort(),
                     uploader:uploader,

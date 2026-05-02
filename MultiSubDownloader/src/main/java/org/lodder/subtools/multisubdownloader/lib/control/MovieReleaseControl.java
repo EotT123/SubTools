@@ -37,19 +37,19 @@ public final class MovieReleaseControl extends ReleaseControl<MovieReleaseWithou
     }
 
     private void setImdbId(MovieReleaseWithoutPath release) {
-        release.providerIds.getImdbId().ifNotPresent(() -> omdbAdapter.searchMovie(release.name)
+        release.providerIds.imdbId.ifNotPresent(() -> omdbAdapter.searchMovie(release.name)
             .ifPresent(omdbRelease -> release.providerIds.add(ProviderIdType.IMDB, omdbRelease.imdbID)));
-        release.providerIds.getImdbId().ifNotPresent(() -> imdbAdapter.getImdbId(release.name, VideoType.MOVIE)
+        release.providerIds.imdbId.ifNotPresent(() -> imdbAdapter.getImdbId(release.name, VideoType.MOVIE)
             .ifPresent(imdbId -> release.providerIds.add(ProviderIdType.IMDB, imdbId)));
 //        release.providerIds.getImdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
 //            .ifPresent(movie -> release.providerIds.add(ProviderIdType.IMDB, movie.imdbId)));
-        if (release.providerIds.getImdbId().isEmpty()) {
+        if (release.providerIds.imdbId.isEmpty()) {
             throw new IllegalStateException("Unable to find IMDB id for movie: " + release.name);
         }
     }
 
     private void setTvdbId(MovieReleaseWithoutPath release) {
-        release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
+        release.providerIds.tvdbId.ifNotPresent(() -> tvdbAdapter.searchMovie(release.name)
             .ifPresent(movie -> release.providerIds.add(ProviderIdType.TVDB, movie.id)));
         // TODO enable this, also use imdbId if present
 //        release.providerIds.getTvdbId().ifNotPresent(() -> imdbAdapter.getSerieDetails(release.name)
@@ -57,7 +57,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieReleaseWithou
     }
 
     private void processInfo(MovieReleaseWithoutPath release) {
-        release.providerIds.getImdbId().ifPresentOrElse(
+        release.providerIds.imdbId.ifPresentOrElse(
             imdbId -> imdbAdapter.getDetails(imdbId).ifPresent(details -> {
                 release.year = details.year;
                 release.name = details.name;

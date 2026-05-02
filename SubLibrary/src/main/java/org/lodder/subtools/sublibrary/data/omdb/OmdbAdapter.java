@@ -10,11 +10,13 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 
 @NullMarked
 public class OmdbAdapter implements AdapterIntf {
 
-    private static @Nullable OmdbAdapter instance;
+    private static final LazyBiFunction<Manager, UserInteractionHandler, OmdbAdapter> INSTANCE =
+        new LazyBiFunction<>(OmdbAdapter::new);
     private final OmdbApi api;
     @val @override Manager manager;
     @val @override String provider = "OMDB";
@@ -59,9 +61,6 @@ public class OmdbAdapter implements AdapterIntf {
     }
 
     public static synchronized OmdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
-        if (instance == null) {
-            instance = new OmdbAdapter(manager, userInteractionHandler);
-        }
-        return instance;
+        return INSTANCE.apply(manager, userInteractionHandler);
     }
 }

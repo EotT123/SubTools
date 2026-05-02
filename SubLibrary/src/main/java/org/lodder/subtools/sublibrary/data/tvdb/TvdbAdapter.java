@@ -16,7 +16,6 @@ import com.tvdb.model.SearchResult;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
@@ -29,6 +28,7 @@ import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,8 @@ public class TvdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvdbAdapter.class);
     private static final String API_KEY = "A1720D2DDFDCE82D";
-    private static @Nullable TvdbAdapter instance;
+    private static final LazyBiFunction<Manager, UserInteractionHandler, TvdbAdapter> INSTANCE =
+        new LazyBiFunction<>(TvdbAdapter::new);
     @val @override Manager manager;
     @val @override String provider = "TVDB";
     private final UserInteractionHandler userInteractionHandler;
@@ -124,12 +125,8 @@ public class TvdbAdapter implements AdapterIntf {
                 storeTempNullValue:true);
     }
 
-    public static synchronized TvdbAdapter getInstance(Manager manager,
-        UserInteractionHandler userInteractionHandler) {
-        if (instance == null) {
-            instance = new TvdbAdapter(manager, userInteractionHandler);
-        }
-        return instance;
+    public static synchronized TvdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
+        return INSTANCE.apply(manager, userInteractionHandler);
     }
 
     private OptionalInt promptUserToEnterTvdbId(String showName) {

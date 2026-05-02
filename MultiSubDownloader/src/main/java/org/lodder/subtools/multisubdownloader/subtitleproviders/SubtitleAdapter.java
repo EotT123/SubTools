@@ -320,7 +320,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
 
         CacheKey cacheKey = getCache("EPISODEMapping", b -> b
-            .addIdParam("tvdbId", providerIds.getTvdbId().mapToObj(v -> v).orElse(null))
+            .addIdParam("tvdbId", providerIds.tvdbId.mapToObj(v -> v).orElse(null))
             .addIdParam("imdbId", providerIds.getImdbId().orElse(""))
             .addIdParam("name", name)
             .add(extraParams));

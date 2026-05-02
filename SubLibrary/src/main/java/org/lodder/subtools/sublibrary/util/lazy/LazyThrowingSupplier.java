@@ -8,7 +8,7 @@ import org.jspecify.annotations.Nullable;
 public class LazyThrowingSupplier<T extends @Nullable Object, X extends Exception> {
 
     private final ThrowingSupplier<T, X> supplier;
-    private T object;
+    private @Nullable T object;
     private volatile boolean initialized = false;
 
     public LazyThrowingSupplier(ThrowingSupplier<T, X> supplier) {

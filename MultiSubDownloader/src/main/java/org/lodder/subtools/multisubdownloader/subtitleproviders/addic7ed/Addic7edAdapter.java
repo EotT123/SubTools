@@ -30,19 +30,17 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Addic7edSubtitle, ProviderId,
     Addic7edException> {
 
-    private static Addic7edApi api;
+    private final Addic7edApi api;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = true;
 
     public Addic7edAdapter(Manager manager, boolean speedy, @Nullable Credentials credentials=null,
         UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
-        if (api == null) {
-            try {
-                api = new Addic7edApi(manager, speedy, credentials);
-            } catch (Exception e) {
-                throw new SubtitlesProviderInitException(provider, e);
-            }
+        try {
+            api = new Addic7edApi(manager, speedy, credentials);
+        } catch (Exception e) {
+            throw new SubtitlesProviderInitException(provider, e);
         }
     }
 

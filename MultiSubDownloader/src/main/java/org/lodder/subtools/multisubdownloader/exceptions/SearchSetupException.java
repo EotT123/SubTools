@@ -14,8 +14,4 @@ public class SearchSetupException extends ActionException {
     public SearchSetupException(String message) {
         super(message);
     }
-
-    protected SearchSetupException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

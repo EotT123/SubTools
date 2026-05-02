@@ -24,7 +24,7 @@ public final class OsCheck {
         WINDOWS, MAC, LINUX, OTHER
     }
 
-    @val static OSType operatingSystemType = calculatedOsType();
+    @val static OSType OPERATING_SYSTEM_TYPE = calculatedOsType();
 
     private static OSType calculatedOsType() {
         // detect the operating system from the os.name System property
@@ -40,3 +40,4 @@ public final class OsCheck {
         }
     }
 }
+

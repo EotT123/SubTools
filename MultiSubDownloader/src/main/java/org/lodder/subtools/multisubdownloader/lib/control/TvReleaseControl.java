@@ -47,16 +47,16 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
     }
 
     private void setTvdbId(TvReleaseWithoutPath release) {
-        release.providerIds.getTvdbId().ifNotPresent(() -> tvdbAdapter.searchSerie(release.name, release.providerIds)
+        release.providerIds.tvdbId.ifNotPresent(() -> tvdbAdapter.searchSerie(release.name, release.providerIds)
             .map(serie -> serie.providerId)
             .ifPresent(tvdbId -> release.providerIds.add(ProviderIdType.TVDB, Integer.parseInt(tvdbId))));
-        if (release.providerIds.getTvdbId().isEmpty()) {
+        if (release.providerIds.tvdbId.isEmpty()) {
 //            throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
         }
     }
 
     private void processTvdbInfo(TvReleaseWithoutPath release) {
-        release.providerIds.getTvdbId()
+        release.providerIds.tvdbId
             .flatMapToObj(tvdbId -> tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode))
             .ifPresent(episode -> release.title = episode.name);
     }

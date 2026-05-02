@@ -29,18 +29,16 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class TvSubtitlesAdapter
     extends SubtitleAdapter<TVSubtitlesSubtitleMetadata, TvSubtiltesSubtitle, ProviderId, TvSubtitleException> {
 
-    private static TvSubtitlesApi api;
+    private final TvSubtitlesApi api;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.TVSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
     public TvSubtitlesAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
-        if (api == null) {
-            try {
-                api = new TvSubtitlesApi(manager);
-            } catch (Exception e) {
-                throw new SubtitlesProviderInitException(provider, e);
-            }
+        try {
+            api = new TvSubtitlesApi(manager);
+        } catch (Exception e) {
+            throw new SubtitlesProviderInitException(provider, e);
         }
     }
 

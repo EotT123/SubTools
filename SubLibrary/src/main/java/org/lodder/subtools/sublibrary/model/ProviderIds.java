@@ -10,11 +10,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import manifold.ext.props.rt.api.val;
+import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class ProviderIds {
+
+    @var @val OptionalInt tvdbId = OptionalInt.empty();
+
     private final Map<ProviderIdType, @Nullable Object> providerIdMap = new LinkedHashMap<>();
 
     public ProviderIds add(ProviderIdType providerIdType, Object value){
@@ -25,9 +30,11 @@ public class ProviderIds {
     public @Nullable Object get(ProviderIdType providerIdType) {
         return providerIdMap.get(providerIdType);
     }
+
     public OptionalInt getTvdbId(){
         return ifNotNullOrElseGet(get(ProviderIdType.TVDB), v -> OptionalInt.of((int) v), OptionalInt::empty);
     }
+
     public Optional<String> getImdbId(){
         return Optional.ofNullable((String) get(ProviderIdType.IMDB));
     }

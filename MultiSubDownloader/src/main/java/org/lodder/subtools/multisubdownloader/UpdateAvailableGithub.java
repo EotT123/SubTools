@@ -37,7 +37,7 @@ public class UpdateAvailableGithub {
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
 
     private static final String DOMAIN = "https://github.com";
-    private static final String REPO_URI = "/phdelodder/SubTools";
+    private static final String REPO_URI = "/EotT/SubTools";
     private static final String REPO_URL = DOMAIN + REPO_URI;
 
     private final Manager manager;

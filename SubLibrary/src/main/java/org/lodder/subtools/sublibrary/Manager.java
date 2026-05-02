@@ -328,7 +328,7 @@ public class Manager {
 
         public <V> Optional<V> getOptional() {
             Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
-            return optionalCache.flatMap(cache -> (Optional<V>) cache.get(key));
+            return optionalCache.flatMap(cache -> cache.get(key));
         }
 
         public <V extends @Nullable Object, X extends Exception> Optional<V> getOptional(
@@ -418,7 +418,7 @@ public class Manager {
             manager.getCache(cacheType).put(key, object, ttl);
         }
 
-        public <V, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
+        public <V extends @Nullable Object, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
             Time ttl = getTemporaryTimeToLive().orElse(1 hr) * 2;
             manager.getCache(cacheType).put(key, value.getValue(), ttl);
         }
@@ -446,7 +446,7 @@ public class Manager {
         return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
     }
 
-    private <V> Optional<ProviderCache<@Nullable V>> getOptionalCache(CacheType cacheType) {
+    private <V extends @Nullable Object> Optional<ProviderCache<V>> getOptionalCache(CacheType cacheType) {
         return switch (cacheType) {
             case NONE -> Optional.empty();
             case MEMORY -> (Optional) Optional.of(inMemoryCache);
