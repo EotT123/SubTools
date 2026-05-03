@@ -89,7 +89,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                 try {
                     CookieManager cookieManager = providerLang == null ? null :
                         new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
-                    return manager.get(new PageContentParams(
+                    return manager.getDocument(new PageContentParams(
                             DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
                             cookieManager:cookieManager))
                         .select("#table5 tr[bgcolor]")
@@ -115,7 +115,7 @@ public class TvSubtitlesApi implements SubtitleApi {
         return getCache("subtitles", b -> b.add("url", episodeUrl))
             .get(() -> {
                 try {
-                    return manager.get(new PageContentParams(episodeUrl))
+                    return manager.getDocument(new PageContentParams(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")
                         .stream().map(subtitleElement -> {
                             Map<MetadataType, String> metadataMap =

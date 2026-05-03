@@ -86,7 +86,7 @@ public class TvdbApiBak implements ApiIntf {
         try {
             return getCache("series", b -> b.add("serieName", serieName))
                 .get(() ->
-                    manager.get(new PageContentParams(
+                    manager.getDocument(new PageContentParams(
                             "https://www.thetvdb.com/search?query=" +
                                 serieName.toLowerCase().replace(" ", "%20").urlEncode()))
                         .select(".ais-Hits-item").stream().map(elem ->
@@ -106,7 +106,7 @@ public class TvdbApiBak implements ApiIntf {
             return getCache("serie", b -> b.add("tvdbId", tvdbId))
                 .get(() -> new SeriesBaseRecord()
                     .id(tvdbId)
-                    .name(manager.get(
+                    .name(manager.getDocument(
                             new PageContentParams("https://www.thetvdb.com/?tab=series&id=" + tvdbId)).
                         selectFirst("#series_title").text()));
         } catch (ManagerException e) {

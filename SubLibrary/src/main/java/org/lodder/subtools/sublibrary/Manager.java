@@ -25,7 +25,6 @@ import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jspecify.annotations.NullMarked;
@@ -129,47 +128,72 @@ public class Manager {
     // GET PAGE CONTENT \\
     // ================ \\
 
-    public Document get(PageContentParams params) throws ManagerException {
+    public Document getDocument(PageContentParams params) throws ManagerException {
+        return switch (params.cacheType) {
+            case NONE -> getDocumentWithoutCache(params);
+            case MEMORY -> ((ProviderCacheMemory<Document>) inMemoryCache).getOrPut(
+                new ProviderCacheKey("document", params.url + params.cookieManager(), List.of()),
+                () -> getDocumentWithoutCache(params));
+            case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
+        };
+    }
+
+    public JSONArray getJsonArray(PageContentParams params) throws ManagerException {
+        return new JSONArray(getJsonString(params));
+    }
+
+    private String getJsonString(PageContentParams params) throws ManagerException {
+        try {
+            return getContent(params);
+        } catch (JSONException e) {
+            throw new ManagerException(e);
+        }
+    }
+
+    private Document getDocumentWithoutCache(PageContentParams params) throws ManagerException {
+        return getDocumentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
+            params.browserMode);
+    }
+
+    private Document getDocumentWithoutCache(String url, String userAgent, Retry retry,
+        @Nullable CookieManager cookieManager, BrowserMode browserMode=BrowserMode.HTMLUNIT) throws ManagerException {
+        try {
+            return WebPage.getWebsiteDomTree(url, browserMode:browserMode);
+        } catch (WebpageException e) {
+            if (retry.canRetry() && retry.predicate.test(e)) {
+                return this.getDocumentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
+            }
+            throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
+                e);
+        }
+    }
+
+    public String getContent(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
             case NONE -> getContentWithoutCache(params);
-            case MEMORY -> ((ProviderCacheMemory<Document>) inMemoryCache).getOrPut(
+            case MEMORY -> ((ProviderCacheMemory<String>) inMemoryCache).getOrPut(
                 new ProviderCacheKey("pagecontent", params.url + params.cookieManager(), List.of()),
                 () -> getContentWithoutCache(params));
             case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
         };
     }
 
-    public JSONObject getAsJsonObject(PageContentParams params) throws ManagerException {
-        return new JSONObject(getAsJsonString(params));
+    private String getContentWithoutCache(PageContentParams params) throws ManagerException {
+        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager);
     }
 
-    public JSONArray getAsJsonArray(PageContentParams params) throws ManagerException {
-        return new JSONArray(getAsJsonString(params));
-    }
-
-    private String getAsJsonString(PageContentParams params) throws ManagerException {
+    private String getContentWithoutCache(String url, String userAgent, Retry retry,
+        @Nullable CookieManager cookieManager) throws ManagerException {
         try {
-            return get(params).outerHtml();
-        } catch (JSONException e) {
-            throw new ManagerException(e);
-        }
-    }
-
-    private Document getContentWithoutCache(PageContentParams params) throws ManagerException {
-        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
-            params.browserMode);
-    }
-
-    private Document getContentWithoutCache(String url, String userAgent, Retry retry,
-        @Nullable CookieManager cookieManager, BrowserMode browserMode=BrowserMode.HTMLUNIT) throws ManagerException {
-        try {
-            return WebPage.getWebsiteDomTree(url, browserMode:browserMode);
+            return new HttpClient().doGet(new URI(url).toURL(), userAgent, cookieManager);
         } catch (WebpageException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
                 return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
             }
             throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
                 e);
+        } catch (HttpClientException | IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
