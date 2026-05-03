@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 
 import com.tvdb.model.SearchResult;
 import com.tvdb.model.SeriesBaseRecord;
@@ -17,6 +16,7 @@ import com.uwetrottmann.thetvdb.entities.SeriesResultsResponse;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
@@ -39,7 +39,7 @@ public class TvdbApi implements ApiIntf {
 
     public List<SearchResult> searchSeries(String serieName) throws TvdbApiException {
         return getCache("series", b -> b.add("serieName", serieName))
-            .getCollection(() -> {
+            .get(() -> {
                 String encodedSerieName =
                     URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
                 try {
@@ -93,11 +93,14 @@ public class TvdbApi implements ApiIntf {
             });
     }
 
-    public Optional<TvdbEpisode> searchEpisode(int tvdbId, int season, int episode, Language language)
+    public @Nullable TvdbEpisode searchEpisode(int tvdbId, int season, int episode, Language language)
         throws TvdbApiException {
 
         return getCache("episode",
-            b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode)
+            b -> b
+                .add("tvdbId", tvdbId)
+                .add("season", season)
+                .add("episode", episode)
                 .add("language", language))
             .get(() -> {
                 try {
@@ -105,10 +108,10 @@ public class TvdbApi implements ApiIntf {
                         null, null, null, null, null, language.iso639_1).execute();
                     if (response.isSuccessful()) {
                         Episode ep = response.body().data.getFirst();
-                        return Optional.of(new TvdbEpisode(ep.id, ep.seriesId.longValue(), ep.episodeName,
-                            ep.airedEpisodeNumber, ep.airedSeason, null));
+                        return new TvdbEpisode(ep.id, ep.seriesId.longValue(), ep.episodeName, ep.airedEpisodeNumber,
+                            ep.airedSeason, null);
                     }
-                    return Optional.empty();
+                    return null;
                 } catch (IOException e) {
                     throw TvdbApiException.error(e);
                 }

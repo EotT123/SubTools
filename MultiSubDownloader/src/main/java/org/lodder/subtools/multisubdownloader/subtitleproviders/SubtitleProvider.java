@@ -1,10 +1,10 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders;
 
-import java.util.Optional;
 import java.util.Set;
 
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -53,5 +53,5 @@ public interface SubtitleProvider<SUB extends Subtitle> {
         manager.getCache(CacheType.DISK, k -> k.provider.equals(provider)).clearExpiredCache();
     }
 
-    <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X;
+    <X extends Exception> @Nullable SerieMapping getProviderSerieMapping(TvRelease tvRelease) throws X;
 }

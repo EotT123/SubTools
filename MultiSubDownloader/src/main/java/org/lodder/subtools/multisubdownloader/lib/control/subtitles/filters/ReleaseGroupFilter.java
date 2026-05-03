@@ -1,6 +1,6 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -15,7 +15,7 @@ public final class ReleaseGroupFilter extends SubtitleFilter {
 
     @Override
     public boolean useSubtitle(Release release, Subtitle subtitle) {
-        if (!StringUtils.containsAnyIgnoreCase(subtitle.releaseGroup, release.releaseGroup, subtitle.releaseGroup)) {
+        if (!Strings.CI.containsAny(subtitle.releaseGroup, release.releaseGroup, subtitle.releaseGroup)) {
             return false;
         }
         LOGGER.debug("getSubtitlesFiltered: found KEYWORD based TEAM match [{}] ", subtitle.fileName);

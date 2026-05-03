@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class MapUtil {
 
-    private MapUtil(){
+    private MapUtil() {
         // Hide utility class constructor
     }
 
-   public static <K,V> Map<K, V> create(K k1, V v1) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         return map;
@@ -28,10 +29,9 @@ public class MapUtil {
      * @param k2 the second mapping's key
      * @param v2 the second mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -39,7 +39,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing three mappings.
+     * Returns a map containing three mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -50,10 +50,9 @@ public class MapUtil {
      * @param k3 the third mapping's key
      * @param v3 the third mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -75,10 +74,9 @@ public class MapUtil {
      * @param k4 the fourth mapping's key
      * @param v4 the fourth mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -103,10 +101,10 @@ public class MapUtil {
      * @param k5 the fifth mapping's key
      * @param v5 the fifth mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5,
+        V v5) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -117,7 +115,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing six mappings.
+     * Returns a map containing six mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -134,11 +132,10 @@ public class MapUtil {
      * @param k6 the sixth mapping's key
      * @param v6 the sixth mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-        K k6, V v6) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5,
+        V v5, K k6, V v6) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -150,7 +147,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing seven mappings.
+     * Returns a map containing seven mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -169,11 +166,10 @@ public class MapUtil {
      * @param k7 the seventh mapping's key
      * @param v7 the seventh mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-        K k6, V v6, K k7, V v7) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5,
+        V v5, K k6, V v6, K k7, V v7) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -186,7 +182,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing eight mappings.
+     * Returns a map containing eight mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -207,11 +203,10 @@ public class MapUtil {
      * @param k8 the eighth mapping's key
      * @param v8 the eighth mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-        K k6, V v6, K k7, V v7, K k8, V v8) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5,
+        V v5, K k6, V v6, K k7, V v7, K k8, V v8) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -225,7 +220,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing nine mappings.
+     * Returns a map containing nine mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -248,11 +243,10 @@ public class MapUtil {
      * @param k9 the ninth mapping's key
      * @param v9 the ninth mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-        K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5,
+        V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -267,7 +261,7 @@ public class MapUtil {
     }
 
     /**
-     * Returns an map containing ten mappings.
+     * Returns a map containing ten mappings.
      *
      * @param <K> the {@code Map}'s key type
      * @param <V> the {@code Map}'s value type
@@ -292,11 +286,10 @@ public class MapUtil {
      * @param k10 the tenth mapping's key
      * @param v10 the tenth mapping's value
      * @return a {@code Map} containing the specified mappings
-     *
      * @since 9
      */
-   public static <K,V> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5,
-        K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
+    public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5,
+        V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
@@ -310,5 +303,4 @@ public class MapUtil {
         map.put(k10, v10);
         return map;
     }
-
 }

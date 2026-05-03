@@ -2,10 +2,10 @@ package org.lodder.subtools.sublibrary.data.tvdb;
 
 import static manifold.science.util.UnitConstants.*;
 import static org.apache.commons.lang3.StringUtils.*;
+import static util.Utils.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import com.tvdb.api.LoginApi;
 import com.tvdb.api.SearchApi;
@@ -22,6 +22,7 @@ import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import okhttp3.OkHttpClient;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
@@ -60,18 +61,18 @@ public class TvdbApiBak implements ApiIntf {
         return manager.getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
             .get(
                 supplier:() -> {
-            try {
-                LoginPost200Response response = new ApiClient().createService(LoginApi.class)
-                    .loginPost(new LoginPostRequest().apikey(APIKEY)).execute().body();
-                if (response == null || response.getData() == null) {
-                    throw TvdbApiException.noResult("Could not acquire a bearer token");
-                }
-                return response.getData().getToken();
-            } catch (IOException e) {
-                throw TvdbApiException.error(e);
-            }
-        },
-            timeToLive:29.5 day);
+                    try {
+                        LoginPost200Response response = new ApiClient().createService(LoginApi.class)
+                            .loginPost(new LoginPostRequest().apikey(APIKEY)).execute().body();
+                        if (response == null || response.getData() == null) {
+                            throw TvdbApiException.noResult("Could not acquire a bearer token");
+                        }
+                        return response.getData().getToken();
+                    } catch (IOException e) {
+                        throw TvdbApiException.error(e);
+                    }
+                },
+                timeToLive:29.5 day);
     }
 
     public List<SearchResult> searchSeries(String serieName) throws TvdbApiException {
@@ -84,7 +85,7 @@ public class TvdbApiBak implements ApiIntf {
 
         try {
             return getCache("series", b -> b.add("serieName", serieName))
-                .getCollection(() ->
+                .get(() ->
                     manager.getAsJsoupDocument(new PageContentParams(
                             "https://www.thetvdb.com/search?query=" +
                                 serieName.toLowerCase().replace(" ", "%20").urlEncode()))
@@ -126,15 +127,15 @@ public class TvdbApiBak implements ApiIntf {
             });
     }
 
-    public Optional<TvdbEpisode> searchEpisode(int tvdbId, int season, int episode, Language language)
+    public @Nullable TvdbEpisode searchEpisode(int tvdbId, int season, int episode, Language language)
         throws TvdbApiException {
         return getCache("episode",
             b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode)
                 .add("language", language))
-            .getOptional(() -> Optional.ofNullable(apiCall(
+            .get(() -> ifNotNull(apiCall(
                     () -> seriesApi.get()
-                        .getSeriesSeasonEpisodesTranslated(tvdbId, "default", language.iso639_3, 0)).getData())
-                .map(TvdbEpisode::new));
+                        .getSeriesSeasonEpisodesTranslated(tvdbId, "default", language.iso639_3, 0)).getData(),
+                TvdbEpisode::new));
     }
 
     private static <T> T apiCall(ThrowingSupplier<Call<T>, TvdbApiException> supplier)

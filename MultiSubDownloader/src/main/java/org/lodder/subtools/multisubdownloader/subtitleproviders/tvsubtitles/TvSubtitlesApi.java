@@ -48,7 +48,7 @@ public class TvSubtitlesApi implements SubtitleApi {
 
     public List<ProviderId> getProviderIds(String serieName) throws TvSubtitleApiException {
         return getCache("providerIds", b -> b.add("name", serieName))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     return manager.postBuilder("$DOMAIN/search.php")
                         .addData("qs", serieName)
@@ -85,7 +85,7 @@ public class TvSubtitlesApi implements SubtitleApi {
         @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleApiException {
         return getCache("seasonSubtitleInfo",
             b -> b.add("providerId", providerId).add("season", season).add("language", providerLang))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     CookieManager cookieManager = providerLang == null ? null :
                         new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
@@ -113,7 +113,7 @@ public class TvSubtitlesApi implements SubtitleApi {
     private List<TVSubtitlesSubtitleMetadata> getSubtitles(String episodeUrl,
         @Nullable TVSubtitlesLanguage providerLang) throws TvSubtitleApiException {
         return getCache("subtitles", b -> b.add("url", episodeUrl))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     return manager.getAsJsoupDocument(new PageContentParams(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")

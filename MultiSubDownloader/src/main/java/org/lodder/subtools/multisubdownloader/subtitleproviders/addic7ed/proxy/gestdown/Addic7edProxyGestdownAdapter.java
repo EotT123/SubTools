@@ -1,5 +1,8 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown;
 
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
+import static util.Utils.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -7,7 +10,7 @@ import java.util.function.BiPredicate;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.gestdown.model.ShowDto;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -72,15 +75,15 @@ public final class Addic7edProxyGestdownAdapter extends
     @Override
     public List<Addic7edProxyGestdownSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws Addic7edException {
-        return providerIds.tvdbId.flatMapToObjEx(api::getProviderSerieIds).map(this::toSerieId).map(List::of)
-            .orElseGet(List::of);
+        return providerIds.userOrElse(TVDB,
+            tvdbId -> ifNotNull(api.getProviderSerieIds(tvdbId), ids -> List.of(toSerieId(ids))), List::of);
     }
 
     @Override
     public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(String serieName,
         @Nullable Integer season) throws Addic7edException {
         return api.getProviderSerieIds(serieName).stream()
-            .sorted(Comparator.comparing(n -> !StringUtils.equalsAnyIgnoreCase(serieName.keepLettersOnly(),
+            .sorted(Comparator.comparing(n -> !Strings.CI.equalsAny(serieName.keepLettersOnly(),
                 n.name.keepLettersOnly())))
             .map(this::toSerieId)
             .toList();

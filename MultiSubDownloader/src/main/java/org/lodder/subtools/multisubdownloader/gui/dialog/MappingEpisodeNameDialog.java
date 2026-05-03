@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -108,7 +109,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                         customName:newName,
                                         completeName:currentName);
                                     try {
-                                        provider.getProviderSerieMapping(tvRelease).ifPresentOrElse(serieId -> {
+                                        ifNotNullOrElseDo(provider.getProviderSerieMapping(tvRelease), serieId -> {
                                             row.serieMapping =
                                                 new SerieMapping(currentName, serieId.providerId, serieId.providerName,
                                                     serieId.season);

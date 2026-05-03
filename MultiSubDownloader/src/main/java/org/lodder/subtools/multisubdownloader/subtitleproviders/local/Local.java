@@ -5,13 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -131,7 +131,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
     }
 
     @Override
-    public <X extends Exception> Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
+    public <X extends Exception> @Nullable SerieMapping getProviderSerieMapping(TvRelease tvRelease) throws X {
         throw new NotImplementedException();
     }
 }

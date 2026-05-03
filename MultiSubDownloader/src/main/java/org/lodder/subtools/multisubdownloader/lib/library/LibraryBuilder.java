@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
+import static util.Utils.*;
+
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,8 +36,8 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
     public abstract String buildPathStructure(Release release);
 
     protected String getShowName(String name) {
-        return tvdbAdapter != null ?
-            tvdbAdapter.searchSerie(name, new ProviderIds()).map(TvdbSerie::getProviderName).orElse(name) : name;
+        return tvdbAdapter == null ? name :
+            ifNotNullOrElse(tvdbAdapter.searchSerie(name, new ProviderIds()), TvdbSerie::getProviderName, name);
     }
 
     protected String replace(String structure, StructureTag tag, String value) {

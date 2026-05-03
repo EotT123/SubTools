@@ -98,7 +98,7 @@ class InMemoryCacheTest {
         assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam4))).contains("value2");
 
         // duplicated sub key should not be present
-        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam3))).isEmpty();
+        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam3))).isNull();
 
         // Remove 2nd value
         cache.remove(new ProviderCacheKey("provider", "type", List.of(cacheKeyParam4, cacheKeyParam3)));
@@ -108,17 +108,17 @@ class InMemoryCacheTest {
         assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam1))).contains("value");
         assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam2))).contains("value");
         // duplicated subkey should not be present
-        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam4))).isEmpty();
+        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam4))).isNull();
         // subkey of removed value should not be present
-        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam4))).isEmpty();
+        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam4))).isNull();
 
         // Cleanup by filter
         cache.cleanup((cacheKey, cacheValue) -> "provider".equals(cacheKey.provider));
         assertThat(cache.size()).as("Cache should be empty").isEqualTo(0);
 
         // sub keys should not be present
-        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam1))).isEmpty();
-        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam2))).isEmpty();
+        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam1))).isNull();
+        assertThat(cache.get(new ProviderCacheKeySub("provider", "type", cacheKeyParam2))).isNull();
 
     }
 

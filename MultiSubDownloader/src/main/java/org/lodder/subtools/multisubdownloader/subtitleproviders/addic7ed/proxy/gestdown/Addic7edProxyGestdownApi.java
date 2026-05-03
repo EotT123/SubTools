@@ -4,7 +4,6 @@ import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import extensions.java.lang.String.StringExt;
@@ -19,6 +18,7 @@ import org.gestdown.model.ShowDto;
 import org.gestdown.model.SubtitleDto;
 import org.gestdown.model.SubtitleSearchResponse;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
@@ -72,7 +72,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     public List<ShowDto> getProviderSerieIds(String name) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("name", name))
-            .getCollection(
+            .get(
                 () -> {
                     List<ShowDto> shows = apiCall(() -> TV_SHOWS_API.showsSearchSearchGet(name)).execute().getShows();
                     if (shows == null) {
@@ -83,15 +83,15 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             );
     }
 
-    public Optional<ShowDto> getProviderSerieIds(int tvdbId) throws Addic7edApiException {
+    public @Nullable ShowDto getProviderSerieIds(int tvdbId) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
-            .getOptional(() -> {
+            .get(() -> {
                 List<ShowDto> shows =
                     apiCall(() -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId)).execute().getShows();
-                if (shows == null) {
-                    return Optional.empty();
+                if (shows == null || shows.isEmpty()) {
+                    return null;
                 }
-                return shows.stream().findFirst();
+                return shows.getFirst();
             });
     }
 
@@ -99,7 +99,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
         Language language) throws Addic7edApiException {
         return getCache("subtitles", b -> b.add("providerId", providerId)
             .add("season", season).add("episode", episode).add("language", language))
-            .getCollection(() -> {
+            .get(() -> {
                 SubtitleSearchResponse response = apiCall(
                     () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
                         UUID.fromString(providerId), season, episode)).execute();

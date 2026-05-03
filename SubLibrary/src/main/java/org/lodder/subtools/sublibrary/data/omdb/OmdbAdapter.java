@@ -1,7 +1,6 @@
 package org.lodder.subtools.sublibrary.data.omdb;
 
-import java.util.Optional;
-
+import Omdb.Release;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
@@ -26,37 +25,37 @@ public class OmdbAdapter implements AdapterIntf {
         this.api = new OmdbApi(manager);
     }
 
-    public Optional<Omdb.Release> searchReleaseWithImdbId(String imdbId) {
+    public @Nullable Release searchReleaseWithImdbId(String imdbId) {
         try {
             return getCache("release", b -> b.add("imdbId", imdbId))
-                .getOptional(
+                .get(
                     supplier:() -> api.searchRelease(imdbId),
                     storeTempNullValue:true);
         } catch (OmdbException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
 
-    public Optional<Omdb.Release> searchMovie(String title, @Nullable Integer year=null) {
+    public @Nullable Release searchMovie(String title, @Nullable Integer year=null) {
         try {
             return getCache("movie", b -> b.add("title", title).add("year", year))
-                .getOptional(
+                .get(
                     supplier:() -> api.searchMovie(title, year),
                     storeTempNullValue:true);
         } catch (OmdbException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
-    public Optional<Omdb.Release> searchSerie(String name) {
+    public @Nullable Release searchSerie(String name) {
         try {
             return getCache("serie", b -> b.add("name", name))
-                .getOptional(
+                .get(
                     supplier:() -> api.searchSerie(name),
                     storeTempNullValue:true);
         } catch (OmdbException e) {
-            return Optional.empty();
+            return null;
         }
     }
 

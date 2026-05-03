@@ -23,6 +23,7 @@ import org.lodder.subtools.multisubdownloader.workers.SearchHandler;
 import org.lodder.subtools.multisubdownloader.workers.SearchManager;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +36,19 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     @val(Protected) SubtitleProviderStore subtitleProviderStore;
 
     @get(Protected) @set(Private) @Nullable StatusListener statusListener;
-    @get(Protected) @set(Private) @Nullable SearchManager searchManager;
     @get(Protected) @set(Private) @Nullable List<R> releases;
     @get(Protected) abstract Language language;
     abstract @get(Protected) IndexingProgressListener indexingProgressListener;
     abstract @get(Protected) UserInteractionHandler userInteractionHandler;
     abstract @get(Protected) SearchProgressListener searchProgressListener;
+    private final LazySupplier<SearchManager> searchManagerLazy;
+    @get(Protected) SearchManager searchManager; // Computed property
 
     protected SearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore) {
         this.settings = settings;
         this.subtitleProviderStore = subtitleProviderStore;
+        this.searchManagerLazy = new LazySupplier<>(() ->
+            new SearchManager(settings, language, searchProgressListener, userInteractionHandler, this));
     }
 
     @Override
@@ -84,18 +88,6 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
 
         this.statusListener = this.searchProgressListener;
 
-        /* Create a new SearchManager. */
-        this.searchManager =
-            new SearchManager(settings,
-                /* Tell the manager which language we want */
-                language,
-                /* Tell the manager where to push progressUpdates */
-                searchProgressListener,
-                /* Tell the manager how to handle user interactions */
-                userInteractionHandler,
-                /* Listen for when the manager tells us Subtitles are found */
-                this);
-
         /* Tell the manager which providers to use */
         searchManager.reset();
         this.subtitleProviderStore.allProviders.stream()
@@ -119,11 +111,13 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
         requireNonNull(this.statusListener).onStatus(message);
     }
 
+    protected SearchManager getSearchManager() {
+        return searchManagerLazy.get();
+    }
+
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        if (searchManager != null) {
-            this.searchManager.cancel(mayInterruptIfRunning);
-        }
+        this.searchManager.cancel(mayInterruptIfRunning);
         Thread.currentThread().interrupt();
         this.indexingProgressListener.completed();
         this.searchProgressListener.completed();

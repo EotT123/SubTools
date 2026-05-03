@@ -18,7 +18,6 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serial;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -119,17 +118,17 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void checkUpdate(final boolean forceUpdateCheck) {
         UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
-        Optional<String> updateUrl = (forceUpdateCheck && u.isNewVersionAvailable()) ||
+        String updateUrl = (forceUpdateCheck && u.isNewVersionAvailable()) ||
             (!forceUpdateCheck && u.shouldCheckForNewUpdate(settingsControl.settings.updateCheckPeriod) &&
-                u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : Optional.empty();
-        if (updateUrl.isPresent()) {
+                u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : null;
+        if (updateUrl != null) {
             final JEditorPane editorPane = new JEditorPane();
             editorPane.setPreferredSize(new Dimension(800, 50));
             editorPane.setEditable(false);
             editorPane.setContentType("text/html");
 
-            editorPane.setText("<html>" + getText("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl.get() + ">" +
-                updateUrl.get() + "</a></html>");
+            editorPane.setText("<html>" + getText("UpdateAppAvailable") + "!: </br><A HREF=" + updateUrl + ">" +
+                updateUrl + "</a></html>");
 
             editorPane.addHyperlinkListener(hyperlinkEvent -> {
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED &&

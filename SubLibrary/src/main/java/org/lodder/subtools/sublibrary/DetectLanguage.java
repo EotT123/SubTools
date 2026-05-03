@@ -24,8 +24,7 @@ import org.slf4j.LoggerFactory;
 public class DetectLanguage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DetectLanguage.class);
-    private static final LazyThrowingSupplier<LanguageDetector, IOException> DETECTOR =
-        new LazyThrowingSupplier<>(
+    private static final LazyThrowingSupplier<LanguageDetector, IOException> DETECTOR = new LazyThrowingSupplier<>(
         () -> LanguageDetectorBuilder.create(NgramExtractors.standard())
             .shortTextAlgorithm(0)
             .withProfiles(new LanguageProfileReader().readAllBuiltIn())

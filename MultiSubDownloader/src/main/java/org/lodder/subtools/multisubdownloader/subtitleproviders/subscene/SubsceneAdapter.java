@@ -2,6 +2,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 
 import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SearchResultType.*;
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -73,8 +74,8 @@ public final class SubsceneAdapter
     @Override
     public List<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, Integer season)
         throws SubsceneException {
-        return providerIds.getImdbId().mapEx(imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)))
-            .orElseGet(List::of);
+        return providerIds.userOrElse(IMDB, imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)),
+            List::of);
     }
 
     /**

@@ -6,7 +6,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,9 +29,9 @@ public class ImdbApi implements ApiIntf {
         this.manager = manager;
     }
 
-    public Optional<ImdbDetails> getDetails(String imdbId) throws ImdbApiException {
+    public ImdbDetails getDetails(String imdbId) throws ImdbApiException {
         return getCache("details", b -> b.add("imdbId", imdbId))
-            .getOptional(() -> {
+            .get(() -> {
                 String query = """
                     {
                       title(id: "$imdbId") {
@@ -45,7 +44,7 @@ public class ImdbApi implements ApiIntf {
                     JsonNode jsonNode = post(query);
                     String title = jsonNode.get("primary_title").asText();
                     int year = jsonNode.get("start_year").asInt();
-                    return Optional.of(new ImdbDetails(title, year));
+                    return new ImdbDetails(title, year);
                 } catch (IOException | InterruptedException e) {
                     throw ImdbApiException.error(e,
                         "Error trying to fetch details for id [$imdbId], " + e.getMessage());

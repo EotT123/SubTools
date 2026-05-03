@@ -1,5 +1,8 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.subdl;
 
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
+import static util.Utils.*;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -48,7 +51,7 @@ public final class SubdlAdapter extends
     @Override
     public Collection<SubdlSubtitleMetadata> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws SubdlException {
-        return providerIds.getImdbId().mapEx(imdbId -> api.getMovieSubtitles(imdbId, language)).orElse(List.of());
+        return providerIds.userOrElse(IMDB, imdbId -> api.getMovieSubtitles(imdbId, language), List::of);
     }
 
     @Override
@@ -64,8 +67,8 @@ public final class SubdlAdapter extends
     @Override
     public List<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws SubdlException {
-        return providerIds.getImdbId().flatMapEx(imdbId -> api.getProviderIdUsingImdbId(imdbId).map(List::of))
-            .orElseGet(List::of);
+        return providerIds.userOrElse(IMDB, imdbId -> ifNotNull(api.getProviderIdUsingImdbId(imdbId), List::of),
+            List::of);
     }
 
     @Override
@@ -85,8 +88,9 @@ public final class SubdlAdapter extends
     @Override
     public Collection<SubdlSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season, int episode,
         Language language) throws SubdlException {
-        return providerIds.getImdbId().mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode,
-            language)).orElse(List.of());
+        return providerIds.userOrElse(IMDB,
+            imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language),
+            List::of);
     }
 
     @Override

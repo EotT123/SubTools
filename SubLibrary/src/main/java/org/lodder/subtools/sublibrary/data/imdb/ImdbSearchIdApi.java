@@ -39,7 +39,7 @@ record ImdbSearchIdApi(Manager manager) {
         throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-imdb").add("title", title).add("year", year))
-            .getCollection(() -> {
+            .get(() -> {
                 StringBuilder sb = new StringBuilder("https://www.imdb.com/find/?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {
@@ -97,7 +97,7 @@ record ImdbSearchIdApi(Manager manager) {
         throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-yahoo").add("title", title).add("year", year))
-            .getCollection(() -> {
+            .get(() -> {
                 StringBuilder sb =
                     new StringBuilder("http://search.yahoo.com/search;_ylt=A1f4cfvx9C1I1qQAACVjAQx.?p=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
@@ -128,7 +128,7 @@ record ImdbSearchIdApi(Manager manager) {
         throws ImdbSearchIdException {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
-            .getCollection(() -> {
+            .get(() -> {
                 StringBuilder sb = new StringBuilder("http://www.google.com/search?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {

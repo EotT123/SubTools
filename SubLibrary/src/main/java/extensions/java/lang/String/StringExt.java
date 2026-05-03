@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -27,7 +27,7 @@ public class StringExt {
     }
 
     public static String removeIllegalWindowsChars(@This String text) {
-        return StringUtils.removeEnd(text.replaceAll("[\\\\/:*?\"<>|]", ""), ".").trim();
+        return Strings.CS.removeEnd(text.replaceAll("[\\\\/:*?\"<>|]", ""), ".").trim();
     }
 
     public static String urlEncode(@This String text) {

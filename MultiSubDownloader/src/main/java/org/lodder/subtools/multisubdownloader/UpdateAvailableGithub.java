@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,25 +63,25 @@ public class UpdateAvailableGithub {
         }
     }
 
-    public Optional<String> getLatestDownloadUrl() {
+    public @Nullable String getLatestDownloadUrl() {
         return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease();
-            case null -> Optional.empty();
+            case null -> null;
         };
     }
 
     public boolean isNewVersionAvailable() {
         return switch (settings.updateType) {
-            case STABLE -> getUrlLatestNewStableGithubRelease().isPresent();
-            case NIGHTLY -> getUrlLatestNewNightlyGithubRelease().isPresent();
+            case STABLE -> getUrlLatestNewStableGithubRelease() != null;
+            case NIGHTLY -> getUrlLatestNewNightlyGithubRelease() != null;
             case null -> false;
         };
     }
 
-    private Optional<String> getUrlLatestNewStableGithubRelease() {
+    private @Nullable String getUrlLatestNewStableGithubRelease() {
         return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url"))
-            .getOptional(() -> {
+            .get(() -> {
                 try {
                     String currentVersion = getVersion();
                     Element element =
@@ -97,7 +96,7 @@ public class UpdateAvailableGithub {
                     matcher.find();
                     String version = matcher.group();
                     if (isFinalVersion(currentVersion) && compareVersions(version, currentVersion) <= 0) {
-                        return Optional.empty();
+                        return null;
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
                     Element artifactElement = manager.getAsJsoupDocument(
@@ -105,21 +104,22 @@ public class UpdateAvailableGithub {
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
-                    return Optional.of(url);
+                    return url;
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
                         LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
                         LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
-                    return Optional.empty();
+                    return null;
                 }
             });
     }
 
-    private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url-nightly"))
-            .getOptional(() -> {
+    private @Nullable String getUrlLatestNewNightlyGithubRelease() {
+        return new CacheKey(manager, CacheType.MEMORY,
+            new ProviderCacheKey("Github", "update-url-nightly"))
+            .get(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
 
@@ -132,7 +132,7 @@ public class UpdateAvailableGithub {
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
                         rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
                     if (nightlyBuildTista.isBefore(buildTista)) {
-                        return Optional.empty();
+                        return null;
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
@@ -140,14 +140,14 @@ public class UpdateAvailableGithub {
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();
-                    return Optional.of(downloadUrl);
+                    return downloadUrl;
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
                         LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
                         LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
-                    return Optional.empty();
+                    return null;
                 }
             });
     }

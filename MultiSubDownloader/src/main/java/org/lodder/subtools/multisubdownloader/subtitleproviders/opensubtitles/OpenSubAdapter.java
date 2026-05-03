@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
 import static util.Utils.*;
 
 import java.util.Collection;
@@ -57,9 +58,8 @@ public final class OpenSubAdapter
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws OpenSubtitleException {
-        return providerIds.getImdbId()
-            .mapEx(imdbId -> api.searchSubtitles(imdbId:imdbId, language:language, type:TypeEnum.MOVIE))
-            .orElse(List.of());
+        return providerIds.userOrElse(IMDB,
+            imdbId -> api.searchSubtitles(imdbId:imdbId, language:language, type:TypeEnum.MOVIE), List::of);
     }
 
     @Override
@@ -98,15 +98,14 @@ public final class OpenSubAdapter
     @Override
     public Collection<Subtitle> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws OpenSubtitleException {
-        return providerIds.getImdbId()
-            .mapEx(imdbId ->
-                api.searchSubtitles(
-                    imdbId:imdbId,
-                    season:season,
-                    episode:episode,
-                    language:language,
-                    type:TypeEnum.EPISODE))
-            .orElse(List.of());
+        return providerIds.userOrElse(IMDB,
+            imdbId -> api.searchSubtitles(
+                imdbId:imdbId,
+                season:season,
+                episode:episode,
+                language:language,
+                type:TypeEnum.EPISODE),
+            List::of);
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.lodder.subtools.sublibrary;
 
 import java.util.Locale;
 
-import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -24,7 +23,7 @@ public final class OsCheck {
         WINDOWS, MAC, LINUX, OTHER
     }
 
-    @val static OSType OPERATING_SYSTEM_TYPE = calculatedOsType();
+    public static final OSType OPERATING_SYSTEM_TYPE = calculatedOsType();
 
     private static OSType calculatedOsType() {
         // detect the operating system from the os.name System property
@@ -40,4 +39,3 @@ public final class OsCheck {
         }
     }
 }
-

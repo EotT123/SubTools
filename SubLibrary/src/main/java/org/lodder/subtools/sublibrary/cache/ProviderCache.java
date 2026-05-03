@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.cache;
 
 import static manifold.ext.props.rt.api.PropOption.*;
+import static util.Utils.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,15 +68,14 @@ public abstract sealed class ProviderCache<V extends @Nullable Object> permits P
         }
     }
 
-    public Optional<V> get(ProviderCacheKeyCommon key) {
+    public @Nullable V get(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
             CacheObject<V> cacheObject = switch (key) {
                 case ProviderCacheKey k -> cacheMap.get(k);
-                case ProviderCacheKeySub k -> invalidKeys.contains(k) ? null :
-                    Optional.ofNullable(keyMapperCache.get(k)).map(cacheMap::get).orElse(null);
+                case ProviderCacheKeySub k ->
+                    invalidKeys.contains(k) ? null : ifNotNull(keyMapperCache.get(k), cacheMap::get);
             };
-            return Optional.ofNullable(cacheObject)
-                .map(obj -> {
+            return ifNotNull(cacheObject, obj -> {
                     obj.updateLastAccessed();
                     return obj.value;
                 });
@@ -93,28 +93,26 @@ public abstract sealed class ProviderCache<V extends @Nullable Object> permits P
 
     public boolean isTemporaryObject(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).map(v -> v instanceof TemporaryCacheObject).orElse(false);
+            return get(key) instanceof TemporaryCacheObject;
         }
     }
 
     public boolean isTemporaryExpired(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).map(
-                    v -> v instanceof TemporaryCacheObject<?> tempCacheObject && tempCacheObject.isExpired())
-                .orElse(false);
+            return get(key) instanceof TemporaryCacheObject<?> tempCacheObject && tempCacheObject.isExpired();
         }
     }
 
-    public Optional<Time> getTemporaryTimeToLive(ProviderCacheKeyCommon key) {
+    public @Nullable Time getTemporaryTimeToLive(ProviderCacheKeyCommon key) {
         synchronized (cacheMap) {
-            return get(key).filterCast(TemporaryCacheObject.class).map(TemporaryCacheObject::getTimeToLive);
+            return ifNotNull((TemporaryCacheObject) get(key), TemporaryCacheObject::getTimeToLive);
         }
     }
 
     public <X extends Exception> V getOrPut(ProviderCacheKey key, ThrowingSupplier<V, X> supplier) throws X {
         synchronized (cacheMap) {
             if (contains(key)) {
-                return get(key).orElseThrow();
+                return get(key);
             }
         }
         V value = supplier.get();

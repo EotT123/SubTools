@@ -159,7 +159,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public List<OpensubtitleId> getProviderSerieIds(String serieName) throws OpenSubtitleException {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     return manager.getAsJsonArray(new PageContentParams(
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
@@ -237,7 +237,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .add("type", type)
                 .add("userId", userId)
                 .add("year", year))
-            .getCollection(() -> {
+            .get(() -> {
                 Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) : null;
                 return apiCall(
                     () -> subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,

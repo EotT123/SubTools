@@ -116,7 +116,7 @@ public class SubsceneApi implements SubtitleApi {
         Language language) throws SubsceneApiException {
         return getCache("subtitles",
             b -> b.add("providerId", providerId).add("season", season).add("episode", episode))
-            .getCollection(() -> {
+            .get(() -> {
                 setLanguageWithCookie(language);
                 try {
                     return getJsoupDocument(DOMAIN + providerId)
