@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.data.imdb;
 
+import static org.lodder.subtools.sublibrary.util.webpage.BrowserMode.*;
 import static util.Utils.*;
 
 import java.net.URLDecoder;
@@ -51,7 +52,7 @@ record ImdbSearchIdApi(Manager manager) {
                 });
                 String url = sb.toString().replace("+", "%20");
                 try {
-                    Elements searchResults = manager.getAsJsoupDocument(new PageContentParams(url))
+                    Elements searchResults = manager.get(new PageContentParams(url, browserMode:WEBDRIVER))
                         .select(".ipc-metadata-list-summary-item .cli-children");
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirst("a").text(),
@@ -76,7 +77,7 @@ record ImdbSearchIdApi(Manager manager) {
             .get(() -> {
                 String url = "https://www.imdb.com/title/" + imdbId;
                 try {
-                    String json = manager.getAsJsoupDocument(new PageContentParams(url))
+                    String json = manager.get(new PageContentParams(url, browserMode:WEBDRIVER))
                         .selectFirst("html > head > script[type=\"application/ld+json\"]").data();
                     JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
                     String name = jsonObject.get("name").getAsString();
@@ -109,7 +110,7 @@ record ImdbSearchIdApi(Manager manager) {
                 String url = sb.toString();
 
                 try {
-                    Elements searchResults = manager.getAsJsoupDocument(new PageContentParams(url))
+                    Elements searchResults = manager.get(new PageContentParams(url, browserMode:WEBDRIVER))
                         .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
                     Function<Element, @Nullable String> toStringMapper =
                         e -> Optional.ofNullable((Element) e.selectFirst("h3"))
@@ -129,7 +130,7 @@ record ImdbSearchIdApi(Manager manager) {
         return manager.getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
             .get(() -> {
-                StringBuilder sb = new StringBuilder("http://www.google.com/search?q=");
+                StringBuilder sb = new StringBuilder("https://www.google.com/search?q=");
                 sb.append(URLEncoder.encode(title, StandardCharsets.UTF_8));
                 if (year != null) {
                     sb.append("+%28").append(year).append("%29");
@@ -138,8 +139,8 @@ record ImdbSearchIdApi(Manager manager) {
                 String url = sb.toString();
                 try {
                     Elements searchResults =
-                        manager.getAsJsoupDocument(new PageContentParams(url))
-                            .select("a[href*='https://www.imdb.com/title/tt']");
+                        manager.get(new PageContentParams(url, browserMode:WEBDRIVER))
+                            .select("a[href^='https://www.imdb.com/title/tt']");
                     Function<Element, String> toStringMapper =
                         e -> e.selectFirst("span").text().replace(" - IMDb", "");
                     Function<Element, String> toHrefMapper = e -> e.attr("href");

@@ -254,7 +254,7 @@ public class Addic7edApi implements SubtitleApi {
                 }
                 lastRequest = Time.now();
             }
-            return manager.getAsJsoupDocument(new PageContentParams(url:url, userAgent:""));
+            return manager.get(new PageContentParams(url:url, userAgent:""));
         } catch (Exception e) {
             throw Addic7edApiException.error(e);
         }

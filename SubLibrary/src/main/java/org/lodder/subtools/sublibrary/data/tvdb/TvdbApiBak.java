@@ -32,8 +32,8 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
-import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.lodder.subtools.sublibrary.util.lazy.LazyThrowingSupplier;
+import org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService;
 import retrofit2.Call;
 
 @NullMarked
@@ -86,7 +86,7 @@ public class TvdbApiBak implements ApiIntf {
         try {
             return getCache("series", b -> b.add("serieName", serieName))
                 .get(() ->
-                    manager.getAsJsoupDocument(new PageContentParams(
+                    manager.get(new PageContentParams(
                             "https://www.thetvdb.com/search?query=" +
                                 serieName.toLowerCase().replace(" ", "%20").urlEncode()))
                         .select(".ais-Hits-item").stream().map(elem ->
@@ -106,7 +106,7 @@ public class TvdbApiBak implements ApiIntf {
             return getCache("serie", b -> b.add("tvdbId", tvdbId))
                 .get(() -> new SeriesBaseRecord()
                     .id(tvdbId)
-                    .name(manager.getAsJsoupDocument(
+                    .name(manager.get(
                             new PageContentParams("https://www.thetvdb.com/?tab=series&id=" + tvdbId)).
                         selectFirst("#series_title").text()));
         } catch (ManagerException e) {

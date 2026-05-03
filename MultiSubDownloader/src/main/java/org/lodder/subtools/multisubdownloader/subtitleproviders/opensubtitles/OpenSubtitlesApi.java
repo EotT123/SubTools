@@ -2,8 +2,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
-import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
-import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,10 +55,10 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
-import org.lodder.subtools.sublibrary.util.http.HttpStatus;
-import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
+import org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService;
 import org.opensubtitles.api.AuthenticationApi;
 import org.opensubtitles.api.DownloadApi;
 import org.opensubtitles.api.SubtitlesApi;

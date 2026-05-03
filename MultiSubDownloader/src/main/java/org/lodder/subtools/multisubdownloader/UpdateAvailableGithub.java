@@ -85,7 +85,7 @@ public class UpdateAvailableGithub {
                 try {
                     String currentVersion = getVersion();
                     Element element =
-                        manager.getAsJsoupDocument(new PageContentParams(
+                        manager.get(new PageContentParams(
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
@@ -99,7 +99,7 @@ public class UpdateAvailableGithub {
                         return null;
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
-                    Element artifactElement = manager.getAsJsoupDocument(
+                    Element artifactElement = manager.get(
                             new PageContentParams(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
@@ -124,7 +124,7 @@ public class UpdateAvailableGithub {
                     LocalDateTime buildTista = getBuildTista();
 
                     Element rowElement =
-                        manager.getAsJsoupDocument(new PageContentParams(
+                        manager.get(new PageContentParams(
                                 url:"$REPO_URL/actions?query=branch%3Amaster",
                                 cacheType:CacheType.MEMORY,
                                 userAgent:null))
@@ -136,7 +136,7 @@ public class UpdateAvailableGithub {
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY))
+                    String downloadUrl = manager.get(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();

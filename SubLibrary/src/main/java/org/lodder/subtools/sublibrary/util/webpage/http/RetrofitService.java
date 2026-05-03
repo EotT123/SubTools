@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util.http;
+package org.lodder.subtools.sublibrary.util.webpage.http;
 
 import static java.util.Objects.*;
 import static manifold.science.measures.TimeUnit.*;
@@ -6,7 +6,7 @@ import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
-import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
 
 import java.io.IOException;
 import java.util.ArrayList;

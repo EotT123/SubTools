@@ -36,7 +36,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.UrlBuilder;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 
 @NullMarked
 public class PodnapisiApi implements SubtitleApi {
@@ -207,7 +207,7 @@ public class PodnapisiApi implements SubtitleApi {
 
     protected @Nullable Document getXml(String url) throws PodnapisiApiException {
         try {
-            return manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
+            return manager.get(new PageContentParams(url, CacheType.MEMORY, userAgent,
                 new Retry(
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&

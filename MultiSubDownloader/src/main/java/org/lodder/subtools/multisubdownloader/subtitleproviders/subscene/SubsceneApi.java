@@ -31,7 +31,7 @@ import org.lodder.subtools.sublibrary.ManagerException;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.Utils;
@@ -195,7 +195,7 @@ public class SubsceneApi implements SubtitleApi {
         }
 
         Document document =
-            manager.getAsJsoupDocument(new PageContentParams(
+            manager.get(new PageContentParams(
                 url:url,
                 userAgent:"",
                 retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));

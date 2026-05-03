@@ -5,11 +5,9 @@ import static manifold.science.util.UnitConstants.*;
 import static util.Utils.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,12 +22,12 @@ import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -41,14 +39,15 @@ import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.Nothing;
 import org.lodder.subtools.sublibrary.util.Sleep;
-import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
-import org.lodder.subtools.sublibrary.util.http.CookieManager;
-import org.lodder.subtools.sublibrary.util.http.HttpClient;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
-import org.lodder.subtools.sublibrary.xml.XMLHelper;
+import org.lodder.subtools.sublibrary.util.webpage.BrowserMode;
+import org.lodder.subtools.sublibrary.util.webpage.WebPage;
+import org.lodder.subtools.sublibrary.util.webpage.exception.WebpageException;
+import org.lodder.subtools.sublibrary.util.webpage.http.ApiExceptionIntf;
+import org.lodder.subtools.sublibrary.util.webpage.http.CookieManager;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClient;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 @NullMarked
 public class Manager {
@@ -121,7 +120,7 @@ public class Manager {
             }
         }
 
-        public org.jsoup.nodes.Document postAsJsoupDocument() throws ManagerException {
+        public Document postAsJsoupDocument() throws ManagerException {
             return Jsoup.parse(post());
         }
     }
@@ -130,38 +129,14 @@ public class Manager {
     // GET PAGE CONTENT \\
     // ================ \\
 
-    public String get(PageContentParams params) throws ManagerException {
+    public Document get(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
             case NONE -> getContentWithoutCache(params);
-            case MEMORY -> ((ProviderCacheMemory<String>) inMemoryCache).getOrPut(
+            case MEMORY -> ((ProviderCacheMemory<Document>) inMemoryCache).getOrPut(
                 new ProviderCacheKey("pagecontent", params.url + params.cookieManager(), List.of()),
                 () -> getContentWithoutCache(params));
             case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
         };
-    }
-
-    public InputStream getAsInputStream(PageContentParams params) throws ManagerException {
-        return get(params).toInputStream(StandardCharsets.UTF_8);
-    }
-
-    public @Nullable Document getAsDocument(PageContentParams params,
-        @Nullable Predicate<String> emptyResultPredicate=null)
-        throws ManagerException, IOException {
-        return getAsStringDocument(params, emptyResultPredicate).mapEx(XMLHelper::getDocument).orElse(null);
-    }
-
-    public org.jsoup.nodes.@Nullable Document getAsJsoupDocument(PageContentParams params,
-        @Nullable Predicate<String> emptyResultPredicate=null) throws ManagerException {
-        return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
-    }
-
-    private Optional<String> getAsStringDocument(PageContentParams params,
-        @Nullable Predicate<String> emptyResultPredicate) throws ManagerException {
-        if (emptyResultPredicate == null) {
-            return Optional.of(get(params));
-        }
-        String html = get(params);
-        return StringUtils.isBlank(html) || emptyResultPredicate.test(html) ? Optional.empty() : Optional.of(html);
     }
 
     public JSONObject getAsJsonObject(PageContentParams params) throws ManagerException {
@@ -174,34 +149,27 @@ public class Manager {
 
     private String getAsJsonString(PageContentParams params) throws ManagerException {
         try {
-            return new String(getAsInputStream(params).readAllBytes(), StandardCharsets.UTF_8);
-        } catch (JSONException | IOException | ManagerException e) {
+            return get(params).outerHtml();
+        } catch (JSONException e) {
             throw new ManagerException(e);
         }
     }
 
-    private String getContentWithoutCache(PageContentParams params) throws ManagerException {
-        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager);
+    private Document getContentWithoutCache(PageContentParams params) throws ManagerException {
+        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
+            params.browserMode);
     }
 
-    private String getContentWithoutCache(String url, String userAgent, Retry retry,
-        @Nullable CookieManager cookieManager) throws ManagerException {
+    private Document getContentWithoutCache(String url, String userAgent, Retry retry,
+        @Nullable CookieManager cookieManager, BrowserMode browserMode=BrowserMode.HTMLUNIT) throws ManagerException {
         try {
-            return httpClient.doGet(new URI(url).toURL(), userAgent, cookieManager);
-        } catch (HttpClientException e) {
+            return WebPage.getWebsiteDomTree(url, browserMode:browserMode);
+        } catch (WebpageException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
                 return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
             }
-            throw new ManagerException(
-                "Error occurred with httpclient response: %s %s while accessing %s".formatted(e.responseCode,
-                    e.responseMessage, url), e);
-        } catch (IOException e) {
-            if (retry.canRetry() && retry.predicate.test(e)) {
-                return getContentWithoutCache(url, userAgent, retry.decreaseRetries(), cookieManager);
-            }
-            throw new ManagerException(e);
-        } catch (URISyntaxException e) {
-            throw new ManagerException("Invalid url [%s]".formatted(url), e);
+            throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
+                e);
         }
     }
 

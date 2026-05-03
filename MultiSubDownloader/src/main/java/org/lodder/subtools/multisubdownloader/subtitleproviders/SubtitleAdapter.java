@@ -41,7 +41,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
+import org.lodder.subtools.sublibrary.util.webpage.http.ApiExceptionIntf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

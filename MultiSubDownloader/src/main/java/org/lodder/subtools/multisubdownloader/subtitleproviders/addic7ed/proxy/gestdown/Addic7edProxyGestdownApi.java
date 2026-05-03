@@ -1,7 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown;
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
-import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +27,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.util.http.RetrofitService;
+import org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;

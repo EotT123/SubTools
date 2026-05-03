@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util.http;
+package org.lodder.subtools.sublibrary.util.webpage.http;
 
 import java.io.IOException;
 import java.io.Serial;
