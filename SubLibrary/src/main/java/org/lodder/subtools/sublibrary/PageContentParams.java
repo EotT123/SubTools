@@ -13,5 +13,6 @@ public record PageContentParams(String url,
         ".0 Safari/537.36",
     Manager.Retry retry=Manager.Retry.NONE,
     @Nullable CookieManager cookieManager=null,
-    BrowserMode browserMode=BrowserMode.HTMLUNIT) {
+    BrowserMode browserMode=BrowserMode.HTMLUNIT,
+    @Nullable String contentType=null) {
 }

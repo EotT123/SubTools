@@ -179,16 +179,18 @@ public class Manager {
     }
 
     private String getContentWithoutCache(PageContentParams params) throws ManagerException {
-        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager);
+        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
+            params.contentType);
     }
 
     private String getContentWithoutCache(String url, String userAgent, Retry retry,
-        @Nullable CookieManager cookieManager) throws ManagerException {
+        @Nullable CookieManager cookieManager, @Nullable String contentType) throws ManagerException {
         try {
-            return new HttpClient().doGet(new URI(url).toURL(), userAgent, cookieManager);
+            return new HttpClient().doGet(new URI(url).toURL(), userAgent, cookieManager, contentType);
         } catch (WebpageException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
+                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager,
+                    contentType);
             }
             throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
                 e);

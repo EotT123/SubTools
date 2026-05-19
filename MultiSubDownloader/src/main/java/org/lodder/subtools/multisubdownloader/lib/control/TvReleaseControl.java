@@ -40,7 +40,7 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
 
     private void setImdbId(TvReleaseWithoutPath release) {
         release.providerIds.getOrPut(IMDB, () -> imdbAdapter.getImdbId(release.name, VideoType.EPISODE));
-        release.providerIds.getOrPut(IMDB, () -> omdbAdapter.searchSerie(release.name), r -> r.released);
+        release.providerIds.getOrPut(IMDB, () -> omdbAdapter.searchSerie(release.name), r -> r.imdbID);
         //release.providerIds.getOrPut(IMDB, () -> tvdbAdapter.searchSerie(release.name),  TvdbSerie::getImdbId);
         if (release.providerIds.get(IMDB) == null) {
             throw new IllegalStateException("Unable to find IMDB id for movie: " + release.name);
@@ -59,6 +59,8 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
         release.title = release.providerIds.get(TVDB,
             tvdbId -> ifNotNull(tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode),
                 TvdbEpisode::name));
+        ifNotNullDo(ifNotNull(tvdbAdapter.searchSerie(release.name, release.providerIds), TvdbSerie::getProviderName),
+            v -> release.originalName = v);
     }
 
     private void processImdbInfo(TvReleaseWithoutPath release) {

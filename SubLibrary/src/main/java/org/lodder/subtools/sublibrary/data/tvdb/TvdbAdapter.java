@@ -10,11 +10,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.tvdb.model.MovieBaseRecord;
 import com.tvdb.model.SearchResult;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
@@ -86,7 +89,8 @@ public class TvdbAdapter implements AdapterIntf {
                         (SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, requireNonNull(s.name)));
                     return userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
                             getText("Prompter.SelectTvdbMatchForSerie", serieName), provider,
-                            s -> "${s.name} (${s.firstAirTime})")
+                            s -> s.name + Stream.of(s.firstAirTime, s.tvdbId).mapFilterNonNull(StringUtils::trimToNull)
+                                .collect(Collectors.joining(" - ", "(", ")")))
                         .map(searchResult -> new TvdbSerie(serieName, searchResult))
                         .orElse(null);
                 }

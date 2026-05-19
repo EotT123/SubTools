@@ -183,7 +183,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             this.providerNameColumn = getText("MappingEpisodeNameDialog.ProviderName");
         }
 
-        public List<Pair<ProviderCacheKey, SerieMapping>> getValues(Manager manager) {
+        public List<Pair<ProviderCacheKey, @Nullable SerieMapping>> getValues(Manager manager) {
             return MAPPING_SUPPLIER.apply(manager, provider, type);
         }
     }

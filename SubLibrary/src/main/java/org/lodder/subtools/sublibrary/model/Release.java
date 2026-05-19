@@ -15,6 +15,7 @@ public sealed interface Release permits ReleaseWithoutPath, ReleaseWithPath, Mov
     @val @Nullable String releaseGroup;
     @val ProviderIds providerIds = new ProviderIds();
     @val String releaseDescription;
+    // the complete (file) name
     @val String completeName;
 
     @val String folderNameOrName = switch (this) {

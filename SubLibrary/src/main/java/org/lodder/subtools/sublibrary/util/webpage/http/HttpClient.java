@@ -35,7 +35,8 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
-    public String doGet(URL url, @Nullable String userAgent, @Nullable CookieManager cookieManager=null)
+    public String doGet(URL url, @Nullable String userAgent, @Nullable CookieManager cookieManager=null,
+        @Nullable String contentType)
         throws IOException, HttpClientException {
         HttpURLConnection conn = null;
         try {
@@ -45,7 +46,9 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
             if (StringUtils.isNotBlank(userAgent)) {
                 conn.setRequestProperty(HttpHeaders.USER_AGENT, userAgent);
             }
-            conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "text/html");
+            if (contentType != null) {
+                conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, contentType);
+            }
             if (conn.responseCode == HttpURLConnection.HTTP_OK) {
                 return conn.getInputStream().asString(StandardCharsets.UTF_8);
             } else if (conn.responseCode == HttpURLConnection.HTTP_MOVED_TEMP
@@ -53,7 +56,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
                 || conn.responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
 
                 String newUrl = conn.getHeaderField("Location");
-                return doGet(new URL(newUrl), userAgent, cookieManager);
+                return doGet(new URL(newUrl), userAgent, cookieManager, contentType);
             }
             throw new HttpClientException(conn);
         } finally {
@@ -94,7 +97,8 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
             getCookieManager(cookieManager).storeCookies(conn);
 
             if (conn.responseCode == 302 && isUrl(conn.getHeaderField(HttpHeaders.LOCATION))) {
-                return doGet(new URI(conn.getHeaderField(HttpHeaders.LOCATION)).toURL(), userAgent, cookieManager);
+                return doGet(new URI(conn.getHeaderField(HttpHeaders.LOCATION)).toURL(), userAgent, cookieManager,
+                    null);
             }
             return conn.getInputStream().asString(StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {

@@ -134,9 +134,9 @@ public class ImdbAdapter implements AdapterIntf {
                         }
                         return 0;
                     })).toList(), getText("Prompter.SelectImdbMatchForSerie", title), provider,
-            providerId -> providerId.name +
+            providerId -> providerId.name + ifNotNullOrElse(StringUtils.trimToNull(
                 Stream.of(providerId.year, providerId.otherInfo).mapFilterNonNull(StringUtils::trimToNull).collect(
-                    Collectors.joining(" - ", " (", ")"))).orElse(null);
+                    Collectors.joining(" - "))), v -> "(" + v + ")", "")).orElse(null);
     }
 
     private Optional<String> promptUserToEnterImdbId(String title) {

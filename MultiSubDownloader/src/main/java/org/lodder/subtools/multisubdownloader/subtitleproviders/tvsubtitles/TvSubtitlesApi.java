@@ -50,7 +50,7 @@ public class TvSubtitlesApi implements SubtitleApi {
         return getCache("providerIds", b -> b.add("name", serieName))
             .get(() -> {
                 try {
-                    return manager.postBuilder("$DOMAIN/search.php")
+                    return manager.postBuilder("$DOMAIN/search1.php")
                         .addData("qs", serieName)
                         .postAsJsoupDocument()
                         .select(".left_articles > ul > li a")

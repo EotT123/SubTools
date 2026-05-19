@@ -20,6 +20,7 @@ import java.util.function.Function;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import jakarta.ws.rs.core.MediaType;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
@@ -82,7 +83,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
-    @Nullable Credentials credentials;
+    private @Nullable Credentials credentials;
 
     private static final Function<Chain, Builder> DEFAULT_BUILDER =
         chain -> chain.request().newBuilder()
@@ -125,10 +126,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
-            .get(() -> getBearerTokenWithoutCache(username, password)
-                    .orElseThrow(() -> OpenSubtitleApiException.noResult("Could not acquire a bearer token, " +
-                        "invalid username/password?")),
-                23.5 hr);
+            .get(() -> getBearerTokenWithoutCache(username, password).orElseThrow(
+                () -> OpenSubtitleApiException.noResult(
+                    "Could not acquire a bearer token, " + "invalid username/password?")), 23.5hr);
     }
 
     private static Optional<String> getBearerTokenWithoutCache(String username, String password)
@@ -165,11 +165,10 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                                 + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
                             cacheType:CacheType.MEMORY,
-                            userAgent:"",
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5 Second)
+                                5Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -278,7 +277,12 @@ public class OpenSubtitlesApi implements SubtitleApi {
                         .build();
 
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
+                    if (response.statusCode() / 200 == 1) {
+                        return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
+                    } else {
+                        throw new OpenSubtitleApiException(HttpStatus.fromStatusCode(response.statusCode()),
+                            response.body(), CacheStrategy.CACHE_DISABLED, LogLevel.ERROR);
+                    }
                 } catch (IOException | InterruptedException | JsonSyntaxException e) {
                     throw new OpenSubtitleApiException(SERVER_ERROR, e.getMessage(), CacheStrategy.CACHE_DISABLED,
                         LogLevel.ERROR);
