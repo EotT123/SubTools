@@ -24,6 +24,7 @@ import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
 import org.lodder.subtools.sublibrary.model.VideoType;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingTriFunction;
@@ -63,7 +64,7 @@ public class ImdbAdapter implements AdapterIntf {
 
     public @Nullable String getImdbId(String title, VideoType videoType, @Nullable Integer year=null) {
         try {
-            return getCache(videoType.name() + "mapping",
+            SerieMapping imdbSerieMapping = getCache(videoType.name() + "mapping",
                 b -> b.add("title", title).add("videoType", videoType).add("year", year))
                 .get(() -> {
                     ImdbId imdbId = ifNullThenGet(getImdbIdOnImdb(title, year, videoType),
@@ -71,8 +72,9 @@ public class ImdbAdapter implements AdapterIntf {
                             () -> ifNullThenGet(getImdbIdOnYahoo(title, year, videoType),
                                 () -> promptUserToEnterImdbId(title).map(id -> getImdbIdOnImdb(title, id))
                                     .orElse(null))));
-                    return imdbId == null ? null : imdbId.id;
+                    return ifNotNull(imdbId, id -> new SerieMapping(title, id.id, imdbId.name));
                 }, storeTempNullValue:true);
+            return ifNotNull(imdbSerieMapping, SerieMapping::getProviderId);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(provider, title, e.getMessage()), e);
             return null;
