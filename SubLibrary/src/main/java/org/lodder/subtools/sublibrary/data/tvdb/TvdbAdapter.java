@@ -107,10 +107,9 @@ public class TvdbAdapter implements AdapterIntf {
         if (tvdbSerie == null) {
             cache.storeTempValue(Value.nullValue());
         } else {
-            cache.store(Value.nullValue());
+            cache.store(Value.of(tvdbSerie));
         }
         return tvdbSerie;
-
     }
 
     public @Nullable TvdbEpisode searchEpisode(int tvdbId, int season, int episode) {

@@ -75,7 +75,7 @@ public final class OpenSubAdapter
     @Override
     public List<OpensubtitleId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws OpenSubtitleException {
-        return List.of();
+        return ifNotNull(providerIds.get(IMDB, api::getProviderSerieId), List::of);
     }
 
     @Override
@@ -83,10 +83,9 @@ public final class OpenSubAdapter
         throws OpenSubtitleException {
         return api.getProviderSerieIds(serieName)
             .stream()
-            .sorted(
-                Comparator.comparing((OpensubtitleId n) -> !serieName.replaceAll("[^A-Za-z]", "")
-                        .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                    .thenComparing(OpensubtitleId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
+            .sorted(Comparator.comparing((OpensubtitleId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                    .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
+                .thenComparing(OpensubtitleId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
             .toList();
     }
 

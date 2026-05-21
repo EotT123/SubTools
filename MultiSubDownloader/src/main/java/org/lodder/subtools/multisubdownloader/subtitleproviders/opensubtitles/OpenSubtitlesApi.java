@@ -176,7 +176,34 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             show.getString("year")))
                         .toList();
                 } catch (Exception e) {
-                    throw OpenSubtitleApiException.error(e);
+                    throw OpenSubtitleApiException.error(e,
+                        "OpenSubtitlesApi: Error while retrieving provider serie id for [%s] - %s".formatted
+                            (serieName, e.getCause()));
+                }
+            });
+    }
+
+    public @Nullable OpensubtitleId getProviderSerieId(String imdbId) throws OpenSubtitleException {
+        return getCache("providerSerieId", b -> b.add("imdbId", imdbId))
+            .get(() -> {
+                try {
+                    return manager.getJsonArray(new PageContentParams(
+                            url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName=" + imdbId,
+                            cacheType:CacheType.MEMORY,
+                            retry:new Retry(
+                                1,
+                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                                5Second), contentType:MediaType.APPLICATION_JSON
+                            ))
+                        .streamJsonObjects()
+                        .filter(show -> "tv".equals(show.getString("kind")))
+                        .map(show -> new OpensubtitleId(show.getString("name"), show.getInt("id"),
+                            show.getString("year")))
+                        .findAny().orElse(null);
+                } catch (Exception e) {
+                    throw OpenSubtitleApiException.error(e,
+                        "OpenSubtitlesApi: Error while retrieving provider serie id for imdbid [%s] - %s".formatted
+                            (imdbId, e.getCause()));
                 }
             });
     }
@@ -184,7 +211,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
     // ====== \\
     // COMMON \\
     // ====== \\
-
 
     public List<Subtitle> searchSubtitles(
         @Nullable AiTranslatedEnum aiTranslated=AiTranslatedEnum.EXCLUDE,

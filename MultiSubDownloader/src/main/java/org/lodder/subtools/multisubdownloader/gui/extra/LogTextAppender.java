@@ -46,6 +46,9 @@ public class LogTextAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     public void append(ILoggingEvent event) {
+        if (event.getMessage().startsWith("Obsolete content type encountered")) {
+            return;
+        }
         try {
             encoder.doEncode(event);
             out.flush();

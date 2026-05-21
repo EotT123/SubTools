@@ -57,7 +57,7 @@ record ImdbSearchIdApi(Manager manager) {
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirst("a").text(),
                         e -> e.selectFirst("a").attr("href"),
-                        e -> e.selectFirst(".cli-title-metadata .cli-title-metadata-item").text().split("–")[0],
+                        e -> ifNotNull(e.selectFirst(".ipc-inline-list--inline li"), e2 -> e2.text().split("–")[0]),
                         e -> Stream.of(e.selectFirst(".cli-title-metadata .cli-title-type-data"),
                                 e.selectFirst(".cli-title-metadata .cli-title-metadata-item:nth-child(2)"))
                             .map(ElementExt::text)

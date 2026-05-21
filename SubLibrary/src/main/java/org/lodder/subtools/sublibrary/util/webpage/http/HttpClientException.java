@@ -47,4 +47,9 @@ public class HttpClientException extends Exception {
         }
         return "";
     }
+
+    @Override
+    public String toString() {
+        return "HttpClientException $responseCode $responseMessage";
+    }
 }
