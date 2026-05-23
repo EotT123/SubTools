@@ -5,9 +5,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
@@ -24,10 +22,6 @@ public class Container {
         return bindings.get(name).get();
     }
 
-    public SubtitleProviderStore makeSubtitleProviderStore() {
-        return (SubtitleProviderStore) make("SubtitleProviderStore");
-    }
-
     public Manager makeManager() {
         return (Manager) make("Manager");
     }
@@ -38,9 +32,5 @@ public class Container {
 
     public Preferences makePreferences() {
         return (Preferences) make("Preferences");
-    }
-
-    public Emitter makeEventEmitter() {
-        return (Emitter) make("EventEmitter");
     }
 }

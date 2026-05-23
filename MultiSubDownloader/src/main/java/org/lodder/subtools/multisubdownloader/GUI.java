@@ -227,8 +227,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             .withEditRenameTVAction(() -> showRenameDialog.accept(VideoType.EPISODE, getText("Menu.RenameSerie")))
             .withEditRenameMovieAction(() -> showRenameDialog.accept(VideoType.MOVIE, getText("Menu.RenameMovie")))
             .withEditPreferencesAction(
-                () -> new PreferenceDialog(self(), settingsControl, app.makeEventEmitter(), manager,
-                    userInteractionHandler).setVisible(true))
+                () -> new PreferenceDialog(self(), settingsControl, manager, userInteractionHandler).setVisible(true))
             .withTranslateShowNamesAction(this::showTranslateShowNames)
             .withExportTranslationsAction(() -> exportImport.exportSettings(ExportImport.SettingsType.SERIE_MAPPING))
             .withImportTranslationsAction(() -> exportImport.importSettings(ExportImport.SettingsType.SERIE_MAPPING))
@@ -251,8 +250,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(_ -> downloadText());
 
-        TextGuiSearchAction searchAction = new TextGuiSearchAction(settings, app.makeSubtitleProviderStore(),
-            this, pnlSearchText, new ReleaseFactory(settings, app.makeManager()));
+        TextGuiSearchAction searchAction =
+            new TextGuiSearchAction(settings, this, pnlSearchText, new ReleaseFactory(settings, app.makeManager()));
         pnlSearchTextInput.addSearchAction(searchAction);
     }
 
@@ -277,8 +276,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         resultPanel.setTable(createVideoTable());
 
-        FileGuiSearchAction searchAction = new FileGuiSearchAction(settings, app.makeSubtitleProviderStore(), this,
-            pnlSearchFile, new ReleaseFactory(settings, app.makeManager()));
+        FileGuiSearchAction searchAction =
+            new FileGuiSearchAction(settings, this, pnlSearchFile, new ReleaseFactory(settings, app.makeManager()));
 
         pnlSearchFileInput.addSelectFolderAction(_ -> selectIncomingFolder());
         pnlSearchFileInput.addSearchAction(searchAction);
@@ -366,8 +365,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     protected void showTranslateShowNames() {
-        final MappingEpisodeNameDialog tDialog = new MappingEpisodeNameDialog(this, app.makeManager(),
-            app.makeSubtitleProviderStore(), userInteractionHandler);
+        final MappingEpisodeNameDialog tDialog =
+            new MappingEpisodeNameDialog(this, app.makeManager(), userInteractionHandler);
         tDialog.setVisible(true);
     }
 

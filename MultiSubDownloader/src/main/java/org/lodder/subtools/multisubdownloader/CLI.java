@@ -95,7 +95,6 @@ public class CLI {
     public void search() {
         try {
             new CliSearchAction(settings,
-                app.makeSubtitleProviderStore(),
                 new CLIFileIndexerProgress().verbose(verboseProgress),
                 new CLISearchProgress().verbose(verboseProgress),
                 this,

@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.serviceproviders;
 
+import java.util.function.Supplier;
+
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
@@ -15,8 +17,7 @@ public class SubdlServiceProvider implements ServiceProvider {
     @val @override int priority = 1;
 
     @Override
-    public void register(Container app, UserInteractionHandler userInteractionHandler) {
-        /* Add the SubtitleProvider to the store */
-        app.makeSubtitleProviderStore().addProvider(new SubdlAdapter(app.makeManager(), userInteractionHandler));
+    public Supplier<SubdlAdapter> createProviderSupplier(Container app, UserInteractionHandler userInteractionHandler) {
+        return () -> new SubdlAdapter(app.makeManager(), userInteractionHandler);
     }
 }
