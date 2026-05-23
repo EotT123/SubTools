@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbSerie;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
@@ -33,8 +34,7 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
         LOGGER.debug("process: serie [{}], season [{}], episode [{}]", release.name, release.season, release.episodes);
         setImdbId(release);
         setTvdbId(release);
-        processTvdbInfo(release);
-        processImdbInfo(release);
+        processProviderInfo(release);
         return release;
     }
 
@@ -55,18 +55,13 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
         }
     }
 
-    private void processTvdbInfo(TvReleaseWithoutPath release) {
+    private void processProviderInfo(TvReleaseWithoutPath release) {
         release.title = release.providerIds.get(TVDB,
             tvdbId -> ifNotNull(tvdbAdapter.searchEpisode(tvdbId, release.season, release.firstEpisode),
                 TvdbEpisode::name));
-        ifNotNullDo(ifNotNull(tvdbAdapter.searchSerie(release.name, release.providerIds), TvdbSerie::getProviderName),
-            v -> release.originalName = v);
-    }
-
-    private void processImdbInfo(TvReleaseWithoutPath release) {
-        // TODO implement this
-//        release.providerIds.getImdbId().ifPresent(
-//            imdbId -> imdbAdapter.getSerieDetails(imdbId)
-//                .ifPresent(tvRelease::updateImdbEpisodeInfo));
+        release.originalName =
+            ifNotNullOrElseGet(tvdbAdapter.searchSerie(release.name, release.providerIds), TvdbSerie::getProviderName,
+                () -> ifNotNull(release.providerIds.get(IMDB),
+                    imdbId -> ifNotNull(imdbAdapter.getDetails(imdbId), ImdbDetails::title)));
     }
 }

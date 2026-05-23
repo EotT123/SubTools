@@ -41,7 +41,7 @@ public sealed class TvReleaseWithoutPath extends ReleaseWithoutPath implements T
         this.customName = customName;
     }
 
-    public void updateImdbEpisodeInfo(ImdbDetails tvdbEpisode) {
+    public void updateImdbEpisodeInfo(ImdbDetails imdbDetails) {
         // TODO implement this
     }
 

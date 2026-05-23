@@ -11,11 +11,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.jsoup.nodes.Document;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbApiException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
+import org.lodder.subtools.sublibrary.util.webpage.BrowserMode;
+import org.lodder.subtools.sublibrary.util.webpage.WebPage;
+import org.lodder.subtools.sublibrary.util.webpage.exception.WebpageException;
 
 @NullMarked
 public class ImdbApi implements ApiIntf {
@@ -32,23 +36,41 @@ public class ImdbApi implements ApiIntf {
     public ImdbDetails getDetails(String imdbId) throws ImdbApiException {
         return getCache("details", b -> b.add("imdbId", imdbId))
             .get(() -> {
-                String query = """
-                    {
-                      title(id: "$imdbId") {
-                        start_year
-                        primary_title
-                      }
-                    }
-                    """;
                 try {
-                    JsonNode jsonNode = post(query);
-                    String title = jsonNode.get("primary_title").asText();
-                    int year = jsonNode.get("start_year").asInt();
+                    String url = "$DOMAIN/title/$imdbId/releaseinfo/";
+                    Document document = WebPage.getWebsiteDomTree(url, browserMode:BrowserMode.WEBDRIVER);
+
+                    String date = document.selectFirst(
+                        "[data-testid=\"sub-section-releases\"] .ipc-metadata-list-item__list-content-item").text();
+                    int year = 0;
+                    if (date.contains(",")) {
+                        year = date.split(",")[1].trim().parseAsNumber(Integer::parseUnsignedInt);
+                    }
+                    String title = document.selectFirst(
+                        "[data-testid=\"sub-section-akas\"] .ipc-metadata-list-item__list-content-item").text();
                     return new ImdbDetails(title, year);
-                } catch (IOException | InterruptedException e) {
+                } catch (WebpageException e) {
                     throw ImdbApiException.error(e,
                         "Error trying to fetch details for id [$imdbId], " + e.getMessage());
                 }
+                // API isn't free to use anymore
+                //String query = """
+                //    {
+                //      title(id: "$imdbId") {
+                //        start_year
+                //        primary_title
+                //      }
+                //    }
+                //    """;
+                //try {
+                //    JsonNode jsonNode = post(query);
+                //    String title = jsonNode.get("primary_title").asText();
+                //    int year = jsonNode.get("start_year").asInt();
+                //    return new ImdbDetails(title, year);
+                //} catch (IOException | InterruptedException e) {
+                //    throw ImdbApiException.error(e,
+                //        "Error trying to fetch details for id [$imdbId], " + e.getMessage());
+                //}
             });
     }
 
