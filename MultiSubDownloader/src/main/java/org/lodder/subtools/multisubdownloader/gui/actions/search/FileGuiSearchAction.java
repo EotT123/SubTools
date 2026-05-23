@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
+import static util.Utils.*;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +90,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
             /* Tell progressListener which file we are processing */
             this.indexingProgressListener.progress(file.getFileName().toString());
 
-            releaseFactory.createRelease(file, userInteractionHandler).ifPresent(releases::add);
+            ifNotNullDo(releaseFactory.createRelease(file, userInteractionHandler), releases::add);
 
             /* Update progressListener */
             this.indexingProgressListener.progress(progress);

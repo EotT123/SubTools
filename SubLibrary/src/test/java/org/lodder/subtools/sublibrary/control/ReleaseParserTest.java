@@ -6,7 +6,6 @@ import static org.lodder.subtools.sublibrary.assertions.SubLibraryAssertions.ass
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
-import org.lodder.subtools.sublibrary.model.Release;
 
 class ReleaseParserTest {
 
@@ -29,14 +28,13 @@ class ReleaseParserTest {
     void testListGetQualityKeyWords() throws Exception {
 
         String name = "Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv";
-        Release release = ReleaseParser.parse(name).orElseThrow();
 
-        assertThat(ReleaseParser.getQualityKeyWords(release.quality)).containsExactly("720p", "hdtv", "x264");
+        assertThat(ReleaseParser.getQualityKeyWords(ReleaseParser.parse(name).quality))
+            .containsExactly("720p", "hdtv", "x264");
 
         name = "The.Drop.2014.1080p.WEB-DL.DD5.1.H264-RARBG.mkv";
-        release = ReleaseParser.parse(name).orElseThrow();
 
-        assertThat(ReleaseParser.getQualityKeyWords(release.quality))
+        assertThat(ReleaseParser.getQualityKeyWords(ReleaseParser.parse(name).quality))
             .containsExactly("1080p", "web-dl", "dd5.1", "x264");
     }
 
@@ -49,9 +47,8 @@ class ReleaseParserTest {
             @Test
             void StartsWithSeasonEpisode1() throws Exception {
                 String name = "S04E02 - White Collar - Most Wanted.mkv";
-                Release release = ReleaseParser.parse(name).orElseThrow();
 
-                assertThat(release)
+                assertThat(ReleaseParser.parse(name))
                     .isSerie()
                     .hasExtension("mkv")
                     .hasFileName("S04E02 - White Collar - Most Wanted.mkv")
@@ -66,9 +63,8 @@ class ReleaseParserTest {
             @Test
             void StartsWithSeasonEpisode2() throws Exception {
                 String name = "(S04E02) - White Collar - Most Wanted.mkv";
-                Release release = ReleaseParser.parse(name).orElseThrow();
 
-                assertThat(release)
+                assertThat(ReleaseParser.parse(name))
                     .isSerie()
                     .hasExtension("mkv")
                     .hasFileName("(S04E02) - White Collar - Most Wanted.mkv")
@@ -83,9 +79,8 @@ class ReleaseParserTest {
             @Test
             void StartsWithSeasonEpisode3() throws Exception {
                 String name = "(S04E02) White Collar - Most Wanted.mkv";
-                Release release = ReleaseParser.parse(name).orElseThrow();
 
-                assertThat(release)
+                assertThat(ReleaseParser.parse(name))
                     .isSerie()
                     .hasExtension("mkv")
                     .hasFileName("(S04E02) White Collar - Most Wanted.mkv")
@@ -102,9 +97,8 @@ class ReleaseParserTest {
         @Test
         void testTV1() throws Exception {
             String name = "Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mkv")
                 .hasFileName("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv")
@@ -119,9 +113,8 @@ class ReleaseParserTest {
         @Test
         void testTV4() throws Exception {
             String name = "Spartacus.Gods.of.The.Arena.Pt.IV.720p.HDTV.X264-DIMENSION.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mkv")
                 .hasFileName("Spartacus.Gods.of.The.Arena.Pt.IV.720p.HDTV.X264-DIMENSION.mkv")
@@ -136,9 +129,8 @@ class ReleaseParserTest {
         @Test
         void testTV5() throws Exception {
             String name = "hawaii.five-0.2010.410.hdtv-lol.mp4";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mp4")
                 .hasFileName("hawaii.five-0.2010.410.hdtv-lol.mp4")
@@ -153,9 +145,8 @@ class ReleaseParserTest {
         @Test
         void testTV6() throws Exception {
             String name = "Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mkv")
                 .hasFileName("Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv")
@@ -170,9 +161,8 @@ class ReleaseParserTest {
         @Test
         void testTV7() throws Exception {
             String name = "Greys.Anatomy.S10E01E02 Seal Our Fate 720p.HDTV.X264-DIMENSION.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mkv")
                 .hasFileName("Greys.Anatomy.S10E01E02 Seal Our Fate 720p.HDTV.X264-DIMENSION.mkv")
@@ -188,9 +178,8 @@ class ReleaseParserTest {
         @Test
         void testTV8() throws Exception {
             String name = "(2-11) Joey and the High School Friend.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mkv")
                 .hasFileName("(2-11) Joey and the High School Friend.mkv")
@@ -205,9 +194,8 @@ class ReleaseParserTest {
         @Test
         void testTV9() throws Exception {
             String name = "The.Boys.S04E05.Beware.the.jabberwock.my.son.1080p.web.dl.hevc.x265.rmteam.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isSerie()
                 .hasExtension("mkv")
                 .hasFileName("The.Boys.S04E05.Beware.the.jabberwock.my.son.1080p.web.dl.hevc.x265.rmteam.mkv")
@@ -223,7 +211,7 @@ class ReleaseParserTest {
     @Test
     void testReleaseParseExceptionMessage() throws ReleaseParseException {
         String name = "exceptiontesting.mkv";
-        assertThat(ReleaseParser.parse(name)).isEmpty();
+        assertThat(ReleaseParser.parse(name)).isNull();
     }
 
     @Nested
@@ -232,9 +220,8 @@ class ReleaseParserTest {
         @Test
         void testMovie1() throws Exception {
             String name = "Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isMovie()
                 .hasExtension("mkv")
                 .hasFileName("Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv")
@@ -247,9 +234,8 @@ class ReleaseParserTest {
         @Test
         void testMovie2() throws Exception {
             String name = "Back.to.the.Future.Part.21.1989.720p.BluRay.X264-AMIABLE.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isMovie()
                 .hasExtension("mkv")
                 .hasFileName("Back.to.the.Future.Part.21.1989.720p.BluRay.X264-AMIABLE.mkv")
@@ -262,9 +248,8 @@ class ReleaseParserTest {
         @Test
         void testMovie3() throws Exception {
             String name = "The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isMovie()
                 .hasExtension("mkv")
                 .hasFileName("The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv")
@@ -277,9 +262,8 @@ class ReleaseParserTest {
         @Test
         void testMovie4() throws Exception {
             String name = "The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isMovie()
                 .hasExtension("mkv")
                 .hasFileName("The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv")
@@ -292,9 +276,8 @@ class ReleaseParserTest {
         @Test
         void testMovie5() throws Exception {
             String name = "Final.Destination.5.720p.Bluray.x264-TWiZTED.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isMovie()
                 .hasExtension("mkv")
                 .hasFileName("Final.Destination.5.720p.Bluray.x264-TWiZTED.mkv")
@@ -307,9 +290,8 @@ class ReleaseParserTest {
         @Test
         void testMovie6() throws Exception {
             String name = "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv";
-            Release release = ReleaseParser.parse(name).orElseThrow();
 
-            assertThat(release)
+            assertThat(ReleaseParser.parse(name))
                 .isMovie()
                 .hasExtension("mkv")
                 .hasFileName("Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv")

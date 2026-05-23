@@ -3,6 +3,7 @@ package org.lodder.subtools.sublibrary.control;
 import static java.util.Objects.*;
 import static org.lodder.subtools.sublibrary.control.RegexUtils.*;
 import static org.lodder.subtools.sublibrary.control.Tags.*;
+import static util.Utils.*;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -63,14 +64,14 @@ public class ReleaseParser {
      *
      * @param file The file path being parsed.
      * @param includeParent If true, the parent directory name is also parsed.
-     * @return an {@link Optional} containing the {@link ReleaseWithPath} if parsing was successful; otherwise
-     * {@link Optional#empty()}
+     * @return the {@link ReleaseWithPath} if parsing was successful; otherwise null
      */
-    public static Optional<ReleaseWithPath> parse(Path file, boolean includeParent=false) {
-        Optional<ReleaseWithoutPath> release =
-            includeParent ? parse(file.getParent().fileNameAsString) : Optional.empty();
-        return release.orElseMapEx(() -> parse(StringUtils.substringBeforeLast(file.fileNameAsString, ".")))
-            .map(r -> withPath(r, file));
+    public static @Nullable ReleaseWithPath parse(Path file, boolean includeParent=false) {
+        ReleaseWithoutPath release = includeParent ? parse(file.getParent().fileNameAsString) : null;
+        if (release == null) {
+            release = parse(StringUtils.substringBeforeLast(file.fileNameAsString, "."));
+        }
+        return ifNotNull(release, r -> withPath(r, file));
     }
 
     public static ReleaseWithPath withPath(ReleaseWithoutPath release, Path path) {
@@ -92,7 +93,7 @@ public class ReleaseParser {
      * @return an {@link Optional} containing the {@link ReleaseWithoutPath} if parsing was successful; otherwise
      * {@link Optional#empty()}
      */
-    public static Optional<ReleaseWithoutPath> parse(String text) {
+    public static @Nullable ReleaseWithoutPath parse(String text) {
         ParserResults parserResults = new ParserResults(Strings.CS.endsWithAny(text, ".zip", ".srt") ||
             Strings.CS.endsWithAny(text,
                 VideoExtensions.values().stream().map(VideoExtensions::getValue).toList().toArray(new String[0])) ?
@@ -133,14 +134,14 @@ public class ReleaseParser {
                 if (parserResults.contains(YEAR) || parserResults.getNamedMatch(SOURCE).stream()
                     .anyMatch(source -> source.likelyMovieRelease || !source.likelyTvRelease)) {
                     if (Strings.CS.equals(parserResults.parts.first, text)) {
-                        return Optional.empty();
+                        return null;
                     }
-                    return Optional.of(new MovieReleaseWithoutPath(
+                    return new MovieReleaseWithoutPath(
                         name:cleanUnwantedChars(parserResults.parts.first),
                         year:parserResults.getNamedMatchValue(YEAR),
                         releaseGroup:releaseGroup,
                         quality:StringUtils.toRootLowerCase(quality),
-                        completeName:text));
+                        completeName:text);
                 }
             }
         }
@@ -151,7 +152,7 @@ public class ReleaseParser {
         LinkedHashSet<Integer> episodes = new LinkedHashSet<>();
         if (!parserResults.contains(SEASON) || (parserResults.containsNone(EPISODE, EPISODES_TEXT))) {
             if (parserResults.containsNone(ARABIC_NUMBER, ROMAN_NUMBER)) {
-                return Optional.empty();
+                return null;
             }
             // Parse the number parts. They are still present at this point, because they were not removed from the
             // remaining parts earlier
@@ -181,9 +182,9 @@ public class ReleaseParser {
         name = parserResults.containsNone(NAME) ? parserResults.parts.first : parserResults.getNamedMatchValue(NAME);
 
         if (Strings.CS.equals(name, text)) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(new TvReleaseWithoutPath(
+        return new TvReleaseWithoutPath(
             name:cleanUnwantedChars(name),
             season:season,
             episodes:episodes,
@@ -191,7 +192,7 @@ public class ReleaseParser {
             releaseGroup:releaseGroup,
             special:isSpecialEpisode(season, episodes),
             quality:StringUtils.toRootLowerCase(quality),
-            completeName:text));
+            completeName:text);
     }
 
     @NullMarked

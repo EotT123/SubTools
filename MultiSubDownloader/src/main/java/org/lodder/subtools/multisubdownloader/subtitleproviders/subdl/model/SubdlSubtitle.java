@@ -19,9 +19,9 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
-import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,11 +65,10 @@ public class SubdlSubtitle extends Subtitle {
                     .filter(path -> path.toString().toLowerCase().endsWith(".srt"))
                     .mapFilterNonNull(path -> {
                         if (multipleDirectories && forRelease instanceof TvReleaseWithoutPath tvRelease) {
-                            Boolean matchingSub = ReleaseParser.parse(path).filter(TvReleaseWithPath.class::isInstance)
-                                .map(TvReleaseWithPath.class::cast)
-                                .map(release -> release.season == tvRelease.season &&
-                                    release.episodes.stream().anyMatch(tvRelease.episodes::contains))
-                                .orElse(false);
+                            ReleaseWithPath releaseWithPath = ReleaseParser.parse(path);
+                            boolean matchingSub = releaseWithPath instanceof TvReleaseWithoutPath release &&
+                                release.season == tvRelease.season &&
+                                release.episodes.stream().anyMatch(tvRelease.episodes::contains);
                             if (!matchingSub) {
                                 return null;
                             }

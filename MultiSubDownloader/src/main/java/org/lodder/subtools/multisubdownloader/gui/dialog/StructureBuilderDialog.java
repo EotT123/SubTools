@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
+import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 
 import javax.swing.*;
@@ -51,12 +52,12 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         Function<String, ? extends LibraryBuilder> filenameLibraryBuilder) {
         super(frame, title, modal);
         this.libraryBuilder = filenameLibraryBuilder;
-        this.release = switch (videoType) {
+        this.release = requireNonNull(switch (videoType) {
             case EPISODE -> new ReleaseFactory(new Settings(), manager).createRelease(
-                "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv", userInteractionHandler, false).orElseThrow();
+                "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv", userInteractionHandler, false);
             case MOVIE -> new ReleaseFactory(new Settings(), manager).createRelease(
-                "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv", userInteractionHandler, false).orElseThrow();
-        };
+                "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv", userInteractionHandler, false);
+        });
 
         // Initialize GUI
 

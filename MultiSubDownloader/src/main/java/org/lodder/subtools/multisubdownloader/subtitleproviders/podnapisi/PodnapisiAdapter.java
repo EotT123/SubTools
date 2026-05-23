@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
 import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
+import static util.Utils.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -98,16 +99,16 @@ public final class PodnapisiAdapter
 
     @Override
     public PodnapisiSubtitle convertToSubtitle(Release release, PodnapisiSubtitleMetadata metadata) {
-        return ReleaseParser.parse(metadata.releaseString)
-            .map(r -> new PodnapisiSubtitle(
+        return ifNotNullOrElseGet(ReleaseParser.parse(metadata.releaseString),
+            r -> new PodnapisiSubtitle(
                 url:metadata.url,
                 fileName:metadata.releaseString,
                 language:metadata.language,
                 quality:r.quality,
                 releaseGroup:r.releaseGroup,
                 uploader:metadata.uploaderName,
-                hearingImpaired:metadata.hearingImpaired))
-            .orElseGet(() -> new PodnapisiSubtitle(
+                hearingImpaired:metadata.hearingImpaired),
+            () -> new PodnapisiSubtitle(
                 url:metadata.url,
                 fileName:metadata.releaseString,
                 language:metadata.language,
