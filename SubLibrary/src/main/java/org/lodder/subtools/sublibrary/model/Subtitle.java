@@ -1,6 +1,5 @@
 package org.lodder.subtools.sublibrary.model;
 
-import static manifold.ext.props.rt.api.PropOption.*;
 import static util.Utils.*;
 
 import java.io.IOException;
@@ -21,18 +20,18 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser;
 @NullMarked
 public abstract class Subtitle implements Serializable {
 
-    @val @Nullable String fileName;
+    @val String fileName;
     @val Language language;
     @val @Nullable String releaseGroup;
     @val @Nullable String uploader;
     @val boolean hearingImpaired;
     @val String quality;
-    @val(Abstract) SubtitleSource source;
+    abstract @val SubtitleSource source;
 
     @var @Nullable SubtitleMatchType subtitleMatchType;
     @var int score;
 
-    public Subtitle(@Nullable String fileName=null,
+    public Subtitle(String fileName,
         Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,

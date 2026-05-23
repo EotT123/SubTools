@@ -3,18 +3,21 @@ package org.lodder.subtools.sublibrary.data.tvdb;
 import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
 import static org.lodder.subtools.sublibrary.Manager.*;
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.tvdb.model.MovieBaseRecord;
 import com.tvdb.model.SearchResult;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
@@ -29,6 +32,7 @@ import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +41,8 @@ public class TvdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvdbAdapter.class);
     private static final String API_KEY = "A1720D2DDFDCE82D";
-    private static @Nullable TvdbAdapter instance;
+    private static final LazyBiFunction<Manager, UserInteractionHandler, TvdbAdapter> INSTANCE =
+        new LazyBiFunction<>(TvdbAdapter::new);
     @val @override Manager manager;
     @val @override String provider = "TVDB";
     private final UserInteractionHandler userInteractionHandler;
@@ -49,68 +54,68 @@ public class TvdbAdapter implements AdapterIntf {
         this.api = new TvdbApi(manager, API_KEY);
     }
 
-    public Optional<MovieBaseRecord> searchMovie(String title) {
+    public @Nullable MovieBaseRecord searchMovie(String title) {
         //TODO implement this
-        return Optional.empty();
+        return null;
     }
 
-    public Optional<TvdbSerie> searchSerie(String serieName, ProviderIds providerIds) {
+    public @Nullable TvdbSerie searchSerie(String serieName, ProviderIds providerIds) {
         String encodedSerieName = URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
 
         CacheKey cache = getCache(VideoType.EPISODE + "mapping", b -> b
             .addIdParam("name", encodedSerieName)
-            .addIdParam("imdbid", providerIds.getImdbId().orElse(null)));
+            .addIdParam("imdbid", providerIds.get(IMDB)));
 
         if (cache.isPresent() && (!cache.isTemporaryObject() || !cache.isExpiredTemporary())) {
-            return cache.getOptional();
+            return cache.get();
         }
 
-        Optional<TvdbSerie> tvdbSerie;
-        try {
-            tvdbSerie = providerIds.getImdbId().mapEx(api::searchSerieWithRemoteId)
-                .map(serieBaseRecord -> new TvdbSerie(serieName, serieBaseRecord));
-        } catch (TvdbException e) {
-            tvdbSerie = Optional.empty();
-        }
-        if (tvdbSerie.isEmpty()) {
-            List<SearchResult> serieIds;
+        TvdbSerie tvdbSerie = providerIds.get(IMDB, (String imdbId) -> {
             try {
-                serieIds = api.searchSeries(encodedSerieName);
+                return new TvdbSerie(serieName, api.searchSerieWithRemoteId(imdbId));
             } catch (TvdbException e) {
-                serieIds = List.of();
+                List<SearchResult> serieIds;
+                try {
+                    serieIds = api.searchSeries(encodedSerieName);
+                } catch (TvdbException e2) {
+                    serieIds = List.of();
+                }
+                if (serieIds.isEmpty()) {
+                    return null;
+                } else if (!userInteractionHandler.settings.optionsConfirmProviderMapping && serieIds.size() == 1) {
+                    return new TvdbSerie(serieName, serieIds.first);
+                } else {
+                    Comparator<SearchResult> comparator = Comparator.comparing(
+                        (SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, requireNonNull(s.name)));
+                    return userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
+                            getText("Prompter.SelectTvdbMatchForSerie", serieName), provider,
+                            s -> s.name + Stream.of(s.firstAirTime, s.tvdbId).mapFilterNonNull(StringUtils::trimToNull)
+                                .collect(Collectors.joining(" - ", "(", ")")))
+                        .map(searchResult -> new TvdbSerie(serieName, searchResult))
+                        .orElse(null);
+                }
             }
-            if (serieIds.isEmpty()) {
-                tvdbSerie = Optional.empty();
-            } else if (!userInteractionHandler.settings.optionsConfirmProviderMapping && serieIds.size() == 1) {
-                return Optional.of(serieIds.first).map(searchResult -> new TvdbSerie(serieName, searchResult));
-            } else {
-                Comparator<SearchResult> comparator = Comparator.comparing(
-                    (SearchResult s) -> ProviderId.calculateLevenshteinDistance(serieName, requireNonNull(s.name)));
-                tvdbSerie = userInteractionHandler.selectFromList(serieIds.stream().sorted(comparator).toList(),
-                    getText("Prompter.SelectTvdbMatchForSerie", serieName), provider,
-                    s -> "${s.name} (${s.firstAirTime})").map(searchResult -> new TvdbSerie(serieName, searchResult));
-            }
-        }
-        if (tvdbSerie.isEmpty()) {
+        });
+        if (tvdbSerie == null) {
             try {
                 tvdbSerie = promptUserToEnterTvdbId(serieName).mapToObjEx(api::searchSerieWithTvdbId)
-                    .map(serieBaseRecord -> new TvdbSerie(serieName, serieBaseRecord));
+                    .map(serieBaseRecord -> new TvdbSerie(serieName, serieBaseRecord)).orElse(null);
             } catch (TvdbApiException e) {
                 //continue
             }
         }
-        if (tvdbSerie.isEmpty()) {
-            cache.storeTempValue(Value.ofOptional(tvdbSerie));
+        if (tvdbSerie == null) {
+            cache.storeTempValue(Value.nullValue());
         } else {
-            cache.store(Value.ofOptional(tvdbSerie));
+            cache.store(Value.of(tvdbSerie));
         }
         return tvdbSerie;
-
     }
 
-    public Optional<TvdbEpisode> searchEpisode(int tvdbId, int season, int episode) {
-        return getCache("episode", b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode))
-            .getOptional(
+    public @Nullable TvdbEpisode searchEpisode(int tvdbId, int season, int episode) {
+        return getCache("episode",
+            b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode))
+            .get(
                 () -> {
                     try {
                         return api.searchEpisode(tvdbId, season, episode, Language.ENGLISH);
@@ -118,18 +123,14 @@ public class TvdbAdapter implements AdapterIntf {
                         LOGGER.error(
                             "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
                                 TvRelease.formatSeasonEpisode(season, episode)), e);
-                        return Optional.empty();
+                        return null;
                     }
                 },
                 storeTempNullValue:true);
     }
 
-    public static synchronized TvdbAdapter getInstance(Manager manager,
-        UserInteractionHandler userInteractionHandler) {
-        if (instance == null) {
-            instance = new TvdbAdapter(manager, userInteractionHandler);
-        }
-        return instance;
+    public static synchronized TvdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
+        return INSTANCE.apply(manager, userInteractionHandler);
     }
 
     private OptionalInt promptUserToEnterTvdbId(String showName) {

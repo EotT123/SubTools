@@ -3,6 +3,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders;
 import static manifold.ext.props.rt.api.PropOption.*;
 import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
+import static util.Utils.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,7 +12,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -40,7 +41,7 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
-import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
+import org.lodder.subtools.sublibrary.util.webpage.http.ApiExceptionIntf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,8 +141,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         }
         // Search using current provider id
         try {
-            return getProviderSerieMapping(tvRelease)
-                .mapEx(mapping -> tvRelease.episodes.stream()
+            return ifNotNullOrElseGet(getProviderSerieMapping(tvRelease),
+                mapping -> tvRelease.episodes.stream()
                     .flatMap(episode -> {
                         try {
                             return searchSubtitles(mapping, tvRelease.season, episode, language).stream();
@@ -153,8 +154,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                             return Stream.of();
                         }
                     })
-                    .map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet())
-                .orElse(Set.of());
+                    .map(subtitle -> convertToSubtitle(tvRelease, subtitle)).toSet(), Set::of);
         } catch (Exception e) {
             String displayName = StringUtils.defaultIfBlank(tvRelease.originalName, tvRelease.name);
             LOGGER.error("API %s searchSubtitles for serie [%s] (%s)".formatted(source.name,
@@ -172,22 +172,17 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         int episode, Language language) throws X;
 
     @Override
-    public Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease) throws X {
-        if (StringUtils.isNotBlank(tvRelease.customName)) {
-            return getProviderSerieMapping(tvRelease, tvRelease.originalName, tvRelease.customName);
-        } else {
-            Optional<SerieMapping> providerSerieMapping = getProviderSerieMapping(tvRelease, tvRelease.originalName);
-            if (providerSerieMapping.isEmpty()) {
-                providerSerieMapping =
-                    !Objects.equals(tvRelease.originalName, tvRelease.name) ?
-                        getProviderSerieMapping(tvRelease, tvRelease.name) : Optional.empty();
-            }
-            return providerSerieMapping;
-
+    public @Nullable SerieMapping getProviderSerieMapping(TvRelease tvRelease) throws X {
+        SerieMapping providerSerieMapping = getProviderSerieMapping(tvRelease, tvRelease.originalName,
+            StringUtils.defaultIfBlank(tvRelease.customName, tvRelease.originalName));
+        if (providerSerieMapping == null) {
+            providerSerieMapping = Objects.equals(tvRelease.originalName, tvRelease.name) ? null :
+                getProviderSerieMapping(tvRelease, tvRelease.name);
         }
+        return providerSerieMapping;
     }
 
-    private Optional<SerieMapping> getProviderSerieMapping(TvRelease tvRelease, String name, String customName=name)
+    private @Nullable SerieMapping getProviderSerieMapping(TvRelease tvRelease, String name, String customName=name)
         throws X {
         return getProviderSerieMapping(name, customName, tvRelease.displayName,
             useSeasonForSerieId ? tvRelease.season : null, tvRelease.providerIds);
@@ -212,11 +207,10 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @param displayName the name to display in the UI
      * @param season the season number to narrow down the search results
      * @param providerIds a container of provider-specific identifiers (e.g., TVDB, IMDb)
-     * @return an {@code Optional<SerieMapping>} containing the mapping information if found, or an empty {@code
-     * Optional} if none is found.
+     * @return the mapping information if found, or null if none is found.
      * @throws X if an error occurs during the retrieval operation
      */
-    private Optional<SerieMapping> getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
+    private @Nullable SerieMapping getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
         @Nullable Integer season, ProviderIds providerIds) throws X {
 
         ThrowingSupplier<List<S_ID>, X> providerReleaseIdsByIdFunction =
@@ -310,7 +304,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * Optional} if none is found.
      * @throws X if an error occurs during the retrieval operation
      */
-    public <M extends ReleaseMapping, P extends ProviderId> Optional<M> getProviderReleaseMapping(String name,
+    public <M extends ReleaseMapping, P extends ProviderId> @Nullable M getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
         List<ProviderCacheKeyParam> extraParams, ProviderIds providerIds,
         ThrowingSupplier<List<P>, X> providerReleaseIdsByIdFunction,
@@ -320,17 +314,17 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
         Function<P, String> providerReleaseIdToDisplayStringFunction) throws X {
 
         CacheKey cacheKey = getCache("EPISODEMapping", b -> b
-            .addIdParam("tvdbId", providerIds.getTvdbId().mapToObj(v -> v).orElse(null))
-            .addIdParam("imdbId", providerIds.getImdbId().orElse(""))
+            .addIdParam("tvdbId", providerIds.get(TVDB))
+            .addIdParam("imdbId", ifNullThen(providerIds.get(IMDB), ""))
             .addIdParam("name", name)
             .add(extraParams));
 
         if (cacheKey.isPresent()) {
-            return cacheKey.getOptional();
+            return cacheKey.get();
         }
 
         if (StringUtils.isBlank(nameToSearchFor)) {
-            return Optional.empty();
+            return null;
         }
 
         List<P> providerReleaseIds = providerReleaseIdsByIdFunction.get();
@@ -355,8 +349,8 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
                     switch (e.cacheStrategy) {
                         case CACHE_DISABLED -> {
                         }
-                        case CACHE_TEMPORARY -> cacheKey.storeTempValue(Value.ofOptional(Optional.empty()));
-                        case CACHE_PERMANENT -> cacheKey.store(Value.ofOptional(Optional.empty()));
+                        case CACHE_TEMPORARY -> cacheKey.storeTempValue(Value.nullValue());
+                        case CACHE_PERMANENT -> cacheKey.store(Value.nullValue());
                     }
                 }
                 throw (X) exc;
@@ -380,18 +374,16 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             }
         }
         if (releaseMapping == null) {
-            // If no mapping was found, cache a temporary null value with a 1-day
-            // expiration. If a temporary null value already exists, update it with double the previous
-            // expiration time.
+            // If no mapping was found, cache a temporary null value with a 1-day expiration.
+            // If a temporary null value already exists, update it with double the previous expiration time.
             cacheKey.store(
-                value:Value.ofOptional(Optional.empty()),
+                value:Value.nullValue(),
                 storeTempNullValue:true,
                 timeToLive:1 day);
-            return Optional.empty();
+            return null;
         } else {
-            Optional<M> result = Optional.of(releaseMapping);
-            cacheKey.store(Value.ofOptional(result));
-            return result;
+            cacheKey.store(Value.of(releaseMapping));
+            return releaseMapping;
         }
     }
 

@@ -78,7 +78,7 @@ public class Addic7edApi implements SubtitleApi {
     public List<Addic7edMovieSubtitleId> getMovieProviderIds(String title,
         @Nullable Integer year=null) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("title", title))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     return getContent("$DOMAIN/search.php?Submit=Search&search=" + title.urlEncode()).select(
                             "form[action='/search.php'] ~ table td a").stream()
@@ -114,23 +114,24 @@ public class Addic7edApi implements SubtitleApi {
         if (StringUtils.isBlank(serieName)) {
             return List.of();
         }
-        return getCache("providerId", b -> b.add("serieName", serieName)).getCollection(() -> {
-            try {
-                List<ProviderId> providerIds =
-                    getContent("$DOMAIN/allshows/" + serieName.urlEncode()).select("#container a[href^='/show/']")
-                    .stream().map(elem -> new ProviderId(elem.text(), elem.attr("href").split("/")[2]))
-                    .toList();
-                String serieNameFormatted = serieName.keepLettersOnly().toLowerCase();
-                List<ProviderId> providerIdsFormatted = providerIds.stream().filter(providerId -> {
-                    String formattedSerieName = providerId.name.keepLettersOnly().toLowerCase();
-                    return serieNameFormatted.contains(formattedSerieName) ||
-                        formattedSerieName.contains(serieNameFormatted);
-                }).toList();
-                return !providerIdsFormatted.isEmpty() ? providerIdsFormatted : providerIds;
-            } catch (Exception e) {
-                throw Addic7edApiException.error(e, cacheStrategy:CACHE_DISABLED);
-            }
-        });
+        return getCache("providerId", b -> b.add("serieName", serieName))
+            .get(() -> {
+                try {
+                    List<ProviderId> providerIds =
+                        getContent("$DOMAIN/allshows/" + serieName.urlEncode()).select("#container a[href^='/show/']")
+                            .stream().map(elem -> new ProviderId(elem.text(), elem.attr("href").split("/")[2]))
+                            .toList();
+                    String serieNameFormatted = serieName.keepLettersOnly().toLowerCase();
+                    List<ProviderId> providerIdsFormatted = providerIds.stream().filter(providerId -> {
+                        String formattedSerieName = providerId.name.keepLettersOnly().toLowerCase();
+                        return serieNameFormatted.contains(formattedSerieName) ||
+                            formattedSerieName.contains(serieNameFormatted);
+                    }).toList();
+                    return !providerIdsFormatted.isEmpty() ? providerIdsFormatted : providerIds;
+                } catch (Exception e) {
+                    throw Addic7edApiException.error(e, cacheStrategy:CACHE_DISABLED);
+                }
+            });
     }
 
     public List<Addic7edSubtitle> searchSerieSubtitles(String providerId, String providerName, int season, int episode,
@@ -151,7 +152,7 @@ public class Addic7edApi implements SubtitleApi {
         throws Addic7edApiException {
         return getCache("subtitles",
             b -> b.add("providerId", providerId).add("url", url).add("language", language))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     Document doc = getContent(url);
                     String title = null;
@@ -253,7 +254,7 @@ public class Addic7edApi implements SubtitleApi {
                 }
                 lastRequest = Time.now();
             }
-            return manager.getAsJsoupDocument(new PageContentParams(url:url, userAgent:""));
+            return manager.getDocument(new PageContentParams(url:url, userAgent:""));
         } catch (Exception e) {
             throw Addic7edApiException.error(e);
         }

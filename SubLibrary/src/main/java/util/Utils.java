@@ -10,6 +10,7 @@ import java.util.stream.Collector;
 
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
+import name.falgout.jeffrey.throwing.ThrowingRunnable;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
@@ -22,8 +23,7 @@ public class Utils {
         // hide utility class constructor
     }
 
-    public static <T, K, V> Collector<T, Map<K, V>, Map<K, V>> mapCollector(
-        BiConsumer<Map<K, V>, T> accumulator) {
+    public static <T, K, V> Collector<T, Map<K, V>, Map<K, V>> mapCollector(BiConsumer<Map<K, V>, T> accumulator) {
         return mapCollector(HashMap::new, accumulator);
     }
 
@@ -60,48 +60,38 @@ public class Utils {
         }
     }
 
+    public static <T, X extends Exception> void ifNotNullOrElseDo(@Nullable T value, ThrowingConsumer<T, X> consumer,
+        ThrowingRunnable<X> runnable)
+        throws X {
+        if (value != null) {
+            consumer.accept(value);
+        } else {
+            runnable.run();
+        }
+    }
+
     public static <T, R extends @Nullable Object, X extends Exception> @Nullable R ifNotNull(@Nullable T value,
         ThrowingFunction<T, R, X> mapper) throws X {
         return value != null ? mapper.apply(value) : null;
     }
 
-    public static <T, R, X extends Exception> R ifNotNullOrElse(@Nullable T value,
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElse(@Nullable T value,
         ThrowingFunction<T, R, X> mapper, R orElseValue) throws X {
         return value != null ? mapper.apply(value) : orElseValue;
     }
 
-    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseNullable(@Nullable T value,
-        ThrowingFunction<T, R, X> mapper, R orElseValue) throws X {
-        return value != null ? mapper.apply(value) : orElseValue;
-    }
-
-    public static <T, R, X extends Exception> R ifNotNullOrElseGet(@Nullable T value,
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGet(@Nullable T value,
         ThrowingFunction<T, R, X> mapper, Supplier<R> orElseSupplier) throws X {
         return value != null ? mapper.apply(value) : orElseSupplier.get();
     }
 
-    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGetNullable(@Nullable T value,
-        ThrowingFunction<T, R, X> mapper, Supplier<R> orElseSupplier) throws X {
-        return value != null ? mapper.apply(value) : orElseSupplier.get();
-    }
-
-    @Contract("!null,_ -> param1; null,!null -> param2; null,null -> null")
-    public static <T> T ifNullThen(@Nullable T value, T orElseValue) {
+    @Contract("!null,_ -> param1; null,_ -> param2")
+    public static <S extends @Nullable Object, T extends S> S ifNullThen(@Nullable T value, S orElseValue) {
         return value != null ? value : orElseValue;
     }
 
-    @Contract("!null,_ -> param1; null,!null -> param2; null,null -> null")
-    public static <T> @Nullable T ifNullThenNullable(@Nullable T value, @Nullable T orElseValue) {
-        return value != null ? value : orElseValue;
-    }
-
-    public static <T, X extends Exception> T ifNullThenGet(@Nullable T value, ThrowingSupplier<T, X> orElseSupplier)
-        throws X {
-        return value != null ? value : orElseSupplier.get();
-    }
-
-    public static <T, X extends Exception> @Nullable T ifNullThenGetNullable(@Nullable T value,
-        ThrowingSupplier<@Nullable T, X> orElseSupplier) throws X {
+    public static <S extends @Nullable Object, T extends S, X extends Exception> S ifNullThenGet(
+        @Nullable T value, ThrowingSupplier<S, X> orElseSupplier) throws X {
         return value != null ? value : orElseSupplier.get();
     }
 }

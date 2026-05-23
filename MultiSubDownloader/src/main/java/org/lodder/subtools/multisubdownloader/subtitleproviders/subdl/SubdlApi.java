@@ -5,7 +5,6 @@ import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -98,9 +97,9 @@ public class SubdlApi implements SubtitleApi {
      * @return an optional containing the {@link SubdlSerieId} object if one was found
      * @throws SubdlApiException if the API call fails
      */
-    public Optional<SubdlSerieId> getProviderIdUsingImdbId(String imdbId) throws SubdlApiException {
+    public @Nullable SubdlSerieId getProviderIdUsingImdbId(String imdbId) throws SubdlApiException {
         return getSerie(MapUtil.create(SearchParam.IMDB_ID, imdbId))
-            .results.stream().map(SubdlSerieId::new).findFirst();
+            .results.stream().map(SubdlSerieId::new).findFirst().orElse(null);
 
 //        return getCache("providerId", b -> b.add("imdbId", imdbId))
 //            .getCollection(() -> {

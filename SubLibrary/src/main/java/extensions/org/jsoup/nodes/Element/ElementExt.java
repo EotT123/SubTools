@@ -12,7 +12,7 @@ import org.jsoup.select.Evaluator;
 import org.jsoup.select.QueryParser;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.exception.WebpageException;
+import org.lodder.subtools.sublibrary.util.webpage.exception.WebpageException;
 
 @Extension
 @NullMarked

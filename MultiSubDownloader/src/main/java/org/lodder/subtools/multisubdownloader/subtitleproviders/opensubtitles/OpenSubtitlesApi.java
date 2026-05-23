@@ -2,8 +2,8 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
-import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
-import static org.lodder.subtools.sublibrary.util.http.RetrofitService.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,11 +13,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import jakarta.ws.rs.core.MediaType;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
@@ -53,10 +56,10 @@ import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
-import org.lodder.subtools.sublibrary.util.http.HttpStatus;
-import org.lodder.subtools.sublibrary.util.http.RetrofitService;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
+import org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService;
 import org.opensubtitles.api.AuthenticationApi;
 import org.opensubtitles.api.DownloadApi;
 import org.opensubtitles.api.SubtitlesApi;
@@ -80,7 +83,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
-    @Nullable Credentials credentials;
+    private @Nullable Credentials credentials;
 
     private static final Function<Chain, Builder> DEFAULT_BUILDER =
         chain -> chain.request().newBuilder()
@@ -123,10 +126,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
-            .get(() -> getBearerTokenWithoutCache(username, password)
-                    .orElseThrow(() -> OpenSubtitleApiException.noResult("Could not acquire a bearer token, " +
-                        "invalid username/password?")),
-                23.5 hr);
+            .get(() -> getBearerTokenWithoutCache(username, password).orElseThrow(
+                () -> OpenSubtitleApiException.noResult(
+                    "Could not acquire a bearer token, " + "invalid username/password?")), 23.5hr);
     }
 
     private static Optional<String> getBearerTokenWithoutCache(String username, String password)
@@ -157,17 +159,16 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public List<OpensubtitleId> getProviderSerieIds(String serieName) throws OpenSubtitleException {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
-                    return manager.getAsJsonArray(new PageContentParams(
+                    return manager.getJsonArray(new PageContentParams(
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                                 + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
                             cacheType:CacheType.MEMORY,
-                            userAgent:"",
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5 Second)
+                                5Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -175,7 +176,34 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             show.getString("year")))
                         .toList();
                 } catch (Exception e) {
-                    throw OpenSubtitleApiException.error(e);
+                    throw OpenSubtitleApiException.error(e,
+                        "OpenSubtitlesApi: Error while retrieving provider serie id for [%s] - %s".formatted
+                            (serieName, e.getCause()));
+                }
+            });
+    }
+
+    public @Nullable OpensubtitleId getProviderSerieId(String imdbId) throws OpenSubtitleException {
+        return getCache("providerSerieId", b -> b.add("imdbId", imdbId))
+            .get(() -> {
+                try {
+                    return manager.getJsonArray(new PageContentParams(
+                            url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName=" + imdbId,
+                            cacheType:CacheType.MEMORY,
+                            retry:new Retry(
+                                1,
+                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                                5Second), contentType:MediaType.APPLICATION_JSON
+                            ))
+                        .streamJsonObjects()
+                        .filter(show -> "tv".equals(show.getString("kind")))
+                        .map(show -> new OpensubtitleId(show.getString("name"), show.getInt("id"),
+                            show.getString("year")))
+                        .findAny().orElse(null);
+                } catch (Exception e) {
+                    throw OpenSubtitleApiException.error(e,
+                        "OpenSubtitlesApi: Error while retrieving provider serie id for imdbid [%s] - %s".formatted
+                            (imdbId, e.getCause()));
                 }
             });
     }
@@ -183,7 +211,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
     // ====== \\
     // COMMON \\
     // ====== \\
-
 
     public List<Subtitle> searchSubtitles(
         @Nullable AiTranslatedEnum aiTranslated=AiTranslatedEnum.EXCLUDE,
@@ -235,7 +262,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .add("type", type)
                 .add("userId", userId)
                 .add("year", year))
-            .getCollection(() -> {
+            .get(() -> {
                 Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) : null;
                 return apiCall(
                     () -> subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
@@ -270,11 +297,18 @@ public class OpenSubtitlesApi implements SubtitleApi {
                         .header("Authorization", "Bearer " + getBearerToken(credentials.username, credentials.password))
                         .header("Content-Type", "application/json")
                         .header("User-Agent", "Test v1.0")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
+                        .POST(HttpRequest.BodyPublishers.ofString(
+                            new ObjectMapper().writeValueAsString(Map.of("file_id", fileId))))
+                        //.POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
                         .build();
 
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
+                    if (response.statusCode() / 200 == 1) {
+                        return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
+                    } else {
+                        throw new OpenSubtitleApiException(HttpStatus.fromStatusCode(response.statusCode()),
+                            response.body(), CacheStrategy.CACHE_DISABLED, LogLevel.ERROR);
+                    }
                 } catch (IOException | InterruptedException | JsonSyntaxException e) {
                     throw new OpenSubtitleApiException(SERVER_ERROR, e.getMessage(), CacheStrategy.CACHE_DISABLED,
                         LogLevel.ERROR);

@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.data.imdb;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -23,10 +24,9 @@ import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
 import org.lodder.subtools.sublibrary.model.VideoType;
-import org.lodder.subtools.sublibrary.settings.model.MovieMapping;
-import org.lodder.subtools.sublibrary.settings.model.ReleaseMapping;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
+import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingTriFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,8 @@ import org.slf4j.LoggerFactory;
 public class ImdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImdbAdapter.class);
-    private static ImdbAdapter instance;
+    private static final LazyBiFunction<Manager, UserInteractionHandler, ImdbAdapter> INSTANCE =
+        new LazyBiFunction<>(ImdbAdapter::new);
     @val @override Manager manager;
     @val @override String provider = "IMDB";
     private final UserInteractionHandler userInteractionHandler;
@@ -49,62 +50,61 @@ public class ImdbAdapter implements AdapterIntf {
         this.imdbSearchIdApi = new ImdbSearchIdApi(manager);
     }
 
-    public Optional<ImdbDetails> getDetails(String imdbId) {
-        return getCache("details", b -> b.add("imdbId", imdbId)).getOptional(() -> {
-            try {
-                return imdbApi.getDetails(imdbId);
-            } catch (ImdbException e) {
-                LOGGER.error("$provider: error while fetching details for id [$imdbId]", e);
-                return Optional.empty();
-            }
-        });
+    public @Nullable ImdbDetails getDetails(String imdbId) {
+        return getCache("details", b -> b.add("imdbId", imdbId))
+            .get(() -> {
+                try {
+                    return imdbApi.getDetails(imdbId);
+                } catch (ImdbException e) {
+                    LOGGER.error("$provider: error while fetching details for id [$imdbId]", e);
+                    return null;
+                }
+            });
     }
 
-    public Optional<String> getImdbId(String title, VideoType videoType, @Nullable Integer year=null) {
+    public @Nullable String getImdbId(String title, VideoType videoType, @Nullable Integer year=null) {
         try {
-            @SuppressWarnings("unchecked") Optional<ReleaseMapping> releaseMapping =
-                (Optional<ReleaseMapping>) getCache(videoType.name() + "mapping",
-                    b -> b.add("title", title).add("videoType", videoType).add("year", year)).getOptional(
-                    () -> getImdbIdOnImdb(title, year, videoType)
-                        .orElseMap(() -> getImdbIdOnGoogle(title, year, videoType))
-                        .orElseMap(() -> getImdbIdOnYahoo(title, year, videoType))
-                        .orElseMap(
-                            () -> promptUserToEnterImdbId(title).flatMap(imdbId -> getImdbIdOnImdb(title, imdbId)))
-                        .map(imdbId -> switch (videoType) {
-                            case EPISODE -> new SerieMapping(title, imdbId.id, imdbId.name);
-                            case MOVIE -> new MovieMapping(title, imdbId.id, imdbId.name, year);
-                        }), storeTempNullValue:true);
-            return releaseMapping.map(ReleaseMapping::getProviderId);
+            SerieMapping imdbSerieMapping = getCache(videoType.name() + "mapping",
+                b -> b.add("title", title).add("videoType", videoType).add("year", year))
+                .get(() -> {
+                    ImdbId imdbId = ifNullThenGet(getImdbIdOnImdb(title, year, videoType),
+                        () -> ifNullThenGet(getImdbIdOnGoogle(title, year, videoType),
+                            () -> ifNullThenGet(getImdbIdOnYahoo(title, year, videoType),
+                                () -> promptUserToEnterImdbId(title).map(id -> getImdbIdOnImdb(title, id))
+                                    .orElse(null))));
+                    return ifNotNull(imdbId, id -> new SerieMapping(title, id.id, imdbId.name));
+                }, storeTempNullValue:true);
+            return ifNotNull(imdbSerieMapping, SerieMapping::getProviderId);
         } catch (Exception e) {
             LOGGER.error("API %s getImdbId for title [%s] (%s)".formatted(provider, title, e.getMessage()), e);
-            return Optional.empty();
+            return null;
         }
     }
 
-    private Optional<ImdbId> getImdbIdOnImdb(String title, @Nullable Integer year, VideoType videoType) {
+    private @Nullable ImdbId getImdbIdOnImdb(String title, @Nullable Integer year, VideoType videoType) {
         return getImdbIdCommon(title, year, videoType, imdbSearchIdApi::getImdbIdOnImdb);
     }
 
-    private Optional<ImdbId> getImdbIdOnImdb(String title, String imdbId) {
+    private @Nullable ImdbId getImdbIdOnImdb(String title, String imdbId) {
         try {
-            return Optional.of(imdbSearchIdApi.getImdbIdOnImdb(title, imdbId));
+            return imdbSearchIdApi.getImdbIdOnImdb(title, imdbId);
         } catch (ImdbSearchIdException e) {
             LOGGER.error("API %s getImdbId for title [%s] and provided imdbId [imdbId] (%s)".formatted(provider, title,
                 e.getMessage()), e);
-            return Optional.empty();
+            return null;
         }
     }
 
 
-    private Optional<ImdbId> getImdbIdOnGoogle(String title, @Nullable Integer year, VideoType videoType) {
+    private @Nullable ImdbId getImdbIdOnGoogle(String title, @Nullable Integer year, VideoType videoType) {
         return getImdbIdCommon(title, year, videoType, imdbSearchIdApi::getImdbIdOnGoogle);
     }
 
-    private Optional<ImdbId> getImdbIdOnYahoo(String title, @Nullable Integer year, VideoType videoType) {
+    private @Nullable ImdbId getImdbIdOnYahoo(String title, @Nullable Integer year, VideoType videoType) {
         return getImdbIdCommon(title, year, videoType, imdbSearchIdApi::getImdbIdOnYahoo);
     }
 
-    private Optional<ImdbId> getImdbIdCommon(String title, @Nullable Integer year, VideoType videoType,
+    private @Nullable ImdbId getImdbIdCommon(String title, @Nullable Integer year, VideoType videoType,
         ThrowingTriFunction<String, @Nullable Integer, VideoType, Collection<ImdbId>, ImdbSearchIdException> providerSerieIdSupplier) {
         Collection<ImdbId> providerIds;
         try {
@@ -113,11 +113,11 @@ public class ImdbAdapter implements AdapterIntf {
             LOGGER.error(
                 "API %s getImdbId for title [%s] and year [%s] (%s)".formatted(provider, title, year, e.getMessage()),
                 e);
-            return Optional.empty();
+            return null;
         }
         if (!userInteractionHandler.settings.optionsConfirmProviderMapping && providerIds.size() == 1) {
             // found single exact match
-            return Optional.of(providerIds.iterator().next());
+            return providerIds.iterator().next();
         }
         Pattern yearPattern = Pattern.compile("(?<year>[1-2]\\d{3})");
         return userInteractionHandler.selectFromList(providerIds.stream().sorted(
@@ -136,9 +136,9 @@ public class ImdbAdapter implements AdapterIntf {
                         }
                         return 0;
                     })).toList(), getText("Prompter.SelectImdbMatchForSerie", title), provider,
-            providerId -> providerId.name +
+            providerId -> providerId.name + ifNotNullOrElse(StringUtils.trimToNull(
                 Stream.of(providerId.year, providerId.otherInfo).mapFilterNonNull(StringUtils::trimToNull).collect(
-                    Collectors.joining(" - ", " (", ")")));
+                    Collectors.joining(" - "))), v -> "(" + v + ")", "")).orElse(null);
     }
 
     private Optional<String> promptUserToEnterImdbId(String title) {
@@ -146,9 +146,6 @@ public class ImdbAdapter implements AdapterIntf {
     }
 
     public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
-        if (instance == null) {
-            instance = new ImdbAdapter(manager, userInteractionHandler);
-        }
-        return instance;
+        return INSTANCE.apply(manager, userInteractionHandler);
     }
 }

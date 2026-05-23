@@ -4,7 +4,6 @@ import static org.lodder.subtools.sublibrary.data.omdb.OmdbApi.ParamType.*;
 import static org.lodder.subtools.sublibrary.data.omdb.OmdbApi.SearchParamByIdTitle.*;
 import static org.lodder.subtools.sublibrary.data.omdb.OmdbApi.SearchParamCommon.*;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import Omdb.Release;
@@ -29,30 +28,28 @@ class OmdbApi implements ApiIntf {
         this.manager = manager;
     }
 
-    public Optional<Release> searchRelease(String imdbId) throws OmdbApiException {
+    public @Nullable Release searchRelease(String imdbId) throws OmdbApiException {
         return getCache("release", b -> b.add("imdbId", imdbId))
-            .getOptional(() -> search(req -> req.withParam(IMDB_ID, imdbId)));
+            .get(() -> search(req -> req.withParam(IMDB_ID, imdbId)));
     }
 
-    public Optional<Release> searchMovie(String title, @Nullable Integer year=null) throws OmdbApiException {
+    public @Nullable Release searchMovie(String title, @Nullable Integer year=null) throws OmdbApiException {
         return getCache("movie", b -> b.add("title", title).add("year", year))
-            .getOptional(
-                () -> search(req -> req.withParam(TITLE, title.replace(" ", "+")).withParam(RESULT_TYPE, MOVIE)));
+            .get(() -> search(req -> req.withParam(TITLE, title.replace(" ", "+")).withParam(RESULT_TYPE, MOVIE)));
     }
 
-    public Optional<Release> searchSerie(String name) throws OmdbApiException {
+    public @Nullable Release searchSerie(String name) throws OmdbApiException {
         return getCache("serie", b -> b.add("name", name))
-            .getOptional(() -> search(req -> req.withParam(TITLE, name.replace(" ", "+")).withParam(RESULT_TYPE,
-                SERIE)));
+            .get(() -> search(req -> req.withParam(TITLE, name.replace(" ", "+")).withParam(RESULT_TYPE, SERIE)));
     }
 
-    private static Optional<Release> search(Consumer<RequesterWrapper<Release>> extraParamConsumer)
+    private static @Nullable Release search(Consumer<RequesterWrapper<Release>> extraParamConsumer)
         throws OmdbApiException {
         try {
             Requester<Release> request = Release.request(API_DOMAIN).withParam("apikey", API_KEY);
             extraParamConsumer.accept(new RequesterWrapper<>(request));
             Release release = request.getOne();
-            return release.response ? Optional.of(release) : Optional.empty();
+            return release.response ? release : null;
         } catch (Exception e) {
             throw OmdbApiException.error(null, e.getMessage().replace("apikey=" + API_KEY, ""));
         }
@@ -132,7 +129,9 @@ class OmdbApi implements ApiIntf {
 
     @NullMarked
     enum ParamType implements ParamIntf {
-        MOVIE("movie"), SERIE("series"), EPISODE("episode");
+        MOVIE("movie"),
+        SERIE("series"),
+        EPISODE("episode");
 
         @override @val String value;
 
@@ -143,7 +142,8 @@ class OmdbApi implements ApiIntf {
 
     @NullMarked
     enum ParamPlot implements ParamIntf {
-        SHORT("short"), FULL("full");
+        SHORT("short"),
+        FULL("full");
 
         @override @val String value;
 
@@ -154,7 +154,8 @@ class OmdbApi implements ApiIntf {
 
     @NullMarked
     enum ParamDataReturnType implements ParamIntf {
-        JSON("json"), XML("xml");
+        JSON("json"),
+        XML("xml");
 
         @override @val String value;
 

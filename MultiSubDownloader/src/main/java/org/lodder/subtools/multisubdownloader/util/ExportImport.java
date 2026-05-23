@@ -49,7 +49,8 @@ public class ExportImport {
 
     @NullMarked
     public enum SettingsType {
-        PREFERENCES(FileType.XML), SERIE_MAPPING(FileType.JSON);
+        PREFERENCES(FileType.XML),
+        SERIE_MAPPING(FileType.JSON);
 
         @val FileType fileType;
 
@@ -60,7 +61,8 @@ public class ExportImport {
 
     @NullMarked
     private enum FileType {
-        XML(".xml", new XmlFileFilter()), JSON(".json", new JsonFileFilter());
+        XML(".xml", new XmlFileFilter()),
+        JSON(".json", new JsonFileFilter());
 
         @val String extension;
         @val ExtensionFileFilter fileFilter;
@@ -197,7 +199,8 @@ public class ExportImport {
 
     @NullMarked
     private enum ImportStyle {
-        OVERWRITE, APPEND
+        OVERWRITE,
+        APPEND
     }
 
     @NullMarked

@@ -3,41 +3,56 @@ package org.lodder.subtools.sublibrary.model;
 import static util.Utils.*;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import name.falgout.jeffrey.throwing.ThrowingFunction;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class ProviderIds {
-    private final Map<ProviderIdType, @Nullable Object> providerIdMap = new LinkedHashMap<>();
 
-    public ProviderIds add(ProviderIdType providerIdType, Object value){
+    private final Map<ProviderIdType<?>, @Nullable Object> providerIdMap = new LinkedHashMap<>();
+
+    public <T> ProviderIds add(ProviderIdType<T> providerIdType, @Nullable T value) {
         providerIdMap.put(providerIdType, value);
         return this;
     }
 
-    public @Nullable Object get(ProviderIdType providerIdType) {
-        return providerIdMap.get(providerIdType);
-    }
-    public OptionalInt getTvdbId(){
-        return ifNotNullOrElseGet(get(ProviderIdType.TVDB), v -> OptionalInt.of((int) v), OptionalInt::empty);
-    }
-    public Optional<String> getImdbId(){
-        return Optional.ofNullable((String) get(ProviderIdType.IMDB));
+    public <T> @Nullable T get(ProviderIdType<T> providerIdType) {
+        return (T) providerIdMap.get(providerIdType);
     }
 
-    public List<Entry<ProviderIdType, Object>> getNonNullIds(){
-        return providerIdMap.entrySet().stream().filter(entry -> entry.value != null).toList();
+    public <T, S extends @Nullable Object, E extends Exception> S get(ProviderIdType<T> providerIdType,
+        ThrowingFunction<T, S, E> mapper) throws E {
+        return ifNotNull(get(providerIdType), mapper);
     }
 
-    public boolean isEqual(ProviderIds other, ProviderIdType providerIdType){
-        if(!providerIdMap.containsKey(providerIdType) || !other.providerIdMap.containsKey(providerIdType)){
+    public <T extends @Nullable S, S> S getOrPut(ProviderIdType<S> providerIdType, Supplier<T> supplier) {
+        return getOrPut(providerIdType, supplier, v -> v);
+    }
+
+    public <S, T extends @Nullable S, I> S getOrPut(ProviderIdType<S> providerIdType, Supplier<@Nullable I> supplier,
+        Function<I, T> mapper) {
+        return getOrPut(providerIdType, supplier, mapper, v -> v);
+    }
+
+    public <S, T extends @Nullable S, I, I2> S getOrPut(ProviderIdType<S> providerIdType,
+        Supplier<@Nullable I> supplier, Function<I, @Nullable I2> mapper, Function<I2, T> mapper2) {
+        return (T) providerIdMap.computeIfAbsent(providerIdType,
+            _ -> ifNotNull(ifNotNull(supplier.get(), mapper::apply), mapper2::apply));
+    }
+
+    public <T, S extends @Nullable Object, X extends Exception> S userOrElse(ProviderIdType<T> providerIdType,
+        ThrowingFunction<T, S, X> mapper, Supplier<S> supplier) throws X {
+        return ifNotNullOrElseGet(get(providerIdType), mapper, supplier);
+    }
+
+    public boolean isEqual(ProviderIds other, ProviderIdType<?> providerIdType) {
+        if (!providerIdMap.containsKey(providerIdType) || !other.providerIdMap.containsKey(providerIdType)) {
             return false;
         }
         return Objects.equals(providerIdMap.get(providerIdType), other.providerIdMap.get(providerIdType));

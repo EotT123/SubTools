@@ -27,7 +27,6 @@ public class CopyDirVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, @Nullable BasicFileAttributes attrs) throws IOException {
-
         Path targetPath = toPath.resolve(fromPath.relativize(dir));
         if (!Files.exists(targetPath)) {
             Files.createDirectory(targetPath);

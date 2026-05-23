@@ -93,8 +93,8 @@ public class ReleaseParser {
      * {@link Optional#empty()}
      */
     public static Optional<ReleaseWithoutPath> parse(String text) {
-        ParserResults parserResults = new ParserResults(StringUtils.endsWithAny(text, ".zip", ".srt") ||
-            StringUtils.endsWithAny(text,
+        ParserResults parserResults = new ParserResults(Strings.CS.endsWithAny(text, ".zip", ".srt") ||
+            Strings.CS.endsWithAny(text,
                 VideoExtensions.values().stream().map(VideoExtensions::getValue).toList().toArray(new String[0])) ?
             StringUtils.substringBeforeLast(text, ".") : text);
 

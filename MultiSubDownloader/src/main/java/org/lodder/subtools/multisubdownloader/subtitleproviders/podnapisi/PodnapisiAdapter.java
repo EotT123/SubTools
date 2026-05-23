@@ -1,11 +1,13 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
+
 import java.util.Collection;
 import java.util.List;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -26,15 +28,13 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class PodnapisiAdapter
     extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
 
-    private static PodnapisiApi api;
+    private final PodnapisiApi api;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.PODNAPISI;
     @val @override boolean useSeasonForSerieId = false;
 
     public PodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
-        if (api == null) {
-            api = new PodnapisiApi(manager, "JBierSubDownloader");
-        }
+        this.api = new PodnapisiApi(manager, "JBierSubDownloader");
     }
 
     // ===== \\
@@ -81,9 +81,9 @@ public final class PodnapisiAdapter
     @Override
     public Collection<PodnapisiSubtitleMetadata> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws PodnapisiException {
-        return providerIds.getImdbId()
-            .mapEx(imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language))
-            .orElse(List.of());
+        return providerIds.userOrElse(IMDB,
+            imdbId -> api.getSerieSubtitlesUsingImdbId(imdbId, season, episode, language),
+            List::of);
     }
 
     @Override
@@ -113,7 +113,7 @@ public final class PodnapisiAdapter
                 language:metadata.language,
                 quality:ReleaseParser.getQualityKeyword(metadata.releaseString),
                 releaseGroup:ReleaseParser.extractReleaseGroup(metadata.releaseString,
-                    StringUtils.endsWith(metadata.releaseString, ".srt")),
+                    Strings.CS.endsWith(metadata.releaseString, ".srt")),
                 uploader:metadata.uploaderName,
                 hearingImpaired:metadata.hearingImpaired));
     }

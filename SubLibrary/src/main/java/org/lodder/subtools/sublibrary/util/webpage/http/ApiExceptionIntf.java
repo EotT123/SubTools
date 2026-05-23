@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util.http;
+package org.lodder.subtools.sublibrary.util.webpage.http;
 
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;

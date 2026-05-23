@@ -276,22 +276,28 @@ public class PathExt {
         }
     }
 
-    /////////////////////
+    /// //////////////////
 
-    public static void unzip(InputStream inputStream, Path outputDir, String extensionFilter) throws IOException {
+    public static void unzip(InputStream inputStream, Path outputFile, String extensionFilter) throws IOException {
+        //int numberOfFiles = 0;
+        //try (ZipInputStream zis = new ZipInputStream(inputStream)) {
+        //    ZipEntry ze;
+        //    while ((ze = zis.getNextEntry()) != null) {
+        //        if (!ze.isDirectory() && ze.getName().endsWith(extensionFilter)) {
+        //            numberOfFiles++;
+        //        }
+        //    }
+        //}
+        int index = 1;
         try (ZipInputStream zis = new ZipInputStream(inputStream)) {
             ZipEntry ze;
             while ((ze = zis.getNextEntry()) != null) {
                 if (!ze.isDirectory() && ze.getName().endsWith(extensionFilter)) {
-                    Path outputPath = outputDir.resolve(ze.getName()).normalize();
-
-                    // Prevent Zip Slip
-                    if (!outputPath.startsWith(outputDir)) {
-                        throw new IOException("Bad zip entry: " + ze.getName());
-                    }
-
-                    Files.createDirectories(outputPath.getParent());
-                    try (OutputStream out = Files.newOutputStream(outputPath)) {
+                    Files.createDirectories(outputFile.getParent());
+                    FilenameAndExtension filenameAndExtension = outputFile.splitExtension();
+                    Path path = outputFile.getParent().resolve(
+                        filenameAndExtension.filename + "_v" + index++ + "." + filenameAndExtension.extension);
+                    try (OutputStream out = Files.newOutputStream(path)) {
                         byte[] buffer = new byte[4096];
                         int len;
                         while ((len = zis.read(buffer)) > 0) {
@@ -300,6 +306,12 @@ public class PathExt {
                     }
                 }
             }
+        }
+        if (index == 2) {
+            FilenameAndExtension filenameAndExtension = outputFile.splitExtension();
+            Path path = outputFile.getParent().resolve(
+                filenameAndExtension.filename + "_v1." + filenameAndExtension.extension);
+            Files.move(path, outputFile);
         }
     }
 

@@ -1,5 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
 import static util.Utils.*;
 
 import java.util.Collection;
@@ -35,18 +36,16 @@ public final class OpenSubAdapter
     extends
     SubtitleAdapter<org.opensubtitles.model.Subtitle, OpenSubtilteSubtitle, OpensubtitleId, OpenSubtitleException> {
 
-    private static OpenSubtitlesApi api;
+    private final OpenSubtitlesApi api;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
     public OpenSubAdapter(Manager manager, Credentials credentials, UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
-        if (api == null) {
-            try {
-                api = new OpenSubtitlesApi(manager, credentials);
-            } catch (OpenSubtitleException e) {
-                throw new SubtitlesProviderInitException(provider, e);
-            }
+        try {
+            api = new OpenSubtitlesApi(manager, credentials);
+        } catch (OpenSubtitleException e) {
+            throw new SubtitlesProviderInitException(provider, e);
         }
     }
 
@@ -59,9 +58,8 @@ public final class OpenSubAdapter
     @Override
     public List<org.opensubtitles.model.Subtitle> searchMovieSubtitlesWithId(ProviderIds providerIds, Language language)
         throws OpenSubtitleException {
-        return providerIds.getImdbId()
-            .mapEx(imdbId -> api.searchSubtitles(imdbId:imdbId, language:language, type:TypeEnum.MOVIE))
-            .orElse(List.of());
+        return providerIds.userOrElse(IMDB,
+            imdbId -> api.searchSubtitles(imdbId:imdbId, language:language, type:TypeEnum.MOVIE), List::of);
     }
 
     @Override
@@ -77,7 +75,7 @@ public final class OpenSubAdapter
     @Override
     public List<OpensubtitleId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws OpenSubtitleException {
-        return List.of();
+        return ifNotNull(providerIds.get(IMDB, api::getProviderSerieId), List::of);
     }
 
     @Override
@@ -85,10 +83,9 @@ public final class OpenSubAdapter
         throws OpenSubtitleException {
         return api.getProviderSerieIds(serieName)
             .stream()
-            .sorted(
-                Comparator.comparing((OpensubtitleId n) -> !serieName.replaceAll("[^A-Za-z]", "")
-                        .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
-                    .thenComparing(OpensubtitleId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
+            .sorted(Comparator.comparing((OpensubtitleId n) -> !serieName.replaceAll("[^A-Za-z]", "")
+                    .equalsIgnoreCase(n.name.replaceAll("[^A-Za-z]", "")))
+                .thenComparing(OpensubtitleId::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
             .toList();
     }
 
@@ -100,15 +97,14 @@ public final class OpenSubAdapter
     @Override
     public Collection<Subtitle> searchSubtitles(ProviderIds providerIds, int season,
         int episode, Language language) throws OpenSubtitleException {
-        return providerIds.getImdbId()
-            .mapEx(imdbId ->
-                api.searchSubtitles(
-                    imdbId:imdbId,
-                    season:season,
-                    episode:episode,
-                    language:language,
-                    type:TypeEnum.EPISODE))
-            .orElse(List.of());
+        return providerIds.userOrElse(IMDB,
+            imdbId -> api.searchSubtitles(
+                imdbId:imdbId,
+                season:season,
+                episode:episode,
+                language:language,
+                type:TypeEnum.EPISODE),
+            List::of);
     }
 
     @Override
@@ -136,7 +132,7 @@ public final class OpenSubAdapter
         return ReleaseParser.parse(attr.release)
             .map(r -> new OpenSubtilteSubtitle(
                 urlSupplier:() -> api.getDownloadUrl(fileId),
-                fileName:attr.release,
+                fileName:ifNullThenGet(attr.release, release::getFileNameOrName),
                 language:language,
                 releaseGroup:r.releaseGroup,
                 uploader:uploader,
@@ -146,7 +142,7 @@ public final class OpenSubAdapter
                 ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
                 return new OpenSubtilteSubtitle(
                     urlSupplier:() -> api.getDownloadUrl(fileId),
-                    fileName:attr.release,
+                    fileName:ifNullThenGet(attr.release, release::getFileNameOrName),
                     language:language,
                     releaseGroup:extraInfo.getReleaseGroupBestEffort(),
                     uploader:uploader,

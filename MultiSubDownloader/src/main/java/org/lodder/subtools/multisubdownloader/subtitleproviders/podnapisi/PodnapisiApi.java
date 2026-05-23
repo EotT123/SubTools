@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi;
 import static java.nio.charset.StandardCharsets.*;
 import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
+import static org.lodder.subtools.sublibrary.model.ProviderIdType.*;
 import static util.Utils.*;
 
 import java.io.Serializable;
@@ -10,7 +11,6 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Function;
 
 import extensions.org.jsoup.nodes.Element.ElementExt;
@@ -36,7 +36,7 @@ import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.UrlBuilder;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 
 @NullMarked
 public class PodnapisiApi implements SubtitleApi {
@@ -68,22 +68,18 @@ public class PodnapisiApi implements SubtitleApi {
      */
     public List<PodnapisiSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language, ProviderIds providerIds) throws PodnapisiApiException {
-        Optional<List<PodnapisiSubtitleMetadata>> podnapisiSubtitleMetadata;
         try {
-            podnapisiSubtitleMetadata = providerIds.getImdbId()
-                .mapEx(imdbId -> getSubtitles(
-                    MapUtil.create(
-                        SearchParam.IMDB, imdbId,
-                        SearchParam.LANGUAGE, language.iso639_1,
-                        SearchParam.YEAR, year)));
+            return providerIds.get(IMDB,
+                imdbId -> getSubtitles(MapUtil.create(
+                    SearchParam.IMDB, imdbId,
+                    SearchParam.LANGUAGE, language.iso639_1,
+                    SearchParam.YEAR, year)));
         } catch (PodnapisiApiException e) {
-            podnapisiSubtitleMetadata = Optional.empty();
-        }
-        return podnapisiSubtitleMetadata.orElseGetEx(() -> getSubtitles(
-            MapUtil.create(
+            return getSubtitles(MapUtil.create(
                 SearchParam.KEYWORDS, URLEncoder.encode(title.trim().toLowerCase(), UTF_8),
                 SearchParam.LANGUAGE, language.iso639_1,
-                SearchParam.YEAR, year)));
+                SearchParam.YEAR, year));
+        }
     }
 
     // ===== \\
@@ -162,7 +158,7 @@ public class PodnapisiApi implements SubtitleApi {
         List<ProviderCacheKeyParam> params = paramMap.entrySet().stream().sorted(Entry.comparingByKey())
             .map(entry -> new ProviderCacheKeyParam(entry.getKey().name(), entry.getValue())).toList();
         return getCache("subtitles", b -> b.add(params))
-            .getCollection(() -> {
+            .get(() -> {
                 try {
                     UrlBuilder urlBuilder = new UrlBuilder(DOMAIN, "/sl/ppodnapisi/search");
                     paramMap.forEach((param, value) -> {
@@ -181,7 +177,7 @@ public class PodnapisiApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw PodnapisiApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
-            }, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1Second));
+            }, null, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1Second));
     }
 
     // see https://www.podnapisi.net/forum/viewtopic.php?f=62&t=26164#p212652
@@ -211,7 +207,7 @@ public class PodnapisiApi implements SubtitleApi {
 
     protected @Nullable Document getXml(String url) throws PodnapisiApiException {
         try {
-            return manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
+            return manager.getDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
                 new Retry(
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&

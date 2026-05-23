@@ -14,6 +14,13 @@ import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * A cache entry that expires after a fixed duration.
+ * <p>
+ * The expiration does not reset on access.
+ *
+ * @param <V> the type of the cached value
+ */
 @NullMarked
 public final class TemporaryCacheObject<V extends @Nullable Object> implements CacheObject<V> {
 

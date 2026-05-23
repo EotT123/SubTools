@@ -2,15 +2,15 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.excep
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.LogLevel.*;
-import static org.lodder.subtools.sublibrary.util.http.HttpStatus.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.CacheStrategy;
 import org.lodder.subtools.sublibrary.LogLevel;
-import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
-import org.lodder.subtools.sublibrary.util.http.HttpStatus;
+import org.lodder.subtools.sublibrary.util.webpage.http.ApiExceptionIntf;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 
 @NullMarked
 public class PodnapisiApiException extends PodnapisiException implements ApiExceptionIntf {

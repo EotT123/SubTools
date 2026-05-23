@@ -1,4 +1,4 @@
-package org.lodder.subtools.sublibrary.util.http;
+package org.lodder.subtools.sublibrary.util.webpage.http;
 
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status.Family;

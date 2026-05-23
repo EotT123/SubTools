@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +36,7 @@ public class UpdateAvailableGithub {
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
 
     private static final String DOMAIN = "https://github.com";
-    private static final String REPO_URI = "/phdelodder/SubTools";
+    private static final String REPO_URI = "/EotT/SubTools";
     private static final String REPO_URL = DOMAIN + REPO_URI;
 
     private final Manager manager;
@@ -64,29 +63,29 @@ public class UpdateAvailableGithub {
         }
     }
 
-    public Optional<String> getLatestDownloadUrl() {
+    public @Nullable String getLatestDownloadUrl() {
         return switch (settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease();
-            case null -> Optional.empty();
+            case null -> null;
         };
     }
 
     public boolean isNewVersionAvailable() {
         return switch (settings.updateType) {
-            case STABLE -> getUrlLatestNewStableGithubRelease().isPresent();
-            case NIGHTLY -> getUrlLatestNewNightlyGithubRelease().isPresent();
+            case STABLE -> getUrlLatestNewStableGithubRelease() != null;
+            case NIGHTLY -> getUrlLatestNewNightlyGithubRelease() != null;
             case null -> false;
         };
     }
 
-    private Optional<String> getUrlLatestNewStableGithubRelease() {
+    private @Nullable String getUrlLatestNewStableGithubRelease() {
         return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url"))
-            .getOptional(() -> {
+            .get(() -> {
                 try {
                     String currentVersion = getVersion();
                     Element element =
-                        manager.getAsJsoupDocument(new PageContentParams(
+                        manager.getDocument(new PageContentParams(
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
@@ -97,34 +96,35 @@ public class UpdateAvailableGithub {
                     matcher.find();
                     String version = matcher.group();
                     if (isFinalVersion(currentVersion) && compareVersions(version, currentVersion) <= 0) {
-                        return Optional.empty();
+                        return null;
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
-                    Element artifactElement = manager.getAsJsoupDocument(
+                    Element artifactElement = manager.getDocument(
                             new PageContentParams(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
                     updateLastUpdateCheck();
-                    return Optional.of(url);
+                    return url;
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
                         LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
                         LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
-                    return Optional.empty();
+                    return null;
                 }
             });
     }
 
-    private Optional<String> getUrlLatestNewNightlyGithubRelease() {
-        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url-nightly"))
-            .getOptional(() -> {
+    private @Nullable String getUrlLatestNewNightlyGithubRelease() {
+        return new CacheKey(manager, CacheType.MEMORY,
+            new ProviderCacheKey("Github", "update-url-nightly"))
+            .get(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
 
                     Element rowElement =
-                        manager.getAsJsoupDocument(new PageContentParams(
+                        manager.getDocument(new PageContentParams(
                                 url:"$REPO_URL/actions?query=branch%3Amaster",
                                 cacheType:CacheType.MEMORY,
                                 userAgent:null))
@@ -132,22 +132,22 @@ public class UpdateAvailableGithub {
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
                         rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
                     if (nightlyBuildTista.isBefore(buildTista)) {
-                        return Optional.empty();
+                        return null;
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getAsJsoupDocument(new PageContentParams(url, CacheType.MEMORY))
+                    String downloadUrl = manager.getDocument(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
                     updateLastUpdateCheck();
-                    return Optional.of(downloadUrl);
+                    return downloadUrl;
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
                         LOGGER.trace(getText("LoggingPanel.UpdateCheckFailed"), e);
                     } else {
                         LOGGER.error(getText("LoggingPanel.UpdateCheckFailed"));
                     }
-                    return Optional.empty();
+                    return null;
                 }
             });
     }

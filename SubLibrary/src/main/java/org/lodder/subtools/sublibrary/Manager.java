@@ -2,22 +2,19 @@ package org.lodder.subtools.sublibrary;
 
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
+import static util.Utils.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.function.Predicate;
 
 import manifold.ext.props.rt.api.val;
@@ -25,12 +22,11 @@ import manifold.science.measures.Time;
 import name.falgout.jeffrey.throwing.ThrowingConsumer;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -42,14 +38,15 @@ import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.lodder.subtools.sublibrary.util.Nothing;
 import org.lodder.subtools.sublibrary.util.Sleep;
-import org.lodder.subtools.sublibrary.util.http.ApiExceptionIntf;
-import org.lodder.subtools.sublibrary.util.http.CookieManager;
-import org.lodder.subtools.sublibrary.util.http.HttpClient;
-import org.lodder.subtools.sublibrary.util.http.HttpClientException;
-import org.lodder.subtools.sublibrary.xml.XMLHelper;
+import org.lodder.subtools.sublibrary.util.webpage.BrowserMode;
+import org.lodder.subtools.sublibrary.util.webpage.WebPage;
+import org.lodder.subtools.sublibrary.util.webpage.exception.WebpageException;
+import org.lodder.subtools.sublibrary.util.webpage.http.ApiExceptionIntf;
+import org.lodder.subtools.sublibrary.util.webpage.http.CookieManager;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClient;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 @NullMarked
 public class Manager {
@@ -122,7 +119,7 @@ public class Manager {
             }
         }
 
-        public org.jsoup.nodes.Document postAsJsoupDocument() throws ManagerException {
+        public Document postAsJsoupDocument() throws ManagerException {
             return Jsoup.parse(post());
         }
     }
@@ -131,7 +128,47 @@ public class Manager {
     // GET PAGE CONTENT \\
     // ================ \\
 
-    public String get(PageContentParams params) throws ManagerException {
+    public Document getDocument(PageContentParams params) throws ManagerException {
+        return switch (params.cacheType) {
+            case NONE -> getDocumentWithoutCache(params);
+            case MEMORY -> ((ProviderCacheMemory<Document>) inMemoryCache).getOrPut(
+                new ProviderCacheKey("document", params.url + params.cookieManager(), List.of()),
+                () -> getDocumentWithoutCache(params));
+            case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
+        };
+    }
+
+    public JSONArray getJsonArray(PageContentParams params) throws ManagerException {
+        return new JSONArray(getJsonString(params));
+    }
+
+    private String getJsonString(PageContentParams params) throws ManagerException {
+        try {
+            return getContent(params);
+        } catch (JSONException e) {
+            throw new ManagerException(e);
+        }
+    }
+
+    private Document getDocumentWithoutCache(PageContentParams params) throws ManagerException {
+        return getDocumentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
+            params.browserMode);
+    }
+
+    private Document getDocumentWithoutCache(String url, String userAgent, Retry retry,
+        @Nullable CookieManager cookieManager, BrowserMode browserMode=BrowserMode.HTMLUNIT) throws ManagerException {
+        try {
+            return WebPage.getWebsiteDomTree(url, browserMode:browserMode);
+        } catch (WebpageException e) {
+            if (retry.canRetry() && retry.predicate.test(e)) {
+                return this.getDocumentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
+            }
+            throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
+                e);
+        }
+    }
+
+    public String getContent(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
             case NONE -> getContentWithoutCache(params);
             case MEMORY -> ((ProviderCacheMemory<String>) inMemoryCache).getOrPut(
@@ -141,68 +178,24 @@ public class Manager {
         };
     }
 
-    public InputStream getAsInputStream(PageContentParams params) throws ManagerException {
-        return get(params).toInputStream(StandardCharsets.UTF_8);
-    }
-
-    public @Nullable Document getAsDocument(PageContentParams params,
-        @Nullable Predicate<String> emptyResultPredicate=null)
-        throws ManagerException, IOException {
-        return getAsStringDocument(params, emptyResultPredicate).mapEx(XMLHelper::getDocument).orElse(null);
-    }
-
-    public org.jsoup.nodes.@Nullable Document getAsJsoupDocument(PageContentParams params,
-        @Nullable Predicate<String> emptyResultPredicate=null) throws ManagerException {
-        return getAsStringDocument(params, emptyResultPredicate).map(Jsoup::parse).orElse(null);
-    }
-
-    private Optional<String> getAsStringDocument(PageContentParams params,
-        @Nullable Predicate<String> emptyResultPredicate) throws ManagerException {
-        if (emptyResultPredicate == null) {
-            return Optional.of(get(params));
-        }
-        String html = get(params);
-        return StringUtils.isBlank(html) || emptyResultPredicate.test(html) ? Optional.empty() : Optional.of(html);
-    }
-
-    public JSONObject getAsJsonObject(PageContentParams params) throws ManagerException {
-        return new JSONObject(getAsJsonString(params));
-    }
-
-    public JSONArray getAsJsonArray(PageContentParams params) throws ManagerException {
-        return new JSONArray(getAsJsonString(params));
-    }
-
-    private String getAsJsonString(PageContentParams params) throws ManagerException {
-        try {
-            return new String(getAsInputStream(params).readAllBytes(), StandardCharsets.UTF_8);
-        } catch (JSONException | IOException | ManagerException e) {
-            throw new ManagerException(e);
-        }
-    }
-
     private String getContentWithoutCache(PageContentParams params) throws ManagerException {
-        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager);
+        return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
+            params.contentType);
     }
 
     private String getContentWithoutCache(String url, String userAgent, Retry retry,
-        @Nullable CookieManager cookieManager) throws ManagerException {
+        @Nullable CookieManager cookieManager, @Nullable String contentType) throws ManagerException {
         try {
-            return httpClient.doGet(new URI(url).toURL(), userAgent, cookieManager);
-        } catch (HttpClientException e) {
+            return new HttpClient().doGet(new URI(url).toURL(), userAgent, cookieManager, contentType);
+        } catch (WebpageException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
+                return getContentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager,
+                    contentType);
             }
-            throw new ManagerException(
-                "Error occurred with httpclient response: %s %s while accessing %s".formatted(e.responseCode,
-                    e.responseMessage, url), e);
-        } catch (IOException e) {
-            if (retry.canRetry() && retry.predicate.test(e)) {
-                return getContentWithoutCache(url, userAgent, retry.decreaseRetries(), cookieManager);
-            }
-            throw new ManagerException(e);
-        } catch (URISyntaxException e) {
-            throw new ManagerException("Invalid url [%s]".formatted(url), e);
+            throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
+                e);
+        } catch (HttpClientException | IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -261,24 +254,34 @@ public class Manager {
         }
 
         public Optional<Time> getTemporaryTimeToLive() {
-            return manager.getOptionalCache(cacheType).map(cache -> cache.getTemporaryTimeToLive(key))
-                .orElseGet(() -> Optional.of(0 Second));
+            return manager.getOptionalCache(cacheType)
+                .map(cache -> ifNullThen(cache.getTemporaryTimeToLive(key), 0Second));
         }
 
         public void remove() {
             manager.getCache(cacheType).remove(key);
         }
 
-        public <V extends @Nullable Object, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
-            @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
+        public <V extends @Nullable Object> @Nullable V get() {
             ProviderCache<V> cache = manager.getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
-                return cache.get(key).orElseThrow();
+                return cache.get(key);
+            }
+            return null;
+        }
+
+        public <V extends @Nullable Object, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
+            @Nullable Time timeToLive=null, Retry retry=Retry.NONE, boolean storeTempNullValue=false) throws X {
+            ProviderCache<V> cache = manager.getCache(cacheType);
+            if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
+                return cache.get(key);
             }
             try {
                 V value = executeSupplier(supplier, retry);
-                if (value != null) {
-                    cache.put(key, value, timeToLive);
+                if (value != null || storeTempNullValue) {
+                    Time ttl =
+                        storeTempNullValue && value == null ? getTemporaryTimeToLive().orElse(12hr) * 2 : timeToLive;
+                    cache.put(key, value, ttl);
                 } else {
                     switch (cache) {
                         case ProviderCacheDisk<V> dCache -> dCache.putWithoutPersist(key, null);
@@ -292,134 +295,24 @@ public class Manager {
                     switch (e.cacheStrategy) {
                         case CACHE_DISABLED -> {
                         }
-                        case CACHE_TEMPORARY -> storeTempValue(Value.of(List.of()));
-                        case CACHE_PERMANENT -> store(Value.of(List.of()));
+                        case CACHE_TEMPORARY -> storeTempValue(Value.nullValue());
+                        case CACHE_PERMANENT -> store(Value.nullValue());
                     }
                 }
                 throw (X) ex;
             }
         }
 
-        public <C extends Iterable<? extends V>, V, X extends Exception> C getCollection(
-            ThrowingSupplier<C, X> supplier, Retry retry=Retry.NONE) throws X {
-            Optional<ProviderCache<C>> optionalCache = manager.getOptionalCache(cacheType);
-            return optionalCache.mapEx(cache -> {
-                if (cache.contains(key)) {
-                    return cache.get(key).orElseThrow();
-                }
-                try {
-                    C value = executeSupplier(supplier, retry);
-                    cache.put(key, value);
-                    return value;
-                } catch (Exception ex) {
-                    if (ex instanceof ApiExceptionIntf e) {
-                        LOGGER.log(e.logLevel, ex.getMessage(), ex);
-                        switch (e.cacheStrategy) {
-                            case CACHE_DISABLED -> {
-                            }
-                            case CACHE_TEMPORARY -> storeTempValue(Value.of(List.of()));
-                            case CACHE_PERMANENT -> store(Value.of(List.of()));
-                        }
-                    }
-                    throw (X) ex;
-                }
-            }).orElseGetEx(supplier);
-        }
-
-        public <V> Optional<V> getOptional() {
-            Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
-            return optionalCache.flatMap(cache -> (Optional<V>) cache.get(key));
-        }
-
-        public <V extends @Nullable Object, X extends Exception> Optional<V> getOptional(
-            ThrowingSupplier<Optional<V>, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
-            boolean storeTempNullValue=false) throws X {
-            Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
-
-            if (optionalCache.isPresent()) {
-                ProviderCache<V> cache = optionalCache.get();
-                boolean containsKey = cache.contains(key);
-                if (!containsKey && storeTempNullValue) {
-                    store(Value.ofOptional(supplier), storeTempNullValue, timeToLive, retry);
-                    return cache.get(key);
-                } else if (containsKey && !isExpiredTemporary()) {
-                    return cache.get(key);
-                } else {
-                    try {
-                        Optional<V> object = executeSupplier(supplier, retry);
-                        object.ifPresentOrElse(v -> cache.put(key, v, timeToLive), () -> {
-                            switch (cache) {
-                                case ProviderCacheDisk<V> dCache -> dCache.putWithoutPersist(key, null);
-                                case ProviderCacheMemory<V> mCache -> mCache.put(key, null);
-                            }
-                        });
-                        return object;
-                    } catch (Exception ex) {
-                        if (ex instanceof ApiExceptionIntf e) {
-                            LOGGER.log(e.logLevel, ex.getMessage(), ex);
-                            switch (e.cacheStrategy) {
-                                case CACHE_DISABLED -> {
-                                }
-                                case CACHE_TEMPORARY -> storeTempValue(Value.ofOptional(Optional.empty()));
-                                case CACHE_PERMANENT -> store(Value.ofOptional(Optional.empty()));
-                            }
-                        }
-                        throw (X) ex;
-                    }
-                }
-            } else {
-                return supplier.get();
-            }
-        }
-
-        public <X extends Exception> OptionalInt getOptionalInt(
-            ThrowingSupplier<OptionalInt, X> supplier, @Nullable Time timeToLive=null, Retry retry=Retry.NONE,
-            boolean storeTempNullValue=false) throws X {
-
-            return manager.getOptionalCache(cacheType).mapEx(cache -> {
-                boolean containsKey = cache.contains(key);
-                if (!containsKey && storeTempNullValue) {
-                    store(Value.ofOptionalInt(supplier), storeTempNullValue, timeToLive, retry);
-                    return cache.get(key).mapToIntEx(t -> (int) t);
-                } else if (containsKey && !isExpiredTemporary()) {
-                    return cache.get(key).mapToIntEx(t -> (int) t);
-                } else {
-                    try {
-                        OptionalInt object = executeSupplier(supplier, retry);
-                        object.ifPresentOrElse(v -> cache.put(key, v), () -> {
-                            switch (cache) {
-                                case ProviderCacheDisk<? extends @Nullable Object> dCache ->
-                                    dCache.putWithoutPersist(key, null);
-                                case ProviderCacheMemory<? extends @Nullable Object> mCache -> mCache.put(key, null);
-                            }
-                        });
-                        return object;
-                    } catch (Exception ex) {
-                        if (ex instanceof ApiExceptionIntf e) {
-                            LOGGER.log(e.logLevel, ex.getMessage(), ex);
-                            switch (e.cacheStrategy) {
-                                case CACHE_DISABLED -> {
-                                }
-                                case CACHE_TEMPORARY -> storeTempValue(Value.ofOptionalInt(OptionalInt.empty()));
-                                case CACHE_PERMANENT -> store(Value.ofOptionalInt(OptionalInt.empty()));
-                            }
-                        }
-                        throw (X) ex;
-                    }
-                }
-            }).orElseGetEx(supplier);
-        }
-
         public <V extends @Nullable Object, X extends Exception> void store(Value<V, X> value,
             boolean storeTempNullValue=false, @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
 
             V object = value.getValue(retry);
-            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
+            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12hr) * 2 : timeToLive;
             manager.getCache(cacheType).put(key, object, ttl);
         }
 
-        public <V, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
-            Time ttl = getTemporaryTimeToLive().orElse(1 hr) * 2;
+        public <V extends @Nullable Object, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
+            Time ttl = getTemporaryTimeToLive().orElse(1hr) * 2;
             manager.getCache(cacheType).put(key, value.getValue(), ttl);
         }
     }
@@ -446,7 +339,7 @@ public class Manager {
         return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
     }
 
-    private <V> Optional<ProviderCache<@Nullable V>> getOptionalCache(CacheType cacheType) {
+    private <V extends @Nullable Object> Optional<ProviderCache<V>> getOptionalCache(CacheType cacheType) {
         return switch (cacheType) {
             case NONE -> Optional.empty();
             case MEMORY -> (Optional) Optional.of(inMemoryCache);
@@ -465,38 +358,16 @@ public class Manager {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @NullMarked
     public record Value<V extends @Nullable Object, X extends Exception>(ThrowingFunction<Retry, V, X> supplier) {
+
+        public static <V extends @Nullable Object> Value<V, Nothing> nullValue() {
+            return new Value<V, Nothing>(_ -> null);
+        }
+
         public static <V> Value<V, Nothing> of(V value) {
             return new Value<>(_ -> value);
         }
 
         public static <V, X extends Exception> Value<V, X> of(ThrowingSupplier<V, X> supplier) {
-            return new Value<>(retry -> executeSupplier(supplier, retry));
-        }
-
-        public static <V extends @Nullable Object> Value<V, Nothing> ofOptional(Optional<V> value) {
-            return new Value<@Nullable V, Nothing>(_ -> value.orElse(null));
-        }
-
-        public static <V extends @Nullable Object, X extends Exception> Value<V, X> ofOptional(
-            ThrowingSupplier<Optional<V>, X> supplier) {
-            return new Value<@Nullable V, X>(retry -> executeSupplier(supplier, retry).orElse(null));
-        }
-
-        public static Value<@Nullable Integer, Nothing> ofOptionalInt(OptionalInt value) {
-            return ofOptional(() -> value.mapToObj(i -> i));
-        }
-
-        public static <X extends Exception> Value<@Nullable Integer, X> ofOptionalInt(
-            ThrowingSupplier<OptionalInt, X> supplier) {
-            return ofOptional(() -> supplier.get().mapToObj(i -> i));
-        }
-
-        public static <C extends Collection<V>, V> Value<C, Nothing> ofCollection(C value) {
-            return new Value<>(_ -> value);
-        }
-
-        public static <C extends Collection<V>, V, X extends Exception> Value<C, X> ofCollection(ThrowingSupplier<C,
-            X> supplier) {
             return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 

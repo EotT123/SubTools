@@ -32,7 +32,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheDisk;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
-import org.lodder.subtools.sublibrary.util.http.HttpClient;
+import org.lodder.subtools.sublibrary.util.webpage.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -62,7 +62,7 @@ public class TvSubtiltesSubtitle extends Subtitle {
                 }
 
                 String baseUrl = uri.resolve(".").toString();
-                return baseUrl + finalPath;
+                return baseUrl + finalPath.toString().replace(" ", "%20");
             }
         } catch (URISyntaxException e) {
             throw new IOException(e);

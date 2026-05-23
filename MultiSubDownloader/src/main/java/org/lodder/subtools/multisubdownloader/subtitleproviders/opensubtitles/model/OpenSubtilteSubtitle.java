@@ -24,8 +24,8 @@ public class OpenSubtilteSubtitle extends Subtitle {
     @val @override SubtitleSource source = SubtitleSource.OPENSUBTITLES;
 
     public OpenSubtilteSubtitle(ThrowingSupplier<@Nullable String, OpenSubtitleException> urlSupplier,
-        @Nullable String fileName=null,
-         Language language,
+        String fileName,
+        Language language,
         @Nullable String releaseGroup=null,
         @Nullable String uploader=null,
         @Nullable String quality=null,
