@@ -16,7 +16,6 @@ import org.lodder.subtools.multisubdownloader.gui.panels.SearchFileInputPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.SearchPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -26,9 +25,9 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
 
     private final FileListAction filelistAction;
 
-    public FileGuiSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore, GUI mainWindow,
-        SearchPanel<SearchFileInputPanel> searchPanel, ReleaseFactory releaseFactory) {
-        super(settings, subtitleProviderStore, mainWindow, searchPanel, releaseFactory);
+    public FileGuiSearchAction(Settings settings, GUI mainWindow, SearchPanel<SearchFileInputPanel> searchPanel,
+        ReleaseFactory releaseFactory) {
+        super(settings, mainWindow, searchPanel, releaseFactory);
         this.filelistAction = new FileListAction(settings);
     }
 

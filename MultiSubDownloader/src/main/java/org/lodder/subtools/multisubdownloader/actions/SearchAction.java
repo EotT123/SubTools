@@ -33,7 +33,6 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
     @val(Protected) Settings settings;
-    @val(Protected) SubtitleProviderStore subtitleProviderStore;
 
     @get(Protected) @set(Private) @Nullable StatusListener statusListener;
     @get(Protected) @set(Private) @Nullable List<R> releases;
@@ -44,9 +43,8 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     private final LazySupplier<SearchManager> searchManagerLazy;
     @get(Protected) SearchManager searchManager; // Computed property
 
-    protected SearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore) {
+    protected SearchAction(Settings settings) {
         this.settings = settings;
-        this.subtitleProviderStore = subtitleProviderStore;
         this.searchManagerLazy = new LazySupplier<>(() ->
             new SearchManager(settings, language, searchProgressListener, userInteractionHandler, this));
     }
@@ -90,7 +88,7 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
 
         /* Tell the manager which providers to use */
         searchManager.reset();
-        this.subtitleProviderStore.allProviders.stream()
+        SubtitleProviderStore.allProviders.stream()
             .filter(subtitleProvider -> settings.useSerieSource(subtitleProvider.source))
             .forEach(searchManager::addProvider);
 

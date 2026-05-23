@@ -22,7 +22,6 @@ import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFilt
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -46,12 +45,12 @@ public class CliSearchAction extends SearchAction<ReleaseWithPath> {
     @get(Protected) @override IndexingProgressListener indexingProgressListener;
     @get(Protected) @override SearchProgressListener searchProgressListener;
 
-    public CliSearchAction(Settings settings, SubtitleProviderStore subtitleProviderStore,
-        IndexingProgressListener indexingProgressListener, SearchProgressListener searchProgressListener, CLI cli,
-        FileListAction fileListAction, Language language, ReleaseFactory releaseFactory, SubtitleFiltering filtering,
-        List<Path> folders, boolean overwriteSubtitles=true, boolean recursive=true)
+    public CliSearchAction(Settings settings, IndexingProgressListener indexingProgressListener,
+        SearchProgressListener searchProgressListener, CLI cli, FileListAction fileListAction, Language language,
+        ReleaseFactory releaseFactory, SubtitleFiltering filtering, List<Path> folders, boolean overwriteSubtitles=true,
+        boolean recursive=true)
         throws SearchSetupException {
-        super(settings, subtitleProviderStore);
+        super(settings);
         this.indexingProgressListener = indexingProgressListener;
         this.searchProgressListener = searchProgressListener;
         this.cli = cli;

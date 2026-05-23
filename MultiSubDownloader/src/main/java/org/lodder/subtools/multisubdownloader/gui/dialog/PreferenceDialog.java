@@ -10,8 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
-import org.lodder.subtools.multisubdownloader.framework.event.Emitter;
-import org.lodder.subtools.multisubdownloader.framework.event.Event;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.GeneralPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.MovieLibraryPanel;
@@ -19,6 +17,7 @@ import org.lodder.subtools.multisubdownloader.gui.panels.preference.OptionsPanel
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.PreferencePanelIntf;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.SerieProvidersPanel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -28,18 +27,16 @@ public class PreferenceDialog extends MultiSubDialog {
     @Serial private static final long serialVersionUID = 1L;
 
     private final SettingsControl settingsCtrl;
-    private final Emitter eventEmitter;
     private final GeneralPanel pnlGeneral;
     private final EpisodeLibraryPanel pnlEpisodeLibrary;
     private final MovieLibraryPanel pnlMovieLibrary;
     private final OptionsPanel pnlOptions;
     private final SerieProvidersPanel pnlSerieSources;
 
-    public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Emitter eventEmitter, Manager manager,
+    public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Manager manager,
         UserInteractionHandler userInteractionHandler) {
         super(gui, getText("PreferenceDialog.Title"), true);
         this.settingsCtrl = settingsCtrl;
-        this.eventEmitter = eventEmitter;
 
         setResizable(false);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -100,7 +97,7 @@ public class PreferenceDialog extends MultiSubDialog {
             pnlSerieSources.savePreferenceSettings();
             setVisible(false);
             settingsCtrl.store();
-            this.eventEmitter.fire(new Event("providers.settings.change"));
+            SubtitleProviderStore.resetProviders();
         } else {
             JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"), "Error",
                 JOptionPane.ERROR_MESSAGE);

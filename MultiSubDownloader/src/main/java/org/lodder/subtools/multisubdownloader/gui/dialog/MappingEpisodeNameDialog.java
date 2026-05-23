@@ -28,7 +28,6 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.cache.CacheType;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKey;
-import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
@@ -39,16 +38,14 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     @Serial private static final long serialVersionUID = 1L;
 
     private final MappingTableModel mappingTableModel;
-    private final SubtitleProviderStore subtitleProviderStore;
     private final JButton btnAddCustomMapping;
     private final JTable table;
-    private @Nullable SubtitleProvider<? extends Subtitle> selectedSubtitleProvider;
+    private @Nullable SubtitleProvider selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
     public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
-        SubtitleProviderStore subtitleProviderStore, UserInteractionHandlerGUI userInteractionHandler) {
+        UserInteractionHandlerGUI userInteractionHandler) {
         super(frame, getText("MappingEpisodeNameDialog.Title"), true);
-        this.subtitleProviderStore = subtitleProviderStore;
         this.mappingTableModel = new MappingTableModel(manager);
         setResizable(true);
         setBounds(150, 150, 650, 400);
@@ -136,7 +133,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     private void selectMappingType(MappingType mappingType) {
         this.selectedMappingType = mappingType;
-        this.selectedSubtitleProvider = subtitleProviderStore.allProviders.stream()
+        this.selectedSubtitleProvider = SubtitleProviderStore.allProviders.stream()
             .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
             .findAny().orElse(null);
         btnAddCustomMapping.enabled = selectedSubtitleProvider != null;

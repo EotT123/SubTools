@@ -25,6 +25,7 @@ import org.lodder.subtools.multisubdownloader.framework.Bootstrapper;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Splash;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
+import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
@@ -112,7 +113,7 @@ public class App {
         }
         new Thread(() -> {
             List<String> providerNames =
-                app.makeSubtitleProviderStore().allProviders.stream().map(provider -> provider.provider)
+                SubtitleProviderStore.allProviders.stream().map(provider -> provider.provider)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
             manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key.provider::equals))
