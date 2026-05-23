@@ -2,12 +2,12 @@ package org.lodder.subtools.sublibrary.model;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class SeasonEpisode {
@@ -28,21 +28,21 @@ public class SeasonEpisode {
         this.episodes = Arrays.stream(episodes).boxed().toList();
     }
 
-    public static Optional<SeasonEpisode> fromText(String text) {
+    public static @Nullable SeasonEpisode fromText(String text) {
         Matcher matcher = SEASON_EPISODES_PATTERN_1.matcher(text);
         if (matcher.find()) {
-            return Optional.of(
-                    new SeasonEpisode(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3))));
+            return new SeasonEpisode(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)),
+                Integer.parseInt(matcher.group(3)));
         }
         Matcher matcher2 = SEASON_EPISODE_PATTERN_1.matcher(text);
         if (matcher2.find()) {
-            return Optional.of(new SeasonEpisode(Integer.parseInt(matcher2.group(1)), Integer.parseInt(matcher2.group(2))));
+            return new SeasonEpisode(Integer.parseInt(matcher2.group(1)), Integer.parseInt(matcher2.group(2)));
         }
         Matcher matcher3 = SEASON_EPISODE_PATTERN_2.matcher(text);
         if (matcher3.find()) {
-            return Optional.of(new SeasonEpisode(Integer.parseInt(matcher3.group(1)), Integer.parseInt(matcher3.group(2))));
+            return new SeasonEpisode(Integer.parseInt(matcher3.group(1)), Integer.parseInt(matcher3.group(2)));
         }
-        return Optional.empty();
+        return null;
     }
 
     public boolean containsEpisode(int episode) {

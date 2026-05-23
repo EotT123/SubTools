@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import extensions.java.nio.file.Path.PathExt;
@@ -105,15 +104,14 @@ public class FileListAction {
 
     public boolean fileHasSubtitles(Path file, Language language) throws IOException {
         String extension = file.getExtension();
-        Optional<String> subtitleNameOptional = VideoPatterns.EXTENSIONS.stream()
+        String subtitleName = VideoPatterns.EXTENSIONS.stream()
             .filter(extension::equals)
             .map(_ -> file.changeExtension(SUBTITLE_EXTENSION))
-            .findAny();
+            .findAny().orElse(null);
 
-        if (subtitleNameOptional.isEmpty()) {
+        if (subtitleName == null) {
             return false;
         }
-        String subtitleName = subtitleNameOptional.get();
         Path f = file.resolveSibling(subtitleName);
         if (f.exists()) {
             return true;

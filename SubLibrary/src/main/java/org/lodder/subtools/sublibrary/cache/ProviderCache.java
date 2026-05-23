@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -63,7 +62,7 @@ public abstract sealed class ProviderCache<V extends @Nullable Object> permits P
             return switch (key) {
                 case ProviderCacheKey k -> cacheMap.containsKey(k);
                 case ProviderCacheKeySub k -> !invalidKeys.contains(k) &&
-                    Optional.ofNullable(keyMapperCache.get(k)).map(cacheMap::containsKey).orElse(false);
+                    ifNotNullOrElse(keyMapperCache.get(k), cacheMap::containsKey, false);
             };
         }
     }

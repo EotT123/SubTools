@@ -28,7 +28,7 @@ public class SubsceneSubtitleMetadata implements Serializable {
         this.hearingImpaired = hearingImpaired;
         this.uploader = uploader;
         this.comment = comment;
-        this.seasonEpisode = SeasonEpisode.fromText(name).orElse(null);
+        this.seasonEpisode = SeasonEpisode.fromText(name);
         this.urlSupplier = urlSupplier;
     }
 }

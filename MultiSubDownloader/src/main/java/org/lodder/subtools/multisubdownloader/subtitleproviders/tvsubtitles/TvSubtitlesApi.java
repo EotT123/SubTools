@@ -3,11 +3,10 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Gatherers;
 
 import manifold.ext.props.rt.api.override;
@@ -67,18 +66,13 @@ public class TvSubtitlesApi implements SubtitleApi {
 
     public Set<TVSubtitlesSubtitleMetadata> getSubtitles(String providerId, int season, int episode,
         Language language) throws TvSubtitleApiException {
-        Set<TVSubtitlesSubtitleMetadata> results = new HashSet<>();
         TVSubtitlesLanguage providerLang = TVSubtitlesLanguage.of(language).orElse(null);
 
-        Optional<EpisodeRow> episodeRow = getSeasonSubtitleInfo(providerId, season, providerLang)
-            .filter(row -> row.isSameEpisode(season, episode)).findAny();
-        if (episodeRow.isPresent()) {
-            for (String url : episodeRow.get().urls) {
-                results.addAll(getSubtitles(url, providerLang));
-            }
-            return results;
-        }
-        return results;
+        return getSeasonSubtitleInfo(providerId, season, providerLang)
+            .filter(row -> row.isSameEpisode(season, episode)).findAny().stream()
+            .flatMap(episodeRow -> episodeRow.urls().stream())
+            .flatMapEx(url -> getSubtitles(url, providerLang).stream())
+            .collect(Collectors.toSet());
     }
 
     private List<EpisodeRow> getSeasonSubtitleInfo(String providerId, int season,

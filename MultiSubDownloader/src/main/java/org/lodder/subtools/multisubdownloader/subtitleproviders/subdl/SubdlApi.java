@@ -93,8 +93,8 @@ public class SubdlApi implements SubtitleApi {
      * Fetches subtitle provider id using an IMDB ID.
      * Results are cached in memory.
      *
-     * @param imdbId an optional IMDb ID to use for lookup
-     * @return an optional containing the {@link SubdlSerieId} object if one was found
+     * @param imdbId an IMDB ID to use for lookup
+     * @return the {@link SubdlSerieId} object if one was found
      * @throws SubdlApiException if the API call fails
      */
     public @Nullable SubdlSerieId getProviderIdUsingImdbId(String imdbId) throws SubdlApiException {

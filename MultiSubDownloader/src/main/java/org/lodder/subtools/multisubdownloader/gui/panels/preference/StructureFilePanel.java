@@ -11,12 +11,10 @@ import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NullMarked;
@@ -203,7 +201,7 @@ public class StructureFilePanel extends JPanel {
         }
 
         private void updateBorder(Language lang) {
-            List<LanguageComponents> componentList = getLanguageComponentsForLanguageStream(lang).toList();
+            List<LanguageComponents> componentList = getLanguageComponentsForLanguage(lang);
             if (componentList.isEmpty()) {
                 return;
             }
@@ -218,12 +216,9 @@ public class StructureFilePanel extends JPanel {
                     languageComponentsMap.size();
         }
 
-        private Stream<LanguageComponents> getLanguageComponentsForLanguageStream(Language language) {
-            return languageComponentsMap.values().stream().filter(langComps -> langComps.getLanguage() == language);
-        }
-
-        public Optional<LanguageComponents> getLanguageComponentsForLanguage(Language language) {
-            return getLanguageComponentsForLanguageStream(language).findAny();
+        private List<LanguageComponents> getLanguageComponentsForLanguage(Language language) {
+            return languageComponentsMap.values().stream().filter(langComps -> langComps.getLanguage() == language)
+                .toList();
         }
 
         public Map<Language, String> toSettingsMap() {
