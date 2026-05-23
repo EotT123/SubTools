@@ -34,6 +34,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoEncoding;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoExtensions;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
+import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
