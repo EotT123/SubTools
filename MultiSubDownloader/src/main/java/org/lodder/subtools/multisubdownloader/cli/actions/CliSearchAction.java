@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.cli.actions;
 
 import static manifold.ext.props.rt.api.PropOption.*;
+import static util.Utils.*;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class CliSearchAction extends SearchAction<ReleaseWithPath> {
             /* Tell progressListener which file we are processing */
             this.indexingProgressListener.progress(file.getFileNameAsString());
 
-            this.releaseFactory.createRelease(file, userInteractionHandler).ifPresent(releases::add);
+            ifNotNullDo(this.releaseFactory.createRelease(file, userInteractionHandler), releases::add);
 
             /* Update progressListener */
             this.indexingProgressListener.progress(progress);

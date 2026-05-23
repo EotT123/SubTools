@@ -51,7 +51,7 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
         release.providerIds.getOrPut(TVDB, () -> tvdbAdapter.searchSerie(release.name, release.providerIds),
             TvdbSerie::getProviderId, Integer::parseInt);
         if (release.providerIds.get(TVDB) == null) {
-//            throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
+            throw new IllegalStateException("Unable to find TVDB id for movie: " + release.name);
         }
     }
 

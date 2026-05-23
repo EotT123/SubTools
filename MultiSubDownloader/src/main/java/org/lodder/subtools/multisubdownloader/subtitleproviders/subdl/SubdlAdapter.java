@@ -22,6 +22,7 @@ import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import subdl.Serie.ReleaseType;
@@ -105,8 +106,10 @@ public final class SubdlAdapter extends
 
     @Override
     public SubdlSubtitle convertToSubtitle(Release originalRelease, SubdlSubtitleMetadata sub) {
-        return ReleaseParser.parse(sub.title).orElseMapEx(() -> ReleaseParser.parse(sub.fileName))
-            .map(release -> new SubdlSubtitle(
+        ReleaseWithoutPath releaseWithoutPath =
+            ifNullThenGet(ReleaseParser.parse(sub.title), () -> ReleaseParser.parse(sub.fileName));
+        return ifNotNullOrElseGet(releaseWithoutPath,
+            release -> new SubdlSubtitle(
                 sub.url,
                 sub.title,
                 sub.language,
@@ -114,8 +117,8 @@ public final class SubdlAdapter extends
                 sub.uploader,
                 sub.hearingImpaired,
                 release.quality,
-                originalRelease))
-            .orElseGet(() -> new SubdlSubtitle(
+                originalRelease),
+            () -> new SubdlSubtitle(
                 sub.url,
                 sub.title,
                 sub.language,

@@ -1,13 +1,13 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 
 @NullMarked
@@ -38,7 +38,7 @@ public enum SearchColumnName implements CustomColumnName {
         this.editable = editable;
     }
 
-    public static Optional<SearchColumnName> getForColumnName(String columnName) {
-        return Optional.ofNullable(MAP.get(columnName));
+    public static @Nullable SearchColumnName getForColumnName(String columnName) {
+        return MAP.get(columnName);
     }
 }

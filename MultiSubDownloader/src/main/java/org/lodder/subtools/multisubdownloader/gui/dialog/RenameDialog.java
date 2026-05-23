@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.dialog;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -156,12 +157,13 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             dir.list().forEachEx(file -> {
                 if (file.isRegularFile()) {
                     if (!file.fileNameContainsIgnoreCase("sample") && extensions.contains(file.getExtension())) {
-                        releaseFactory.createRelease(file, userInteractionHandler).ifPresent(release -> {
-                            publish(release.fileNameOrName);
-                            if (release.isOfType(videoType)) {
-                                moveAndRenameAction.moveAndRename(file, release);
-                            }
-                        });
+                        ifNotNullDo(releaseFactory.createRelease(file, userInteractionHandler),
+                            release -> {
+                                publish(release.fileNameOrName);
+                                if (release.isOfType(videoType)) {
+                                    moveAndRenameAction.moveAndRename(file, release);
+                                }
+                            });
                     }
                 } else if (isRecursive && file.isDirectory()) {
                     rename(file);

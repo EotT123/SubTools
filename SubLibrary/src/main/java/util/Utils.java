@@ -94,4 +94,13 @@ public class Utils {
         @Nullable T value, ThrowingSupplier<S, X> orElseSupplier) throws X {
         return value != null ? value : orElseSupplier.get();
     }
+
+    @Contract("!null,_ -> param1; null,_ -> fail")
+    public static <T, X extends Exception> T ifNullThrow(@Nullable T value, Supplier<X> exceptionSupplier) throws X {
+        if (value != null) {
+            return value;
+        } else {
+            throw exceptionSupplier.get();
+        }
+    }
 }

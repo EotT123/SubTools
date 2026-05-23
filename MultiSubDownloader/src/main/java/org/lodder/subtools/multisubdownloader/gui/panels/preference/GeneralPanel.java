@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.panels.preference;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import javax.swing.*;
 import java.io.Serial;
@@ -188,7 +189,7 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         settingsCtrl.settings.updateType = cbxUpdateType.getSelectedValue();
         settingsCtrl.settings.generalProxyEnabled = chkUseProxy.isSelected();
         settingsCtrl.settings.generalProxyHost = txtProxyHost.getText();
-        settingsCtrl.settings.generalProxyPort = txtProxyPort.getOptionalObject().orElse(80);
+        settingsCtrl.settings.generalProxyPort = ifNullThen(txtProxyPort.getObject(), 80);
     }
 
     @Override

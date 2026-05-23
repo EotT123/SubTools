@@ -1,11 +1,11 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed;
 
 import static org.lodder.subtools.multisubdownloader.Messages.*;
+import static util.Utils.*;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -62,23 +62,23 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     @Override
     public Collection<Addic7edSubtitle> searchMovieSubtitlesWithName(String title, @Nullable Integer year,
         Language language, ProviderIds providerIds) throws Addic7edException {
-        return getMovieProviderId(title, year).mapEx(providerId -> api.searchMovieSubtitles(providerId.id, language))
-            .orElse(List.of());
+        return ifNotNullOrElseGet(getMovieProviderId(title, year),
+            providerId -> api.searchMovieSubtitles(providerId.id, language), List::of);
     }
 
-    private Optional<Addic7edMovieSubtitleId> getMovieProviderId(String title, @Nullable Integer year)
+    private @Nullable Addic7edMovieSubtitleId getMovieProviderId(String title, @Nullable Integer year)
         throws Addic7edException {
         List<Addic7edMovieSubtitleId> sortedMovieProviderIds = api.getMovieProviderIds(title, year)
             .stream()
             .sorted(Comparator.comparing((Addic7edMovieSubtitleId sId) -> sId.getScore(title, year)).reversed())
             .toList();
         if (sortedMovieProviderIds.isEmpty()) {
-            return Optional.empty();
+            return null;
         }
         if (!userInteractionHandler.settings.optionsConfirmProviderMapping && sortedMovieProviderIds.size() == 1) {
             // If only one releases mapping is found and the user has disabled confirmation for single results,
             // automatically select this mapping as the desired one.
-            return Optional.of(sortedMovieProviderIds.first());
+            return sortedMovieProviderIds.first();
         } else {
             String selectFromListMessage =
                 year == null ? getText("SelectDialog.SelectMovieNameForName", title) :
@@ -88,7 +88,7 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
                 sortedMovieProviderIds,
                 selectFromListMessage,
                 provider,
-                Addic7edMovieSubtitleId::getName);
+                Addic7edMovieSubtitleId::getName).orElse(null);
         }
     }
 

@@ -11,7 +11,6 @@ import java.awt.*;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -165,10 +164,6 @@ public abstract sealed class MyTextFieldCommon<T extends @Nullable Object, R ext
     public T getObject() {
         String text = super.getText();
         return completeValueVerifier.test(text) ? toObjectMapper.apply(text) : null;
-    }
-
-    public Optional<T> getOptionalObject() {
-        return Optional.ofNullable(getObject());
     }
 
     public void setObject(T object) {

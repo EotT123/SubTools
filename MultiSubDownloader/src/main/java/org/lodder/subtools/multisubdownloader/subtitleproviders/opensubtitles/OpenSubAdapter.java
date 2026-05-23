@@ -129,16 +129,16 @@ public final class OpenSubAdapter
         Language language = Language.ofIso639_1(attr.language);
         String uploader = ifNotNull(attr.getUploader(), SubtitleAttributesUploader::getName);
         int fileId = attr.files.stream().findFirst().orElseThrow().fileId.intValue();
-        return ReleaseParser.parse(attr.release)
-            .map(r -> new OpenSubtilteSubtitle(
+        return ifNotNullOrElseGet(ReleaseParser.parse(attr.release),
+            r -> new OpenSubtilteSubtitle(
                 urlSupplier:() -> api.getDownloadUrl(fileId),
                 fileName:ifNullThenGet(attr.release, release::getFileNameOrName),
                 language:language,
                 releaseGroup:r.releaseGroup,
                 uploader:uploader,
                 quality:r.quality,
-                hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()))
-            .orElseGet(() -> {
+                hearingImpaired:Boolean.TRUE == attr.isHearingImpaired()),
+            () -> {
                 ReleaseParserExtraInfo extraInfo = ReleaseParser.parseExtraInfo(attr.release);
                 return new OpenSubtilteSubtitle(
                     urlSupplier:() -> api.getDownloadUrl(fileId),

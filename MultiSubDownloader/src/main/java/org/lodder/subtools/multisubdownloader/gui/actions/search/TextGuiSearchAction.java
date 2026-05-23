@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.gui.actions.search;
 
+import static util.Utils.*;
+
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
@@ -48,8 +50,8 @@ public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPa
                     inputPanel.quality, completeName:name));
             case MOVIE ->
                 List.of(new MovieReleaseWithoutPath(name:name, quality:inputPanel.quality, completeName:name));
-            default -> releaseFactory.createRelease(name, userInteractionHandler).map(Release.class::cast).map(List::of)
-                .orElseGet(List::of);
+            default ->
+                ifNotNullOrElseGet(releaseFactory.createRelease(name, userInteractionHandler), List::of, List::of);
         };
     }
 

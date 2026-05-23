@@ -1,9 +1,9 @@
 package org.lodder.subtools.multisubdownloader.lib;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
@@ -25,12 +25,12 @@ public record ReleaseFactory(Settings settings, Manager manager) {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
-    public Optional<ReleaseWithPath> createRelease(Path file,
+    public @Nullable ReleaseWithPath createRelease(Path file,
         UserInteractionHandler userInteractionHandler, boolean validate=true) {
         try {
-            Optional<ReleaseWithPath> release = ReleaseParser.parse(file);
-            if (validate && release.isPresent()) {
-                switch (release.get()) {
+            ReleaseWithPath release = ReleaseParser.parse(file);
+            if (validate && release != null) {
+                switch (release) {
                     case TvReleaseWithPath tvRelease ->
                         new TvReleaseControl(settings, manager, userInteractionHandler).process(tvRelease);
                     case MovieReleaseWithPath movieRelease ->
@@ -40,16 +40,16 @@ public record ReleaseFactory(Settings settings, Manager manager) {
             return release;
         } catch (ReleaseControlException e) {
             LOGGER.error("Failed to create a release for $file: " + e.getMessage(), e);
-            return Optional.empty();
+            return null;
         }
     }
 
-    public Optional<ReleaseWithoutPath> createRelease(String name,
+    public @Nullable ReleaseWithoutPath createRelease(String name,
         UserInteractionHandler userInteractionHandler, boolean validate=true) {
         try {
-            Optional<ReleaseWithoutPath> release = ReleaseParser.parse(name);
-            if (validate && release.isPresent()) {
-                switch (release.get()) {
+            ReleaseWithoutPath release = ReleaseParser.parse(name);
+            if (validate && release != null) {
+                switch (release) {
                     case TvReleaseWithoutPath tvRelease ->
                         new TvReleaseControl(settings, manager, userInteractionHandler).process(tvRelease);
                     case MovieReleaseWithoutPath movieRelease ->
@@ -59,7 +59,7 @@ public record ReleaseFactory(Settings settings, Manager manager) {
             return release;
         } catch (ReleaseControlException e) {
             LOGGER.error("Failed to create a release for $name: " + e.getMessage(), e);
-            return Optional.empty();
+            return null;
         }
     }
 }
