@@ -54,7 +54,7 @@ public class WebPage {
                         new HtmlUnitSearchParams(url, cookies, waitUntilCondition, proxy));
                 };
             } catch (WebpageException e) {
-                LOG.error("Could not access webpage %s using browserMode %s", url, mode);
+                LOG.error("Could not access webpage {} using browserMode {}", url, mode);
             }
         }
         throw new WebpageException("Could not access webpage " + url);
