@@ -6,7 +6,6 @@ import static util.Utils.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -113,9 +112,7 @@ record ImdbSearchIdApi(Manager manager) {
                     Elements searchResults = manager.getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
                         .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
                     Function<Element, @Nullable String> toStringMapper =
-                        e -> Optional.ofNullable((Element) e.selectFirst("h3"))
-                            .map(e2 -> e2.text().replace(" - IMDb", ""))
-                            .orElse(null);
+                        e -> ifNotNull((Element) e.selectFirst("h3"), e2 -> e2.text().replace(" - IMDb", ""));
                     Function<Element, String> toHrefMapper =
                         e -> URLDecoder.decode(e.attr("href"), StandardCharsets.UTF_8);
                     return getImdbIdCommon(searchResults, toStringMapper, toHrefMapper);

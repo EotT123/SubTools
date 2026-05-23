@@ -300,8 +300,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      * @param providerReleaseIdToDisplayStringFunction a function that converts a provider-specific release ID to a
      * string that is used in the GUI.
      * @param <M> the type of the {@link ReleaseMapping} to return
-     * @return an {@code Optional<ReleaseMapping>} containing the mapping information if found, or an empty {@code
-     * Optional} if none is found.
+     * @return the mapping information if found, or null if none is found.
      * @throws X if an error occurs during the retrieval operation
      */
     public <M extends ReleaseMapping, P extends ProviderId> @Nullable M getProviderReleaseMapping(String name,

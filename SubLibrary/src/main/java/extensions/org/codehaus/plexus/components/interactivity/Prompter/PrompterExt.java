@@ -39,7 +39,7 @@ public class PrompterExt {
     public static Validator<String> NON_BLANK_VALIDATOR =
         new Validator<>(StringUtils::isNotBlank, getText("Prompter.ValueNonBlank"));
     public static Validator<String> INT_VALIDATOR =
-        new Validator<>(v -> v.parseAsNumber(Integer::parseInt).isPresent());
+        new Validator<>(v -> v.parseAsNumber(Integer::parseInt) != null);
     public static Validator<String> BOOLEAN_VALIDATOR =
         new Validator<>(v -> getText("Prompter.YesAbbreviation").equalsIgnoreCase(v) ||
             getText("Prompter.Yes").equalsIgnoreCase(v) ||
@@ -92,7 +92,7 @@ public class PrompterExt {
         @Nullable Comparator<T> sorter=null) {
 
         Validator<@Nullable String> inputValidator =
-            new Validator<@Nullable String>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt).isPresent());
+            new Validator<@Nullable String>(v -> v == null || v.parseAsNumber(Integer::parseUnsignedInt) != null);
         Function<@Nullable String, @Nullable Integer> toObjectMapper =
             v -> v == null ? null : Integer.parseUnsignedInt(v);
         int numberOfElements = elements.size();
@@ -119,7 +119,7 @@ public class PrompterExt {
         @Nullable Comparator<T> sorter=null) {
 
         Validator<@Nullable String> inputValidator = new Validator<@Nullable String>(v -> v == null ||
-            v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt).isPresent()));
+            v.split(",").stream().allMatch(n -> n.parseAsNumber(Integer::parseUnsignedInt) != null));
         Function<String, int[]> toObjectsMapper =
             v -> Arrays.stream(v.split(",")).mapToInt(Integer::parseUnsignedInt).toArray();
         int numberOfElements = elements.size();

@@ -4,7 +4,6 @@ import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -75,9 +74,9 @@ class CommonWebDriverManagerSingleton<W extends WebDriver> {
             }
             synchronized (webDriverPool) {
                 if (!webDriverPool.isEmpty()) {
-                    Optional<W> optionalWebDriver = webDriverPool.stream().filter(filter).findAny();
-                    if (optionalWebDriver.isPresent()) {
-                        return webDriverPool.remove(webDriverPool.indexOf(optionalWebDriver.get()));
+                    W webDriver = webDriverPool.stream().filter(filter).findAny().orElse(null);
+                    if (webDriver != null) {
+                        return webDriverPool.remove(webDriverPool.indexOf(webDriver));
                     } else if (suppressFilterWhenNoMatch) {
                         return webDriverPool.removeFirst();
                     }

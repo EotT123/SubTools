@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -90,8 +89,7 @@ public class ReleaseParser {
      * and release group from the filename.
      *
      * @param text value to be parsed.
-     * @return an {@link Optional} containing the {@link ReleaseWithoutPath} if parsing was successful; otherwise
-     * {@link Optional#empty()}
+     * @return the {@link ReleaseWithoutPath} if parsing was successful; otherwise null
      */
     public static @Nullable ReleaseWithoutPath parse(String text) {
         ParserResults parserResults = new ParserResults(Strings.CS.endsWithAny(text, ".zip", ".srt") ||

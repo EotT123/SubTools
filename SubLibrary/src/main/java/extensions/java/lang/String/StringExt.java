@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import java.util.function.Function;
 
 import manifold.ext.rt.api.Extension;
@@ -38,15 +37,15 @@ public class StringExt {
         return new ByteArrayInputStream(text.getBytes(charset));
     }
 
-    public static <T extends Number> Optional<T> parseAsNumber(@This @Nullable String text,
+    public static <T extends Number> @Nullable T parseAsNumber(@This @Nullable String text,
         Function<String, T> mapper) {
         if (text == null) {
-            return Optional.empty();
+            return null;
         }
         try {
-            return Optional.of(mapper.apply(text));
+            return mapper.apply(text);
         } catch (NumberFormatException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
