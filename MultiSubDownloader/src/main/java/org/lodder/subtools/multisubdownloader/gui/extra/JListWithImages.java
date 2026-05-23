@@ -1,10 +1,11 @@
 package org.lodder.subtools.multisubdownloader.gui.extra;
 
+import static util.Utils.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -50,11 +51,11 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
     }
 
     public @Nullable T getObject(int index) {
-        return getLabelPanel(index).map(LabelPanel::getObject).orElse(null);
+        return ifNotNull(getLabelPanel(index), LabelPanel::getObject);
     }
 
     public @Nullable Image getImage(int index) {
-        return getLabelPanel(index).map(LabelPanel::getImage).orElse(null);
+        return ifNotNull(getLabelPanel(index), LabelPanel::getImage);
     }
 
     public Stream<LabelPanel<T>> stream() {
@@ -65,8 +66,8 @@ public class JListWithImages<T> extends JList<JListWithImages.LabelPanel<T>> {
         return stream().map(LabelPanel::getObject).anyMatch(obj -> Objects.equal(obj, object));
     }
 
-    private Optional<LabelPanel<T>> getLabelPanel(int index) {
-        return Optional.ofNullable(getModel().getElementAt(index));
+    private @Nullable LabelPanel<T> getLabelPanel(int index) {
+        return getModel().getElementAt(index);
     }
 
     @NullMarked

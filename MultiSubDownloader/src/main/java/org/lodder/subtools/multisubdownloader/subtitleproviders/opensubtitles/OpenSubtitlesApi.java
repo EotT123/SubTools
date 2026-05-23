@@ -4,6 +4,7 @@ import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
 import static org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService.*;
+import static util.Utils.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,7 +15,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -118,7 +118,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public static boolean isValidCredentials(String userName, String password) {
         try {
-            return getBearerTokenWithoutCache(userName, password).isPresent();
+            return getBearerTokenWithoutCache(userName, password) != null;
         } catch (OpenSubtitleApiException e) {
             return false;
         }
@@ -126,12 +126,12 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
-            .get(() -> getBearerTokenWithoutCache(username, password).orElseThrow(
+            .get(() -> ifNullThrow(getBearerTokenWithoutCache(username, password),
                 () -> OpenSubtitleApiException.noResult(
                     "Could not acquire a bearer token, " + "invalid username/password?")), 23.5hr);
     }
 
-    private static Optional<String> getBearerTokenWithoutCache(String username, String password)
+    private static @Nullable String getBearerTokenWithoutCache(String username, String password)
         throws OpenSubtitleApiException {
         try {
             Response<Login200Response> response = new ApiClient(new OkHttpClient.Builder()
@@ -140,11 +140,11 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .login(CONTENT_TYPE, USER_AGENT, new LoginRequest().username(username).password(password))
                 .execute();
             if (!response.isSuccessful() || response.body() == null) {
-                return Optional.empty();
+                return null;
             }
-            return Optional.of(response.body().getToken());
+            return response.body().getToken();
         } catch (IOException e) {
-            return Optional.empty();
+            return null;
         }
     }
 

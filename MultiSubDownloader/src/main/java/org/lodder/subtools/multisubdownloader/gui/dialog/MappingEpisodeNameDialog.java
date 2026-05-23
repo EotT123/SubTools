@@ -12,7 +12,6 @@ import java.awt.*;
 import java.io.Serial;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Vector;
 
 import manifold.ext.props.rt.api.val;
@@ -43,7 +42,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private final SubtitleProviderStore subtitleProviderStore;
     private final JButton btnAddCustomMapping;
     private final JTable table;
-    private Optional<SubtitleProvider<? extends Subtitle>> selectedSubtitleProvider;
+    private @Nullable SubtitleProvider<? extends Subtitle> selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
     public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
@@ -99,7 +98,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
                             String message = getText("MappingEpisodeNameDialog.enterNewNameForSerie",
                                 currentName);
-                            selectedSubtitleProvider.ifPresent(provider ->
+                            if (selectedSubtitleProvider != null) {
                                 userInteractionHandler.enter(message).ifPresent(newName -> {
                                     TvReleaseWithoutPath tvRelease = new TvReleaseWithoutPath(
                                         name:currentName,
@@ -109,21 +108,24 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                                         customName:newName,
                                         completeName:currentName);
                                     try {
-                                        ifNotNullOrElseDo(provider.getProviderSerieMapping(tvRelease), serieId -> {
-                                            row.serieMapping =
-                                                new SerieMapping(currentName, serieId.providerId, serieId.providerName,
-                                                    serieId.season);
-                                            List<? extends SortKey> sortKeys = table.rowSorter.sortKeys;
-                                            selectMappingType(selectedMappingType);
-                                            table.rowSorter.sortKeys = sortKeys;
-                                        }, () -> userInteractionHandler.message(
-                                            getText("MappingEpisodeNameDialog.NoResultsFoundForSerieName", newName),
-                                            getText("App.Info")));
+                                        ifNotNullOrElseDo(selectedSubtitleProvider.getProviderSerieMapping(tvRelease),
+                                            serieId -> {
+                                                row.serieMapping =
+                                                    new SerieMapping(currentName, serieId.providerId,
+                                                        serieId.providerName,
+                                                        serieId.season);
+                                                List<? extends SortKey> sortKeys = table.rowSorter.sortKeys;
+                                                selectMappingType(selectedMappingType);
+                                                table.rowSorter.sortKeys = sortKeys;
+                                            }, () -> userInteractionHandler.message(
+                                                getText("MappingEpisodeNameDialog.NoResultsFoundForSerieName", newName),
+                                                getText("App.Info")));
                                     } catch (Exception e) {
                                         userInteractionHandler.message(getText("App.ErrorOccurred", e.getMessage()),
                                             getText("App.Error"));
                                     }
-                                }));
+                                });
+                            }
                         }))
                 .addComponent("skip", new JButton(getText("App.Close"))
                     .defaultButtonFor(getRootPane())
@@ -136,8 +138,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         this.selectedMappingType = mappingType;
         this.selectedSubtitleProvider = subtitleProviderStore.allProviders.stream()
             .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
-            .findAny();
-        btnAddCustomMapping.enabled = selectedSubtitleProvider.isPresent();
+            .findAny().orElse(null);
+        btnAddCustomMapping.enabled = selectedSubtitleProvider != null;
         mappingTableModel.mappingType = mappingType;
         repaint();
     }
