@@ -2,7 +2,6 @@ package org.lodder.subtools.multisubdownloader.framework;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Manager;
@@ -23,9 +22,5 @@ public class Container {
 
     public Manager makeManager() {
         return (Manager) make("Manager");
-    }
-
-    public Preferences makePreferences() {
-        return (Preferences) make("Preferences");
     }
 }

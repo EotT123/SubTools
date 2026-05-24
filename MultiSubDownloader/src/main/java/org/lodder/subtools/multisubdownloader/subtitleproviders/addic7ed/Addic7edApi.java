@@ -47,13 +47,11 @@ public class Addic7edApi implements SubtitleApi {
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (?<info>.+), Duration: \\d+\\.\\d+");
     @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
-    private final boolean speedy;
     private Time lastRequest = Time.now();
 
-    public Addic7edApi(Manager manager, boolean speedy, @Nullable Credentials credentials=null)
+    public Addic7edApi(Manager manager, @Nullable Credentials credentials=null)
         throws Addic7edApiException {
         this.manager = manager;
-        this.speedy = speedy;
         if (credentials != null) {
             login(credentials);
         }
@@ -244,7 +242,7 @@ public class Addic7edApi implements SubtitleApi {
 
     private Document getContent(String url) throws Addic7edApiException {
         try {
-            if (!speedy && getCache("content", b -> b.add("url", url)).isNotPresent()) {
+            if (getCache("content", b -> b.add("url", url)).isNotPresent()) {
                 // if (ChronoUnit.SECONDS.between(lastRequest, LocalDateTime.now()) < RATEDURATION) {
                 // LOGGER.info("RateLimit is reached for ADDIC7ed, please wait {} seconds", RATEDURATION);
                 // }

@@ -34,11 +34,11 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = true;
 
-    public Addic7edAdapter(Manager manager, boolean speedy, @Nullable Credentials credentials=null,
+    public Addic7edAdapter(Manager manager, @Nullable Credentials credentials=null,
         UserInteractionHandler userInteractionHandler) {
         super(manager, userInteractionHandler);
         try {
-            api = new Addic7edApi(manager, speedy, credentials);
+            api = new Addic7edApi(manager, credentials);
         } catch (Exception e) {
             throw new SubtitlesProviderInitException(provider, e);
         }
