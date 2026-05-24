@@ -123,7 +123,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     }
 
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
-        return Manager.getInstance().getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
+        return Manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
             .get(() -> ifNullThrow(getBearerTokenWithoutCache(username, password),
                 () -> OpenSubtitleApiException.noResult(
                     "Could not acquire a bearer token, " + "invalid username/password?")), 23.5hr);
@@ -159,14 +159,14 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
             .get(() -> {
                 try {
-                    return Manager.getInstance().getJsonArray(new PageContentParams(
-                            url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
+                    return Manager.getJsonArray(new PageContentParams(url:
+                            "https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                                 + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
                             cacheType:CacheType.MEMORY,
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5Second), contentType:MediaType.APPLICATION_JSON
+                                5 Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -185,13 +185,13 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return getCache("providerSerieId", b -> b.add("imdbId", imdbId))
             .get(() -> {
                 try {
-                    return Manager.getInstance().getJsonArray(new PageContentParams(
+                    return Manager.getJsonArray(new PageContentParams(
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName=" + imdbId,
                             cacheType:CacheType.MEMORY,
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5Second), contentType:MediaType.APPLICATION_JSON
+                                5 Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))

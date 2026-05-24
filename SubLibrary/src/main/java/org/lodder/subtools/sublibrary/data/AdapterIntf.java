@@ -14,7 +14,7 @@ public interface AdapterIntf {
     @val String provider;
 
     default CacheKey getCache(String operation, UnaryOperator<CacheKeyBuilder> CacheKeyBuilderFunction=b -> b) {
-        return Manager.getInstance().getCache(CacheType.DISK,
+        return Manager.getCache(CacheType.DISK,
             CacheKeyBuilderFunction.apply(new CacheKeyBuilder(provider, operation)));
     }
 }

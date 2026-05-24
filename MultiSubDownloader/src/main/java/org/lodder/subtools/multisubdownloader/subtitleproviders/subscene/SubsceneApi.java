@@ -193,7 +193,7 @@ public class SubsceneApi implements SubtitleApi {
         }
 
         Document document =
-            Manager.getInstance().getDocument(new PageContentParams(
+            Manager.getDocument(new PageContentParams(
                 url:url,
                 userAgent:"",
                 retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));
@@ -218,7 +218,7 @@ public class SubsceneApi implements SubtitleApi {
     }
 
     private void addCookie(String cookieName, String cookieValue) {
-        Manager.getInstance().storeCookies("subscene.com", Map.of(cookieName, cookieValue));
+        Manager.storeCookies("subscene.com", Map.of(cookieName, cookieValue));
     }
 
     private Integer getSubsceneLangId(Language language) {

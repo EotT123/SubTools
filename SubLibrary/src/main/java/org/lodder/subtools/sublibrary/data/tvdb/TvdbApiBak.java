@@ -56,7 +56,7 @@ public class TvdbApiBak implements ApiIntf {
     }
 
     private String getBearerToken() throws TvdbApiException {
-        return Manager.getInstance().getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
+        return Manager.getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
             .get(
                 supplier:() -> {
                     try {
@@ -84,7 +84,7 @@ public class TvdbApiBak implements ApiIntf {
         try {
             return getCache("series", b -> b.add("serieName", serieName))
                 .get(() ->
-                    Manager.getInstance().getDocument(new PageContentParams(
+                    Manager.getDocument(new PageContentParams(
                             "https://www.thetvdb.com/search?query=" +
                                 serieName.toLowerCase().replace(" ", "%20").urlEncode()))
                         .select(".ais-Hits-item").stream().map(elem ->
@@ -104,7 +104,7 @@ public class TvdbApiBak implements ApiIntf {
             return getCache("serie", b -> b.add("tvdbId", tvdbId))
                 .get(() -> new SeriesBaseRecord()
                     .id(tvdbId)
-                    .name(Manager.getInstance().getDocument(
+                    .name(Manager.getDocument(
                             new PageContentParams("https://www.thetvdb.com/?tab=series&id=" + tvdbId)).
                         selectFirst("#series_title").text()));
         } catch (ManagerException e) {

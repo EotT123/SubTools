@@ -41,7 +41,7 @@ public class OpenSubtilteSubtitle extends Subtitle {
         try {
             String url = urlSupplier.get();
             Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-            Manager.getInstance().downloadAndExtractFile(url, subPath);
+            Manager.downloadAndExtractFile(url, subPath);
             return List.of(subPath);
         } catch (OpenSubtitleException e) {
             throw new IOException(e);

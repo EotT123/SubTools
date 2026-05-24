@@ -153,8 +153,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         SUBDL(SubtitleProviderFrontEnd.SUBDL, "EPISODEmapping");
 
         private static final BiFunction<String, String, List<Pair<ProviderCacheKey, SerieMapping>>>
-            MAPPING_SUPPLIER = (provider, type) -> Manager.getInstance()
-            .getEntries(CacheType.DISK, key -> provider.equals(key.provider) && type.equals(key.type));
+            MAPPING_SUPPLIER = (provider, type) -> Manager.getEntries(CacheType.DISK,
+            key -> provider.equals(key.provider) && type.equals(key.type));
 
         @val String providerDisplayName;
         @val String provider;

@@ -37,7 +37,7 @@ public class Addic7edProxyGestdownSubtitle extends Subtitle {
     public List<Path> download(Path destinationFolder,
         Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-        Manager.getInstance().downloadAndExtractFile(url, subPath);
+        Manager.downloadAndExtractFile(url, subPath);
         return List.of(subPath);
     }
 }

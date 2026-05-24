@@ -42,7 +42,7 @@ public class TvSubtiltesSubtitle extends Subtitle {
     public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
         throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-        Manager.getInstance().downloadAndExtractFile(getForwardUrl(url), subPath);
+        Manager.downloadAndExtractFile(getForwardUrl(url), subPath);
         return List.of(subPath);
     }
 

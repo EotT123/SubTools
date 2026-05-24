@@ -99,6 +99,6 @@ public class SettingsControl {
     }
 
     private static void migrateDatabase() {
-//        int version = Manager.getInstance().getCache(DISK, DATABASE_VERSION_KEY).get(() -> 0);
+//        int version = Manager.getCache(DISK, DATABASE_VERSION_KEY).get(() -> 0);
     }
 }

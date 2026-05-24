@@ -77,7 +77,7 @@ public class UpdateAvailableGithub {
                 try {
                     String currentVersion = getVersion();
                     Element element =
-                        Manager.getInstance().getDocument(new PageContentParams(
+                        Manager.getDocument(new PageContentParams(
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
@@ -91,7 +91,7 @@ public class UpdateAvailableGithub {
                         return null;
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
-                    Element artifactElement = Manager.getInstance().getDocument(
+                    Element artifactElement = Manager.getDocument(
                             new PageContentParams(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
@@ -115,7 +115,7 @@ public class UpdateAvailableGithub {
                 try {
                     LocalDateTime buildTista = getBuildTista();
 
-                    Element rowElement = Manager.getInstance().getDocument(new PageContentParams(
+                    Element rowElement = Manager.getDocument(new PageContentParams(
                             url:"$REPO_URL/actions?query=branch%3Amaster",
                             cacheType:CacheType.MEMORY,
                             userAgent:null))
@@ -125,12 +125,10 @@ public class UpdateAvailableGithub {
                     if (nightlyBuildTista.isBefore(buildTista)) {
                         return null;
                     }
-                    String url =
-                        "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl =
-                        Manager.getInstance().getDocument(new PageContentParams(url, CacheType.MEMORY))
-                            .selectFirstByCss("table td a")
-                            .attr("href");
+                    String url = "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
+                    String downloadUrl = Manager.getDocument(new PageContentParams(url, CacheType.MEMORY))
+                        .selectFirstByCss("table td a")
+                        .attr("href");
                     updateLastUpdateCheck();
                     return downloadUrl;
                 } catch (Exception e) {

@@ -49,7 +49,7 @@ public interface SubtitleProvider<SUB extends Subtitle> {
     }
 
     default void clearCache() {
-        Manager.getInstance().getCache(CacheType.DISK, k -> k.provider.equals(provider)).clearExpiredCache();
+        Manager.getCache(CacheType.DISK, k -> k.provider.equals(provider)).clearExpiredCache();
     }
 
     <X extends Exception> @Nullable SerieMapping getProviderSerieMapping(TvRelease tvRelease) throws X;

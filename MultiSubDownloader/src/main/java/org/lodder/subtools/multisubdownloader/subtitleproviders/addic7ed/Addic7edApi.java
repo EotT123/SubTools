@@ -57,7 +57,7 @@ public class Addic7edApi implements SubtitleApi {
 
     public void login(Credentials credentials) throws Addic7edApiException {
         try {
-            Manager.getInstance().postBuilder("$DOMAIN/dologin.php")
+            Manager.postBuilder("$DOMAIN/dologin.php")
                 .addData("username", credentials.username)
                 .addData("password", credentials.password)
                 .addData("remember", "false")
@@ -250,7 +250,7 @@ public class Addic7edApi implements SubtitleApi {
                 }
                 lastRequest = Time.now();
             }
-            return Manager.getInstance().getDocument(new PageContentParams(url:url, userAgent:""));
+            return Manager.getDocument(new PageContentParams(url:url, userAgent:""));
         } catch (Exception e) {
             throw Addic7edApiException.error(e);
         }

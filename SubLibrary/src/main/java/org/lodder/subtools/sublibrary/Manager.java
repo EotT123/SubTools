@@ -53,29 +53,18 @@ public class Manager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
 
-    private static final Manager INSTANCE = new Manager(
-        new HttpClient(),
-        new ProviderCacheMemory(10 min, 100 ms, 2500),
-        new ProviderCacheDisk(500 day, 5000));
+    private static final HttpClient HTTP_CLIENT = new HttpClient();
+    private static final ProviderCacheMemory<?> IN_MEMORY_CACHE = new ProviderCacheMemory(10 min, 100 ms, 2500);
+    private static final ProviderCacheDisk<?> DISK_CACHE = new ProviderCacheDisk(500 day, 5000);
 
-    @val HttpClient httpClient;
-    @val ProviderCacheMemory<?> inMemoryCache;
-    @val ProviderCacheDisk<?> diskCache;
-
-    private Manager(HttpClient httpClient, ProviderCacheMemory<?> inMemoryCache, ProviderCacheDisk<?> diskCache) {
-        this.httpClient = httpClient;
-        this.inMemoryCache = inMemoryCache;
-        this.diskCache = diskCache;
+    private Manager() {
+        // Hide Utility Class Constructor
     }
 
-    public static Manager getInstance() {
-        return INSTANCE;
-    }
-
-    public void downloadAndExtractFile(String downloadLink, Path file,
+    public static void downloadAndExtractFile(String downloadLink, Path file,
         @Nullable ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
         try {
-            httpClient.downloadAndExtractFile(new URI(downloadLink).toURL(), file, validateFunction);
+            HTTP_CLIENT.downloadAndExtractFile(new URI(downloadLink).toURL(), file, validateFunction);
             if (!Files.exists(file)) {
                 throw new IOException("Could not download subtitle");
             } else if (Files.size(file) == 0) {
@@ -88,16 +77,16 @@ public class Manager {
         }
     }
 
-    public void storeCookies(String domain, Map<String, String> cookieMap) {
-        httpClient.storeCookies(domain, cookieMap);
+    public static void storeCookies(String domain, Map<String, String> cookieMap) {
+        HTTP_CLIENT.storeCookies(domain, cookieMap);
     }
 
     // ==== \\
     // POST \\
     // ==== \\
 
-    public PostBuilder postBuilder(String url, @Nullable String userAgent=null) {
-        return new PostBuilder(httpClient, url, userAgent);
+    public static PostBuilder postBuilder(String url, @Nullable String userAgent=null) {
+        return new PostBuilder(HTTP_CLIENT, url, userAgent);
     }
 
     @NullMarked
@@ -137,21 +126,21 @@ public class Manager {
     // GET PAGE CONTENT \\
     // ================ \\
 
-    public Document getDocument(PageContentParams params) throws ManagerException {
+    public static Document getDocument(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
             case NONE -> getDocumentWithoutCache(params);
-            case MEMORY -> ((ProviderCacheMemory<Document>) inMemoryCache).getOrPut(
+            case MEMORY -> ((ProviderCacheMemory<Document>) IN_MEMORY_CACHE).getOrPut(
                 new ProviderCacheKey("document", params.url + params.cookieManager(), List.of()),
                 () -> getDocumentWithoutCache(params));
             case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
         };
     }
 
-    public JSONArray getJsonArray(PageContentParams params) throws ManagerException {
+    public static JSONArray getJsonArray(PageContentParams params) throws ManagerException {
         return new JSONArray(getJsonString(params));
     }
 
-    private String getJsonString(PageContentParams params) throws ManagerException {
+    private static String getJsonString(PageContentParams params) throws ManagerException {
         try {
             return getContent(params);
         } catch (JSONException e) {
@@ -159,40 +148,40 @@ public class Manager {
         }
     }
 
-    private Document getDocumentWithoutCache(PageContentParams params) throws ManagerException {
+    private static Document getDocumentWithoutCache(PageContentParams params) throws ManagerException {
         return getDocumentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
             params.browserMode);
     }
 
-    private Document getDocumentWithoutCache(String url, String userAgent, Retry retry,
+    private static Document getDocumentWithoutCache(String url, String userAgent, Retry retry,
         @Nullable CookieManager cookieManager, BrowserMode browserMode=BrowserMode.HTMLUNIT) throws ManagerException {
         try {
             return WebPage.getWebsiteDomTree(url, browserMode:browserMode);
         } catch (WebpageException e) {
             if (retry.canRetry() && retry.predicate.test(e)) {
-                return this.getDocumentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
+                return getDocumentWithoutCache(url, userAgent, retry.decreaseRetries().sleep(), cookieManager);
             }
             throw new ManagerException("Error occurred while accessing webpage [%s]: %s".formatted(url, e.getMessage()),
                 e);
         }
     }
 
-    public String getContent(PageContentParams params) throws ManagerException {
+    public static String getContent(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
             case NONE -> getContentWithoutCache(params);
-            case MEMORY -> ((ProviderCacheMemory<String>) inMemoryCache).getOrPut(
+            case MEMORY -> ((ProviderCacheMemory<String>) IN_MEMORY_CACHE).getOrPut(
                 new ProviderCacheKey("pagecontent", params.url + params.cookieManager(), List.of()),
                 () -> getContentWithoutCache(params));
             case DISK -> throw new IllegalArgumentException("Unexpected value: " + params.cacheType);
         };
     }
 
-    private String getContentWithoutCache(PageContentParams params) throws ManagerException {
+    private static String getContentWithoutCache(PageContentParams params) throws ManagerException {
         return getContentWithoutCache(params.url, params.userAgent, params.retry, params.cookieManager,
             params.contentType);
     }
 
-    private String getContentWithoutCache(String url, String userAgent, Retry retry,
+    private static String getContentWithoutCache(String url, String userAgent, Retry retry,
         @Nullable CookieManager cookieManager, @Nullable String contentType) throws ManagerException {
         try {
             return new HttpClient().doGet(new URI(url).toURL(), userAgent, cookieManager, contentType);
@@ -233,7 +222,7 @@ public class Manager {
         }
     }
 
-    public <V> List<Pair<ProviderCacheKey, V>> getEntries(CacheType cacheType,
+    public static <V> List<Pair<ProviderCacheKey, V>> getEntries(CacheType cacheType,
         Predicate<ProviderCacheKey> keyFilter, @Nullable Class<V> type=null) {
         return getCache(cacheType, keyFilter).getEntries(type);
     }
@@ -247,7 +236,7 @@ public class Manager {
     public record CacheKey(CacheType cacheType, ProviderCacheKey key) {
 
         public boolean isPresent() {
-            return Manager.getInstance().getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
+            return Manager.getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
         }
 
         public boolean isNotPresent() {
@@ -255,26 +244,24 @@ public class Manager {
         }
 
         public boolean isExpiredTemporary() {
-            return Manager.getInstance().getOptionalCache(cacheType).map(cache -> cache.isTemporaryExpired(key))
-                .orElse(false);
+            return Manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryExpired(key)).orElse(false);
         }
 
         public boolean isTemporaryObject() {
-            return Manager.getInstance().getOptionalCache(cacheType).map(cache -> cache.isTemporaryObject(key))
-                .orElse(false);
+            return Manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryObject(key)).orElse(false);
         }
 
         public Optional<Time> getTemporaryTimeToLive() {
-            return Manager.getInstance().getOptionalCache(cacheType)
+            return Manager.getOptionalCache(cacheType)
                 .map(cache -> ifNullThen(cache.getTemporaryTimeToLive(key), 0 Second));
         }
 
         public void remove() {
-            Manager.getInstance().getCache(cacheType).remove(key);
+            Manager.getCache(cacheType).remove(key);
         }
 
         public <V extends @Nullable Object> @Nullable V get() {
-            ProviderCache<V> cache = Manager.getInstance().getCache(cacheType);
+            ProviderCache<V> cache = Manager.getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
                 return cache.get(key);
             }
@@ -283,7 +270,7 @@ public class Manager {
 
         public <V extends @Nullable Object, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
             @Nullable Time timeToLive=null, Retry retry=Retry.NONE, boolean storeTempNullValue=false) throws X {
-            ProviderCache<V> cache = Manager.getInstance().getCache(cacheType);
+            ProviderCache<V> cache = Manager.getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
                 return cache.get(key);
             }
@@ -319,12 +306,12 @@ public class Manager {
 
             V object = value.getValue(retry);
             Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
-            Manager.getInstance().getCache(cacheType).put(key, object, ttl);
+            Manager.getCache(cacheType).put(key, object, ttl);
         }
 
         public <V extends @Nullable Object, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
             Time ttl = getTemporaryTimeToLive().orElse(1 hr) * 2;
-            Manager.getInstance().getCache(cacheType).put(key, value.getValue(), ttl);
+            Manager.getCache(cacheType).put(key, value.getValue(), ttl);
         }
     }
 
@@ -332,38 +319,37 @@ public class Manager {
     public record CacheKeyFilter(CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
         public void clearExpiredCache() {
             Time now = Time.now();
-            Manager.getInstance().getCache(cacheType)
-                .cleanup((key, cacheValue) -> keyFilter.test(key) && cacheValue.isExpired(now));
+            Manager.getCache(cacheType).cleanup((key, cacheValue) -> keyFilter.test(key) && cacheValue.isExpired(now));
         }
 
         public void remove() {
-            Manager.getInstance().getCache(cacheType).deleteEntries(keyFilter);
+            Manager.getCache(cacheType).deleteEntries(keyFilter);
         }
 
         public <V> List<Pair<ProviderCacheKey, V>> getEntries(@Nullable Class<V> valueType=null) {
-            Optional<ProviderCache<V>> optionalCache = Manager.getInstance().getOptionalCache(cacheType);
+            Optional<ProviderCache<V>> optionalCache = Manager.getOptionalCache(cacheType);
             return optionalCache.map(cache -> cache.getEntries(keyFilter)).orElseGet(List::of);
         }
     }
 
-    private <V> ProviderCache<V> getCache(CacheType cacheType) {
+    private static <V> ProviderCache<V> getCache(CacheType cacheType) {
         Optional<ProviderCache<V>> optionalCache = getOptionalCache(cacheType);
         return optionalCache.orElseThrow(() -> new IllegalArgumentException("Unexpected value: " + cacheType));
     }
 
-    private <V extends @Nullable Object> Optional<ProviderCache<V>> getOptionalCache(CacheType cacheType) {
+    private static <V extends @Nullable Object> Optional<ProviderCache<V>> getOptionalCache(CacheType cacheType) {
         return switch (cacheType) {
             case NONE -> Optional.empty();
-            case MEMORY -> (Optional) Optional.of(inMemoryCache);
-            case DISK -> (Optional) Optional.of(diskCache);
+            case MEMORY -> (Optional) Optional.of(IN_MEMORY_CACHE);
+            case DISK -> (Optional) Optional.of(DISK_CACHE);
         };
     }
 
-    public CacheKey getCache(CacheType cacheType, CacheKeyBuilder cacheKeyBuilder) {
+    public static CacheKey getCache(CacheType cacheType, CacheKeyBuilder cacheKeyBuilder) {
         return new CacheKey(cacheType, cacheKeyBuilder.build());
     }
 
-    public CacheKeyFilter getCache(CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
+    public static CacheKeyFilter getCache(CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
         return new CacheKeyFilter(cacheType, keyFilter);
     }
 

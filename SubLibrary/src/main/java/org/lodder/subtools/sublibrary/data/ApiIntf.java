@@ -15,7 +15,7 @@ public interface ApiIntf {
     @val String provider;
 
     default CacheKey getCache(String operation, UnaryOperator<CacheKeyBuilder> CacheKeyBuilderFunction) {
-        return Manager.getInstance().getCache(CacheType.MEMORY,
+        return Manager.getCache(CacheType.MEMORY,
             CacheKeyBuilderFunction.apply(new CacheKeyBuilder(provider, operation)));
     }
 }

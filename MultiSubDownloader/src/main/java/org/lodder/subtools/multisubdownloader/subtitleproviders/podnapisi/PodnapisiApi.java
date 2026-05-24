@@ -205,7 +205,7 @@ public class PodnapisiApi implements SubtitleApi {
 
     protected @Nullable Document getXml(String url) throws PodnapisiApiException {
         try {
-            return Manager.getInstance().getDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
+            return Manager.getDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
                 new Retry(
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&

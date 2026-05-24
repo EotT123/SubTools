@@ -52,7 +52,7 @@ public class SubdlSubtitle extends Subtitle {
         Path unzipPath = tempDir.resolve(StringUtils.substringBeforeLast(zipFileName, "."));
 
         if (!Files.exists(unzipPath)) {
-            Manager.getInstance().downloadAndExtractFile(url, unzipPath);
+            Manager.downloadAndExtractFile(url, unzipPath);
         }
 
         // find all extracted subtitle files and move them to the destination folder, renaming them using the
