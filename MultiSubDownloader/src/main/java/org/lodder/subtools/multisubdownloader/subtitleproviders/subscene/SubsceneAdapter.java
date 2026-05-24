@@ -24,7 +24,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.S
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subscene.model.SubsceneSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -35,13 +34,12 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class SubsceneAdapter
     extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneSerieId, SubsceneException> {
 
-    private final SubsceneApi api;
+    private final SubsceneApi api = new SubsceneApi();
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBSCENE;
     @val @override boolean useSeasonForSerieId = true;
 
-    public SubsceneAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
-        api = new SubsceneApi(manager);
+    public SubsceneAdapter(UserInteractionHandler userInteractionHandler) {
+        super(userInteractionHandler);
     }
 
     // ===== \\

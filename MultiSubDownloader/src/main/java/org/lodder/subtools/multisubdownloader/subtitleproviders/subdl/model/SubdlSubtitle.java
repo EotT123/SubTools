@@ -43,8 +43,8 @@ public class SubdlSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder,
-        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
+    public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
+        throws IOException {
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir")).resolve("multisubdownloader").resolve("subdl");
         Files.createDirectories(tempDir);
         String zipFileName = url.contains("/") ? StringUtils.substringAfterLast(url, "/").removeIllegalWindowsChars() :
@@ -52,7 +52,7 @@ public class SubdlSubtitle extends Subtitle {
         Path unzipPath = tempDir.resolve(StringUtils.substringBeforeLast(zipFileName, "."));
 
         if (!Files.exists(unzipPath)) {
-            manager.downloadAndExtractFile(url, unzipPath);
+            Manager.downloadAndExtractFile(url, unzipPath);
         }
 
         // find all extracted subtitle files and move them to the destination folder, renaming them using the

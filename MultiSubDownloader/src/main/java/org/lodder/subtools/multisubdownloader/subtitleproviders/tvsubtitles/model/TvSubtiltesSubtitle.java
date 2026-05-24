@@ -39,10 +39,10 @@ public class TvSubtiltesSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder,
-        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
+    public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
+        throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-        manager.downloadAndExtractFile(getForwardUrl(url), subPath);
+        Manager.downloadAndExtractFile(getForwardUrl(url), subPath);
         return List.of(subPath);
     }
 

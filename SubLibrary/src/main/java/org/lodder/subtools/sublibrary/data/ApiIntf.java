@@ -12,11 +12,10 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 @NullMarked
 public interface ApiIntf {
 
-    @val Manager manager;
     @val String provider;
 
     default CacheKey getCache(String operation, UnaryOperator<CacheKeyBuilder> CacheKeyBuilderFunction) {
-        return manager.getCache(CacheType.MEMORY,
+        return Manager.getCache(CacheType.MEMORY,
             CacheKeyBuilderFunction.apply(new CacheKeyBuilder(provider, operation)));
     }
 }

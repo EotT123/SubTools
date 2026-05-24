@@ -26,7 +26,6 @@ import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFi
 import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -43,7 +42,7 @@ public class StructureFilePanel extends JPanel {
     private final Supplier<LanguageComponents> addLanguageSupplier;
     private final LanguageMapping languageMapping = new LanguageMapping();
 
-    public StructureFilePanel(LibrarySettings librarySettings, VideoType videoType, Manager manager,
+    public StructureFilePanel(LibrarySettings librarySettings, VideoType videoType,
         UserInteractionHandler userInteractionHandler) {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
@@ -60,8 +59,8 @@ public class StructureFilePanel extends JPanel {
             .actionListener(() -> {
                 StructureBuilderDialog sDialog =
                     new StructureBuilderDialog(null, getText("PreferenceDialog.StructureBuilderTitle"),
-                        true, videoType, StructureBuilderDialog.StructureType.FILE, manager,
-                        userInteractionHandler, getLibraryStructureBuilder());
+                        true, videoType, StructureBuilderDialog.StructureType.FILE, userInteractionHandler,
+                        getLibraryStructureBuilder());
                 String value = sDialog.showDialog(txtFileStructure.getText());
                 if (!value.isEmpty()) {
                     txtFileStructure.setText(value);

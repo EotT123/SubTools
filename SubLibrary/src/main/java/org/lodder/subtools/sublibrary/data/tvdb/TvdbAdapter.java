@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
@@ -32,7 +31,7 @@ import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
+import org.lodder.subtools.sublibrary.util.lazy.LazyFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,17 +40,15 @@ public class TvdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvdbAdapter.class);
     private static final String API_KEY = "A1720D2DDFDCE82D";
-    private static final LazyBiFunction<Manager, UserInteractionHandler, TvdbAdapter> INSTANCE =
-        new LazyBiFunction<>(TvdbAdapter::new);
-    @val @override Manager manager;
+    private static final LazyFunction<UserInteractionHandler, TvdbAdapter> INSTANCE =
+        new LazyFunction<>(TvdbAdapter::new);
     @val @override String provider = "TVDB";
     private final UserInteractionHandler userInteractionHandler;
     private final TvdbApi api;
 
-    public TvdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.manager = manager;
+    public TvdbAdapter(UserInteractionHandler userInteractionHandler) {
         this.userInteractionHandler = userInteractionHandler;
-        this.api = new TvdbApi(manager, API_KEY);
+        this.api = new TvdbApi(API_KEY);
     }
 
     public @Nullable MovieBaseRecord searchMovie(String title) {
@@ -129,8 +126,8 @@ public class TvdbAdapter implements AdapterIntf {
                 storeTempNullValue:true);
     }
 
-    public static synchronized TvdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
-        return INSTANCE.apply(manager, userInteractionHandler);
+    public static synchronized TvdbAdapter getInstance(UserInteractionHandler userInteractionHandler) {
+        return INSTANCE.apply(userInteractionHandler);
     }
 
     private OptionalInt promptUserToEnterTvdbId(String showName) {

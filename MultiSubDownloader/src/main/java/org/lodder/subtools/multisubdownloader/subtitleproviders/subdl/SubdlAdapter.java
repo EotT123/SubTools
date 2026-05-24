@@ -18,7 +18,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.Subd
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -31,13 +30,12 @@ import subdl.Serie.ReleaseType;
 public final class SubdlAdapter extends
     SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId, SubdlException> {
 
-    private final SubdlApi api;
+    private final SubdlApi api = new SubdlApi();
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBDL;
     @val @override boolean useSeasonForSerieId = false;
 
-    public SubdlAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
-        api = new SubdlApi(manager);
+    public SubdlAdapter(UserInteractionHandler userInteractionHandler) {
+        super(userInteractionHandler);
     }
 
     // ===== \\

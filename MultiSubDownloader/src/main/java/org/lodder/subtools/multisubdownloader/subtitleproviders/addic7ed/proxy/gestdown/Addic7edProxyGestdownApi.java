@@ -23,7 +23,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
@@ -45,7 +44,6 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://api.gestdown.info";
 
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN;
     private static final TvShowsApi TV_SHOWS_API;
     private static final SubtitlesApi SUBTITLES_API;
@@ -54,10 +52,6 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
         ApiClient apiClient = new ApiClient();
         TV_SHOWS_API = apiClient.createService(TvShowsApi.class);
         SUBTITLES_API = apiClient.createService(SubtitlesApi.class);
-    }
-
-    public Addic7edProxyGestdownApi(Manager manager) {
-        this.manager = manager;
     }
 
     // ===== \\

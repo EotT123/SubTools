@@ -38,7 +38,7 @@ public class Addic7edSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder,
+    public List<Path> download(Path destinationFolder,
         Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
         ThrowingConsumer<String, IOException> validateFunction = content -> {
@@ -46,7 +46,7 @@ public class Addic7edSubtitle extends Subtitle {
                 throw new IOException("Addic7ed Daily Download count exceeded!");
             }
         };
-        manager.downloadAndExtractFile(url, subPath, validateFunction);
+        Manager.downloadAndExtractFile(url, subPath, validateFunction);
         return List.of(subPath);
     }
 }

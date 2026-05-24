@@ -18,7 +18,6 @@ import org.lodder.subtools.multisubdownloader.gui.panels.preference.PreferencePa
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.SerieProvidersPanel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @NullMarked
@@ -32,7 +31,7 @@ public class PreferenceDialog extends MultiSubDialog {
     private final OptionsPanel pnlOptions;
     private final SerieProvidersPanel pnlSerieSources;
 
-    public PreferenceDialog(GUI gui, Manager manager, UserInteractionHandler userInteractionHandler) {
+    public PreferenceDialog(GUI gui, UserInteractionHandler userInteractionHandler) {
         super(gui, getText("PreferenceDialog.Title"), true);
 
         setResizable(false);
@@ -63,10 +62,10 @@ public class PreferenceDialog extends MultiSubDialog {
                         pnlGeneral = new GeneralPanel(gui))
                     .withTab(getText("PreferenceDialog.SerieLibrary"),
                         pnlEpisodeLibrary = new EpisodeLibraryPanel(SettingsControl.settings.episodeLibrarySettings,
-                            manager, false, userInteractionHandler))
+                            false, userInteractionHandler))
                     .withTab(getText("PreferenceDialog.MovieLibrary"),
-                        pnlMovieLibrary = new MovieLibraryPanel(SettingsControl.settings.movieLibrarySettings,
-                            manager, false, userInteractionHandler))
+                        pnlMovieLibrary = new MovieLibraryPanel(SettingsControl.settings.movieLibrarySettings, false,
+                            userInteractionHandler))
                     .withTab(getText("PreferenceDialog.Options"),
                         pnlOptions = new OptionsPanel())
                     .withTab(getText("PreferenceDialog.SerieSources"),

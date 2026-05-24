@@ -38,18 +38,13 @@ public class TvSubtitlesApi implements SubtitleApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubtitleApi.class);
 
     private static final String DOMAIN = "https://www.tvsubtitles.net";
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.TVSUBTITLES;
-
-    public TvSubtitlesApi(Manager manager) {
-        this.manager = manager;
-    }
 
     public List<ProviderId> getProviderIds(String serieName) throws TvSubtitleApiException {
         return getCache("providerIds", b -> b.add("name", serieName))
             .get(() -> {
                 try {
-                    return manager.postBuilder("$DOMAIN/search1.php")
+                    return Manager.postBuilder("$DOMAIN/search1.php")
                         .addData("qs", serieName)
                         .postAsJsoupDocument()
                         .select(".left_articles > ul > li a")
@@ -83,7 +78,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                 try {
                     CookieManager cookieManager = providerLang == null ? null :
                         new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
-                    return manager.getDocument(new PageContentParams(
+                    return Manager.getDocument(new PageContentParams(
                             DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
                             cookieManager:cookieManager))
                         .select("#table5 tr[bgcolor]")
@@ -109,7 +104,7 @@ public class TvSubtitlesApi implements SubtitleApi {
         return getCache("subtitles", b -> b.add("url", episodeUrl))
             .get(() -> {
                 try {
-                    return manager.getDocument(new PageContentParams(episodeUrl))
+                    return Manager.getDocument(new PageContentParams(episodeUrl))
                         .select(".left_articles > div[class^='subtitle']")
                         .stream().map(subtitleElement -> {
                             Map<MetadataType, String> metadataMap =

@@ -55,16 +55,14 @@ public class SubsceneApi implements SubtitleApi {
         default -> false;
     };
 
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBSCENE;
     private int selectedLanguage;
     private boolean selectedIncludeHearingImpaired;
 
     private Time lastRequest = Time.now();
 
-    public SubsceneApi(Manager manager) {
-//        super(manager, "Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
-        this.manager = manager;
+    public SubsceneApi() {
+//        super("Mozilla/5.25 Netscape/5.0 (Windows; I; Win95)");
         addCookie("ForeignOnly", "False");
     }
 
@@ -195,7 +193,7 @@ public class SubsceneApi implements SubtitleApi {
         }
 
         Document document =
-            manager.getDocument(new PageContentParams(
+            Manager.getDocument(new PageContentParams(
                 url:url,
                 userAgent:"",
                 retry:new Retry(1, RETRY_PREDICATE, RATE_DURATION_LONG)));
@@ -220,7 +218,7 @@ public class SubsceneApi implements SubtitleApi {
     }
 
     private void addCookie(String cookieName, String cookieValue) {
-        manager.storeCookies("subscene.com", Map.of(cookieName, cookieValue));
+        Manager.storeCookies("subscene.com", Map.of(cookieName, cookieValue));
     }
 
     private Integer getSubsceneLangId(Language language) {

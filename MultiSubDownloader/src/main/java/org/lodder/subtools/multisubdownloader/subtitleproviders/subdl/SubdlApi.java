@@ -19,7 +19,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.Subd
 import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.model.SubdlSubtitleMetadata;
 import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.slf4j.Logger;
@@ -39,12 +38,7 @@ public class SubdlApi implements SubtitleApi {
     private static final String DOMAIN = "https://dl.subdl.com";
     private static final String API_DOMAIN = "https://api.subdl.com/api/v1";
     private static final String API_KEY = "waSZhdBr08sBm3jXNOU0rJ6UWp4lPQvi";
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBDL;
-
-    public SubdlApi(Manager manager) {
-        this.manager = manager;
-    }
 
     // ===== \\
     // MOVIE \\

@@ -10,7 +10,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
@@ -43,7 +42,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         this.rename = rename;
     }
 
-    public static FilenameLibraryBuilder fromSettings(LibrarySettings libSettings, Manager manager,
+    public static FilenameLibraryBuilder fromSettings(LibrarySettings libSettings,
         UserInteractionHandler userInteractionHandler) {
         return new FilenameLibraryBuilder(
             structure:libSettings.folderStructure,
@@ -51,7 +50,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
             includeLanguageCode:libSettings.includeLanguageCode,
             languageTags:libSettings.langCodeMap,
-            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(userInteractionHandler) : null,
             rename:libSettings.hasAnyLibraryAction(LibraryActionType.RENAME, LibraryActionType.MOVE_AND_RENAME));
     }
 

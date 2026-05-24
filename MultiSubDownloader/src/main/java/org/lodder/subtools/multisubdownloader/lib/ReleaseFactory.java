@@ -6,7 +6,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
@@ -20,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public record ReleaseFactory(Manager manager) {
+public record ReleaseFactory() {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
@@ -30,10 +29,9 @@ public record ReleaseFactory(Manager manager) {
             ReleaseWithPath release = ReleaseParser.parse(file);
             if (validate && release != null) {
                 switch (release) {
-                    case TvReleaseWithPath tvRelease ->
-                        new TvReleaseControl(manager, userInteractionHandler).process(tvRelease);
+                    case TvReleaseWithPath tvRelease -> new TvReleaseControl(userInteractionHandler).process(tvRelease);
                     case MovieReleaseWithPath movieRelease ->
-                        new MovieReleaseControl(manager, userInteractionHandler).process(movieRelease);
+                        new MovieReleaseControl(userInteractionHandler).process(movieRelease);
                 }
             }
             return release;
@@ -50,9 +48,9 @@ public record ReleaseFactory(Manager manager) {
             if (validate && release != null) {
                 switch (release) {
                     case TvReleaseWithoutPath tvRelease ->
-                        new TvReleaseControl(manager, userInteractionHandler).process(tvRelease);
+                        new TvReleaseControl(userInteractionHandler).process(tvRelease);
                     case MovieReleaseWithoutPath movieRelease ->
-                        new MovieReleaseControl(manager, userInteractionHandler).process(movieRelease);
+                        new MovieReleaseControl(userInteractionHandler).process(movieRelease);
                 }
             }
             return release;

@@ -17,7 +17,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.except
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitle;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.model.PodnapisiSubtitleMetadata;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
@@ -29,13 +28,12 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class PodnapisiAdapter
     extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
 
-    private final PodnapisiApi api;
+    private final PodnapisiApi api = new PodnapisiApi("JBierSubDownloader");
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.PODNAPISI;
     @val @override boolean useSeasonForSerieId = false;
 
-    public PodnapisiAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
-        this.api = new PodnapisiApi(manager, "JBierSubDownloader");
+    public PodnapisiAdapter(UserInteractionHandler userInteractionHandler) {
+        super(userInteractionHandler);
     }
 
     // ===== \\

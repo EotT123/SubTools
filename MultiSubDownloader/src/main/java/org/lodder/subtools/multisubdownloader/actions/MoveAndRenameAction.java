@@ -12,7 +12,6 @@ import org.lodder.subtools.multisubdownloader.lib.library.PathLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.sublibrary.DetectLanguage;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
@@ -25,13 +24,10 @@ public class MoveAndRenameAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveAndRenameAction.class);
 
     private final LibrarySettings librarySettings;
-    private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public MoveAndRenameAction(LibrarySettings librarySettings, Manager manager,
-        UserInteractionHandler userInteractionHandler) {
+    public MoveAndRenameAction(LibrarySettings librarySettings, UserInteractionHandler userInteractionHandler) {
         this.librarySettings = librarySettings;
-        this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
     }
 
@@ -45,7 +41,7 @@ public class MoveAndRenameAction {
 
         Path newDir = switch (librarySettings.action) {
             case MOVE, MOVE_AND_RENAME ->
-                PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).buildPath(release);
+                PathLibraryBuilder.fromSettings(librarySettings, userInteractionHandler).buildPath(release);
             case RENAME, NOTHING -> release.path.parent;
         };
         if (!newDir.exists()) {
@@ -85,7 +81,7 @@ public class MoveAndRenameAction {
 
     private String getNewFilename(Path f, Release release) {
         FilenameLibraryBuilder filenameLibraryBuilder =
-            FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
+            FilenameLibraryBuilder.fromSettings(librarySettings, userInteractionHandler);
         String filename = filenameLibraryBuilder.buildPathStructure(release);
         if (release.fileNameOrName.endsWith(".srt")) {
             Language language = null;

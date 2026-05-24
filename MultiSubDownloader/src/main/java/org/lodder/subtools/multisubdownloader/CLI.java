@@ -19,13 +19,11 @@ import org.lodder.subtools.multisubdownloader.cli.progress.CLIFileIndexerProgres
 import org.lodder.subtools.multisubdownloader.cli.progress.CLISearchProgress;
 import org.lodder.subtools.multisubdownloader.exceptions.CliException;
 import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
-import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.lib.Info;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
@@ -36,7 +34,6 @@ public class CLI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CLI.class);
 
-    private final Container app;
     private final boolean recursive;
     private final Language language;
     private final boolean force;
@@ -48,13 +45,11 @@ public class CLI {
     private final UserInteractionHandlerAction userInteractionHandlerAction;
     private final boolean dryRun;
 
-    public CLI(Container app, Commandline commandline) throws CliException {
-        this.app = app;
-        Manager manager = app.makeManager();
-        checkUpdate(manager);
+    public CLI(Commandline commandline) throws CliException {
+        checkUpdate();
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(SettingsControl.settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
-        downloadAction = new DownloadAction(manager, userInteractionHandler);
+        downloadAction = new DownloadAction(userInteractionHandler);
         this.folders = commandline.get(FOLDER, List::of, () -> List.copyOf(SettingsControl.settings.defaultFolders));
         this.language = commandline.get(LANGUAGE, Language.ENGLISH);
         this.force = commandline.isEnabled(FORCE);
@@ -66,8 +61,8 @@ public class CLI {
         Messages.language = language;
     }
 
-    private void checkUpdate(Manager manager) {
-        UpdateAvailableGithub u = new UpdateAvailableGithub(manager);
+    private void checkUpdate() {
+        UpdateAvailableGithub u = new UpdateAvailableGithub();
         if (u.shouldCheckForNewUpdate(SettingsControl.settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
             System.out.println(Messages.getText("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
         }
@@ -99,7 +94,7 @@ public class CLI {
                 this,
                 new FileListAction(),
                 language,
-                new ReleaseFactory(app.makeManager()),
+                new ReleaseFactory(),
                 new SubtitleFiltering(),
                 folders,
                 recursive,

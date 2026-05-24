@@ -13,7 +13,6 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jsoup.nodes.Document;
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbApiException;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
@@ -26,12 +25,7 @@ public class ImdbApi implements ApiIntf {
 
     private static final String DOMAIN = "https://www.imdb.com";
     private static final String API_DOMAIN = "https://graph.imdbapi.dev/v1";
-    @val @override Manager manager;
     @val @override String provider = "IMDB";
-
-    public ImdbApi(Manager manager) {
-        this.manager = manager;
-    }
 
     public ImdbDetails getDetails(String imdbId) throws ImdbApiException {
         return getCache("details", b -> b.add("imdbId", imdbId))
