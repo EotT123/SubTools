@@ -27,7 +27,6 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final SettingsControl settingsCtrl;
     private final JCheckBox chkSourceAddic7ed;
     private final JCheckBox chkUserAddic7edLogin;
     private final JCheckBox chkSourceAddic7edProxy;
@@ -44,9 +43,8 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     private final JCheckBox chkSourceLocal;
     private final JListWithImages<Path> localSourcesFoldersList;
 
-    public SerieProvidersPanel(SettingsControl settingsCtrl) {
+    public SerieProvidersPanel() {
         super(new MigLayout("insets 0, fill, nogrid"));
-        this.settingsCtrl = settingsCtrl;
 
         JPanel titlePanel = new TitlePanel(getText("PreferenceDialog.SelectPreferredSources"))
             .addToPanel(this, "span, grow");
@@ -124,7 +122,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void loadPreferenceSettings() {
-        Settings settings = settingsCtrl.settings;
+        Settings settings = SettingsControl.settings;
         chkSourceAddic7ed.setSelected(settings.serieSourceAddic7ed);
         chkUserAddic7edLogin.setSelected(settings.loginAddic7edEnabled);
         chkSourceAddic7edProxy.setSelected(settings.serieSourceAddic7edProxy);
@@ -145,7 +143,7 @@ public class SerieProvidersPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void savePreferenceSettings() {
-        Settings settings = settingsCtrl.settings;
+        Settings settings = SettingsControl.settings;
         settings.serieSourceAddic7ed = chkSourceAddic7ed.isSelected();
         settings.loginAddic7edEnabled = chkUserAddic7edLogin.isSelected();
         settings.serieSourceAddic7edProxy = chkSourceAddic7edProxy.isSelected();

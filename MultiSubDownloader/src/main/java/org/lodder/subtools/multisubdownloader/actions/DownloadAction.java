@@ -17,8 +17,8 @@ import org.lodder.subtools.multisubdownloader.lib.library.FilenameLibraryBuilder
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.PathLibraryBuilder;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
@@ -34,12 +34,10 @@ public class DownloadAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadAction.class);
 
-    private final Settings settings;
     private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public DownloadAction(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.settings = settings;
+    public DownloadAction(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
     }
@@ -48,8 +46,10 @@ public class DownloadAction {
         @Nullable AtomicInteger counter=null) throws IOException {
         LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
         switch (release) {
-            case TvReleaseWithPath _ -> download(release, subtitle, settings.episodeLibrarySettings, counter);
-            case MovieReleaseWithPath _ -> download(release, subtitle, settings.movieLibrarySettings, counter);
+            case TvReleaseWithPath _ ->
+                download(release, subtitle, SettingsControl.settings.episodeLibrarySettings, counter);
+            case MovieReleaseWithPath _ ->
+                download(release, subtitle, SettingsControl.settings.movieLibrarySettings, counter);
         }
     }
 

@@ -22,7 +22,6 @@ import org.lodder.subtools.multisubdownloader.lib.Info;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
@@ -36,7 +35,6 @@ public class CLI {
     private static final Logger LOGGER = LoggerFactory.getLogger(CLI.class);
 
     private final Container app;
-    private final Settings settings;
     private final boolean recursive;
     private final Language language;
     private final boolean force;
@@ -48,14 +46,13 @@ public class CLI {
     private final UserInteractionHandlerAction userInteractionHandlerAction;
     private final boolean dryRun;
 
-    public CLI(SettingsControl settingControl, Container app, CommandLine line) throws CliException {
+    public CLI(Container app, CommandLine line) throws CliException {
         this.app = app;
-        this.settings = settingControl.settings;
         Manager manager = app.makeManager();
         checkUpdate(manager);
-        UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(settings);
-        userInteractionHandlerAction = new UserInteractionHandlerAction(settings, userInteractionHandler);
-        downloadAction = new DownloadAction(settings, manager, userInteractionHandler);
+        UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(SettingsControl.settings);
+        userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
+        downloadAction = new DownloadAction(manager, userInteractionHandler);
         this.folders = getFolders(line);
         this.language = getLanguage(line);
         this.force = line.hasCliOption(CliOption.FORCE);
@@ -68,20 +65,20 @@ public class CLI {
     }
 
     private void checkUpdate(Manager manager) {
-        UpdateAvailableGithub u = new UpdateAvailableGithub(manager, settings);
-        if (u.shouldCheckForNewUpdate(settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
+        UpdateAvailableGithub u = new UpdateAvailableGithub(manager);
+        if (u.shouldCheckForNewUpdate(SettingsControl.settings.updateCheckPeriod) && u.isNewVersionAvailable()) {
             System.out.println(Messages.getText("UpdateAppAvailable") + ": " + u.getLatestDownloadUrl());
         }
     }
 
     public void run() {
-        Info.subtitleSources(this.settings, true);
-        Info.subtitleFiltering(this.settings, true);
+        Info.subtitleSources(true);
+        Info.subtitleFiltering(true);
         this.search();
     }
 
     public void download(List<ReleaseWithPath> releases) {
-        Info.downloadOptions(this.settings, true);
+        Info.downloadOptions(true);
         for (ReleaseWithPath release : releases) {
             try {
                 this.download(release);
@@ -94,14 +91,14 @@ public class CLI {
 
     public void search() {
         try {
-            new CliSearchAction(settings,
+            new CliSearchAction(
                 new CLIFileIndexerProgress().verbose(verboseProgress),
                 new CLISearchProgress().verbose(verboseProgress),
                 this,
-                new FileListAction(this.settings),
+                new FileListAction(),
                 language,
-                new ReleaseFactory(this.settings, app.makeManager()),
-                new SubtitleFiltering(this.settings),
+                new ReleaseFactory(app.makeManager()),
+                new SubtitleFiltering(),
                 folders,
                 recursive,
                 force)
@@ -143,7 +140,7 @@ public class CLI {
         if (line.hasCliOption(CliOption.FOLDER)) {
             return List.of(Path.of(line.getCliOptionValue(CliOption.FOLDER)));
         } else {
-            return List.copyOf(this.settings.defaultFolders);
+            return List.copyOf(SettingsControl.settings.defaultFolders);
         }
     }
 

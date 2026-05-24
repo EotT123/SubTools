@@ -17,7 +17,7 @@ import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -34,11 +34,10 @@ public abstract sealed class GuiSearchAction<P extends InputPanel, R extends Rel
     @get(Protected) @override SearchProgressListener searchProgressListener;
     @get(Protected) @override UserInteractionHandlerGUI userInteractionHandler;
 
-    GuiSearchAction(Settings settings, GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
-        super(settings);
+    GuiSearchAction(GUI mainWindow, SearchPanel<P> searchPanel, ReleaseFactory releaseFactory) {
         this.mainWindow = mainWindow;
         this.searchPanel = searchPanel;
-        this.filtering = new SubtitleFiltering(settings);
+        this.filtering = new SubtitleFiltering();
         this.releaseFactory = releaseFactory;
         /* Create ProgressListeners */
         /*
@@ -48,7 +47,7 @@ public abstract sealed class GuiSearchAction<P extends InputPanel, R extends Rel
          */
         this.indexingProgressListener = mainWindow.createFileIndexerProgressDialog(this);
         this.searchProgressListener = mainWindow.createSearchProgressDialog(this);
-        this.userInteractionHandler = new UserInteractionHandlerGUI(settings, mainWindow);
+        this.userInteractionHandler = new UserInteractionHandlerGUI(SettingsControl.settings, mainWindow);
     }
 
     protected P getInputPanel() {

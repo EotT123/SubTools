@@ -7,7 +7,6 @@ import java.util.List;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
-import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
@@ -17,7 +16,7 @@ import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.listeners.StatusListener;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 import org.lodder.subtools.multisubdownloader.workers.SearchHandler;
 import org.lodder.subtools.multisubdownloader.workers.SearchManager;
@@ -32,8 +31,6 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchAction.class);
 
-    @val(Protected) Settings settings;
-
     @get(Protected) @set(Private) @Nullable StatusListener statusListener;
     @get(Protected) @set(Private) @Nullable List<R> releases;
     @get(Protected) abstract Language language;
@@ -43,10 +40,9 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     private final LazySupplier<SearchManager> searchManagerLazy;
     @get(Protected) SearchManager searchManager; // Computed property
 
-    protected SearchAction(Settings settings) {
-        this.settings = settings;
+    protected SearchAction() {
         this.searchManagerLazy = new LazySupplier<>(() ->
-            new SearchManager(settings, language, searchProgressListener, userInteractionHandler, this));
+            new SearchManager(language, searchProgressListener, userInteractionHandler, this));
     }
 
     @Override
@@ -89,7 +85,7 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
         /* Tell the manager which providers to use */
         searchManager.reset();
         SubtitleProviderStore.allProviders.stream()
-            .filter(subtitleProvider -> settings.useSerieSource(subtitleProvider.source))
+            .filter(subtitleProvider -> SettingsControl.settings.useSerieSource(subtitleProvider.source))
             .forEach(searchManager::addProvider);
 
         /* Tell the manager which releases to search. */

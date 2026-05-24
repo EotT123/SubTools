@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Element;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader;
 import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomProperty;
@@ -40,11 +40,9 @@ public class UpdateAvailableGithub {
     private static final String REPO_URL = DOMAIN + REPO_URI;
 
     private final Manager manager;
-    private final Settings settings;
 
-    public UpdateAvailableGithub(Manager manager, Settings settings) {
+    public UpdateAvailableGithub(Manager manager) {
         this.manager = manager;
-        this.settings = settings;
     }
 
     public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
@@ -64,7 +62,7 @@ public class UpdateAvailableGithub {
     }
 
     public @Nullable String getLatestDownloadUrl() {
-        return switch (settings.updateType) {
+        return switch (SettingsControl.settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease();
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease();
             case null -> null;
@@ -72,7 +70,7 @@ public class UpdateAvailableGithub {
     }
 
     public boolean isNewVersionAvailable() {
-        return switch (settings.updateType) {
+        return switch (SettingsControl.settings.updateType) {
             case STABLE -> getUrlLatestNewStableGithubRelease() != null;
             case NIGHTLY -> getUrlLatestNewNightlyGithubRelease() != null;
             case null -> false;

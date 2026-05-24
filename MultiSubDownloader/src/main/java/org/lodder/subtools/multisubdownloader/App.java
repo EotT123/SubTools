@@ -65,9 +65,8 @@ public class App {
 
         Container app = new Container();
         Manager manager = createManager();
-        SettingsControl prefCtrl = new SettingsControl(manager);
-        Messages.language = ifNullThen(prefCtrl.settings.language, Language.ENGLISH);
-        Bootstrapper bootstrapper = new Bootstrapper(app, prefCtrl.settings, preferences, manager);
+        Messages.language = ifNullThen(SettingsControl.settings.language, Language.ENGLISH);
+        Bootstrapper bootstrapper = new Bootstrapper(app, preferences, manager);
 
         if (line.hasCliOption(CliOption.TRACE)) {
             setLogLevel(Level.ALL);
@@ -76,13 +75,13 @@ public class App {
         }
 
         if (line.hasCliOption(CliOption.NO_GUI)) {
-            bootstrapper.initialize(new UserInteractionHandlerCLI(prefCtrl.settings));
+            bootstrapper.initialize(new UserInteractionHandlerCLI(SettingsControl.settings));
 
             /* Defined here so there is output on console */
-            importPreferences(line, prefCtrl);
+            importPreferences(line);
 
             try {
-                CLI cmd = new CLI(prefCtrl, app, line);
+                CLI cmd = new CLI(app, line);
                 if (line.hasCliOption(CliOption.HELP)) {
                     formatter.printHelp(ConfigProperties.getProperty(Property.NAME), "help", getCLIOptions(), "",
                         false);
@@ -97,12 +96,12 @@ public class App {
             splash = new Splash(Messages.getText("App.Starting")).showSplash();
 
             /* Defined here so there is output in the splash */
-            importPreferences(line, prefCtrl);
+            importPreferences(line);
 
-            bootstrapper.initialize(new UserInteractionHandlerGUI(prefCtrl.settings, null));
+            bootstrapper.initialize(new UserInteractionHandlerGUI(SettingsControl.settings, null));
             EventQueue.invokeLater(() -> {
                 try {
-                    JFrame window = new GUI(prefCtrl, app);
+                    JFrame window = new GUI(app);
                     window.setVisible(true);
                     splash.setVisible(false);
                     splash.dispose();
@@ -128,14 +127,14 @@ public class App {
         root.setLevel(level);
     }
 
-    private static void importPreferences(CommandLine line, SettingsControl prefCtrl) {
+    private static void importPreferences(CommandLine line) {
         if (!line.hasCliOption(CliOption.IMPORT_PREFERENCES)) {
             return;
         }
         Path file = Path.of(line.getCliOptionValue(CliOption.IMPORT_PREFERENCES));
         try {
             if (file.isRegularFile()) {
-                prefCtrl.importPreferences(file);
+                SettingsControl.importPreferences(file);
             }
         } catch (Exception e) {
             LOGGER.error("executeArgs: importPreferences", e);

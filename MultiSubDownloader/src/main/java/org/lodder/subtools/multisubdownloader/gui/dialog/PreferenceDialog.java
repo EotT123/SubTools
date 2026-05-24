@@ -26,17 +26,14 @@ public class PreferenceDialog extends MultiSubDialog {
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final SettingsControl settingsCtrl;
     private final GeneralPanel pnlGeneral;
     private final EpisodeLibraryPanel pnlEpisodeLibrary;
     private final MovieLibraryPanel pnlMovieLibrary;
     private final OptionsPanel pnlOptions;
     private final SerieProvidersPanel pnlSerieSources;
 
-    public PreferenceDialog(GUI gui, final SettingsControl settingsCtrl, Manager manager,
-        UserInteractionHandler userInteractionHandler) {
+    public PreferenceDialog(GUI gui, Manager manager, UserInteractionHandler userInteractionHandler) {
         super(gui, getText("PreferenceDialog.Title"), true);
-        this.settingsCtrl = settingsCtrl;
 
         setResizable(false);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -63,17 +60,17 @@ public class PreferenceDialog extends MultiSubDialog {
                         }
                     })
                     .withTab(getText("PreferenceDialog.TabGeneral"),
-                        pnlGeneral = new GeneralPanel(gui, settingsCtrl))
+                        pnlGeneral = new GeneralPanel(gui))
                     .withTab(getText("PreferenceDialog.SerieLibrary"),
-                        pnlEpisodeLibrary = new EpisodeLibraryPanel(settingsCtrl.settings.episodeLibrarySettings,
+                        pnlEpisodeLibrary = new EpisodeLibraryPanel(SettingsControl.settings.episodeLibrarySettings,
                             manager, false, userInteractionHandler))
                     .withTab(getText("PreferenceDialog.MovieLibrary"),
-                        pnlMovieLibrary = new MovieLibraryPanel(settingsCtrl.settings.movieLibrarySettings,
+                        pnlMovieLibrary = new MovieLibraryPanel(SettingsControl.settings.movieLibrarySettings,
                             manager, false, userInteractionHandler))
                     .withTab(getText("PreferenceDialog.Options"),
-                        pnlOptions = new OptionsPanel(settingsCtrl))
+                        pnlOptions = new OptionsPanel())
                     .withTab(getText("PreferenceDialog.SerieSources"),
-                        pnlSerieSources = new SerieProvidersPanel(settingsCtrl)))
+                        pnlSerieSources = new SerieProvidersPanel()))
             )
             .addComponent(BorderLayout.SOUTH, new JPanel()
                 .layout(new FlowLayout(FlowLayout.RIGHT))
@@ -96,7 +93,7 @@ public class PreferenceDialog extends MultiSubDialog {
             pnlOptions.savePreferenceSettings();
             pnlSerieSources.savePreferenceSettings();
             setVisible(false);
-            settingsCtrl.store();
+            SettingsControl.store();
             SubtitleProviderStore.resetProviders();
         } else {
             JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"), "Error",

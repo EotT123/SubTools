@@ -18,7 +18,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryBuilder;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
@@ -53,9 +52,9 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
         super(frame, title, modal);
         this.libraryBuilder = filenameLibraryBuilder;
         this.release = requireNonNull(switch (videoType) {
-            case EPISODE -> new ReleaseFactory(new Settings(), manager).createRelease(
+            case EPISODE -> new ReleaseFactory(manager).createRelease(
                 "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv", userInteractionHandler, false);
-            case MOVIE -> new ReleaseFactory(new Settings(), manager).createRelease(
+            case MOVIE -> new ReleaseFactory(manager).createRelease(
                 "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv", userInteractionHandler, false);
         });
 

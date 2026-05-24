@@ -11,6 +11,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.BoxModelProperties;
 import org.lodder.subtools.multisubdownloader.gui.extra.PanelCheckBox;
 import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
+import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.SettingsProcessEpisodeSource;
 
 @NullMarked
@@ -18,7 +19,6 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final SettingsControl settingsCtrl;
     private final JCheckBox chkAlwaysConfirm;
     private final JCheckBox chkMinScoreSelection;
     private final JSlider sldMinScoreSelection;
@@ -32,9 +32,8 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
     private final JComboBox<SettingsProcessEpisodeSource> cbxEpisodeProcessSource;
     private final JCheckBox chkConfirmProviderMapping;
 
-    public OptionsPanel(SettingsControl settingsCtrl) {
+    public OptionsPanel() {
         super(new MigLayout("insets 0, fill, nogrid"));
-        this.settingsCtrl = settingsCtrl;
 
         new TitlePanel(
             title:getText("PreferenceDialog.DownloadOptions"),
@@ -56,7 +55,7 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
                         new JCheckBox(getText("PreferenceDialog.DefaultSelection"), null, true),
                     panelOnNewLine:true
                     )
-                    .addComponent(this.pnlDefaultSelection = new DefaultSelectionPanel(settingsCtrl)));
+                    .addComponent(this.pnlDefaultSelection = new DefaultSelectionPanel()));
 
         new TitlePanel(
             title:getText("PreferenceDialog.SearchFilter"),
@@ -99,31 +98,33 @@ public class OptionsPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void loadPreferenceSettings() {
-        chkAlwaysConfirm.setSelected(settingsCtrl.settings.optionsAlwaysConfirm);
-        chkMinScoreSelection.setSelected(settingsCtrl.settings.optionsMinAutomaticSelection);
-        sldMinScoreSelection.setValue(settingsCtrl.settings.optionsMinAutomaticSelectionValue);
-        chkDefaultSelection.setSelected(settingsCtrl.settings.optionsDefaultSelection);
-        chkSubtitleExactMethod.setSelected(settingsCtrl.settings.optionSubtitleExactMatch);
-        chkSubtitleKeywordMethod.setSelected(settingsCtrl.settings.optionSubtitleKeywordMatch);
-        chkExcludeHearingImpaired.setSelected(settingsCtrl.settings.optionSubtitleExcludeHearingImpaired);
-        chkOnlyFound.setSelected(settingsCtrl.settings.optionsShowOnlyFound);
-        chkStopOnSearchError.setSelected(settingsCtrl.settings.optionsStopOnSearchError);
-        cbxEpisodeProcessSource.setSelectedItem(settingsCtrl.settings.processEpisodeSource);
-        chkConfirmProviderMapping.setSelected(settingsCtrl.settings.optionsConfirmProviderMapping);
+        Settings settings = SettingsControl.settings;
+        chkAlwaysConfirm.setSelected(settings.optionsAlwaysConfirm);
+        chkMinScoreSelection.setSelected(settings.optionsMinAutomaticSelection);
+        sldMinScoreSelection.setValue(settings.optionsMinAutomaticSelectionValue);
+        chkDefaultSelection.setSelected(settings.optionsDefaultSelection);
+        chkSubtitleExactMethod.setSelected(settings.optionSubtitleExactMatch);
+        chkSubtitleKeywordMethod.setSelected(settings.optionSubtitleKeywordMatch);
+        chkExcludeHearingImpaired.setSelected(settings.optionSubtitleExcludeHearingImpaired);
+        chkOnlyFound.setSelected(settings.optionsShowOnlyFound);
+        chkStopOnSearchError.setSelected(settings.optionsStopOnSearchError);
+        cbxEpisodeProcessSource.setSelectedItem(settings.processEpisodeSource);
+        chkConfirmProviderMapping.setSelected(settings.optionsConfirmProviderMapping);
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.settings.optionsAlwaysConfirm = chkAlwaysConfirm.isSelected();
-        settingsCtrl.settings.optionsMinAutomaticSelection = chkMinScoreSelection.isSelected();
-        settingsCtrl.settings.optionsMinAutomaticSelectionValue = sldMinScoreSelection.getValue();
-        settingsCtrl.settings.optionsDefaultSelection = chkDefaultSelection.isSelected();
-        settingsCtrl.settings.optionSubtitleExactMatch = chkSubtitleExactMethod.isSelected();
-        settingsCtrl.settings.optionSubtitleKeywordMatch = chkSubtitleKeywordMethod.isSelected();
-        settingsCtrl.settings.optionSubtitleExcludeHearingImpaired = chkExcludeHearingImpaired.isSelected();
-        settingsCtrl.settings.optionsShowOnlyFound = chkOnlyFound.isSelected();
-        settingsCtrl.settings.optionsStopOnSearchError = chkStopOnSearchError.isSelected();
-        settingsCtrl.settings.processEpisodeSource = cbxEpisodeProcessSource.getSelectedValue();
-        settingsCtrl.settings.optionsConfirmProviderMapping = chkConfirmProviderMapping.isSelected();
+        Settings settings = SettingsControl.settings;
+        settings.optionsAlwaysConfirm = chkAlwaysConfirm.isSelected();
+        settings.optionsMinAutomaticSelection = chkMinScoreSelection.isSelected();
+        settings.optionsMinAutomaticSelectionValue = sldMinScoreSelection.getValue();
+        settings.optionsDefaultSelection = chkDefaultSelection.isSelected();
+        settings.optionSubtitleExactMatch = chkSubtitleExactMethod.isSelected();
+        settings.optionSubtitleKeywordMatch = chkSubtitleKeywordMethod.isSelected();
+        settings.optionSubtitleExcludeHearingImpaired = chkExcludeHearingImpaired.isSelected();
+        settings.optionsShowOnlyFound = chkOnlyFound.isSelected();
+        settings.optionsStopOnSearchError = chkStopOnSearchError.isSelected();
+        settings.processEpisodeSource = cbxEpisodeProcessSource.getSelectedValue();
+        settings.optionsConfirmProviderMapping = chkConfirmProviderMapping.isSelected();
         pnlDefaultSelection.savePreferenceSettings();
     }
 

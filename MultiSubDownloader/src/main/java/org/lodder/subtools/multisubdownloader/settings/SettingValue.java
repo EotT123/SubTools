@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.IntStream;
@@ -26,7 +27,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
-import org.lodder.subtools.sublibrary.util.function.TriConsumer;
 
 @NullMarked
 public enum SettingValue {
@@ -406,28 +406,28 @@ public enum SettingValue {
         Settings::setSerieSourceSubscene,
         true));
 
-    private final BiConsumer<Settings, Preferences> storeValueFunction;
-    private final BiConsumer<Settings, Preferences> loadValueFunction;
+    private final Consumer<Preferences> storeValueFunction;
+    private final Consumer<Preferences> loadValueFunction;
 
     SettingValue(SettingCommon settingsTyped) {
-        this.storeValueFunction = (settings, prefs) -> settingsTyped.storeValueFunction.accept(settings, key, prefs);
-        this.loadValueFunction = (settings, prefs) -> settingsTyped.loadValueFunction.accept(settings, key, prefs);
+        this.storeValueFunction = prefs -> settingsTyped.storeValueFunction.accept(key, prefs);
+        this.loadValueFunction = prefs -> settingsTyped.loadValueFunction.accept(key, prefs);
     }
 
     public String getKey() {
         return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name());
     }
 
-    public void store(Settings Settings, Preferences preferences) {
-        storeValueFunction.accept(Settings, preferences);
+    public void store(Preferences preferences) {
+        storeValueFunction.accept(preferences);
     }
 
-    public void load(Settings Settings, Preferences preferences) {
-        loadValueFunction.accept(Settings, preferences);
+    public void load(Preferences preferences) {
+        loadValueFunction.accept(preferences);
     }
 
-    public static void loadAll(Settings Settings, Preferences preferences) {
-        SettingValue.values().forEach(sv -> sv.load(Settings, preferences));
+    public static void loadAll(Preferences preferences) {
+        SettingValue.values().forEach(sv -> sv.load(preferences));
     }
 
     private static <T extends Enum<T>> Mapper<T> enumMapper(Class<T> type) {
@@ -545,14 +545,14 @@ public enum SettingValue {
             Mapper<T> mapper,
             T defaultValue) {
             super(
-                (Settings, key, preferences) -> {
-                    T value = valueGetter.apply(rootElementFunction.apply(Settings));
+                (key, preferences) -> {
+                    T value = valueGetter.apply(rootElementFunction.apply(SettingsControl.settings));
                     if (!Objects.equal(value, defaultValue) &&
                         !(value instanceof String text && text.isEmpty())) {
                         preferences.put(key, mapper.toStringMapper.apply(value));
                     }
                 },
-                (Settings, key, preferences) -> valueSetter.accept(rootElementFunction.apply(Settings),
+                (key, preferences) -> valueSetter.accept(rootElementFunction.apply(SettingsControl.settings),
                     preferences.computeIfPresent(key, mapper.toObjectMapper, defaultValue)));
         }
 
@@ -582,17 +582,17 @@ public enum SettingValue {
             Function<Settings, S> rootElementFunction,
             Function<S, Collection<T>> collectionGetter) {
             super(
-                (Settings, key, preferences) -> {
+                (key, preferences) -> {
                     AtomicInteger i = new AtomicInteger(-1);
-                    collectionGetter.apply(rootElementFunction.apply(Settings)).forEach(
+                    collectionGetter.apply(rootElementFunction.apply(SettingsControl.settings)).forEach(
                         value -> preferences.put(key + i.incrementAndGet(), mapper.toStringMapper.apply(value)));
                     if (i.get() > -1) {
                         preferences.putInt(key + "Size", i.get() + 1);
                     }
                 },
-                (Settings, key, preferences) -> {
+                (key, preferences) -> {
                     int numberOfItems = preferences.getInt(key + "Size", 0);
-                    S rootElement = rootElementFunction.apply(Settings);
+                    S rootElement = rootElementFunction.apply(SettingsControl.settings);
                     collectionGetter.apply(rootElement).clear();
                     IntStream.range(0, numberOfItems)
                         .forEach(i -> collectionGetter.apply(rootElement).add(
@@ -607,9 +607,9 @@ public enum SettingValue {
         SettingMapTyped(Function<Settings, S> rootElementFunction, Function<S, Map<K, V>> mapGetter,
             Mapper<K> keyMapper, Mapper<V> valueMapper) {
 
-            super((Settings, key, preferences) -> {
+            super((key, preferences) -> {
                     AtomicInteger i = new AtomicInteger(-1);
-                    mapToPreferences(rootElementFunction.apply(Settings), mapGetter,
+                    mapToPreferences(rootElementFunction.apply(SettingsControl.settings), mapGetter,
                         (k, v) -> {
                             int idx = i.incrementAndGet();
                             preferences.put(getKeyString(key, idx), keyMapper.toStringMapper.apply(k));
@@ -619,10 +619,10 @@ public enum SettingValue {
                         preferences.putInt(key + "Size", i.get() + 1);
                     }
                 },
-                (Settings, key, preferences) -> {
+                (key, preferences) -> {
                     int numberOfItems = preferences.getInt(key + "Size", 0);
                     IntStream.range(0, numberOfItems).forEach(idx ->
-                        preferencesToMap(rootElementFunction.apply(Settings), mapGetter,
+                        preferencesToMap(rootElementFunction.apply(SettingsControl.settings), mapGetter,
                             keyMapper.toObjectMapper.apply(preferences.get(getKeyString(key, idx), "")),
                             valueMapper.toObjectMapper.apply(preferences.get(getValueString(key, idx), "")))
                     );
@@ -650,12 +650,12 @@ public enum SettingValue {
     }
 
     private abstract static class SettingCommon {
-        @val TriConsumer<Settings, String, Preferences> storeValueFunction;
-        @val TriConsumer<Settings, String, Preferences> loadValueFunction;
+        @val BiConsumer<String, Preferences> storeValueFunction;
+        @val BiConsumer<String, Preferences> loadValueFunction;
 
         SettingCommon(
-            TriConsumer<Settings, String, Preferences> storeValueFunction,
-            TriConsumer<Settings, String, Preferences> loadValueFunction) {
+            BiConsumer<String, Preferences> storeValueFunction,
+            BiConsumer<String, Preferences> loadValueFunction) {
             this.storeValueFunction = storeValueFunction;
             this.loadValueFunction = loadValueFunction;
         }

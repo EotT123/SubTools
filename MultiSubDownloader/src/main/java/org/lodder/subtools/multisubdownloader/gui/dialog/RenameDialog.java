@@ -30,8 +30,8 @@ import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibra
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.MovieLibraryPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.preference.VideoLibraryPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.model.VideoType;
@@ -48,8 +48,8 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
     private ProgressDialog progressDialog;
 
-    public RenameDialog(@Nullable JFrame frame=null, Settings settings, VideoType videoType, String title,
-        Manager manager, UserInteractionHandler userInteractionHandler) {
+    public RenameDialog(@Nullable JFrame frame=null, VideoType videoType, String title, Manager manager,
+        UserInteractionHandler userInteractionHandler) {
         super(frame, title, false);
         setResizable(false);
         setBounds(100, 100, 650, 680);
@@ -71,18 +71,17 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
                 this.chkRecursive = new JCheckBox(getText("RenameDialog.RecursiveSearch")));
 
         if (videoType == VideoType.EPISODE) {
-            pnlLibrary = new EpisodeLibraryPanel(settings.episodeLibrarySettings, manager, true,
+            pnlLibrary = new EpisodeLibraryPanel(SettingsControl.settings.episodeLibrarySettings, manager, true,
                 userInteractionHandler).addTo(contentPane, "grow");
         } else {
-            pnlLibrary =
-                new MovieLibraryPanel(settings.movieLibrarySettings, manager, true, userInteractionHandler).addTo(
-                    contentPane, "grow");
+            pnlLibrary = new MovieLibraryPanel(SettingsControl.settings.movieLibrarySettings, manager, true,
+                userInteractionHandler).addTo(contentPane, "grow");
         }
 
         new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
             .addTo(contentPane, BorderLayout.SOUTH)
             .addComponent(new JButton(getText("RenameDialog.Rename")).defaultButtonFor(getRootPane())
-                .actionListener(() -> rename(videoType, settings, manager, userInteractionHandler))
+                .actionListener(() -> rename(videoType, manager, userInteractionHandler))
                 .actionCommand("Rename"))
             .addComponent(new JButton(getText("App.Cancel")).actionListener(() -> setVisible(false))
                 .actionCommand("Cancel"));
@@ -92,8 +91,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         return pnlLibrary.hasValidSettings() && txtFolder.hasValidValue();
     }
 
-    private void rename(VideoType videoType, Settings settings, Manager manager,
-        UserInteractionHandler userInteractionHandler) {
+    private void rename(VideoType videoType, Manager manager, UserInteractionHandler userInteractionHandler) {
 
         if (!hasValidSettings()) {
             JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"), "Error",
@@ -106,7 +104,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
             new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.librarySettings, videoType,
                 this.chkRecursive.isSelected(), manager, userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
-        renameWorker.releaseFactory = new ReleaseFactory(settings, manager);
+        renameWorker.releaseFactory = new ReleaseFactory(manager);
         progressDialog = new ProgressDialog(renameWorker);
         progressDialog.setVisible(true);
         renameWorker.execute();

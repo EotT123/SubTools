@@ -8,10 +8,12 @@ import java.util.List;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
+import org.mockito.MockedStatic;
 
 class SubtitleFilteringTest {
 
@@ -21,10 +23,11 @@ class SubtitleFilteringTest {
         Subtitle subtitle2 = createSubtitle("", "", false, "");
         Subtitle subtitle3 = createSubtitle("", "", true, "");
 
-        assertThatFilter(new SubtitleFiltering(createSettings(false, false, true)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3)
-            .forRelease(createRelease("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv", "DIMENSION"))
-            .matchesSubtitles(subtitle2);
+        executeWithSettings(false, false, true, () ->
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3)
+                .forRelease(createRelease("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv", "DIMENSION"))
+                .matchesSubtitles(subtitle2));
     }
 
     @Test
@@ -42,16 +45,16 @@ class SubtitleFilteringTest {
             createSubtitle("Criminal.Minds.S10E12.Anonymous.1080p.WEB-DL.DD5.1.H.264-CtrlHD", "CtrlHD", false, "");
 
         // only keyword
-        assertThatFilter(new SubtitleFiltering(createSettings(true, false, false)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-            .forRelease(release)
-            .matchesSubtitles(subtitle3, subtitle4, subtitle5);
+        executeWithSettings(true, false, false, () ->
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
+                .forRelease(release).matchesSubtitles(subtitle3, subtitle4, subtitle5));
 
         // keyword and exclude hearing impaired
-        assertThatFilter(new SubtitleFiltering(createSettings(true, false, true)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-            .forRelease(release)
-            .matchesSubtitles(subtitle4, subtitle5);
+        executeWithSettings(true, false, true, () ->
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
+                .forRelease(release).matchesSubtitles(subtitle4, subtitle5));
     }
 
     @Test
@@ -67,16 +70,16 @@ class SubtitleFilteringTest {
             createSubtitle("Criminal.Minds.S10E12.Anonymous.1080p.WEB-DL.DD5.1.H.264-CtrlHD", "CtrlHD", false, "");
 
         // only exact match
-        assertThatFilter(new SubtitleFiltering(createSettings(false, true, false)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5)
-            .forRelease(release)
-            .matchesSubtitles(subtitle3, subtitle4);
+        executeWithSettings(false, true, false, () ->
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5)
+                .forRelease(release).matchesSubtitles(subtitle3, subtitle4));
 
         // exact match and exclude hearing impaired
-        assertThatFilter(new SubtitleFiltering(createSettings(false, true, true)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5)
-            .forRelease(release)
-            .matchesSubtitles(subtitle4);
+        executeWithSettings(false, true, true, () ->
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5)
+                .forRelease(release).matchesSubtitles(subtitle4));
     }
 
     @Test
@@ -95,26 +98,30 @@ class SubtitleFilteringTest {
             createSubtitle("Criminal.Minds.S10E12.Anonymous.1080p.WEB-DL.DD5.1.H.264-CtrlHD", "CtrlHD", false, "");
 
         // only exact match
-        assertThatFilter(new SubtitleFiltering(createSettings(true, true, false)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-            .forRelease(release)
-            .matchesSubtitles(subtitle3, subtitle4);
+        executeWithSettings(true, true, false, () -> {
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
+                .forRelease(release)
+                .matchesSubtitles(subtitle3, subtitle4);
+        });
 
         // exact match and exclude hearing impaired
-        assertThatFilter(new SubtitleFiltering(createSettings(true, true, true)))
-            .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-            .forRelease(release)
-            .matchesSubtitles(subtitle4);
+        executeWithSettings(true, true, true, () ->
+            assertThatFilter(new SubtitleFiltering())
+                .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
+                .forRelease(release).matchesSubtitles(subtitle4));
     }
 
-    private Settings createSettings(boolean keyword, boolean exact, boolean excludehearing) {
-        Settings settings = mock(Settings.class);
-
-        when(settings.optionSubtitleExactMatch).thenReturn(exact);
-        when(settings.optionSubtitleKeywordMatch).thenReturn(keyword);
-        when(settings.optionSubtitleExcludeHearingImpaired).thenReturn(excludehearing);
-
-        return settings;
+    private void executeWithSettings(boolean keyword, boolean exact, boolean excludeHearingImpaired,
+        Runnable runnable) {
+        try (MockedStatic<SettingsControl> settingsControlMockedStatic = mockStatic(SettingsControl.class)) {
+            Settings settings = mock(Settings.class);
+            settingsControlMockedStatic.when(SettingsControl::getSettings).thenReturn(settings);
+            when(settings.optionSubtitleExactMatch).thenReturn(exact);
+            when(settings.optionSubtitleKeywordMatch).thenReturn(keyword);
+            when(settings.optionSubtitleExcludeHearingImpaired).thenReturn(excludeHearingImpaired);
+            runnable.run();
+        }
     }
 
     private ReleaseWithoutPath createRelease(String filename, String releaseGroup) {

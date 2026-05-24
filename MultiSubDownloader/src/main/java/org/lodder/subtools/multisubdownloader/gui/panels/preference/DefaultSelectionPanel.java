@@ -25,13 +25,11 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final SettingsControl settingsCtrl;
     private final ScrollTable<Source> unusedPatternsTable;
     private final ScrollTable<Source> usedPatternsTable;
 
-    public DefaultSelectionPanel(SettingsControl settingsCtrl) {
+    public DefaultSelectionPanel() {
         super(new MigLayout("fill, bottom, insets 0", "[grow][][grow][]", "[grow, bottom][grow, top]"));
-        this.settingsCtrl = settingsCtrl;
 
         unusedPatternsTable =
             ScrollTable.create(getText("PreferenceDialog.DefaultSelectionUnused"), Source.class)
@@ -184,13 +182,13 @@ public class DefaultSelectionPanel extends JPanel implements PreferencePanelIntf
     }
 
     public void loadPreferenceSettings() {
-        Source.values().stream().filter(not(settingsCtrl.settings.optionsDefaultSelectionQualityList::contains))
+        Source.values().stream().filter(not(SettingsControl.settings.optionsDefaultSelectionQualityList::contains))
             .forEach(unusedPatternsTable::addItem);
-        settingsCtrl.settings.optionsDefaultSelectionQualityList.forEach(usedPatternsTable::addItem);
+        SettingsControl.settings.optionsDefaultSelectionQualityList.forEach(usedPatternsTable::addItem);
     }
 
     public void savePreferenceSettings() {
-        settingsCtrl.settings.optionsDefaultSelectionQualityList.replaceContents(usedPatternsTable.getItems());
+        SettingsControl.settings.optionsDefaultSelectionQualityList.replaceContents(usedPatternsTable.getItems());
     }
 
     @Override
