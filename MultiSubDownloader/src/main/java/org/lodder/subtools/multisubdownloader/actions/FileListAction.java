@@ -11,7 +11,7 @@ import manifold.ext.props.rt.api.set;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.slf4j.Logger;
@@ -23,12 +23,7 @@ public class FileListAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileListAction.class);
     private static final String SUBTITLE_EXTENSION = "srt";
 
-    private final Settings settings;
     @set @Nullable IndexingProgressListener indexingProgressListener;
-
-    public FileListAction(Settings settings) {
-        this.settings = settings;
-    }
 
     public List<Path> getFileListing(Path dir, boolean recursive, Language language, boolean forceSubtitleOverwrite) {
         LOGGER.trace("getFileListing: dir [{}] Recursive [{}] languageCode [{}] forceSubtitleOverwrite [{}]",
@@ -83,7 +78,7 @@ public class FileListAction {
     }
 
     private boolean isExcludedDir(Path path) {
-        boolean excludedDir = settings.excludeList.stream().anyMatch(item -> item.isExcludedPath(path));
+        boolean excludedDir = SettingsControl.settings.excludeList.stream().anyMatch(item -> item.isExcludedPath(path));
         if (excludedDir) {
             LOGGER.trace("isExcludedDir, skipping [{}]", path);
         }
@@ -91,7 +86,8 @@ public class FileListAction {
     }
 
     private boolean isExcludedFile(Path path) {
-        boolean excludedFile = settings.excludeList.stream().anyMatch(item -> item.isExcludedPath(path));
+        boolean excludedFile =
+            SettingsControl.settings.excludeList.stream().anyMatch(item -> item.isExcludedPath(path));
         if (excludedFile) {
             LOGGER.trace("isExcludedFile, skipping [{}]", path);
         }

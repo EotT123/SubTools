@@ -18,6 +18,6 @@ public class LocalServiceProvider implements ServiceProvider {
 
     @Override
     public Supplier<Local> createProviderSupplier(Container app, UserInteractionHandler userInteractionHandler) {
-        return () -> new Local(app.makeSettings(), app.makeManager(), userInteractionHandler);
+        return () -> new Local(app.makeManager(), userInteractionHandler);
     }
 }

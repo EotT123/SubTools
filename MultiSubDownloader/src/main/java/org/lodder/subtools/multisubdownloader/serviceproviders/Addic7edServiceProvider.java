@@ -10,7 +10,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.Addic7edAdapter;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.Addic7edProxyGestdownAdapter;
@@ -27,21 +27,20 @@ public class Addic7edServiceProvider implements ServiceProvider {
     public Supplier<SubtitleProvider> createProviderSupplier(Container app,
         UserInteractionHandler userInteractionHandler) {
         return () -> {
-            Settings settings = app.makeSettings();
             Manager manager = app.makeManager();
 
             boolean loginEnabled = false;
             Credentials credentials = null;
-            if (settings.loginAddic7edEnabled) {
-                String username = StringUtils.trimToNull(settings.loginAddic7edUsername);
-                String password = StringUtils.trimToNull(settings.loginAddic7edPassword);
+            if (SettingsControl.settings.loginAddic7edEnabled) {
+                String username = StringUtils.trimToNull(SettingsControl.settings.loginAddic7edUsername);
+                String password = StringUtils.trimToNull(SettingsControl.settings.loginAddic7edPassword);
                 /* Protect against empty login */
                 if (username != null && password != null) {
                     credentials = new Credentials(username, password);
                 }
             }
 
-            if (settings.serieSourceAddic7edProxy) {
+            if (SettingsControl.settings.serieSourceAddic7edProxy) {
                 return new Addic7edProxyGestdownAdapter(manager, userInteractionHandler);
             } else {
                 boolean speedy = app.makePreferences().getBoolean(CliOption.SPEEDY.value, false);

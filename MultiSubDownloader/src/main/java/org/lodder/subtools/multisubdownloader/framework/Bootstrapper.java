@@ -10,7 +10,6 @@ import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProviderComparator;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.reflections.Reflections;
@@ -23,21 +22,16 @@ public class Bootstrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
 
     private final Container app;
-    private final Settings settings;
     private final Preferences preferences;
     private final Manager manager;
 
-    public Bootstrapper(Container app, Settings settings, Preferences preferences, Manager manager) {
+    public Bootstrapper(Container app, Preferences preferences, Manager manager) {
         this.app = app;
-        this.settings = settings;
         this.preferences = preferences;
         this.manager = manager;
     }
 
     public void initialize(UserInteractionHandler userInteractionHandler) {
-        /* Bind Settings to IoC Container */
-        this.app.bind("Settings", new LazySupplier<>(() -> settings));
-
         /* Bind Preferences to IoC Container */
         this.app.bind("Preferences", new LazySupplier<>(() -> preferences));
 

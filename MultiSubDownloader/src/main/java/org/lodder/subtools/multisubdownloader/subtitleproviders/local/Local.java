@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.control.MovieReleaseControl;
 import org.lodder.subtools.multisubdownloader.lib.control.TvReleaseControl;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.local.model.LocalSubtitle;
 import org.lodder.subtools.sublibrary.DetectLanguage;
@@ -39,19 +39,17 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
 
-    private final Settings settings;
     private final UserInteractionHandler userInteractionHandler;
     @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.LOCAL;
 
-    public Local(Settings settings, Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.settings = settings;
+    public Local(Manager manager, UserInteractionHandler userInteractionHandler) {
         this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
     }
 
     private List<Path> getPossibleSubtitles(String filter) {
-        return settings.localSourcesFolders.stream()
+        return SettingsControl.settings.localSourcesFolders.stream()
             .flatMap(local -> getAllSubtitlesFiles(local, filter).stream())
             .toList();
     }
@@ -63,7 +61,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         String name = !tvRelease.originalName.isEmpty() ? tvRelease.originalName : tvRelease.name;
         String filter = name.replaceAll("[^A-Za-z]", "").trim();
 
-        TvReleaseControl tvReleaseControl = new TvReleaseControl(settings, manager, userInteractionHandler);
+        TvReleaseControl tvReleaseControl = new TvReleaseControl(manager, userInteractionHandler);
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 if (ReleaseParser.parse(fileSub) instanceof TvReleaseWithoutPath tvReleaseWithoutPath &&
@@ -89,7 +87,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
 
         String filter = movieRelease.name;
-        MovieReleaseControl movieCtrl = new MovieReleaseControl(settings, manager, userInteractionHandler);
+        MovieReleaseControl movieCtrl = new MovieReleaseControl(manager, userInteractionHandler);
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {

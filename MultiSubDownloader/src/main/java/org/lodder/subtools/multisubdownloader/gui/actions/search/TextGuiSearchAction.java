@@ -12,7 +12,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.gui.panels.SearchPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.SearchTextInputPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -22,9 +21,9 @@ import org.lodder.subtools.sublibrary.model.VideoSearchType;
 @NullMarked
 public final class TextGuiSearchAction extends GuiSearchAction<SearchTextInputPanel, Release> {
 
-    public TextGuiSearchAction(Settings settings, GUI mainWindow, SearchPanel<SearchTextInputPanel> searchPanel,
+    public TextGuiSearchAction(GUI mainWindow, SearchPanel<SearchTextInputPanel> searchPanel,
         ReleaseFactory releaseFactory) {
-        super(settings, mainWindow, searchPanel, releaseFactory);
+        super(mainWindow, searchPanel, releaseFactory);
     }
 
     @Override

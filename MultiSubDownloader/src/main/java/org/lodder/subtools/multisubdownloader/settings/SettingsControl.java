@@ -12,8 +12,6 @@ import java.util.prefs.Preferences;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
-import org.lodder.subtools.multisubdownloader.settings.model.State;
-import org.lodder.subtools.sublibrary.Manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +22,14 @@ public class SettingsControl {
     private static final String BACKING_STORE_AVAIL = "BackingStoreAvail";
     public static final String DATABASE_VERSION_KEY = "DATABASE_VERSION";
 
-    private final Manager manager;
-    private final Preferences preferences;
-    @val Settings settings;
-    @val State state;
+    private static final Preferences PREFERENCES;
+    @val static Settings settings = new Settings();
 
-    public SettingsControl(Manager manager) {
+    static {
         if (!backingStoreAvailable()) {
             LOGGER.error("Unable to store preferences, used debug for reason");
         }
-        this.manager = manager;
-        this.preferences = Preferences.userRoot().node("MultiSubDownloader");
-        this.settings = new Settings();
-        this.state = new State();
+        PREFERENCES = Preferences.userRoot().node("MultiSubDownloader");
         load();
     }
 
@@ -53,41 +46,41 @@ public class SettingsControl {
         return true;
     }
 
-    public void store() {
+    public static void store() {
         try {
             // clean up
-            preferences.clear();
-            SettingValue.values().forEach(sv -> sv.store(settings, preferences));
+            PREFERENCES.clear();
+            SettingValue.values().forEach(sv -> sv.store(PREFERENCES));
             updateProxySettings();
         } catch (BackingStoreException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
 
-    public void load() {
+    public static void load() {
         migrateSettings();
         migrateDatabase();
-        SettingValue.loadAll(settings, preferences);
+        SettingValue.loadAll(PREFERENCES);
         updateProxySettings();
     }
 
-    public void exportPreferences(Path file) throws IOException, BackingStoreException {
+    public static void exportPreferences(Path file) throws IOException, BackingStoreException {
         store();
         try (OutputStream os = file.newOutputStream()) {
-            preferences.exportSubtree(os);
+            PREFERENCES.exportSubtree(os);
         }
     }
 
-    public void importPreferences(Path file)
+    public static void importPreferences(Path file)
         throws IOException, BackingStoreException, InvalidPreferencesFormatException {
         try (InputStream is = new BufferedInputStream(file.newInputStream())) {
-            preferences.clear();
+            PREFERENCES.clear();
             Preferences.importPreferences(is);
             load();
         }
     }
 
-    public void updateProxySettings() {
+    private static void updateProxySettings() {
         if (settings.generalProxyEnabled) {
             System.getProperties().put("proxySet", "true");
             System.getProperties().put("proxyHost", settings.generalProxyHost);
@@ -100,12 +93,12 @@ public class SettingsControl {
     /**
      * Migrate settings layout for backward incompatibility changes.
      */
-    private void migrateSettings() {
-        SettingValue.loadAll(settings, preferences);
+    private static void migrateSettings() {
+        SettingValue.loadAll(PREFERENCES);
 //        int version = settings.settingsVersion;
     }
 
-    private void migrateDatabase() {
+    private static void migrateDatabase() {
 //        int version = manager.getCache(DISK, DATABASE_VERSION_KEY).get(() -> 0);
     }
 }

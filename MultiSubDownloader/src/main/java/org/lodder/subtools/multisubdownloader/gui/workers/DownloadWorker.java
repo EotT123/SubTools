@@ -16,7 +16,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.lib.Info;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -33,23 +33,21 @@ public class DownloadWorker extends SwingWorker<Void, String> implements Cancela
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadWorker.class);
 
     private final CustomTable table;
-    private final Settings settings;
     private final DownloadAction downloadAction;
     private final UserInteractionHandlerAction userInteractionHandlerAction;
 
-    public DownloadWorker(CustomTable table, Settings settings, Manager manager, GUI gui) {
+    public DownloadWorker(CustomTable table, Manager manager, GUI gui) {
         this.table = table;
-        this.settings = settings;
-        UserInteractionHandlerGUI userInteractionHandler = new UserInteractionHandlerGUI(settings, gui);
-        this.downloadAction = new DownloadAction(settings, manager, userInteractionHandler);
-        this.userInteractionHandlerAction = new UserInteractionHandlerAction(settings, userInteractionHandler);
+        UserInteractionHandlerGUI userInteractionHandler = new UserInteractionHandlerGUI(SettingsControl.settings, gui);
+        this.downloadAction = new DownloadAction(manager, userInteractionHandler);
+        this.userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
     }
 
     @Override
     protected Void doInBackground() {
         VideoTableModel model = (VideoTableModel) table.getModel();
         LOGGER.trace("doInBackground: Rows to treat: {} ", model.getRowCount());
-        Info.downloadOptions(settings, false);
+        Info.downloadOptions(false);
 
         model.executedSynchronized(() -> {
             List<ReleaseWithPath> selectedShows = model.getSelectedShows();

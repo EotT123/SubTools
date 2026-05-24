@@ -5,7 +5,7 @@ import java.util.List;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.SubtitleComparator;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleMatchType;
@@ -17,11 +17,9 @@ public class UserInteractionHandlerAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInteractionHandlerAction.class);
 
-    private final Settings settings;
     private final UserInteractionHandler userInteractionHandler;
 
-    public UserInteractionHandlerAction(Settings settings, UserInteractionHandler userInteractionHandler) {
-        this.settings = settings;
+    public UserInteractionHandlerAction(UserInteractionHandler userInteractionHandler) {
         this.userInteractionHandler = userInteractionHandler;
     }
 
@@ -53,7 +51,7 @@ public class UserInteractionHandlerAction {
             if (!subs.isEmpty()) {
                 LOGGER.debug("determineWhatSubtitleDownload for videoFile: [{}] # found subs: [{}]",
                     release.fileNameOrName, subs.size());
-                if (settings.optionsAlwaysConfirm) {
+                if (SettingsControl.settings.optionsAlwaysConfirm) {
                     return userInteractionHandler.selectSubtitles(release);
                 } else if (subs.size() == 1 && subs.first.subtitleMatchType == SubtitleMatchType.EXACT) {
                     LOGGER.debug("determineWhatSubtitleDownload: Exact Match");

@@ -35,14 +35,12 @@ import org.lodder.subtools.sublibrary.util.filefilter.XmlFileFilter;
 public class ExportImport {
 
     private final Manager manager;
-    private final SettingsControl settingsControl;
     private final UserInteractionHandler userInteractionHandler;
     private final Component parent;
 
-    public ExportImport(Manager manager, SettingsControl settingsControl, UserInteractionHandler userInteractionHandler,
+    public ExportImport(Manager manager, UserInteractionHandler userInteractionHandler,
         Component parent) {
         this.manager = manager;
-        this.settingsControl = settingsControl;
         this.userInteractionHandler = userInteractionHandler;
         this.parent = parent;
     }
@@ -82,8 +80,7 @@ public class ExportImport {
             }
             try {
                 switch (listType) {
-                    case PREFERENCES ->
-                        ExportImportPreferences.importSettings(path, userInteractionHandler, settingsControl);
+                    case PREFERENCES -> ExportImportPreferences.importSettings(path, userInteractionHandler);
                     case SERIE_MAPPING ->
                         ExportImportSerieMapping.importSettings(path, userInteractionHandler, manager);
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
@@ -104,7 +101,7 @@ public class ExportImport {
             .ifPresent(path -> {
                 try {
                     switch (listType) {
-                        case PREFERENCES -> ExportImportPreferences.exportSettings(path, settingsControl);
+                        case PREFERENCES -> ExportImportPreferences.exportSettings(path);
                         case SERIE_MAPPING -> ExportImportSerieMapping.exportSettings(path, manager);
                         default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                     }
@@ -122,14 +119,14 @@ public class ExportImport {
             // hide utility class constructor
         }
 
-        public static void exportSettings(Path path, SettingsControl settingsControl) throws Exception {
-            settingsControl.exportPreferences(path);
+        public static void exportSettings(Path path) throws Exception {
+            SettingsControl.exportPreferences(path);
         }
 
-        public static void importSettings(Path path, UserInteractionHandler userInteractionHandler,
-            SettingsControl settingsControl) throws CorruptSettingsFileException {
+        public static void importSettings(Path path, UserInteractionHandler userInteractionHandler)
+            throws CorruptSettingsFileException {
             try {
-                settingsControl.importPreferences(path);
+                SettingsControl.importPreferences(path);
             } catch (IOException | BackingStoreException | InvalidPreferencesFormatException e) {
                 throw new CorruptSettingsFileException(e);
             }

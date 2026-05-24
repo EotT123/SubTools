@@ -25,6 +25,7 @@ import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFi
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.PathMatchType;
 import org.lodder.subtools.multisubdownloader.settings.model.PathOrRegex;
+import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateCheckPeriod;
 import org.lodder.subtools.multisubdownloader.settings.model.UpdateType;
 import org.lodder.subtools.sublibrary.Language;
@@ -35,7 +36,6 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
     @Serial private static final long serialVersionUID = 1L;
 
     private final GUI gui;
-    private final SettingsControl settingsCtrl;
     private final JComboBox<Language> cbxLanguage;
     private final JListWithImages<Path> defaultIncomingFoldersList;
     private final JListWithImages<PathOrRegex> excludeList;
@@ -45,10 +45,9 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
     private final MyTextFieldString txtProxyHost;
     private final MyTextFieldInteger txtProxyPort;
 
-    public GeneralPanel(GUI gui, SettingsControl settingsCtrl) {
+    public GeneralPanel(GUI gui) {
         super(new MigLayout("fill, nogrid"));
         this.gui = gui;
-        this.settingsCtrl = settingsCtrl;
 
         JPanel settingsPanel = new TitlePanel(
             title:getText("PreferenceDialog.Settings"),
@@ -164,14 +163,15 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
 
         // loadPreferenceSettings
 
-        cbxLanguage.setSelectedItem(settingsCtrl.settings.language);
-        defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.image, settingsCtrl.settings.defaultIncomingFolders);
-        settingsCtrl.settings.excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
-        cbxUpdateCheckPeriod.setSelectedItem(settingsCtrl.settings.updateCheckPeriod);
-        cbxUpdateType.setSelectedItem(settingsCtrl.settings.updateType);
-        chkUseProxy.setSelected(settingsCtrl.settings.generalProxyEnabled);
-        txtProxyHost.setText(settingsCtrl.settings.generalProxyHost);
-        txtProxyPort.setObject(settingsCtrl.settings.generalProxyPort);
+        Settings settings = SettingsControl.settings;
+        cbxLanguage.setSelectedItem(settings.language);
+        defaultIncomingFoldersList.addItems(PathMatchType.FOLDER.image, settings.defaultIncomingFolders);
+        settings.excludeList.forEach(pathOrRegex -> excludeList.addItem(pathOrRegex.image, pathOrRegex));
+        cbxUpdateCheckPeriod.setSelectedItem(settings.updateCheckPeriod);
+        cbxUpdateType.setSelectedItem(settings.updateType);
+        chkUseProxy.setSelected(settings.generalProxyEnabled);
+        txtProxyHost.setText(settings.generalProxyHost);
+        txtProxyPort.setObject(settings.generalProxyPort);
     }
 
     public void savePreferenceSettings() {
@@ -182,14 +182,15 @@ public class GeneralPanel extends JPanel implements PreferencePanelIntf {
         List<Path> defaultIncomingFolders = defaultIncomingFoldersList.stream().map(LabelPanel::getObject).toList();
         List<PathOrRegex> exclList =
             excludeList.stream().map(labelPanel -> new PathOrRegex(labelPanel.getObject().value)).toList();
-        settingsCtrl.settings.language = cbxLanguage.getSelectedValue();
-        settingsCtrl.settings.defaultIncomingFolders.replaceContents(defaultIncomingFolders);
-        settingsCtrl.settings.excludeList.replaceContents(exclList);
-        settingsCtrl.settings.updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedValue();
-        settingsCtrl.settings.updateType = cbxUpdateType.getSelectedValue();
-        settingsCtrl.settings.generalProxyEnabled = chkUseProxy.isSelected();
-        settingsCtrl.settings.generalProxyHost = txtProxyHost.getText();
-        settingsCtrl.settings.generalProxyPort = ifNullThen(txtProxyPort.getObject(), 80);
+        Settings settings = SettingsControl.settings;
+        settings.language = cbxLanguage.getSelectedValue();
+        settings.defaultIncomingFolders.replaceContents(defaultIncomingFolders);
+        settings.excludeList.replaceContents(exclList);
+        settings.updateCheckPeriod = cbxUpdateCheckPeriod.getSelectedValue();
+        settings.updateType = cbxUpdateType.getSelectedValue();
+        settings.generalProxyEnabled = chkUseProxy.isSelected();
+        settings.generalProxyHost = txtProxyHost.getText();
+        settings.generalProxyPort = ifNullThen(txtProxyPort.getObject(), 80);
     }
 
     @Override

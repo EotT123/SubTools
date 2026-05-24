@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib;
 
 import org.jspecify.annotations.NullMarked;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 import org.slf4j.Logger;
@@ -16,12 +17,13 @@ public class Info {
         // hide utility class constructor
     }
 
-    public static void subtitleSources(Settings settings, boolean isCli) {
+    public static void subtitleSources(boolean isCli) {
         if (isCli) {
             System.out.println("----- Subtitle Providers ------");
         } else {
             LOGGER.info("----- Subtitle Providers ------");
         }
+        Settings settings = SettingsControl.settings;
         for (SubtitleSource source : SubtitleSource.values()) {
             boolean enabled = switch (source) {
                 case ADDIC7ED -> settings.serieSourceAddic7ed;
@@ -45,7 +47,8 @@ public class Info {
         }
     }
 
-    public static void subtitleFiltering(Settings settings, boolean isCli) {
+    public static void subtitleFiltering(boolean isCli) {
+        Settings settings = SettingsControl.settings;
         if (isCli) {
             System.out.println("----- Subtitle Filtering ------");
             System.out.println(" - OptionSubtitleExactMatch : " + settings.optionSubtitleExactMatch);
@@ -63,14 +66,14 @@ public class Info {
 
     }
 
-    public static void downloadOptions(Settings settings, boolean isCli) {
+    public static void downloadOptions(boolean isCli) {
         if (isCli) {
             System.out.println("----- Download Options ------");
-            System.out.println(" - OptionsAlwaysConfirm : " + settings.optionsAlwaysConfirm);
+            System.out.println(" - OptionsAlwaysConfirm : " + SettingsControl.settings.optionsAlwaysConfirm);
             System.out.println("-----------------------------");
         } else {
             LOGGER.info("----- Download Options ------");
-            LOGGER.info(" - OptionsAlwaysConfirm : " + settings.optionsAlwaysConfirm);
+            LOGGER.info(" - OptionsAlwaysConfirm : " + SettingsControl.settings.optionsAlwaysConfirm);
             LOGGER.info("-----------------------------");
         }
 

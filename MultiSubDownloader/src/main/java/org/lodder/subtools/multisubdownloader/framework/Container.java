@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
@@ -24,10 +23,6 @@ public class Container {
 
     public Manager makeManager() {
         return (Manager) make("Manager");
-    }
-
-    public Settings makeSettings() {
-        return (Settings) make("Settings");
     }
 
     public Preferences makePreferences() {

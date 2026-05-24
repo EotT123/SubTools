@@ -20,7 +20,7 @@ import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.ScoreCalculator;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.SortWeight;
 import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
@@ -32,7 +32,6 @@ public class SearchManager implements Cancelable {
     private final Map<SubtitleProvider, Queue<Release>> queue = new HashMap<>();
     private final Map<SubtitleProvider, SearchWorker> workers = new HashMap<>();
     private final Map<Release, ScoreCalculator> scoreCalculators = new HashMap<>();
-    private final Settings settings;
     @var @set(Private) int progress = 0;
     private int totalJobs;
 
@@ -41,9 +40,8 @@ public class SearchManager implements Cancelable {
     private final SearchProgressListener progressListener;
     @val UserInteractionHandler userInteractionHandler;
 
-    public SearchManager(Settings settings, Language language, SearchProgressListener progressListener,
+    public SearchManager(Language language, SearchProgressListener progressListener,
         UserInteractionHandler userInteractionHandler, SearchHandler onFound) {
-        this.settings = settings;
         this.language = language;
         this.progressListener = progressListener;
         this.userInteractionHandler = userInteractionHandler;
@@ -67,7 +65,7 @@ public class SearchManager implements Cancelable {
         this.queue.forEach((key, _) -> queue.get(key).add(release));
         /* Create a scoreCalculator so we can score subtitles for this release */
         // TODO: extract to factory
-        SortWeight weights = new SortWeight(release, this.settings.sortWeights);
+        SortWeight weights = new SortWeight(release, SettingsControl.settings.sortWeights);
         this.scoreCalculators.put(release, new ScoreCalculator(weights));
     }
 

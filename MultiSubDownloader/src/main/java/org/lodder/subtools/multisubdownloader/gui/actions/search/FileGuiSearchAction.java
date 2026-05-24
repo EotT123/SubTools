@@ -15,7 +15,7 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.gui.panels.SearchFileInputPanel;
 import org.lodder.subtools.multisubdownloader.gui.panels.SearchPanel;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
-import org.lodder.subtools.multisubdownloader.settings.model.Settings;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -25,16 +25,16 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
 
     private final FileListAction filelistAction;
 
-    public FileGuiSearchAction(Settings settings, GUI mainWindow, SearchPanel<SearchFileInputPanel> searchPanel,
+    public FileGuiSearchAction(GUI mainWindow, SearchPanel<SearchFileInputPanel> searchPanel,
         ReleaseFactory releaseFactory) {
-        super(settings, mainWindow, searchPanel, releaseFactory);
-        this.filelistAction = new FileListAction(settings);
+        super(mainWindow, searchPanel, releaseFactory);
+        this.filelistAction = new FileListAction();
     }
 
     @Override
     protected void validate() throws SearchSetupException {
         String path = getInputPanel().getIncomingPath();
-        if (path.isEmpty() && !this.settings.hasDefaultFolders()) {
+        if (path.isEmpty() && !SettingsControl.settings.hasDefaultFolders()) {
             throw new SearchSetupException(Messages.getText("App.NoFolderSelected"));
         }
     }
@@ -101,7 +101,7 @@ public final class FileGuiSearchAction extends GuiSearchAction<SearchFileInputPa
     private List<Path> getFiles(String filePath, Language language, boolean recursive,
         boolean overwriteExistingSubtitles) {
         /* Get a list of selected directories */
-        List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : this.settings.defaultFolders;
+        List<Path> dirs = !filePath.isEmpty() ? List.of(Path.of(filePath)) : SettingsControl.settings.defaultFolders;
 
         /* Scan directories for video files */
         /* Tell Action where to send progressUpdates */
