@@ -23,12 +23,11 @@ class SubtitleFilteringTest {
         Subtitle subtitle2 = createSubtitle("", "", false, "");
         Subtitle subtitle3 = createSubtitle("", "", true, "");
 
-        executeWithSettings(false, false, true, () -> {
+        executeWithSettings(false, false, true, () ->
             assertThatFilter(new SubtitleFiltering())
                 .appliedOnSubtitles(subtitle1, subtitle2, subtitle3)
                 .forRelease(createRelease("Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv", "DIMENSION"))
-                .matchesSubtitles(subtitle2);
-        });
+                .matchesSubtitles(subtitle2));
     }
 
     @Test
@@ -46,20 +45,16 @@ class SubtitleFilteringTest {
             createSubtitle("Criminal.Minds.S10E12.Anonymous.1080p.WEB-DL.DD5.1.H.264-CtrlHD", "CtrlHD", false, "");
 
         // only keyword
-        executeWithSettings(true, false, false, () -> {
+        executeWithSettings(true, false, false, () ->
             assertThatFilter(new SubtitleFiltering())
                 .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-                .forRelease(release)
-                .matchesSubtitles(subtitle3, subtitle4, subtitle5);
-        });
+                .forRelease(release).matchesSubtitles(subtitle3, subtitle4, subtitle5));
 
         // keyword and exclude hearing impaired
-        executeWithSettings(true, false, true, () -> {
+        executeWithSettings(true, false, true, () ->
             assertThatFilter(new SubtitleFiltering())
                 .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-                .forRelease(release)
-                .matchesSubtitles(subtitle4, subtitle5);
-        });
+                .forRelease(release).matchesSubtitles(subtitle4, subtitle5));
     }
 
     @Test
@@ -75,20 +70,16 @@ class SubtitleFilteringTest {
             createSubtitle("Criminal.Minds.S10E12.Anonymous.1080p.WEB-DL.DD5.1.H.264-CtrlHD", "CtrlHD", false, "");
 
         // only exact match
-        executeWithSettings(false, true, false, () -> {
+        executeWithSettings(false, true, false, () ->
             assertThatFilter(new SubtitleFiltering())
                 .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5)
-                .forRelease(release)
-                .matchesSubtitles(subtitle3, subtitle4);
-        });
+                .forRelease(release).matchesSubtitles(subtitle3, subtitle4));
 
         // exact match and exclude hearing impaired
-        executeWithSettings(false, true, true, () -> {
+        executeWithSettings(false, true, true, () ->
             assertThatFilter(new SubtitleFiltering())
                 .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5)
-                .forRelease(release)
-                .matchesSubtitles(subtitle4);
-        });
+                .forRelease(release).matchesSubtitles(subtitle4));
     }
 
     @Test
@@ -115,12 +106,10 @@ class SubtitleFilteringTest {
         });
 
         // exact match and exclude hearing impaired
-        executeWithSettings(true, true, true, () -> {
+        executeWithSettings(true, true, true, () ->
             assertThatFilter(new SubtitleFiltering())
                 .appliedOnSubtitles(subtitle1, subtitle2, subtitle3, subtitle4, subtitle5, subtitle6)
-                .forRelease(release)
-                .matchesSubtitles(subtitle4);
-        });
+                .forRelease(release).matchesSubtitles(subtitle4));
     }
 
     private void executeWithSettings(boolean keyword, boolean exact, boolean excludeHearingImpaired,
