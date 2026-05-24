@@ -45,13 +45,11 @@ public class Addic7edApi implements SubtitleApi {
     private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
     private static final Pattern TITLE_PATTERN = Pattern.compile(".*? - \\d+x\\d+ - (.*)");
     private static final Pattern VERSION_PATTERN = Pattern.compile("Version (?<info>.+), Duration: \\d+\\.\\d+");
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     private Time lastRequest = Time.now();
 
-    public Addic7edApi(Manager manager, @Nullable Credentials credentials=null)
+    public Addic7edApi(@Nullable Credentials credentials=null)
         throws Addic7edApiException {
-        this.manager = manager;
         if (credentials != null) {
             login(credentials);
         }
@@ -59,7 +57,7 @@ public class Addic7edApi implements SubtitleApi {
 
     public void login(Credentials credentials) throws Addic7edApiException {
         try {
-            manager.postBuilder("$DOMAIN/dologin.php")
+            Manager.getInstance().postBuilder("$DOMAIN/dologin.php")
                 .addData("username", credentials.username)
                 .addData("password", credentials.password)
                 .addData("remember", "false")
@@ -252,7 +250,7 @@ public class Addic7edApi implements SubtitleApi {
                 }
                 lastRequest = Time.now();
             }
-            return manager.getDocument(new PageContentParams(url:url, userAgent:""));
+            return Manager.getInstance().getDocument(new PageContentParams(url:url, userAgent:""));
         } catch (Exception e) {
             throw Addic7edApiException.error(e);
         }

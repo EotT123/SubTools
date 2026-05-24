@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader;
 
 import static java.util.Objects.*;
-import static manifold.science.util.UnitConstants.*;
 import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionEnable.*;
 import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionPath.*;
 import static util.Utils.*;
@@ -24,7 +23,6 @@ import org.lodder.subtools.multisubdownloader.cli.CliOptions;
 import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOption;
 import org.lodder.subtools.multisubdownloader.exceptions.CliException;
 import org.lodder.subtools.multisubdownloader.framework.Bootstrapper;
-import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Splash;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
@@ -33,9 +31,6 @@ import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.cache.CacheType;
-import org.lodder.subtools.sublibrary.cache.ProviderCacheDisk;
-import org.lodder.subtools.sublibrary.cache.ProviderCacheMemory;
-import org.lodder.subtools.sublibrary.util.webpage.http.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +56,7 @@ public class App {
         }
 
 
-        Container app = new Container();
-        Manager manager = createManager();
         Messages.language = ifNullThen(SettingsControl.settings.language, Language.ENGLISH);
-        Bootstrapper bootstrapper = new Bootstrapper(app, manager);
 
         if (commandline.isEnabled(TRACE)) {
             setLogLevel(Level.ALL);
@@ -73,13 +65,13 @@ public class App {
         }
 
         if (commandline.isEnabled(NO_GUI)) {
-            bootstrapper.initialize(new UserInteractionHandlerCLI(SettingsControl.settings));
+            new Bootstrapper(new UserInteractionHandlerCLI(SettingsControl.settings));
 
             /* Defined here so there is output on console */
             importPreferences(commandline);
 
             try {
-                CLI cmd = new CLI(app, commandline);
+                CLI cmd = new CLI(commandline);
                 if (commandline.isEnabled(HELP)) {
                     formatter.printHelp(ConfigProperties.getProperty(Property.NAME), "help", getCLIOptions(), "",
                         false);
@@ -92,14 +84,14 @@ public class App {
             }
         } else {
             splash = new Splash(Messages.getText("App.Starting")).showSplash();
+            new Bootstrapper(new UserInteractionHandlerGUI(SettingsControl.settings, null));
 
             /* Defined here so there is output in the splash */
             importPreferences(commandline);
 
-            bootstrapper.initialize(new UserInteractionHandlerGUI(SettingsControl.settings, null));
             EventQueue.invokeLater(() -> {
                 try {
-                    JFrame window = new GUI(app);
+                    JFrame window = new GUI();
                     window.setVisible(true);
                     splash.setVisible(false);
                     splash.dispose();
@@ -113,7 +105,8 @@ public class App {
                 SubtitleProviderStore.allProviders.stream().map(provider -> provider.provider)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
-            manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key.provider::equals))
+            Manager.getInstance()
+                .getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key.provider::equals))
                 .clearExpiredCache();
         }).start();
 
@@ -143,12 +136,5 @@ public class App {
         Options options = new Options();
         CliOptions.values().stream().map(CliOption::getOption).forEach(options::addOption);
         return options;
-    }
-
-    private static Manager createManager() {
-        ProviderCacheDisk diskCache = new ProviderCacheDisk(500 day, 5000);
-        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10 min, 100 ms, 2500);
-
-        return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }
 }

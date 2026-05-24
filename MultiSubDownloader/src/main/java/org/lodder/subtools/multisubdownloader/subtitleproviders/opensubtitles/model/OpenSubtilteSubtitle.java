@@ -36,12 +36,12 @@ public class OpenSubtilteSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder,
-        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
+    public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
+        throws IOException {
         try {
             String url = urlSupplier.get();
             Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-            manager.downloadAndExtractFile(url, subPath);
+            Manager.getInstance().downloadAndExtractFile(url, subPath);
             return List.of(subPath);
         } catch (OpenSubtitleException e) {
             throw new IOException(e);

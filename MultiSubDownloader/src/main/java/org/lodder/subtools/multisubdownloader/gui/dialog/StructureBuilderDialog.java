@@ -22,7 +22,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStr
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.StructureTag;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
@@ -47,14 +46,14 @@ public class StructureBuilderDialog extends MultiSubDialog implements DocumentLi
     }
 
     public StructureBuilderDialog(@Nullable JFrame frame=null, String title, boolean modal, VideoType videoType,
-        StructureType structureType, Manager manager, UserInteractionHandler userInteractionHandler,
+        StructureType structureType, UserInteractionHandler userInteractionHandler,
         Function<String, ? extends LibraryBuilder> filenameLibraryBuilder) {
         super(frame, title, modal);
         this.libraryBuilder = filenameLibraryBuilder;
         this.release = requireNonNull(switch (videoType) {
-            case EPISODE -> new ReleaseFactory(manager).createRelease(
+            case EPISODE -> new ReleaseFactory().createRelease(
                 "Terra.Nova.S01E01E02.Genesis.720p.HDTV.x264-ORENJI.mkv", userInteractionHandler, false);
-            case MOVIE -> new ReleaseFactory(manager).createRelease(
+            case MOVIE -> new ReleaseFactory().createRelease(
                 "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv", userInteractionHandler, false);
         });
 

@@ -18,7 +18,6 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
@@ -27,13 +26,11 @@ import retrofit2.Response;
 @NullMarked
 public class TvdbApi implements ApiIntf {
 
-    @val @override Manager manager;
     private final TheTvdb theTvdb;
 
     @val @override String provider = "TVDB";
 
-    public TvdbApi(Manager manager, String apikey) {
-        this.manager = manager;
+    public TvdbApi(String apikey) {
         this.theTvdb = new TheTvdb(apikey);
     }
 

@@ -39,12 +39,6 @@ public class UpdateAvailableGithub {
     private static final String REPO_URI = "/EotT/SubTools";
     private static final String REPO_URL = DOMAIN + REPO_URI;
 
-    private final Manager manager;
-
-    public UpdateAvailableGithub(Manager manager) {
-        this.manager = manager;
-    }
-
     public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
         LocalDate lastUpdateCheck = getLastUpdateCheck();
         try {
@@ -78,12 +72,12 @@ public class UpdateAvailableGithub {
     }
 
     private @Nullable String getUrlLatestNewStableGithubRelease() {
-        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "update-url"))
+        return new CacheKey(CacheType.MEMORY, new ProviderCacheKey("Github", "update-url"))
             .get(() -> {
                 try {
                     String currentVersion = getVersion();
                     Element element =
-                        manager.getDocument(new PageContentParams(
+                        Manager.getInstance().getDocument(new PageContentParams(
                                 url:"$REPO_URL/releases",
                                 cacheType:CacheType.NONE,
                                 userAgent:null))
@@ -97,7 +91,7 @@ public class UpdateAvailableGithub {
                         return null;
                     }
                     String versionBlockUrl = REPO_URL + "/releases/expanded_assets/" + versionText;
-                    Element artifactElement = manager.getDocument(
+                    Element artifactElement = Manager.getInstance().getDocument(
                             new PageContentParams(url:versionBlockUrl, userAgent:null))
                         .selectFirstByCss(".Box-row a[href$='.jar']");
                     String url = DOMAIN + artifactElement.attr("href");
@@ -115,18 +109,17 @@ public class UpdateAvailableGithub {
     }
 
     private @Nullable String getUrlLatestNewNightlyGithubRelease() {
-        return new CacheKey(manager, CacheType.MEMORY,
+        return new CacheKey(CacheType.MEMORY,
             new ProviderCacheKey("Github", "update-url-nightly"))
             .get(() -> {
                 try {
                     LocalDateTime buildTista = getBuildTista();
 
-                    Element rowElement =
-                        manager.getDocument(new PageContentParams(
-                                url:"$REPO_URL/actions?query=branch%3Amaster",
-                                cacheType:CacheType.MEMORY,
-                                userAgent:null))
-                            .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
+                    Element rowElement = Manager.getInstance().getDocument(new PageContentParams(
+                            url:"$REPO_URL/actions?query=branch%3Amaster",
+                            cacheType:CacheType.MEMORY,
+                            userAgent:null))
+                        .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
                         rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
                     if (nightlyBuildTista.isBefore(buildTista)) {
@@ -134,9 +127,10 @@ public class UpdateAvailableGithub {
                     }
                     String url =
                         "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
-                    String downloadUrl = manager.getDocument(new PageContentParams(url, CacheType.MEMORY))
-                        .selectFirstByCss("table td a")
-                        .attr("href");
+                    String downloadUrl =
+                        Manager.getInstance().getDocument(new PageContentParams(url, CacheType.MEMORY))
+                            .selectFirstByCss("table td a")
+                            .attr("href");
                     updateLastUpdateCheck();
                     return downloadUrl;
                 } catch (Exception e) {
@@ -164,7 +158,7 @@ public class UpdateAvailableGithub {
     }
 
     private CacheKey getUpdateLastUpdateCheckCache() {
-        return new CacheKey(manager, CacheType.MEMORY, new ProviderCacheKey("Github", "LastUpdateCheck"));
+        return new CacheKey(CacheType.MEMORY, new ProviderCacheKey("Github", "LastUpdateCheck"));
     }
 
     private void updateLastUpdateCheck() {

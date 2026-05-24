@@ -81,7 +81,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private static final String CONTENT_TYPE = "application/json";
     private static final String APIKEY = "YrrY0zddovN1rY55tCWQbMxcNR68wnN3";
 
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     private @Nullable Credentials credentials;
 
@@ -111,8 +110,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private final LazySupplier<DownloadApi> downloadApi =
         new LazySupplier<>(() -> apiClient.get().createService(DownloadApi.class));
 
-    public OpenSubtitlesApi(Manager manager, @Nullable Credentials credentials=null) throws OpenSubtitleApiException {
-        this.manager = manager;
+    public OpenSubtitlesApi(@Nullable Credentials credentials=null) throws OpenSubtitleApiException {
         this.credentials = credentials;
     }
 
@@ -125,7 +123,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     }
 
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
-        return manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
+        return Manager.getInstance().getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
             .get(() -> ifNullThrow(getBearerTokenWithoutCache(username, password),
                 () -> OpenSubtitleApiException.noResult(
                     "Could not acquire a bearer token, " + "invalid username/password?")), 23.5hr);
@@ -161,7 +159,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return getCache("providerSerieIds", b -> b.add("serieName", serieName))
             .get(() -> {
                 try {
-                    return manager.getJsonArray(new PageContentParams(
+                    return Manager.getInstance().getJsonArray(new PageContentParams(
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName="
                                 + URLEncoder.encode(serieName.toLowerCase(), StandardCharsets.UTF_8),
                             cacheType:CacheType.MEMORY,
@@ -187,7 +185,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return getCache("providerSerieId", b -> b.add("imdbId", imdbId))
             .get(() -> {
                 try {
-                    return manager.getJsonArray(new PageContentParams(
+                    return Manager.getInstance().getJsonArray(new PageContentParams(
                             url:"https://www.opensubtitles.org/libs/suggest.php?format=json3&MovieName=" + imdbId,
                             cacheType:CacheType.MEMORY,
                             retry:new Retry(

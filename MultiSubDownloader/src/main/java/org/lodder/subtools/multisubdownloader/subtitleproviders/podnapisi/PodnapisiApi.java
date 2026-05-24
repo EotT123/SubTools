@@ -42,12 +42,10 @@ import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 public class PodnapisiApi implements SubtitleApi {
 
     private static final String DOMAIN = "https://www.podnapisi.net";
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.PODNAPISI;
     private final String userAgent;
 
-    public PodnapisiApi(Manager manager, String userAgent) {
-        this.manager = manager;
+    public PodnapisiApi(String userAgent) {
         this.userAgent = userAgent;
     }
 
@@ -207,7 +205,7 @@ public class PodnapisiApi implements SubtitleApi {
 
     protected @Nullable Document getXml(String url) throws PodnapisiApiException {
         try {
-            return manager.getDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
+            return Manager.getInstance().getDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
                 new Retry(
                     1,
                     ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&

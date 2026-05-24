@@ -17,7 +17,6 @@ import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbException;
 import org.lodder.subtools.sublibrary.data.imdb.exception.ImdbSearchIdException;
@@ -26,7 +25,7 @@ import org.lodder.subtools.sublibrary.data.imdb.model.ImdbId;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
+import org.lodder.subtools.sublibrary.util.lazy.LazyFunction;
 import org.lodder.subtools.sublibrary.util.throwingfunction.ThrowingTriFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,19 +34,17 @@ import org.slf4j.LoggerFactory;
 public class ImdbAdapter implements AdapterIntf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImdbAdapter.class);
-    private static final LazyBiFunction<Manager, UserInteractionHandler, ImdbAdapter> INSTANCE =
-        new LazyBiFunction<>(ImdbAdapter::new);
-    @val @override Manager manager;
+    private static final LazyFunction<UserInteractionHandler, ImdbAdapter> INSTANCE =
+        new LazyFunction<>(ImdbAdapter::new);
     @val @override String provider = "IMDB";
     private final UserInteractionHandler userInteractionHandler;
     private final ImdbApi imdbApi;
     private final ImdbSearchIdApi imdbSearchIdApi;
 
-    private ImdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.manager = manager;
+    private ImdbAdapter(UserInteractionHandler userInteractionHandler) {
         this.userInteractionHandler = userInteractionHandler;
-        this.imdbApi = new ImdbApi(manager);
-        this.imdbSearchIdApi = new ImdbSearchIdApi(manager);
+        this.imdbApi = new ImdbApi();
+        this.imdbSearchIdApi = new ImdbSearchIdApi();
     }
 
     public @Nullable ImdbDetails getDetails(String imdbId) {
@@ -145,7 +142,7 @@ public class ImdbAdapter implements AdapterIntf {
         return userInteractionHandler.enter(provider, getText("Prompter.EnterImdbIdForSerie", title));
     }
 
-    public static synchronized ImdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
-        return INSTANCE.apply(manager, userInteractionHandler);
+    public static synchronized ImdbAdapter getInstance(UserInteractionHandler userInteractionHandler) {
+        return INSTANCE.apply(userInteractionHandler);
     }
 }

@@ -2,12 +2,9 @@ package org.lodder.subtools.multisubdownloader.serviceproviders;
 
 import java.util.function.Supplier;
 
-import manifold.ext.props.rt.api.override;
-import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubAdapter;
@@ -16,12 +13,8 @@ import org.lodder.subtools.sublibrary.Credentials;
 @NullMarked
 public class OpenSubtitlesServiceProvider implements ServiceProvider {
 
-    /* We define a priority lower than SubtitleServiceProvider */
-    @val @override int priority = 1;
-
     @Override
-    public Supplier<OpenSubAdapter> createProviderSupplier(Container app,
-        UserInteractionHandler userInteractionHandler) {
+    public Supplier<OpenSubAdapter> createProviderSupplier(UserInteractionHandler userInteractionHandler) {
         return () -> {
             Credentials credentials = null;
             if (SettingsControl.settings.loginOpenSubtitlesEnabled) {
@@ -32,7 +25,7 @@ public class OpenSubtitlesServiceProvider implements ServiceProvider {
                     credentials = new Credentials(username, password);
                 }
             }
-            return new OpenSubAdapter(app.makeManager(), credentials, userInteractionHandler);
+            return new OpenSubAdapter(credentials, userInteractionHandler);
         };
     }
 }

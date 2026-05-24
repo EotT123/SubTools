@@ -5,7 +5,6 @@ import static util.Utils.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbSerie;
@@ -21,8 +20,8 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TvReleaseControl.class);
 
-    public TvReleaseControl(Manager manager, UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
+    public TvReleaseControl(UserInteractionHandler userInteractionHandler) {
+        super(userInteractionHandler);
     }
 
     @Override

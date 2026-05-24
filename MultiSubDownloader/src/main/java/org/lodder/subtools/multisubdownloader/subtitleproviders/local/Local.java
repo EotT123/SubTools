@@ -19,7 +19,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.local.model.LocalSubtitle;
 import org.lodder.subtools.sublibrary.DetectLanguage;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
@@ -40,11 +39,9 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Local.class);
 
     private final UserInteractionHandler userInteractionHandler;
-    @val @override Manager manager;
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.LOCAL;
 
-    public Local(Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.manager = manager;
+    public Local(UserInteractionHandler userInteractionHandler) {
         this.userInteractionHandler = userInteractionHandler;
     }
 
@@ -61,7 +58,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         String name = !tvRelease.originalName.isEmpty() ? tvRelease.originalName : tvRelease.name;
         String filter = name.replaceAll("[^A-Za-z]", "").trim();
 
-        TvReleaseControl tvReleaseControl = new TvReleaseControl(manager, userInteractionHandler);
+        TvReleaseControl tvReleaseControl = new TvReleaseControl(userInteractionHandler);
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {
                 if (ReleaseParser.parse(fileSub) instanceof TvReleaseWithoutPath tvReleaseWithoutPath &&
@@ -87,7 +84,7 @@ public class Local implements SubtitleProvider<LocalSubtitle> {
         Set<LocalSubtitle> listFoundSubtitles = new HashSet<>();
 
         String filter = movieRelease.name;
-        MovieReleaseControl movieCtrl = new MovieReleaseControl(manager, userInteractionHandler);
+        MovieReleaseControl movieCtrl = new MovieReleaseControl(userInteractionHandler);
 
         for (Path fileSub : getPossibleSubtitles(filter)) {
             try {

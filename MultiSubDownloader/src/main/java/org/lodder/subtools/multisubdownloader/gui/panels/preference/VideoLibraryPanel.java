@@ -14,7 +14,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.TitlePanel;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -32,7 +31,7 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
     protected final StructureFolderPanel pnlStructureFolder;
     protected final StructureFilePanel pnlStructureFile;
 
-    VideoLibraryPanel(LibrarySettings librarySettings, VideoType videoType, Manager manager, boolean renameMode,
+    VideoLibraryPanel(LibrarySettings librarySettings, VideoType videoType, boolean renameMode,
         UserInteractionHandler userInteractionHandler) {
         super(new MigLayout("fillx, nogrid"));
         this.librarySettings = librarySettings;
@@ -55,10 +54,10 @@ public abstract sealed class VideoLibraryPanel extends JPanel implements Prefere
                 .addTo(performActionPanel, "wrap");
 
             this.pnlStructureFolder =
-                new StructureFolderPanel(librarySettings, videoType, manager, userInteractionHandler)
+                new StructureFolderPanel(librarySettings, videoType, userInteractionHandler)
                     .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
             this.pnlStructureFile =
-                new StructureFilePanel(librarySettings, videoType, manager, userInteractionHandler)
+                new StructureFilePanel(librarySettings, videoType, userInteractionHandler)
                     .addTo(performActionPanel, "hidemode 3, wrap, span, growx");
 
             JLabel lblActionForOtherFiles =

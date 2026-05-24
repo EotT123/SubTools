@@ -8,7 +8,6 @@ import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.FolderStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.MovieStructureTag;
 import org.lodder.subtools.multisubdownloader.settings.model.structure.SerieStructureTag;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.tvdb.TvdbAdapter;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
@@ -37,13 +36,13 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         this.move = move;
     }
 
-    public static PathLibraryBuilder fromSettings(LibrarySettings libSettings, Manager manager,
+    public static PathLibraryBuilder fromSettings(LibrarySettings libSettings,
         UserInteractionHandler userInteractionHandler) {
         return new PathLibraryBuilder(
             structure:libSettings.folderStructure,
             replaceSpace:libSettings.folderReplaceSpace,
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
-            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(manager, userInteractionHandler) : null,
+            tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(userInteractionHandler) : null,
             libraryFolder:libSettings.folder,
             move:libSettings.hasAnyLibraryAction(LibraryActionType.MOVE, LibraryActionType.MOVE_AND_RENAME));
     }

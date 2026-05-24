@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.gui.Menu;
 import org.lodder.subtools.multisubdownloader.gui.actions.search.FileGuiSearchAction;
 import org.lodder.subtools.multisubdownloader.gui.actions.search.TextGuiSearchAction;
@@ -60,7 +59,6 @@ import org.lodder.subtools.multisubdownloader.util.PropertiesReader.PomProperty;
 import org.lodder.subtools.sublibrary.ConfigProperties;
 import org.lodder.subtools.sublibrary.ConfigProperties.Property;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.OsCheck;
 import org.lodder.subtools.sublibrary.OsCheck.OSType;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -73,8 +71,6 @@ import org.slf4j.LoggerFactory;
 public class GUI extends JFrame implements PropertyChangeListener {
 
     @Serial private static final long serialVersionUID = 1L;
-    private final Container app;
-    private final Manager manager;
     private final UserInteractionHandlerGUI userInteractionHandler;
     private ProgressDialog progressDialog;
     private SearchPanel<SearchFileInputPanel> pnlSearchFile;
@@ -88,9 +84,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     /**
      * Create the application.
      */
-    public GUI(Container app) {
-        this.app = app;
-        this.manager = app.makeManager();
+    public GUI() {
         this.userInteractionHandler = new UserInteractionHandlerGUI(SettingsControl.settings, this);
         setTitle(ConfigProperties.getProperty(Property.NAME));
         /*
@@ -113,7 +107,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     private void checkUpdate(final boolean forceUpdateCheck) {
-        UpdateAvailableGithub u = new UpdateAvailableGithub(manager);
+        UpdateAvailableGithub u = new UpdateAvailableGithub();
         String updateUrl = (forceUpdateCheck && u.isNewVersionAvailable()) ||
             (!forceUpdateCheck && u.shouldCheckForNewUpdate(SettingsControl.settings.updateCheckPeriod) &&
                 u.isNewVersionAvailable()) ? u.getLatestDownloadUrl() : null;
@@ -203,9 +197,8 @@ public class GUI extends JFrame implements PropertyChangeListener {
         BiConsumer<SearchColumnName, Boolean> visibilityFunction =
             pnlSearchFile.resultPanel.getTable()::setColumnVisibility;
         BiConsumer<VideoType, String> showRenameDialog =
-            (videoType, title) -> new RenameDialog(self(), videoType, title, manager,
-                userInteractionHandler).setVisible(true);
-        ExportImport exportImport = new ExportImport(manager, userInteractionHandler, this);
+            (videoType, title) -> new RenameDialog(self(), videoType, title, userInteractionHandler).setVisible(true);
+        ExportImport exportImport = new ExportImport(userInteractionHandler, this);
         menuBar = new Menu()
             .withShowOnlyFound(SettingsControl.settings.optionsShowOnlyFound)
             .withFileQuitAction(this::close)
@@ -222,7 +215,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
             .withEditRenameTVAction(() -> showRenameDialog.accept(VideoType.EPISODE, getText("Menu.RenameSerie")))
             .withEditRenameMovieAction(() -> showRenameDialog.accept(VideoType.MOVIE, getText("Menu.RenameMovie")))
             .withEditPreferencesAction(
-                () -> new PreferenceDialog(self(), manager, userInteractionHandler).setVisible(true))
+                () -> new PreferenceDialog(self(), userInteractionHandler).setVisible(true))
             .withTranslateShowNamesAction(this::showTranslateShowNames)
             .withExportTranslationsAction(() -> exportImport.exportSettings(ExportImport.SettingsType.SERIE_MAPPING))
             .withImportTranslationsAction(() -> exportImport.importSettings(ExportImport.SettingsType.SERIE_MAPPING))
@@ -243,8 +236,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         resultPanel.setTable(createSubtitleTable());
         resultPanel.setDownloadAction(_ -> downloadText());
 
-        TextGuiSearchAction searchAction =
-            new TextGuiSearchAction(this, pnlSearchText, new ReleaseFactory(app.makeManager()));
+        TextGuiSearchAction searchAction = new TextGuiSearchAction(this, pnlSearchText, new ReleaseFactory());
         pnlSearchTextInput.addSearchAction(searchAction);
     }
 
@@ -267,8 +259,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         resultPanel.setTable(createVideoTable());
 
-        FileGuiSearchAction searchAction =
-            new FileGuiSearchAction(this, pnlSearchFile, new ReleaseFactory(app.makeManager()));
+        FileGuiSearchAction searchAction = new FileGuiSearchAction(this, pnlSearchFile, new ReleaseFactory());
 
         pnlSearchFileInput.addSelectFolderAction(_ -> selectIncomingFolder());
         pnlSearchFileInput.addSearchAction(searchAction);
@@ -356,8 +347,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
     }
 
     protected void showTranslateShowNames() {
-        final MappingEpisodeNameDialog tDialog =
-            new MappingEpisodeNameDialog(this, app.makeManager(), userInteractionHandler);
+        final MappingEpisodeNameDialog tDialog = new MappingEpisodeNameDialog(this, userInteractionHandler);
         tDialog.setVisible(true);
     }
 
@@ -375,7 +365,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     protected void rename() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
-        RenameWorker renameWorker = new RenameWorker(customTable, app.makeManager(), userInteractionHandler);
+        RenameWorker renameWorker = new RenameWorker(customTable, userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
         pnlSearchFile.resultPanel.enableButtons();
         progressDialog = new ProgressDialog(this, renameWorker);
@@ -385,7 +375,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void download() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
-        DownloadWorker downloadWorker = new DownloadWorker(customTable, app.makeManager(), this);
+        DownloadWorker downloadWorker = new DownloadWorker(customTable, this);
         downloadWorker.addPropertyChangeListener(this);
         pnlSearchFile.resultPanel.disableButtons();
         progressDialog = new ProgressDialog(this, downloadWorker);
@@ -414,7 +404,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                             return filename;
                         };
                         try {
-                            subtitle.download(manager, folder, filenameSupplier);
+                            subtitle.download(folder, filenameSupplier);
                         } catch (IOException e) {
                             LOGGER.error("downloadText", e);
                         }

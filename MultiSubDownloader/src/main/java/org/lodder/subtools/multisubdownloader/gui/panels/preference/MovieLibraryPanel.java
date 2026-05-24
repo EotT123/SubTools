@@ -4,7 +4,6 @@ import java.io.Serial;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -14,9 +13,9 @@ public final class MovieLibraryPanel extends VideoLibraryPanel {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public MovieLibraryPanel(LibrarySettings libSettings, Manager manager, boolean renameMode,
-            UserInteractionHandler userInteractionHandler) {
-        super(libSettings, VideoType.MOVIE, manager, renameMode, userInteractionHandler);
+    public MovieLibraryPanel(LibrarySettings libSettings, boolean renameMode,
+        UserInteractionHandler userInteractionHandler) {
+        super(libSettings, VideoType.MOVIE, renameMode, userInteractionHandler);
         repaint();
     }
 }

@@ -12,7 +12,6 @@ import manifold.ext.props.rt.api.val;
 import manifold.json.rt.api.Requester;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbApiException;
 
@@ -21,12 +20,7 @@ class OmdbApi implements ApiIntf {
 
     private static final String API_KEY = "74473b06";
     private static final String API_DOMAIN = "http://www.omdbapi.com";
-    @val @override Manager manager;
     @val @override String provider = "OMDB";
-
-    public OmdbApi(Manager manager) {
-        this.manager = manager;
-    }
 
     public @Nullable Release searchRelease(String imdbId) throws OmdbApiException {
         return getCache("release", b -> b.add("imdbId", imdbId))

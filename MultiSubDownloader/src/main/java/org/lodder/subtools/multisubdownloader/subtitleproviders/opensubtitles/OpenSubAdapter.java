@@ -19,7 +19,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.mo
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.TypeEnum;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
@@ -40,10 +39,10 @@ public final class OpenSubAdapter
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
-    public OpenSubAdapter(Manager manager, Credentials credentials, UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
+    public OpenSubAdapter(Credentials credentials, UserInteractionHandler userInteractionHandler) {
+        super(userInteractionHandler);
         try {
-            api = new OpenSubtitlesApi(manager, credentials);
+            api = new OpenSubtitlesApi(credentials);
         } catch (OpenSubtitleException e) {
             throw new SubtitlesProviderInitException(provider, e);
         }

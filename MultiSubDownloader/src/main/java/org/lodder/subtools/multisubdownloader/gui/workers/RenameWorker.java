@@ -11,7 +11,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger
 import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.TvReleaseWithPath;
@@ -21,12 +20,10 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 public class RenameWorker extends SwingWorker<Void, String> implements Cancelable {
 
     private final CustomTable table;
-    private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public RenameWorker(CustomTable table, Manager manager, UserInteractionHandler userInteractionHandler) {
+    public RenameWorker(CustomTable table, UserInteractionHandler userInteractionHandler) {
         this.table = table;
-        this.manager = manager;
         this.userInteractionHandler = userInteractionHandler;
     }
 
@@ -50,12 +47,10 @@ public class RenameWorker extends SwingWorker<Void, String> implements Cancelabl
                 setProgress(progress);
 
                 MoveAndRenameAction moveAndRenameAction = switch (selectedShow) {
-                    case TvReleaseWithPath _ ->
-                        new MoveAndRenameAction(SettingsControl.settings.episodeLibrarySettings, manager,
-                            userInteractionHandler);
+                    case TvReleaseWithPath _ -> new MoveAndRenameAction(SettingsControl.settings.episodeLibrarySettings,
+                        userInteractionHandler);
                     case MovieReleaseWithPath _ ->
-                        new MoveAndRenameAction(SettingsControl.settings.movieLibrarySettings, manager,
-                            userInteractionHandler);
+                        new MoveAndRenameAction(SettingsControl.settings.movieLibrarySettings, userInteractionHandler);
                 };
                 moveAndRenameAction.moveAndRename(selectedShow.path.parent.resolve(selectedShow.fileName),
                     selectedShow);

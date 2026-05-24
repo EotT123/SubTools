@@ -12,10 +12,9 @@ import org.lodder.subtools.sublibrary.cache.CacheType;
 @NullMarked
 public interface AdapterIntf {
     @val String provider;
-    @val Manager manager;
 
     default CacheKey getCache(String operation, UnaryOperator<CacheKeyBuilder> CacheKeyBuilderFunction=b -> b) {
-        return manager.getCache(CacheType.DISK,
+        return Manager.getInstance().getCache(CacheType.DISK,
             CacheKeyBuilderFunction.apply(new CacheKeyBuilder(provider, operation)));
     }
 }

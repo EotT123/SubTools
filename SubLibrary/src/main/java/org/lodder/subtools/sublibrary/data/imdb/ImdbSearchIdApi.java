@@ -31,13 +31,13 @@ import org.lodder.subtools.sublibrary.model.VideoType;
 import util.Utils;
 
 @NullMarked
-record ImdbSearchIdApi(Manager manager) {
+record ImdbSearchIdApi() {
 
     private static final Pattern IMDB_URL_ID_PATTERN = Pattern.compile("/title/tt(\\d*)");
 
     public Set<ImdbId> getImdbIdOnImdb(String title, @Nullable Integer year, VideoType videoType)
         throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY,
+        return Manager.getInstance().getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-imdb").add("title", title).add("year", year))
             .get(() -> {
                 StringBuilder sb = new StringBuilder("https://www.imdb.com/find/?q=");
@@ -51,7 +51,8 @@ record ImdbSearchIdApi(Manager manager) {
                 });
                 String url = sb.toString().replace("+", "%20");
                 try {
-                    Elements searchResults = manager.getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
+                    Elements searchResults = Manager.getInstance()
+                        .getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
                         .select(".ipc-metadata-list-summary-item .cli-children");
                     return getImdbIdCommon(searchResults,
                         e -> e.selectFirst("a").text(),
@@ -71,12 +72,12 @@ record ImdbSearchIdApi(Manager manager) {
     }
 
     public ImdbId getImdbIdOnImdb(String title, String imdbId) throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY,
+        return Manager.getInstance().getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-imdb_user-provided").add("title", title).add("imdbId", imdbId))
             .get(() -> {
                 String url = "https://www.imdb.com/title/" + imdbId;
                 try {
-                    String json = manager.getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
+                    String json = Manager.getInstance().getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
                         .selectFirst("html > head > script[type=\"application/ld+json\"]").data();
                     JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
                     String name = jsonObject.get("name").getAsString();
@@ -95,7 +96,7 @@ record ImdbSearchIdApi(Manager manager) {
 
     public Set<ImdbId> getImdbIdOnYahoo(String title, @Nullable Integer year, VideoType videoType)
         throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY,
+        return Manager.getInstance().getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-yahoo").add("title", title).add("year", year))
             .get(() -> {
                 StringBuilder sb =
@@ -109,8 +110,9 @@ record ImdbSearchIdApi(Manager manager) {
                 String url = sb.toString();
 
                 try {
-                    Elements searchResults = manager.getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
-                        .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
+                    Elements searchResults =
+                        Manager.getInstance().getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
+                            .select("a[href~='https%3a%2f%2fwww.imdb.com%2ftitle%2ftt']");
                     Function<Element, @Nullable String> toStringMapper =
                         e -> ifNotNull((Element) e.selectFirst("h3"), e2 -> e2.text().replace(" - IMDb", ""));
                     Function<Element, String> toHrefMapper =
@@ -124,7 +126,7 @@ record ImdbSearchIdApi(Manager manager) {
 
     public Set<ImdbId> getImdbIdOnGoogle(String title, @Nullable Integer year, VideoType videoType)
         throws ImdbSearchIdException {
-        return manager.getCache(CacheType.MEMORY,
+        return Manager.getInstance().getCache(CacheType.MEMORY,
                 new CacheKeyBuilder("IMDB", "imdbid-google").add("title", title).add("year", year))
             .get(() -> {
                 StringBuilder sb = new StringBuilder("https://www.google.com/search?q=");
@@ -136,7 +138,7 @@ record ImdbSearchIdApi(Manager manager) {
                 String url = sb.toString();
                 try {
                     Elements searchResults =
-                        manager.getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
+                        Manager.getInstance().getDocument(new PageContentParams(url, browserMode:WEBDRIVER))
                             .select("a[href^='https://www.imdb.com/title/tt']");
                     Function<Element, String> toStringMapper =
                         e -> e.selectFirst("span").text().replace(" - IMDb", "");

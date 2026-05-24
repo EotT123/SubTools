@@ -18,7 +18,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.A
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.model.Addic7edSubtitle;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
@@ -34,11 +33,10 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     @val @override boolean useSeasonForSerieId = true;
 
-    public Addic7edAdapter(Manager manager, @Nullable Credentials credentials=null,
-        UserInteractionHandler userInteractionHandler) {
-        super(manager, userInteractionHandler);
+    public Addic7edAdapter(@Nullable Credentials credentials=null, UserInteractionHandler userInteractionHandler) {
+        super(userInteractionHandler);
         try {
-            api = new Addic7edApi(manager, credentials);
+            api = new Addic7edApi(credentials);
         } catch (Exception e) {
             throw new SubtitlesProviderInitException(provider, e);
         }

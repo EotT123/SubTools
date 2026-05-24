@@ -1,7 +1,6 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
 import static manifold.science.util.UnitConstants.*;
-import static org.apache.commons.lang3.StringUtils.*;
 import static util.Utils.*;
 
 import java.io.IOException;
@@ -41,7 +40,6 @@ public class TvdbApiBak implements ApiIntf {
 
     private static final String APIKEY = "d2dd1b0f-0eb3-45c9-9c62-f852ad857aa3";
     //"cdda250d-4fb1-4134-9555-1f51ad800590";
-    @val @override Manager manager;
     @val @override String provider = "TVDB";
     private final LazyThrowingSupplier<ApiClient, TvdbApiException> apiClient = new LazyThrowingSupplier<>(() -> {
         HttpBearerAuth bearerAuth = new HttpBearerAuth("bearer");
@@ -53,12 +51,11 @@ public class TvdbApiBak implements ApiIntf {
     private final LazyThrowingSupplier<SeriesApi, TvdbApiException> seriesApi =
         new LazyThrowingSupplier<>(() -> apiClient.get().createService(SeriesApi.class));
 
-    public TvdbApiBak(Manager manager, String apikey) {
-        this.manager = manager;
+    public TvdbApiBak(String apikey) {
     }
 
     private String getBearerToken() throws TvdbApiException {
-        return manager.getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
+        return Manager.getInstance().getCache(CacheType.DISK, new CacheKeyBuilder("tvdb", "bearerToken"))
             .get(
                 supplier:() -> {
                     try {
@@ -86,7 +83,7 @@ public class TvdbApiBak implements ApiIntf {
         try {
             return getCache("series", b -> b.add("serieName", serieName))
                 .get(() ->
-                    manager.getDocument(new PageContentParams(
+                    Manager.getInstance().getDocument(new PageContentParams(
                             "https://www.thetvdb.com/search?query=" +
                                 serieName.toLowerCase().replace(" ", "%20").urlEncode()))
                         .select(".ais-Hits-item").stream().map(elem ->
@@ -106,7 +103,7 @@ public class TvdbApiBak implements ApiIntf {
             return getCache("serie", b -> b.add("tvdbId", tvdbId))
                 .get(() -> new SeriesBaseRecord()
                     .id(tvdbId)
-                    .name(manager.getDocument(
+                    .name(Manager.getInstance().getDocument(
                             new PageContentParams("https://www.thetvdb.com/?tab=series&id=" + tvdbId)).
                         selectFirst("#series_title").text()));
         } catch (ManagerException e) {

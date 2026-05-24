@@ -13,11 +13,11 @@ import java.io.Serial;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
+import java.util.function.BiFunction;
 
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import net.miginfocom.swing.MigLayout;
-import org.apache.commons.lang3.function.TriFunction;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -43,10 +43,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     private @Nullable SubtitleProvider selectedSubtitleProvider;
     private MappingType selectedMappingType;
 
-    public MappingEpisodeNameDialog(@Nullable JFrame frame=null, Manager manager,
-        UserInteractionHandlerGUI userInteractionHandler) {
+    public MappingEpisodeNameDialog(@Nullable JFrame frame=null, UserInteractionHandlerGUI userInteractionHandler) {
         super(frame, getText("MappingEpisodeNameDialog.Title"), true);
-        this.mappingTableModel = new MappingTableModel(manager);
+        this.mappingTableModel = new MappingTableModel();
         setResizable(true);
         setBounds(150, 150, 650, 400);
 
@@ -81,7 +80,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
                         int rowNbr = table.convertRowIndexToModel(table.getSelectedRow());
                         MappingTableModel model = (MappingTableModel) table.getModel();
                         Row row = (Row) model.getDataVector().get(rowNbr);
-                        new CacheKey(manager, CacheType.DISK, row.key).remove();
+                        new CacheKey(CacheType.DISK, row.key).remove();
                         model.removeRow(rowNbr);
                     }))
                 .addComponent("skip", btnAddCustomMapping =
@@ -153,9 +152,9 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         PODNAPISI(SubtitleProviderFrontEnd.PODNAPISI, "EPISODEmapping"),
         SUBDL(SubtitleProviderFrontEnd.SUBDL, "EPISODEmapping");
 
-        private static final TriFunction<Manager, String, String, List<Pair<ProviderCacheKey, SerieMapping>>>
-            MAPPING_SUPPLIER = (manager, provider, type) ->
-            manager.getEntries(CacheType.DISK, key -> provider.equals(key.provider) && type.equals(key.type));
+        private static final BiFunction<String, String, List<Pair<ProviderCacheKey, SerieMapping>>>
+            MAPPING_SUPPLIER = (provider, type) -> Manager.getInstance()
+            .getEntries(CacheType.DISK, key -> provider.equals(key.provider) && type.equals(key.type));
 
         @val String providerDisplayName;
         @val String provider;
@@ -182,8 +181,8 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
             this.providerNameColumn = getText("MappingEpisodeNameDialog.ProviderName");
         }
 
-        public List<Pair<ProviderCacheKey, @Nullable SerieMapping>> getValues(Manager manager) {
-            return MAPPING_SUPPLIER.apply(manager, provider, type);
+        public List<Pair<ProviderCacheKey, @Nullable SerieMapping>> getValues() {
+            return MAPPING_SUPPLIER.apply(provider, type);
         }
     }
 
@@ -206,16 +205,11 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
     @NullMarked
     private static class MappingTableModel extends DefaultTableModel {
         @Serial private static final long serialVersionUID = 1L;
-        @val Manager manager;
-
-        public MappingTableModel(Manager manager) {
-            this.manager = manager;
-        }
 
         void setMappingType(MappingType mappingType) {
             setDataVector(null,
                 new String[]{mappingType.nameColumn, mappingType.mappingColumn, mappingType.providerNameColumn});
-            mappingType.getValues(manager).stream()
+            mappingType.getValues().stream()
                 .mapFilterNonNull(serieMappingPair -> {
                     SerieMapping serieMapping = serieMappingPair.getValue();
                     if (serieMapping == null) {

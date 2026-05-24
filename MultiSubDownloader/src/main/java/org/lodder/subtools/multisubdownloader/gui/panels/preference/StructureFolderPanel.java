@@ -17,7 +17,6 @@ import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFi
 import org.lodder.subtools.multisubdownloader.gui.jcomponent.jtextfield.MyTextFieldString;
 import org.lodder.subtools.multisubdownloader.lib.library.PathLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
@@ -34,7 +33,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
     private final JCheckBox chkReplaceSpace;
     private final JComboBox<Character> cbxReplaceSpaceChar;
 
-    public StructureFolderPanel(LibrarySettings librarySettings, VideoType videoType, Manager manager,
+    public StructureFolderPanel(LibrarySettings librarySettings, VideoType videoType,
         UserInteractionHandler userInteractionHandler) {
         super(new MigLayout("insets 0, fill, nogrid"));
         this.librarySettings = librarySettings;
@@ -61,8 +60,8 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
             .actionListener(() -> {
                 StructureBuilderDialog sDialog = new StructureBuilderDialog(null,
                     getText("PreferenceDialog.StructureBuilderTitle"),
-                    true, videoType, StructureBuilderDialog.StructureType.FOLDER, manager,
-                    userInteractionHandler, getLibraryStructureBuilder());
+                    true, videoType, StructureBuilderDialog.StructureType.FOLDER, userInteractionHandler,
+                    getLibraryStructureBuilder());
                 String value = sDialog.showDialog(txtFolderStructure.getText());
                 if (!"".equals(value)) {
                     txtFolderStructure.setText(value);

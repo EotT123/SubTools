@@ -17,7 +17,6 @@ import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.lib.Info;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.slf4j.Logger;
@@ -36,10 +35,10 @@ public class DownloadWorker extends SwingWorker<Void, String> implements Cancela
     private final DownloadAction downloadAction;
     private final UserInteractionHandlerAction userInteractionHandlerAction;
 
-    public DownloadWorker(CustomTable table, Manager manager, GUI gui) {
+    public DownloadWorker(CustomTable table, GUI gui) {
         this.table = table;
         UserInteractionHandlerGUI userInteractionHandler = new UserInteractionHandlerGUI(SettingsControl.settings, gui);
-        this.downloadAction = new DownloadAction(manager, userInteractionHandler);
+        this.downloadAction = new DownloadAction(userInteractionHandler);
         this.userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
     }
 

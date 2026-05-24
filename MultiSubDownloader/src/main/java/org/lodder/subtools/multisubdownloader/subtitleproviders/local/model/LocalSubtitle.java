@@ -11,7 +11,6 @@ import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
@@ -31,8 +30,8 @@ public class LocalSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder,
-        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
+    public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
+        throws IOException {
         Path subPath = destinationFolder.resolve(path.fileName);
         path.copyToDir(subPath);
         return List.of(subPath);

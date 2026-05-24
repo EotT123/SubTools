@@ -5,25 +5,17 @@ import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.data.AdapterIntf;
 import org.lodder.subtools.sublibrary.data.omdb.exception.OmdbException;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
-import org.lodder.subtools.sublibrary.util.lazy.LazyBiFunction;
+import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 
 @NullMarked
 public class OmdbAdapter implements AdapterIntf {
 
-    private static final LazyBiFunction<Manager, UserInteractionHandler, OmdbAdapter> INSTANCE =
-        new LazyBiFunction<>(OmdbAdapter::new);
-    private final OmdbApi api;
-    @val @override Manager manager;
+    private static final LazySupplier<OmdbAdapter> INSTANCE = new LazySupplier<>(OmdbAdapter::new);
+    private final OmdbApi api = new OmdbApi();
     @val @override String provider = "OMDB";
-
-    public OmdbAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.manager = manager;
-        this.api = new OmdbApi(manager);
-    }
 
     public @Nullable Release searchReleaseWithImdbId(String imdbId) {
         try {
@@ -59,7 +51,7 @@ public class OmdbAdapter implements AdapterIntf {
         }
     }
 
-    public static synchronized OmdbAdapter getInstance(Manager manager, UserInteractionHandler userInteractionHandler) {
-        return INSTANCE.apply(manager, userInteractionHandler);
+    public static synchronized OmdbAdapter getInstance(UserInteractionHandler userInteractionHandler) {
+        return INSTANCE.get();
     }
 }

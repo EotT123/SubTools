@@ -17,7 +17,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import name.falgout.jeffrey.throwing.ThrowingFunction;
 import name.falgout.jeffrey.throwing.ThrowingSupplier;
@@ -27,7 +26,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.sublibrary.Language;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
@@ -56,13 +54,11 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     implements SubtitleProvider<SUB>, AdapterIntf {
     Logger LOGGER = LoggerFactory.getLogger(SubtitleAdapter.class);
 
-    @val @override Manager manager;
     @val UserInteractionHandler userInteractionHandler;
     @val(Abstract) boolean useSeasonForSerieId;
     //@val @override String provider = subtitleProviderFrontEnd.name();
 
-    protected SubtitleAdapter(Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.manager = manager;
+    protected SubtitleAdapter(UserInteractionHandler userInteractionHandler) {
         this.userInteractionHandler = userInteractionHandler;
     }
 

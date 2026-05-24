@@ -32,7 +32,6 @@ import org.lodder.subtools.multisubdownloader.gui.panels.preference.VideoLibrary
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;
 import org.lodder.subtools.sublibrary.model.VideoType;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
@@ -48,7 +47,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
 
     private ProgressDialog progressDialog;
 
-    public RenameDialog(@Nullable JFrame frame=null, VideoType videoType, String title, Manager manager,
+    public RenameDialog(@Nullable JFrame frame=null, VideoType videoType, String title,
         UserInteractionHandler userInteractionHandler) {
         super(frame, title, false);
         setResizable(false);
@@ -71,17 +70,17 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
                 this.chkRecursive = new JCheckBox(getText("RenameDialog.RecursiveSearch")));
 
         if (videoType == VideoType.EPISODE) {
-            pnlLibrary = new EpisodeLibraryPanel(SettingsControl.settings.episodeLibrarySettings, manager, true,
+            pnlLibrary = new EpisodeLibraryPanel(SettingsControl.settings.episodeLibrarySettings, true,
                 userInteractionHandler).addTo(contentPane, "grow");
         } else {
-            pnlLibrary = new MovieLibraryPanel(SettingsControl.settings.movieLibrarySettings, manager, true,
+            pnlLibrary = new MovieLibraryPanel(SettingsControl.settings.movieLibrarySettings, true,
                 userInteractionHandler).addTo(contentPane, "grow");
         }
 
         new JPanel().layout(new FlowLayout(FlowLayout.RIGHT))
             .addTo(contentPane, BorderLayout.SOUTH)
             .addComponent(new JButton(getText("RenameDialog.Rename")).defaultButtonFor(getRootPane())
-                .actionListener(() -> rename(videoType, manager, userInteractionHandler))
+                .actionListener(() -> rename(videoType, userInteractionHandler))
                 .actionCommand("Rename"))
             .addComponent(new JButton(getText("App.Cancel")).actionListener(() -> setVisible(false))
                 .actionCommand("Cancel"));
@@ -91,7 +90,7 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         return pnlLibrary.hasValidSettings() && txtFolder.hasValidValue();
     }
 
-    private void rename(VideoType videoType, Manager manager, UserInteractionHandler userInteractionHandler) {
+    private void rename(VideoType videoType, UserInteractionHandler userInteractionHandler) {
 
         if (!hasValidSettings()) {
             JOptionPane.showMessageDialog(this, getText("PreferenceDialog.invalidInput"), "Error",
@@ -102,9 +101,9 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         pnlLibrary.savePreferenceSettings();
         TypedRenameWorker renameWorker =
             new TypedRenameWorker(txtFolder.getObject(), pnlLibrary.librarySettings, videoType,
-                this.chkRecursive.isSelected(), manager, userInteractionHandler);
+                this.chkRecursive.isSelected(), userInteractionHandler);
         renameWorker.addPropertyChangeListener(this);
-        renameWorker.releaseFactory = new ReleaseFactory(manager);
+        renameWorker.releaseFactory = new ReleaseFactory();
         progressDialog = new ProgressDialog(renameWorker);
         progressDialog.setVisible(true);
         renameWorker.execute();
@@ -135,14 +134,14 @@ public class RenameDialog extends MultiSubDialog implements PropertyChangeListen
         @set ReleaseFactory releaseFactory;
 
         public TypedRenameWorker(Path dir, LibrarySettings librarySettings, VideoType videoType, boolean isRecursive,
-            Manager manager, UserInteractionHandler userInteractionHandler) {
+            UserInteractionHandler userInteractionHandler) {
             this.userInteractionHandler = userInteractionHandler;
             this.extensions = Streams.concat(VideoPatterns.EXTENSIONS.stream(), Stream.of("srt"))
                 .collect(Collectors.toUnmodifiableSet());
             this.dir = dir;
             this.videoType = videoType;
             this.isRecursive = isRecursive;
-            this.moveAndRenameAction = new MoveAndRenameAction(librarySettings, manager, userInteractionHandler);
+            this.moveAndRenameAction = new MoveAndRenameAction(librarySettings, userInteractionHandler);
         }
 
         @Override

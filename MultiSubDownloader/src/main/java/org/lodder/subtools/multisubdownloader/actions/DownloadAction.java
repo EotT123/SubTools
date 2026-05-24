@@ -19,7 +19,6 @@ import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileAction
 import org.lodder.subtools.multisubdownloader.lib.library.PathLibraryBuilder;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.settings.model.LibrarySettings;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -34,11 +33,9 @@ public class DownloadAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadAction.class);
 
-    private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
 
-    public DownloadAction(Manager manager, UserInteractionHandler userInteractionHandler) {
-        this.manager = manager;
+    public DownloadAction(UserInteractionHandler userInteractionHandler) {
         this.userInteractionHandler = userInteractionHandler;
     }
 
@@ -57,7 +54,7 @@ public class DownloadAction {
         @Nullable AtomicInteger counter) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
         Path path =
-            PathLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler).buildPath(release);
+            PathLibraryBuilder.fromSettings(librarySettings, userInteractionHandler).buildPath(release);
         if (!path.exists()) {
             LOGGER.debug("Download creating folder [{}] ", path.toAbsolutePath());
             try {
@@ -68,7 +65,7 @@ public class DownloadAction {
         }
 
         FilenameLibraryBuilder filenameLibraryBuilder =
-            FilenameLibraryBuilder.fromSettings(librarySettings, manager, userInteractionHandler);
+            FilenameLibraryBuilder.fromSettings(librarySettings, userInteractionHandler);
         String videoFileName = filenameLibraryBuilder.buildPath(release).toString();
 
         ThrowingFunction<AtomicInteger, @Nullable Integer, Nothing> incrementCounter = AtomicInteger::incrementAndGet;
@@ -79,7 +76,7 @@ public class DownloadAction {
 
         List<Path> downloadedSubtitles;
         try {
-            downloadedSubtitles = subtitle.download(manager, path, fileNameFunction);
+            downloadedSubtitles = subtitle.download(path, fileNameFunction);
             LOGGER.debug("downloaded {} subtitles", downloadedSubtitles.size());
         } catch (IOException e) {
             throw new IOException(

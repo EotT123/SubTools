@@ -53,14 +53,23 @@ public class Manager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
 
+    private static final Manager INSTANCE = new Manager(
+        new HttpClient(),
+        new ProviderCacheMemory(10 min, 100 ms, 2500),
+        new ProviderCacheDisk(500 day, 5000));
+
     @val HttpClient httpClient;
     @val ProviderCacheMemory<?> inMemoryCache;
     @val ProviderCacheDisk<?> diskCache;
 
-    public Manager(HttpClient httpClient, ProviderCacheMemory<?> inMemoryCache, ProviderCacheDisk<?> diskCache) {
+    private Manager(HttpClient httpClient, ProviderCacheMemory<?> inMemoryCache, ProviderCacheDisk<?> diskCache) {
         this.httpClient = httpClient;
         this.inMemoryCache = inMemoryCache;
         this.diskCache = diskCache;
+    }
+
+    public static Manager getInstance() {
+        return INSTANCE;
     }
 
     public void downloadAndExtractFile(String downloadLink, Path file,
@@ -202,7 +211,7 @@ public class Manager {
     @NullMarked
     public record Retry(int retries, Predicate<Exception> predicate, Time waitTime) {
 
-        public static final Retry NONE = new Retry(0, _ -> false, 0Second);
+        public static final Retry NONE = new Retry(0, _ -> false, 0 Second);
 
         public Retry {
             if (retries < 0) {
@@ -235,10 +244,10 @@ public class Manager {
     // ============= \\
 
     @NullMarked
-    public record CacheKey(Manager manager, CacheType cacheType, ProviderCacheKey key) {
+    public record CacheKey(CacheType cacheType, ProviderCacheKey key) {
 
         public boolean isPresent() {
-            return manager.getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
+            return Manager.getInstance().getOptionalCache(cacheType).map(cache -> cache.contains(key)).orElse(false);
         }
 
         public boolean isNotPresent() {
@@ -246,24 +255,26 @@ public class Manager {
         }
 
         public boolean isExpiredTemporary() {
-            return manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryExpired(key)).orElse(false);
+            return Manager.getInstance().getOptionalCache(cacheType).map(cache -> cache.isTemporaryExpired(key))
+                .orElse(false);
         }
 
         public boolean isTemporaryObject() {
-            return manager.getOptionalCache(cacheType).map(cache -> cache.isTemporaryObject(key)).orElse(false);
+            return Manager.getInstance().getOptionalCache(cacheType).map(cache -> cache.isTemporaryObject(key))
+                .orElse(false);
         }
 
         public Optional<Time> getTemporaryTimeToLive() {
-            return manager.getOptionalCache(cacheType)
-                .map(cache -> ifNullThen(cache.getTemporaryTimeToLive(key), 0Second));
+            return Manager.getInstance().getOptionalCache(cacheType)
+                .map(cache -> ifNullThen(cache.getTemporaryTimeToLive(key), 0 Second));
         }
 
         public void remove() {
-            manager.getCache(cacheType).remove(key);
+            Manager.getInstance().getCache(cacheType).remove(key);
         }
 
         public <V extends @Nullable Object> @Nullable V get() {
-            ProviderCache<V> cache = manager.getCache(cacheType);
+            ProviderCache<V> cache = Manager.getInstance().getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
                 return cache.get(key);
             }
@@ -272,7 +283,7 @@ public class Manager {
 
         public <V extends @Nullable Object, X extends Exception> V get(ThrowingSupplier<V, X> supplier,
             @Nullable Time timeToLive=null, Retry retry=Retry.NONE, boolean storeTempNullValue=false) throws X {
-            ProviderCache<V> cache = manager.getCache(cacheType);
+            ProviderCache<V> cache = Manager.getInstance().getCache(cacheType);
             if (cache.contains(key) && !cache.isTemporaryExpired(key)) {
                 return cache.get(key);
             }
@@ -280,7 +291,7 @@ public class Manager {
                 V value = executeSupplier(supplier, retry);
                 if (value != null || storeTempNullValue) {
                     Time ttl =
-                        storeTempNullValue && value == null ? getTemporaryTimeToLive().orElse(12hr) * 2 : timeToLive;
+                        storeTempNullValue && value == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
                     cache.put(key, value, ttl);
                 } else {
                     switch (cache) {
@@ -307,29 +318,30 @@ public class Manager {
             boolean storeTempNullValue=false, @Nullable Time timeToLive=null, Retry retry=Retry.NONE) throws X {
 
             V object = value.getValue(retry);
-            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12hr) * 2 : timeToLive;
-            manager.getCache(cacheType).put(key, object, ttl);
+            Time ttl = storeTempNullValue && object == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
+            Manager.getInstance().getCache(cacheType).put(key, object, ttl);
         }
 
         public <V extends @Nullable Object, X extends Exception> void storeTempValue(Value<V, X> value) throws X {
-            Time ttl = getTemporaryTimeToLive().orElse(1hr) * 2;
-            manager.getCache(cacheType).put(key, value.getValue(), ttl);
+            Time ttl = getTemporaryTimeToLive().orElse(1 hr) * 2;
+            Manager.getInstance().getCache(cacheType).put(key, value.getValue(), ttl);
         }
     }
 
     @NullMarked
-    public record CacheKeyFilter(Manager manager, CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
+    public record CacheKeyFilter(CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
         public void clearExpiredCache() {
             Time now = Time.now();
-            manager.getCache(cacheType).cleanup((key, cacheValue) -> keyFilter.test(key) && cacheValue.isExpired(now));
+            Manager.getInstance().getCache(cacheType)
+                .cleanup((key, cacheValue) -> keyFilter.test(key) && cacheValue.isExpired(now));
         }
 
         public void remove() {
-            manager.getCache(cacheType).deleteEntries(keyFilter);
+            Manager.getInstance().getCache(cacheType).deleteEntries(keyFilter);
         }
 
         public <V> List<Pair<ProviderCacheKey, V>> getEntries(@Nullable Class<V> valueType=null) {
-            Optional<ProviderCache<V>> optionalCache = manager.getOptionalCache(cacheType);
+            Optional<ProviderCache<V>> optionalCache = Manager.getInstance().getOptionalCache(cacheType);
             return optionalCache.map(cache -> cache.getEntries(keyFilter)).orElseGet(List::of);
         }
     }
@@ -348,11 +360,11 @@ public class Manager {
     }
 
     public CacheKey getCache(CacheType cacheType, CacheKeyBuilder cacheKeyBuilder) {
-        return new CacheKey(this, cacheType, cacheKeyBuilder.build());
+        return new CacheKey(cacheType, cacheKeyBuilder.build());
     }
 
     public CacheKeyFilter getCache(CacheType cacheType, Predicate<ProviderCacheKey> keyFilter) {
-        return new CacheKeyFilter(this, cacheType, keyFilter);
+        return new CacheKeyFilter(cacheType, keyFilter);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

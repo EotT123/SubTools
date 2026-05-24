@@ -34,10 +34,10 @@ public class PodnapisiSubtitle extends Subtitle {
     }
 
     @Override
-    public List<Path> download(Manager manager, Path destinationFolder,
-        Function<@Nullable AtomicInteger, String> fileNameFunction) throws IOException {
+    public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
+        throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-        manager.downloadAndExtractFile(url, subPath);
+        Manager.getInstance().downloadAndExtractFile(url, subPath);
         return List.of(subPath);
     }
 }

@@ -20,7 +20,6 @@ import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.sublibrary.Manager;
 import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.Value;
 import org.lodder.subtools.sublibrary.cache.CacheType;
@@ -34,13 +33,10 @@ import org.lodder.subtools.sublibrary.util.filefilter.XmlFileFilter;
 @NullMarked
 public class ExportImport {
 
-    private final Manager manager;
     private final UserInteractionHandler userInteractionHandler;
     private final Component parent;
 
-    public ExportImport(Manager manager, UserInteractionHandler userInteractionHandler,
-        Component parent) {
-        this.manager = manager;
+    public ExportImport(UserInteractionHandler userInteractionHandler, Component parent) {
         this.userInteractionHandler = userInteractionHandler;
         this.parent = parent;
     }
@@ -81,8 +77,7 @@ public class ExportImport {
             try {
                 switch (listType) {
                     case PREFERENCES -> ExportImportPreferences.importSettings(path, userInteractionHandler);
-                    case SERIE_MAPPING ->
-                        ExportImportSerieMapping.importSettings(path, userInteractionHandler, manager);
+                    case SERIE_MAPPING -> ExportImportSerieMapping.importSettings(path, userInteractionHandler);
                     default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                 }
             } catch (CorruptSettingsFileException e) {
@@ -102,7 +97,7 @@ public class ExportImport {
                 try {
                     switch (listType) {
                         case PREFERENCES -> ExportImportPreferences.exportSettings(path);
-                        case SERIE_MAPPING -> ExportImportSerieMapping.exportSettings(path, manager);
+                        case SERIE_MAPPING -> ExportImportSerieMapping.exportSettings(path);
                         default -> throw new IllegalArgumentException("Unexpected value: " + listType);
                     }
                 } catch (Exception e) {
@@ -140,15 +135,15 @@ public class ExportImport {
             // hide utility class constructor
         }
 
-        public static void exportSettings(Path path, Manager manager) throws IOException {
+        public static void exportSettings(Path path) throws IOException {
             List<SerieMappingWithKey> serieMappingsWithKey = MappingType.values().stream()
-                .map(mappingType -> mappingType.getValues(manager)).flatMap(List::stream)
+                .map(mappingType -> mappingType.getValues()).flatMap(List::stream)
                 .map(pair -> new SerieMappingWithKey(pair.getKey(), pair.getValue()))
                 .toList();
             Files.writeString(path, new GsonBuilder().setPrettyPrinting().create().toJson(serieMappingsWithKey));
         }
 
-        public static void importSettings(Path path, UserInteractionHandler userInteractionHandler, Manager manager)
+        public static void importSettings(Path path, UserInteractionHandler userInteractionHandler)
             throws CorruptSettingsFileException {
             SerieMappingWithKey[] serieMappings;
             try {
@@ -159,7 +154,7 @@ public class ExportImport {
                 throw new CorruptSettingsFileException(e);
             }
             getImportStyle(userInteractionHandler).ifPresent(importStyle -> serieMappings.forEach(serieMapping -> {
-                CacheKey cacheKey = new CacheKey(manager, CacheType.DISK, serieMapping.key);
+                CacheKey cacheKey = new CacheKey(CacheType.DISK, serieMapping.key);
                 if (!cacheKey.isPresent() || importStyle == ImportStyle.OVERWRITE) {
                     cacheKey.store(Value.of(serieMapping.serieMapping));
                 }
