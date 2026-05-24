@@ -7,7 +7,6 @@ import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.framework.Container;
 import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -43,8 +42,7 @@ public class Addic7edServiceProvider implements ServiceProvider {
             if (SettingsControl.settings.serieSourceAddic7edProxy) {
                 return new Addic7edProxyGestdownAdapter(manager, userInteractionHandler);
             } else {
-                boolean speedy = app.makePreferences().getBoolean(CliOption.SPEEDY.value, false);
-                return new Addic7edAdapter(manager, speedy, credentials, userInteractionHandler);
+                return new Addic7edAdapter(manager, credentials, userInteractionHandler);
             }
         };
     }

@@ -1,17 +1,19 @@
 package org.lodder.subtools.multisubdownloader;
 
+import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionEnable.*;
+import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionLanguage.*;
+import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionPath.*;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import org.apache.commons.cli.CommandLine;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.actions.DownloadAction;
 import org.lodder.subtools.multisubdownloader.actions.FileListAction;
 import org.lodder.subtools.multisubdownloader.actions.UserInteractionHandlerAction;
-import org.lodder.subtools.multisubdownloader.cli.CliOption;
 import org.lodder.subtools.multisubdownloader.cli.actions.CliSearchAction;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLIFileIndexerProgress;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLISearchProgress;
@@ -46,21 +48,21 @@ public class CLI {
     private final UserInteractionHandlerAction userInteractionHandlerAction;
     private final boolean dryRun;
 
-    public CLI(Container app, CommandLine line) throws CliException {
+    public CLI(Container app, Commandline commandline) throws CliException {
         this.app = app;
         Manager manager = app.makeManager();
         checkUpdate(manager);
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(SettingsControl.settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
         downloadAction = new DownloadAction(manager, userInteractionHandler);
-        this.folders = getFolders(line);
-        this.language = getLanguage(line);
-        this.force = line.hasCliOption(CliOption.FORCE);
-        this.downloadAll = line.hasCliOption(CliOption.DOWNLOAD_ALL);
-        this.recursive = line.hasCliOption(CliOption.RECURSIVE);
-        this.subtitleSelection = line.hasCliOption(CliOption.SELECTION);
-        this.verboseProgress = line.hasCliOption(CliOption.VERBOSE_PROGRESS);
-        this.dryRun = line.hasCliOption(CliOption.DRY_RUN);
+        this.folders = commandline.get(FOLDER, List::of, () -> List.copyOf(SettingsControl.settings.defaultFolders));
+        this.language = commandline.get(LANGUAGE, Language.ENGLISH);
+        this.force = commandline.isEnabled(FORCE);
+        this.downloadAll = commandline.isEnabled(DOWNLOAD_ALL);
+        this.recursive = commandline.isEnabled(RECURSIVE);
+        this.subtitleSelection = commandline.isEnabled(SELECTION);
+        this.verboseProgress = commandline.isEnabled(VERBOSE_PROGRESS);
+        this.dryRun = commandline.isEnabled(DRY_RUN);
         Messages.language = language;
     }
 
@@ -133,26 +135,6 @@ public class CLI {
                         "Error while downloading subtitle for ${release.releaseDescription} (${e.getMessage()})", e);
                 }
             });
-        }
-    }
-
-    private List<Path> getFolders(CommandLine line) {
-        if (line.hasCliOption(CliOption.FOLDER)) {
-            return List.of(Path.of(line.getCliOptionValue(CliOption.FOLDER)));
-        } else {
-            return List.copyOf(SettingsControl.settings.defaultFolders);
-        }
-    }
-
-    private static Language getLanguage(CommandLine line) throws CliException {
-        if (line.hasCliOption(CliOption.LANGUAGE)) {
-            String languageString = line.getCliOptionValue(CliOption.LANGUAGE);
-            return Language.values().stream()
-                .filter(lang -> lang.name().equalsIgnoreCase(languageString))
-                .findAny()
-                .orElseThrow(() -> new CliException(Messages.getText("App.NoValidLanguage")));
-        } else {
-            return Language.ENGLISH;
         }
     }
 }

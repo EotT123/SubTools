@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
@@ -22,19 +21,14 @@ public class Bootstrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
 
     private final Container app;
-    private final Preferences preferences;
     private final Manager manager;
 
-    public Bootstrapper(Container app, Preferences preferences, Manager manager) {
+    public Bootstrapper(Container app, Manager manager) {
         this.app = app;
-        this.preferences = preferences;
         this.manager = manager;
     }
 
     public void initialize(UserInteractionHandler userInteractionHandler) {
-        /* Bind Preferences to IoC Container */
-        this.app.bind("Preferences", new LazySupplier<>(() -> preferences));
-
         /* Bind Manager to IoC Container */
         this.app.bind("Manager", new LazySupplier<>(() -> manager));
 

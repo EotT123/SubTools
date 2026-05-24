@@ -1,6 +1,9 @@
 package org.lodder.subtools.multisubdownloader;
 
+import static java.util.Objects.*;
 import static manifold.science.util.UnitConstants.*;
+import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionEnable.*;
+import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionPath.*;
 import static util.Utils.*;
 
 import javax.swing.*;
@@ -8,10 +11,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import ch.qos.logback.classic.Level;
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -19,7 +20,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.help.HelpFormatter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.cli.CliOption;
+import org.lodder.subtools.multisubdownloader.cli.CliOptions;
+import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOption;
 import org.lodder.subtools.multisubdownloader.exceptions.CliException;
 import org.lodder.subtools.multisubdownloader.framework.Bootstrapper;
 import org.lodder.subtools.multisubdownloader.framework.Container;
@@ -50,39 +52,35 @@ public class App {
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = HelpFormatter.builder().get();
 
-        CommandLine line;
+        Commandline commandline;
         try {
-            line = parser.parse(getCLIOptions(), args);
+            commandline = new Commandline(parser.parse(getCLIOptions(), args));
         } catch (ParseException e) {
             LOGGER.error("Unable to parse cli options", e);
             return;
         }
 
-        Preferences preferences = Preferences.userRoot();
-        preferences.putBoolean(CliOption.SPEEDY.value, line.hasCliOption(CliOption.SPEEDY));
-        preferences.putBoolean(CliOption.CONFIRM_PROVIDER_MAPPING.value,
-            line.hasCliOption(CliOption.CONFIRM_PROVIDER_MAPPING));
 
         Container app = new Container();
         Manager manager = createManager();
         Messages.language = ifNullThen(SettingsControl.settings.language, Language.ENGLISH);
-        Bootstrapper bootstrapper = new Bootstrapper(app, preferences, manager);
+        Bootstrapper bootstrapper = new Bootstrapper(app, manager);
 
-        if (line.hasCliOption(CliOption.TRACE)) {
+        if (commandline.isEnabled(TRACE)) {
             setLogLevel(Level.ALL);
-        } else if (line.hasCliOption(CliOption.DEBUG)) {
+        } else if (commandline.isEnabled(DEBUG)) {
             setLogLevel(Level.DEBUG);
         }
 
-        if (line.hasCliOption(CliOption.NO_GUI)) {
+        if (commandline.isEnabled(NO_GUI)) {
             bootstrapper.initialize(new UserInteractionHandlerCLI(SettingsControl.settings));
 
             /* Defined here so there is output on console */
-            importPreferences(line);
+            importPreferences(commandline);
 
             try {
-                CLI cmd = new CLI(app, line);
-                if (line.hasCliOption(CliOption.HELP)) {
+                CLI cmd = new CLI(app, commandline);
+                if (commandline.isEnabled(HELP)) {
                     formatter.printHelp(ConfigProperties.getProperty(Property.NAME), "help", getCLIOptions(), "",
                         false);
                     return;
@@ -96,7 +94,7 @@ public class App {
             splash = new Splash(Messages.getText("App.Starting")).showSplash();
 
             /* Defined here so there is output in the splash */
-            importPreferences(line);
+            importPreferences(commandline);
 
             bootstrapper.initialize(new UserInteractionHandlerGUI(SettingsControl.settings, null));
             EventQueue.invokeLater(() -> {
@@ -127,12 +125,12 @@ public class App {
         root.setLevel(level);
     }
 
-    private static void importPreferences(CommandLine line) {
-        if (!line.hasCliOption(CliOption.IMPORT_PREFERENCES)) {
+    private static void importPreferences(Commandline commandline) {
+        if (!commandline.contains(IMPORT_PREFERENCES)) {
             return;
         }
-        Path file = Path.of(line.getCliOptionValue(CliOption.IMPORT_PREFERENCES));
         try {
+            Path file = requireNonNull(commandline.get(IMPORT_PREFERENCES));
             if (file.isRegularFile()) {
                 SettingsControl.importPreferences(file);
             }
@@ -143,13 +141,13 @@ public class App {
 
     public static Options getCLIOptions() {
         Options options = new Options();
-        CliOption.values().stream().map(CliOption::toOption).forEach(options::addOption);
+        CliOptions.values().stream().map(CliOption::getOption).forEach(options::addOption);
         return options;
     }
 
     private static Manager createManager() {
         ProviderCacheDisk diskCache = new ProviderCacheDisk(500 day, 5000);
-        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10min, 100ms, 2500);
+        ProviderCacheMemory inMemoryCache = new ProviderCacheMemory(10 min, 100 ms, 2500);
 
         return new Manager(new HttpClient(), inMemoryCache, diskCache);
     }
