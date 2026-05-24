@@ -28,13 +28,12 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class PodnapisiAdapter
     extends SubtitleAdapter<PodnapisiSubtitleMetadata, PodnapisiSubtitle, ProviderId, PodnapisiException> {
 
-    private final PodnapisiApi api;
+    private final PodnapisiApi api = new PodnapisiApi("JBierSubDownloader");
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.PODNAPISI;
     @val @override boolean useSeasonForSerieId = false;
 
     public PodnapisiAdapter(UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        this.api = new PodnapisiApi("JBierSubDownloader");
     }
 
     // ===== \\

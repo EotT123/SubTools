@@ -36,13 +36,12 @@ public final class Addic7edProxyGestdownAdapter extends
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownAdapter.class);
 
-    private final Addic7edProxyGestdownApi api;
+    private final Addic7edProxyGestdownApi api = new Addic7edProxyGestdownApi();
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN;
     @val @override boolean useSeasonForSerieId = false;
 
     public Addic7edProxyGestdownAdapter(UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        this.api = new Addic7edProxyGestdownApi();
     }
 
     // ===== \\

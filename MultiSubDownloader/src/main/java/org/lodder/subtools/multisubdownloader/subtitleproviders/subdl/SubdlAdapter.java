@@ -30,13 +30,12 @@ import subdl.Serie.ReleaseType;
 public final class SubdlAdapter extends
     SubtitleAdapter<SubdlSubtitleMetadata, SubdlSubtitle, SubdlSerieId, SubdlException> {
 
-    private final SubdlApi api;
+    private final SubdlApi api = new SubdlApi();
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBDL;
     @val @override boolean useSeasonForSerieId = false;
 
     public SubdlAdapter(UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        api = new SubdlApi();
     }
 
     // ===== \\

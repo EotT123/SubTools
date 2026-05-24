@@ -34,13 +34,12 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class SubsceneAdapter
     extends SubtitleAdapter<SubsceneSubtitleMetadata, SubsceneSubtitle, SubSceneSerieId, SubsceneException> {
 
-    private final SubsceneApi api;
+    private final SubsceneApi api = new SubsceneApi();
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBSCENE;
     @val @override boolean useSeasonForSerieId = true;
 
     public SubsceneAdapter(UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        api = new SubsceneApi();
     }
 
     // ===== \\
