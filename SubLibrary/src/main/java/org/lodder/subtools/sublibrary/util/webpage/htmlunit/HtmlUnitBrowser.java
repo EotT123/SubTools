@@ -10,12 +10,14 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import org.htmlunit.AbstractPage;
 import org.htmlunit.AjaxController;
 import org.htmlunit.BrowserVersion;
 import org.htmlunit.CookieManager;
 import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.Page;
+import org.htmlunit.SgmlPage;
 import org.htmlunit.UnexpectedPage;
 import org.htmlunit.WebClient;
 import org.htmlunit.WebRequest;
@@ -30,11 +32,12 @@ import org.lodder.subtools.sublibrary.util.webpage.CloudFlare;
 import org.lodder.subtools.sublibrary.util.webpage.PageIntf;
 import org.lodder.subtools.sublibrary.util.webpage.exception.CloudflareException;
 import org.lodder.subtools.sublibrary.util.webpage.exception.WebpageException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
 public class HtmlUnitBrowser {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(HtmlUnitBrowser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HtmlUnitBrowser.class);
 
     private HtmlUnitBrowser() {
         // Hide Utility Class Constructor
@@ -100,7 +103,11 @@ public class HtmlUnitBrowser {
                 LOG.debug("UNEXPECTED PAGE: %s", page.webResponse.statusMessage);
                 throw new WebpageException("Could not access url: " + page.url);
             }
-            return ((HtmlPage) page).asXml();
+            return switch (page) {
+                case SgmlPage sgmlPage -> sgmlPage.asXml();
+                case AbstractPage abstractPage -> abstractPage.webResponse.contentAsString;
+                default -> throw new IllegalStateException("Unexpected value: " + page);
+            };
         } catch (FailingHttpStatusCodeException | IOException e) {
             throw new WebpageException(e);
         }
