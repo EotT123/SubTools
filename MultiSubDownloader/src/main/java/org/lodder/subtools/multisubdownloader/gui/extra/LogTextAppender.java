@@ -46,7 +46,8 @@ public class LogTextAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     public void append(ILoggingEvent event) {
-        if (event.getMessage().startsWith("Obsolete content type encountered")) {
+        if (event.getMessage().startsWith("Obsolete content type encountered") ||
+            event.getMessage().startsWith("Error during JavaScript execution")) {
             return;
         }
         try {
