@@ -39,7 +39,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 @NullMarked
 public class Addic7edApi implements SubtitleApi {
 
-    private static final Time RATE_DURATION = 1Second; // seconds
+    private static final Time RATE_DURATION = 1 Second; // seconds
 
     private static final String DOMAIN = "https://www.addic7ed.com";
     private static final Pattern MOVIE_NAME_PATTERN = Pattern.compile("(?<title>.*?) \\((?<year>\\d{4})\\)");
@@ -48,8 +48,7 @@ public class Addic7edApi implements SubtitleApi {
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED;
     private Time lastRequest = Time.now();
 
-    public Addic7edApi(@Nullable Credentials credentials=null)
-        throws Addic7edApiException {
+    public Addic7edApi(@Nullable Credentials credentials=null) throws Addic7edApiException {
         if (credentials != null) {
             login(credentials);
         }

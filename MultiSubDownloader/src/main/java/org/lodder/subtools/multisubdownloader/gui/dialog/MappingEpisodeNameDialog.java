@@ -132,7 +132,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
 
     private void selectMappingType(MappingType mappingType) {
         this.selectedMappingType = mappingType;
-        this.selectedSubtitleProvider = SubtitleProviderStore.allProviders.stream()
+        this.selectedSubtitleProvider = SubtitleProviderStore.providers.stream()
             .filter(subtitleProvider -> subtitleProvider.source.name.equals(mappingType.provider))
             .findAny().orElse(null);
         btnAddCustomMapping.enabled = selectedSubtitleProvider != null;
