@@ -122,6 +122,7 @@ public class UpdateAvailableGithub {
                         .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
                         rowElement.selectFirstByCss("relative-time").attr("datetime"));
+                    updateLastUpdateCheck();
                     if (nightlyBuildTista.isBefore(buildTista)) {
                         return null;
                     }
@@ -129,7 +130,6 @@ public class UpdateAvailableGithub {
                     String downloadUrl = Manager.getDocument(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
-                    updateLastUpdateCheck();
                     return downloadUrl;
                 } catch (Exception e) {
                     if (LOGGER.isTraceEnabled) {
@@ -156,7 +156,7 @@ public class UpdateAvailableGithub {
     }
 
     private CacheKey getUpdateLastUpdateCheckCache() {
-        return new CacheKey(CacheType.MEMORY, new ProviderCacheKey("Github", "LastUpdateCheck"));
+        return new CacheKey(CacheType.DISK, new ProviderCacheKey("Github", "LastUpdateCheck"));
     }
 
     private void updateLastUpdateCheck() {
