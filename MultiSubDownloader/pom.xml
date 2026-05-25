@@ -258,11 +258,12 @@
                             <generateModelTests>false</generateModelTests>
                             <configOptions>
                                 <typeMappings>integer=int,int=int</typeMappings>
+                                <importMappings>Instant=java.time.Instant</importMappings>
                                 <useSwaggerAnnotations>false</useSwaggerAnnotations>
                                 <serializableModel>true</serializableModel>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
-                                <dateLibrary>java8-localdatetime</dateLibrary>
+                                <dateLibrary>java8</dateLibrary>
                                 <useJakartaEe>true</useJakartaEe>
                                 <library>retrofit2</library>
                             </configOptions>
