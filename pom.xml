@@ -12,6 +12,7 @@
         <manifold.version>2026.1.6</manifold.version>
         <maven.compiler.target>25</maven.compiler.target>
         <maven.compiler.source>25</maven.compiler.source>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
     </properties>
 
     <scm>
