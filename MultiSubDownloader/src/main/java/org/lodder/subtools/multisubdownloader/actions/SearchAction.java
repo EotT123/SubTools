@@ -84,7 +84,7 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
 
         /* Tell the manager which providers to use */
         searchManager.reset();
-        SubtitleProviderStore.allProviders.stream()
+        SubtitleProviderStore.providers.stream()
             .filter(subtitleProvider -> SettingsControl.settings.useSerieSource(subtitleProvider.source))
             .forEach(searchManager::addProvider);
 

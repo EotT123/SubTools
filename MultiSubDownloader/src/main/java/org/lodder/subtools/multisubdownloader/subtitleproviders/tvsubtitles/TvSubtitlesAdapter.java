@@ -18,7 +18,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.tvsubtitles.mode
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.data.ProviderId;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
@@ -28,17 +27,12 @@ import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
 public final class TvSubtitlesAdapter
     extends SubtitleAdapter<TVSubtitlesSubtitleMetadata, TvSubtiltesSubtitle, ProviderId, TvSubtitleException> {
 
-    private final TvSubtitlesApi api;
+    private final TvSubtitlesApi api = new TvSubtitlesApi();
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.TVSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
     public TvSubtitlesAdapter(UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        try {
-            api = new TvSubtitlesApi();
-        } catch (Exception e) {
-            throw new SubtitlesProviderInitException(provider, e);
-        }
     }
 
     // ===== \\

@@ -21,7 +21,6 @@ import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
-import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.ProviderIds;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
@@ -41,11 +40,7 @@ public final class OpenSubAdapter
 
     public OpenSubAdapter(Credentials credentials, UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        try {
-            api = new OpenSubtitlesApi(credentials);
-        } catch (OpenSubtitleException e) {
-            throw new SubtitlesProviderInitException(provider, e);
-        }
+        api = new OpenSubtitlesApi(credentials);
     }
 
     @Override

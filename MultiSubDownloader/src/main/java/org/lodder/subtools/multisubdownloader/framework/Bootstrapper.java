@@ -15,12 +15,6 @@ public class Bootstrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
 
     public Bootstrapper(UserInteractionHandler userInteractionHandler) {
-        this.registerProviders(userInteractionHandler);
-    }
-
-
-    private void registerProviders(UserInteractionHandler userInteractionHandler) {
-
         Reflections reflections = new Reflections("org.lodder.subtools.multisubdownloader");
         Set<Class<? extends ServiceProvider>> providerClasses = reflections.getSubTypesOf(ServiceProvider.class);
 

@@ -110,7 +110,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private final LazySupplier<DownloadApi> downloadApi =
         new LazySupplier<>(() -> apiClient.get().createService(DownloadApi.class));
 
-    public OpenSubtitlesApi(@Nullable Credentials credentials=null) throws OpenSubtitleApiException {
+    public OpenSubtitlesApi(@Nullable Credentials credentials=null) {
         this.credentials = credentials;
     }
 

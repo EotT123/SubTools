@@ -102,7 +102,7 @@ public class App {
         }
         new Thread(() -> {
             List<String> providerNames =
-                SubtitleProviderStore.allProviders.stream().map(provider -> provider.provider)
+                SubtitleProviderStore.providers.stream().map(provider -> provider.provider)
                     .map(providerName -> providerName.contains("-") ? providerName.split("-")[0] : providerName)
                     .map(providerName -> providerName + "-").toList();
             Manager.getCache(CacheType.DISK, key -> providerNames.stream().noneMatch(key.provider::equals))
