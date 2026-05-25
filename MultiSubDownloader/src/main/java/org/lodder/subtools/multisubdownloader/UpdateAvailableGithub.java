@@ -36,7 +36,7 @@ public class UpdateAvailableGithub {
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
 
     private static final String DOMAIN = "https://github.com";
-    private static final String REPO_URI = "/EotT/SubTools";
+    private static final String REPO_URI = "/EotT123/SubTools";
     private static final String REPO_URL = DOMAIN + REPO_URI;
 
     public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
@@ -121,11 +121,11 @@ public class UpdateAvailableGithub {
                             userAgent:null))
                         .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
                     LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
-                        rowElement.selectFirstByCss(".d-inline relative-time").attr("datetime"));
+                        rowElement.selectFirstByCss("relative-time").attr("datetime"));
                     if (nightlyBuildTista.isBefore(buildTista)) {
                         return null;
                     }
-                    String url = "https://nightly.link" + rowElement.selectFirstByCss(".Link--primary").attr("href");
+                    String url = "https://nightly.link" + rowElement.selectFirstByCss("a").attr("href");
                     String downloadUrl = Manager.getDocument(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
@@ -170,7 +170,7 @@ public class UpdateAvailableGithub {
     private LocalDateTime zonedDateTimeStringToLocalDateTime(String dateString) {
         Instant instant = Instant.parse(dateString);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
-        return zonedDateTime.toLocalDateTime();
+        return zonedDateTime.withZoneSameInstant(ZonedDateTime.now().offset).toLocalDateTime();
     }
 
     private int compareVersions(String str1, String str2) {
