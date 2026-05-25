@@ -3,7 +3,7 @@
   "info": {
     "title": "Gestdown: Addicted Proxy",
     "description": "Provide a full api to search and download subtitles from Addic7ed website.",
-    "version": "4.38.7"
+    "version": "4.68.1"
   },
   "servers": [
     {
@@ -109,6 +109,9 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
           "429": {
             "description": "Too Many Requests",
             "content": {
@@ -118,9 +121,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -163,6 +163,19 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Too Many Requests",
             "content": {
@@ -172,9 +185,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -203,23 +213,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TopShowDto"
-                  }
-                }
-              },
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TopShowDto"
-                  }
-                }
-              },
-              "text/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -237,23 +231,29 @@
         "tags": [
           "Subtitles"
         ],
-        "summary": "Download specific subtitle",
+        "summary": "Download specific subtitle. Supports regular subtitle GUIDs, season pack ZIPs (sp_{uuid}), and single episode extraction from season packs (sp_{uuid}_ep_{N}).",
         "operationId": "DownloadSubtitle",
         "parameters": [
           {
             "name": "subtitleId",
             "in": "path",
-            "description": "",
+            "description": "Subtitle identifier: a GUID, sp_{uuid}, or sp_{uuid}_ep_{N}",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -265,15 +265,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+          "200": {
+            "description": "OK"
           },
           "429": {
             "description": "Too Many Requests",
@@ -296,190 +289,6 @@
             }
           }
         }
-      }
-    },
-    "/subtitles/search": {
-      "post": {
-        "tags": [
-          "Subtitles"
-        ],
-        "summary": "Search for a specific episode",
-        "requestBody": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Returns the matching subtitles",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubtitleSearchResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Couldn't find the show or its season/episode",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Refreshing the show, currently don't have data, try again later",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Doesn't follow the right format for the search: Show S00E00",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WrongFormatResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Reached the rate limiting of the endpoint",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "deprecated": true
-      }
-    },
-    "/subtitles/find/{language}/{show}/{season}/{episode}": {
-      "get": {
-        "tags": [
-          "Subtitles"
-        ],
-        "summary": "Find specific episode (same as search but easily cacheable)",
-        "parameters": [
-          {
-            "name": "language",
-            "in": "path",
-            "description": "Language to search for",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "show",
-            "in": "path",
-            "description": "Name of the show",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "season",
-            "in": "path",
-            "description": "Season number to look for",
-            "required": true,
-            "schema": {
-              "minimum": 0,
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "episode",
-            "in": "path",
-            "description": "Episode number to look for",
-            "required": true,
-            "schema": {
-              "minimum": 0,
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returns the matching subtitles",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubtitleSearchResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Couldn't find the show or its season/episode",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Refreshing the show, currently don't have data, try again later",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Doesn't follow the right format for the search: Show S00E00",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WrongFormatResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Reached the rate limiting of the endpoint",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "deprecated": true
       }
     },
     "/subtitles/get/{showUniqueId}/{season}/{episode}/{language}": {
@@ -554,16 +363,6 @@
               }
             }
           },
-          "400": {
-            "description": "Doesn't follow the right format for the search: Show S00E00",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WrongFormatResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Reached the rate limiting of the endpoint",
             "content": {
@@ -609,8 +408,8 @@
               }
             }
           },
-          "429": {
-            "description": "Reached the rate limiting of the endpoint",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -619,8 +418,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "429": {
+            "description": "Reached the rate limiting of the endpoint",
             "content": {
               "application/json": {
                 "schema": {
@@ -661,8 +460,8 @@
               }
             }
           },
-          "429": {
-            "description": "Reached the rate limiting of the endpoint",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -671,8 +470,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "429": {
+            "description": "Reached the rate limiting of the endpoint",
             "content": {
               "application/json": {
                 "schema": {
@@ -750,29 +549,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Couldn't find the show"
-          },
-          "429": {
-            "description": "Reached the rate limiting of the endpoint",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
@@ -793,8 +569,112 @@
               }
             }
           },
+          "404": {
+            "description": "Couldn't find the show"
+          },
           "400": {
-            "description": "Unknown language"
+            "description": "Unknown language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Reached the rate limiting of the endpoint",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shows/{showId}/{seasonNumber}/{language}/season-packs": {
+      "get": {
+        "tags": [
+          "TvShows"
+        ],
+        "summary": "Get season pack subtitles for a specific season and language",
+        "parameters": [
+          {
+            "name": "showId",
+            "in": "path",
+            "description": "Unique ID of the show",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "seasonNumber",
+            "in": "path",
+            "description": "Season number",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "language",
+            "in": "path",
+            "description": "Language ISO code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the season pack subtitles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonPackResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Couldn't find the show"
+          },
+          "400": {
+            "description": "Unknown language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Reached the rate limiting of the endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -938,6 +818,7 @@
           "discovered": {
             "type": "string",
             "description": "When was the Episode discovered",
+            "format": "date-time",
             "readOnly": true,
             "example": "2022-04-02T05:16:45.3996669"
           }
@@ -986,6 +867,7 @@
           "discovered": {
             "type": "string",
             "description": "When was the Episode discovered",
+            "format": "date-time",
             "readOnly": true,
             "example": "2022-04-02T05:16:45.3996669"
           },
@@ -1046,6 +928,14 @@
             "description": "",
             "format": "int32",
             "nullable": true
+          },
+          "seasonPacks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeasonPackSubtitleDto"
+            },
+            "description": "Season pack subtitles available for the last season",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -1059,24 +949,131 @@
         "type": "string",
         "description": "Represent the type of media"
       },
-      "SearchRequest": {
+      "SeasonPackResponse": {
         "type": "object",
         "properties": {
-          "search": {
-            "type": "string",
-            "description": "Search for specific subtitle",
-            "nullable": true,
-            "example": "Wellington Paranormal S01E05"
-          },
-          "language": {
-            "type": "string",
-            "description": "Language of the subtitle",
-            "nullable": true,
-            "example": "English"
+          "seasonPacks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeasonPackSubtitleDto"
+            },
+            "description": "Season pack subtitles",
+            "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "Use for the website to provide easy search for the user"
+        "description": "Response containing season pack subtitles for a given season and language"
+      },
+      "SeasonPackSubtitleDto": {
+        "required": [
+          "downloadCount",
+          "downloadUri",
+          "language",
+          "qualities",
+          "releaseGroups",
+          "source",
+          "subtitleId",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "subtitleId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique Id of the season pack subtitle (prefixed with sp_)",
+            "readOnly": true,
+            "example": "sp_1086727A-EB71-4B24-A209-7CF22374574D"
+          },
+          "language": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Language of the subtitle (in English)",
+            "example": "English"
+          },
+          "version": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Version/release name of the season pack",
+            "readOnly": true,
+            "example": "WEBRip.NTb"
+          },
+          "releaseGroups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Release groups associated with this season pack",
+            "readOnly": true,
+            "example": [
+              "NTb",
+              "FLUX"
+            ]
+          },
+          "rangeStart": {
+            "type": "integer",
+            "description": "Optional first episode covered by this season pack.",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true,
+            "example": 1
+          },
+          "rangeEnd": {
+            "type": "integer",
+            "description": "Optional last episode covered by this season pack.",
+            "format": "int32",
+            "nullable": true,
+            "readOnly": true,
+            "example": 8
+          },
+          "uploader": {
+            "type": "string",
+            "description": "Who uploaded this subtitle",
+            "nullable": true,
+            "readOnly": true,
+            "example": "NTb"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "description": "When the subtitle was uploaded to the provider",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "qualities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Available video qualities for this season pack",
+            "readOnly": true,
+            "example": [
+              "720p",
+              "1080p"
+            ]
+          },
+          "source": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Source provider of the subtitle",
+            "readOnly": true,
+            "example": "SuperSubtitles"
+          },
+          "downloadUri": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Url to download the season pack (ZIP archive)",
+            "example": "/subtitles/download/sp_1086727A-EB71-4B24-A209-7CF22374574D"
+          },
+          "downloadCount": {
+            "type": "integer",
+            "description": "Number of times the season pack was downloaded from the proxy",
+            "format": "int64",
+            "readOnly": true,
+            "example": 42
+          }
+        },
+        "additionalProperties": false,
+        "description": "Season pack subtitle information"
       },
       "ShowDto": {
         "required": [
@@ -1168,6 +1165,8 @@
           "hd",
           "hearingImpaired",
           "language",
+          "qualities",
+          "source",
           "subtitleId",
           "version"
         ],
@@ -1201,6 +1200,7 @@
           },
           "hd": {
             "type": "boolean",
+            "description": "Whether this subtitle has HD quality (720P, 1080P, or 2160P).\nDerived from AddictedProxy.Model.Dto.SubtitleDto.Qualities.",
             "readOnly": true
           },
           "downloadUri": {
@@ -1218,6 +1218,7 @@
           "discovered": {
             "type": "string",
             "description": "When was the subtitle discovered in UTC",
+            "format": "date-time",
             "readOnly": true,
             "example": "2022-04-02T05:16:45.4001274"
           },
@@ -1227,6 +1228,32 @@
             "format": "int64",
             "readOnly": true,
             "example": 100
+          },
+          "source": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Source provider of the subtitle",
+            "readOnly": true,
+            "example": "Addic7ed"
+          },
+          "qualities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Available video qualities for this subtitle.\nEmpty array when quality information is unavailable (e.g. legacy Addic7ed subtitles).",
+            "readOnly": true,
+            "example": [
+              "720p",
+              "1080p"
+            ]
+          },
+          "release": {
+            "type": "string",
+            "description": "Full release name from the provider (e.g. filename without extension).\nPopulated for SuperSubtitles; null for Addic7ed.",
+            "nullable": true,
+            "readOnly": true,
+            "example": "Show.S01E03.720p.BluRay.x264-GROUP"
           }
         },
         "additionalProperties": false
@@ -1271,26 +1298,35 @@
             },
             "description": "Episode with their subtitles",
             "nullable": true
+          },
+          "seasonPacks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeasonPackSubtitleDto"
+            },
+            "description": "Season pack subtitles available for this season",
+            "nullable": true
           }
         },
         "additionalProperties": false
-      },
-      "WrongFormatResponse": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "string",
-            "description": "",
-            "nullable": true
-          },
-          "search": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "description": "Returned when the search wasn't formatted properly"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Application"
+    },
+    {
+      "name": "Media"
+    },
+    {
+      "name": "Stats"
+    },
+    {
+      "name": "Subtitles"
+    },
+    {
+      "name": "TvShows"
+    }
+  ]
 }
