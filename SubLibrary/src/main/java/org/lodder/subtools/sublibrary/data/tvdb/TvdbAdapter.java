@@ -112,17 +112,15 @@ public class TvdbAdapter implements AdapterIntf {
     public @Nullable TvdbEpisode searchEpisode(int tvdbId, int season, int episode) {
         return getCache("episode",
             b -> b.add("tvdbId", tvdbId).add("season", season).add("episode", episode))
-            .get(
-                () -> {
-                    try {
-                        return api.searchEpisode(tvdbId, season, episode, Language.ENGLISH);
-                    } catch (TvdbApiException e) {
-                        LOGGER.error(
-                            "API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
-                                TvRelease.formatSeasonEpisode(season, episode)), e);
-                        return null;
-                    }
-                },
+            .get(() -> {
+                try {
+                    return api.searchEpisode(tvdbId, season, episode, Language.ENGLISH);
+                } catch (TvdbApiException e) {
+                    LOGGER.error("API $provider getEpisode for serie id [$tvdbId] %s (${e.getMessage()})".formatted(
+                        TvRelease.formatSeasonEpisode(season, episode)), e);
+                    return null;
+                }
+            },
                 storeTempNullValue:true);
     }
 

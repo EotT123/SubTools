@@ -81,7 +81,7 @@ public final class Addic7edProxyGestdownAdapter extends
     public List<Addic7edProxyGestdownSerieId> getSortedSerieProviderIds(String serieName,
         @Nullable Integer season) throws Addic7edException {
         return api.getProviderSerieIds(serieName).stream()
-            .sorted(Comparator.comparing(n -> !Strings.CI.equalsAny(serieName.keepLettersOnly(),
+            .sorted(Comparator.comparing(n -> !Strings.CI.equals(serieName.keepLettersOnly(),
                 n.name.keepLettersOnly())))
             .map(this::toSerieId)
             .toList();

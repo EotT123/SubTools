@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -168,9 +167,7 @@ public class UpdateAvailableGithub {
     }
 
     private LocalDateTime zonedDateTimeStringToLocalDateTime(String dateString) {
-        Instant instant = Instant.parse(dateString);
-        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
-        return zonedDateTime.withZoneSameInstant(ZonedDateTime.now().offset).toLocalDateTime();
+        return LocalDateTime.ofInstant(Instant.parse(dateString), ZoneId.systemDefault());
     }
 
     private int compareVersions(String str1, String str2) {

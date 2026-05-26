@@ -11,29 +11,19 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class PropertiesReader {
 
-    private static PropertiesReader propertiesReaderInstance;
-    private final Properties properties;
+    private static final PropertiesReader INSTANCE = new PropertiesReader();
+    private final Properties properties = new Properties();
 
-    public PropertiesReader() throws IOException {
+    private PropertiesReader() {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("properties-from-pom.properties")) {
-            this.properties = new Properties();
             this.properties.load(is);
+        } catch (IOException e) {
+            throw new IllegalStateException("Should not happen", e);
         }
-    }
-
-    private static PropertiesReader getPropertiesReader() {
-        if (propertiesReaderInstance == null) {
-            try {
-                propertiesReaderInstance = new PropertiesReader();
-            } catch (IOException e) {
-                throw new IllegalStateException("Should not happen", e);
-            }
-        }
-        return propertiesReaderInstance;
     }
 
     public static @Nullable String getProperty(PomProperty property) {
-        return PropertiesReader.getPropertiesReader().properties.getProperty(property.value);
+        return PropertiesReader.INSTANCE.properties.getProperty(property.value);
     }
 
     @NullMarked

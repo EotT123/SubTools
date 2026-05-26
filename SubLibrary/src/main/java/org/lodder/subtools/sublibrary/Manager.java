@@ -277,8 +277,7 @@ public class Manager {
             try {
                 V value = executeSupplier(supplier, retry);
                 if (value != null || storeTempNullValue) {
-                    Time ttl =
-                        storeTempNullValue && value == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
+                    Time ttl = value == null ? getTemporaryTimeToLive().orElse(12 hr) * 2 : timeToLive;
                     cache.put(key, value, ttl);
                 } else {
                     switch (cache) {

@@ -66,8 +66,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     public List<ShowDto> getProviderSerieIds(String name) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("name", name))
-            .get(
-                () -> {
+            .get(() -> {
                     List<ShowDto> shows = apiCall(() -> TV_SHOWS_API.showsSearchSearchGet(name)).execute().getShows();
                     if (shows == null) {
                         throw Addic7edApiException.noResult("Serie [$name] not found");
