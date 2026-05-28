@@ -2,8 +2,9 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles;
 
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;
+import static org.lodder.subtools.sublibrary.CacheStrategy.*;
+import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
-import static org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService.*;
 import static util.Utils.*;
 
 import java.io.IOException;
@@ -23,7 +24,6 @@ import com.google.gson.JsonSyntaxException;
 import jakarta.ws.rs.core.MediaType;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import okhttp3.Interceptor.Chain;
 import okhttp3.OkHttpClient;
 import okhttp3.Request.Builder;
@@ -59,7 +59,6 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
-import org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService;
 import org.opensubtitles.api.AuthenticationApi;
 import org.opensubtitles.api.DownloadApi;
 import org.opensubtitles.api.SubtitlesApi;
@@ -67,10 +66,13 @@ import org.opensubtitles.invoker.ApiClient;
 import org.opensubtitles.model.Login200Response;
 import org.opensubtitles.model.LoginRequest;
 import org.opensubtitles.model.Subtitle;
+import org.opensubtitles.model.Subtitles200Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Call;
-import retrofit2.Response;
+import retrofit.ErrorResponse;
+import retrofit.Response;
+import retrofit.Response.ErrorHandler;
+import retrofit.SuccessfulResponse;
 
 @NullMarked
 public class OpenSubtitlesApi implements SubtitleApi {
@@ -116,7 +118,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     public static boolean isValidCredentials(String userName, String password) {
         try {
-            return getBearerTokenWithoutCache(userName, password) != null;
+            getBearerTokenWithoutCache(userName, password);
+            return true;
         } catch (OpenSubtitleApiException e) {
             return false;
         }
@@ -124,26 +127,20 @@ public class OpenSubtitlesApi implements SubtitleApi {
 
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return Manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
-            .get(() -> ifNullThrow(getBearerTokenWithoutCache(username, password),
-                () -> OpenSubtitleApiException.noResult(
-                    "Could not acquire a bearer token, " + "invalid username/password?")), 23.5hr);
+            .get(() -> getBearerTokenWithoutCache(username, password), 23.5hr);
     }
 
-    private static @Nullable String getBearerTokenWithoutCache(String username, String password)
-        throws OpenSubtitleApiException {
-        try {
-            Response<Login200Response> response = new ApiClient(new OkHttpClient.Builder()
-                .addInterceptor(chain -> chain.proceed(DEFAULT_BUILDER.apply(chain).build()))
-                .build()).createService(AuthenticationApi.class)
-                .login(CONTENT_TYPE, USER_AGENT, new LoginRequest().username(username).password(password))
-                .execute();
-            if (!response.isSuccessful() || response.body() == null) {
-                return null;
-            }
-            return response.body().getToken();
-        } catch (IOException e) {
-            return null;
-        }
+    private static String getBearerTokenWithoutCache(String username, String password) throws OpenSubtitleApiException {
+        Response<Login200Response> response = new ApiClient(new OkHttpClient.Builder()
+            .addInterceptor(chain -> chain.proceed(DEFAULT_BUILDER.apply(chain).build()))
+            .build()).createService(AuthenticationApi.class)
+            .login(CONTENT_TYPE, USER_AGENT, new LoginRequest().username(username).password(password))
+            .call();
+        return switch (response) {
+            case SuccessfulResponse<Login200Response> r -> r.body.token;
+            case ErrorResponse r -> throw new OpenSubtitleApiException(r.code, "Could not acquire a bearer token - "
+                + r.message, r.cacheStrategy, r.logLevel);
+        };
     }
 
     // ===== \\
@@ -262,23 +259,54 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 .add("year", year))
             .get(() -> {
                 Integer imdbIdInt = StringUtils.isNotBlank(imdbId) ? Integer.parseInt(imdbId.replace("tt", "")) : null;
-                return apiCall(
-                    () -> subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
-                        language != null ? language.iso639_1 : null, movieHash, userId, getValue(hearingImpaired),
-                        getValue(foreignPartsOnly), getValue(trustedSources), getValue(machineTranslated),
-                        getValue(aiTranslated), orderBy == null ? null : orderBy.paramName, getValue(orderDirection),
-                        parentFeatureId, parentImdbId, parentTmdbId, season, episode, year, getValue(movieHashMatch),
-                        page,
-                        USER_AGENT)).execute().getData();
-                // TODO is this filtering needed?
-                // String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
-                // String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName,
-                // "[^A-Za-z]", ""));
-                //     .filter(file -> {
-                //     String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
-                //     return subFileName.contains(name) ||
-                //         (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
-                // })
+                return switch (
+                    subtitlesApi.get().subtitles(id, imdbIdInt, tmdbId, getValue(type), query,
+                            language != null ? language.iso639_1 : null, movieHash, userId, getValue(hearingImpaired),
+                            getValue(foreignPartsOnly), getValue(trustedSources), getValue(machineTranslated),
+                            getValue(aiTranslated), orderBy == null ? null : orderBy.paramName,
+                            getValue(orderDirection),
+                            parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
+                            getValue(movieHashMatch),
+                            page, USER_AGENT)
+                        .addErrorHandler(createQuotaErrorHandler()).call()) {
+                    case SuccessfulResponse<Subtitles200Response> r -> r.body.data;
+                    case ErrorResponse r -> {
+                        StringBuilder sb = new StringBuilder("Could not find subtitles for:");
+                        ifNotNullDo(id, v -> sb.append(" id[$v]"));
+                        ifNotNullDo(imdbIdInt, v -> sb.append(" imdbIdInt[$v]"));
+                        ifNotNullDo(tmdbId, v -> sb.append(" tmdbId[$v]"));
+                        ifNotNullDo(getValue(type), v -> sb.append(" type[$v]"));
+                        ifNotNullDo(query, v -> sb.append(" query[$v]"));
+                        ifNotNullDo(language, v -> sb.append(" language[$v]"));
+                        ifNotNullDo(movieHash, v -> sb.append(" movieHash[$v]"));
+                        ifNotNullDo(userId, v -> sb.append(" userId[$v]"));
+                        ifNotNullDo(hearingImpaired, v -> sb.append(" hearingImpaired[$v]"));
+                        ifNotNullDo(getValue(foreignPartsOnly), v -> sb.append(" foreignPartsOnly[$v]"));
+                        ifNotNullDo(getValue(trustedSources), v -> sb.append(" trustedSources[$v]"));
+                        ifNotNullDo(getValue(machineTranslated), v -> sb.append(" machineTranslated[$v]"));
+                        ifNotNullDo(getValue(aiTranslated), v -> sb.append(" aiTranslated[$v]"));
+                        ifNotNullDo(orderBy, v -> sb.append(" orderBy[${v.paramName}]"));
+                        ifNotNullDo(getValue(orderDirection), v -> sb.append(" direction[$v]"));
+                        ifNotNullDo(parentFeatureId, v -> sb.append(" parentFeatureId[$v]"));
+                        ifNotNullDo(parentImdbId, v -> sb.append(" parentImdbId[$v]"));
+                        ifNotNullDo(parentTmdbId, v -> sb.append(" parentTmdbId[$v]"));
+                        ifNotNullDo(season, v -> sb.append(" season[$v]"));
+                        ifNotNullDo(episode, v -> sb.append(" episode[$v]"));
+                        ifNotNullDo(year, v -> sb.append(" year[$v]"));
+                        ifNotNullDo(getValue(movieHashMatch), v -> sb.append(" movieHashMatch[$v]"));
+                        ifNotNullDo(page, v -> sb.append(" page[$v]"));
+                        throw handleErrorResponse(r, sb.toString());
+                    }
+                };
+                //// TODO is this filtering needed?
+                //// String name = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.name, "[^A-Za-z]", ""));
+                //// String originalName = StringUtils.lowerCase(RegExUtils.replaceAll(tvRelease.originalName,
+                //// "[^A-Za-z]", ""));
+                ////     .filter(file -> {
+                ////     String subFileName = file.getFileName().replaceAll("[^A-Za-z]", "").toLowerCase();
+                ////     return subFileName.contains(name) ||
+                ////         (StringUtils.isNotBlank(originalName) && subFileName.contains(originalName));
+                //// })
             });
     }
 
@@ -312,19 +340,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
                         LogLevel.ERROR);
                 }
             });
-
-
-//        return getCache("downloadUrl", b -> b.add("fileId", fileId))
-//            .get(() ->
-//                    apiCall(() -> downloadApi.get().download(USER_AGENT, new DownloadRequest().fileId(fileId)))
-//                        .addErrorHandler(createQuotaErrorHandler())
-//                        .execute().getLink()
-//            );
-    }
-
-    private static <T> ExecuteCall<T, OpenSubtitleApiException> apiCall(
-        ThrowingSupplier<Call<T>, OpenSubtitleApiException> supplier) {
-        return RetrofitService.handleExecution(supplier, OpenSubtitleApiException::new);
     }
 
 
@@ -332,18 +347,23 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return param == null ? null : param.value;
     }
 
-    private ErrorHandler<OpenSubtitleApiException> createQuotaErrorHandler() {
-        return new ErrorHandler<>(
+    private ErrorHandler createQuotaErrorHandler() {
+        return new ErrorHandler(
             (HttpStatus code, String errorBody) -> code == NOT_ACCEPTABLE && errorBody.contains("quota"),
             null,
-            (HttpStatus _, String errorBody) -> {
+            (HttpStatus code, String errorBody) -> {
                 String message;
                 try {
                     message = new JSONObject(errorBody).getString("message");
                 } catch (JSONException e) {
                     message = "Quota exceeded. Please try again later.";
                 }
-                return OpenSubtitleApiException.stopContactingServer(message);
+                return new ErrorResponse(code, message, WARN, CACHE_DISABLED);
             });
+    }
+
+    private static OpenSubtitleApiException handleErrorResponse(ErrorResponse errorResponse, String message) {
+        return new OpenSubtitleApiException(errorResponse.code, message + " - " + errorResponse.message,
+            errorResponse.cacheStrategy, errorResponse.logLevel);
     }
 }

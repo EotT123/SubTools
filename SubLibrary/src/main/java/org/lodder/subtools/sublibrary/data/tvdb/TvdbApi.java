@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.data.tvdb;
 
-import java.io.IOException;
+import static util.Utils.*;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -21,7 +22,8 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
-import retrofit2.Response;
+import retrofit.ErrorResponse;
+import retrofit.SuccessfulResponse;
 
 @NullMarked
 public class TvdbApi implements ApiIntf {
@@ -39,55 +41,39 @@ public class TvdbApi implements ApiIntf {
             .get(() -> {
                 String encodedSerieName =
                     URLEncoder.encode(serieName.toLowerCase().replace(" ", "-"), StandardCharsets.UTF_8);
-                try {
-                    Response<SeriesResultsResponse> response =
-                        theTvdb.search()
-                            .series(encodedSerieName, null, null, null, null)
-                            .execute();
-                    if (response.isSuccessful()) {
-                        return response.body().data.stream()
-                            .map(series -> new SearchResult().tvdbId(String.valueOf(series.id)).name(series.seriesName))
-                            .toList();
-                    }
-                    return List.of();
-                } catch (IOException e) {
-                    throw TvdbApiException.error(e);
-                }
+                return switch (theTvdb.search().series(encodedSerieName, null, null, null, null).call()) {
+                    case SuccessfulResponse<SeriesResultsResponse> r -> r.body.data.stream()
+                        .map(series -> new SearchResult().tvdbId(String.valueOf(series.id)).name(series.seriesName))
+                        .toList();
+                    case ErrorResponse r -> throw handleErrorResponse(r, "Could not find serie with name [$serieName]");
+                };
             });
     }
 
     public SeriesBaseRecord searchSerieWithTvdbId(int tvdbId) throws TvdbApiException {
         return getCache("serie", b -> b.add("tvdbId", tvdbId))
-            .get(() -> {
-                try {
-                    Response<SeriesResponse> response = theTvdb.series().series(tvdbId, null).execute();
-                    if (response.isSuccessful()) {
-                        Series series = response.body().data;
-                        return new SeriesBaseRecord().id(series.id).name(series.seriesName);
+            .get(
+                () -> switch (theTvdb.series().series(tvdbId, null).call()) {
+                    case SuccessfulResponse<SeriesResponse> response -> {
+                        Series series = response.body.data;
+                        yield new SeriesBaseRecord().id(series.id).name(series.seriesName);
                     }
-                    throw TvdbApiException.noResult("Could not find tvdb show with id " + tvdbId);
-                } catch (IOException e) {
-                    throw TvdbApiException.error(e);
-                }
-            });
+                    case ErrorResponse r -> throw handleErrorResponse(r, "Could not find show with id [$tvdbId]");
+                });
     }
 
     //  Allows searching for an IMDB or EIDR id
     public SeriesBaseRecord searchSerieWithRemoteId(String remoteId) throws TvdbApiException {
         return getCache("serie", b -> b.add("remoteId", remoteId))
-            .get(() -> {
-                try {
-                    Response<SeriesResultsResponse> response =
-                        theTvdb.search().series(null, remoteId, null, null, null).execute();
-                    if (response.isSuccessful()) {
-                        Series series = response.body().data.getFirst();
-                        return new SeriesBaseRecord().id(series.id).name(series.seriesName);
+            .get(
+                () -> switch (theTvdb.search().series(null, remoteId, null, null, null).call()) {
+                    case SuccessfulResponse<SeriesResultsResponse> response -> {
+                        Series series = response.body.data.first;
+                        yield new SeriesBaseRecord().id(series.id).name(series.seriesName);
                     }
-                    throw TvdbApiException.noResult("Could not find tvdb show with remote id " + remoteId);
-                } catch (IOException e) {
-                    throw TvdbApiException.error(e);
-                }
-            });
+                    case ErrorResponse r ->
+                        throw handleErrorResponse(r, "Could not find show with remote id [$remoteId]");
+                });
     }
 
     public @Nullable TvdbEpisode searchEpisode(int tvdbId, int season, int episode, Language language)
@@ -99,19 +85,24 @@ public class TvdbApi implements ApiIntf {
                 .add("season", season)
                 .add("episode", episode)
                 .add("language", language))
-            .get(() -> {
-                try {
-                    Response<EpisodesResponse> response = theTvdb.series().episodesQuery(tvdbId, null, season, episode,
-                        null, null, null, null, null, language.iso639_1).execute();
-                    if (response.isSuccessful()) {
-                        Episode ep = response.body().data.getFirst();
-                        return new TvdbEpisode(ep.id, ep.seriesId.longValue(), ep.episodeName, ep.airedEpisodeNumber,
-                            ep.airedSeason, null);
+            .get(() -> switch (theTvdb.series()
+                .episodesQuery(tvdbId, null, season, episode, null, null, null, null, null, language.iso639_1).call()) {
+                case SuccessfulResponse<EpisodesResponse> response -> {
+                    List<Episode> episodes = response.body.data;
+                    if (episodes == null || episodes.isEmpty()) {
+                        yield null;
                     }
-                    return null;
-                } catch (IOException e) {
-                    throw TvdbApiException.error(e);
+                    Episode ep = episodes.first;
+                    yield new TvdbEpisode(ep.id, ifNotNull(ep.seriesId, Integer::longValue), ep.episodeName,
+                        ep.airedEpisodeNumber, ep.airedSeason, null);
                 }
+                case ErrorResponse r -> throw handleErrorResponse(r, "Could not find episode with" +
+                    "tvdbId[$tvdbId], season[$season], episode[$episode], language[$language]");
             });
+    }
+
+    private TvdbApiException handleErrorResponse(ErrorResponse errorResponse, String message) {
+        return new TvdbApiException(errorResponse.code, message + " - " + errorResponse.message,
+            errorResponse.cacheStrategy, errorResponse.logLevel);
     }
 }

@@ -165,8 +165,8 @@ public class SubdlApi implements SubtitleApi {
      * @return a list of {@link SubdlSubtitleMetadata} objects matching the given criteria, or an empty list if none
      * @throws SubdlApiException if the API call fails
      */
-    public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode,
-        Language language) throws SubdlApiException {
+    public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode, Language language)
+        throws SubdlApiException {
         Map<SearchParam, Serializable> params = MapUtil.create(
             SearchParam.SUBDL_ID, providerId,
             SearchParam.SEASON, season,

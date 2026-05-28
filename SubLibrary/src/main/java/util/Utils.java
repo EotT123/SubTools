@@ -85,6 +85,15 @@ public class Utils {
         return value != null ? mapper.apply(value) : orElseSupplier.get();
     }
 
+    public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseThrow(@Nullable T value,
+        ThrowingFunction<T, R, X> mapper, Supplier<X> exceptionSupplier) throws X {
+        if (value != null) {
+            return mapper.apply(value);
+        } else {
+            throw exceptionSupplier.get();
+        }
+    }
+
     @Contract("!null,_ -> param1; null,_ -> param2")
     public static <S extends @Nullable Object, T extends S> S ifNullThen(@Nullable T value, S orElseValue) {
         return value != null ? value : orElseValue;

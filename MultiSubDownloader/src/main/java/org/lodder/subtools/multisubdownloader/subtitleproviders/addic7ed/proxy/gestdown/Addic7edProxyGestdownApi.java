@@ -1,20 +1,21 @@
 package org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown;
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
-import static org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService.*;
+import static util.Utils.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import extensions.java.lang.String.StringExt;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.gestdown.api.SubtitlesApi;
 import org.gestdown.api.TvShowsApi;
 import org.gestdown.invoker.ApiClient;
 import org.gestdown.model.EpisodeDto;
 import org.gestdown.model.ShowDto;
+import org.gestdown.model.ShowSearchResponse;
 import org.gestdown.model.SubtitleDto;
 import org.gestdown.model.SubtitleSearchResponse;
 import org.jspecify.annotations.NullMarked;
@@ -26,10 +27,10 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.util.webpage.http.RetrofitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Call;
+import retrofit.ErrorResponse;
+import retrofit.SuccessfulResponse;
 
 /**
  * Provides access to Addic7ed subtitle data via the Gestdown proxy.
@@ -66,43 +67,38 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
 
     public List<ShowDto> getProviderSerieIds(String name) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("name", name))
-            .get(() -> {
-                    List<ShowDto> shows = apiCall(() -> TV_SHOWS_API.showsSearchSearchGet(name)).execute().getShows();
-                    if (shows == null) {
-                        throw Addic7edApiException.noResult("Serie [$name] not found");
-                    }
-                    return shows;
-                }
-            );
+            .get(() -> switch (TV_SHOWS_API.showsSearchSearchGet(name).call()) {
+                case SuccessfulResponse<ShowSearchResponse> response ->
+                    ifNullThrow(response.body.shows, () -> Addic7edApiException.noResult("Serie [$name] not found"));
+                case ErrorResponse r -> throw handleErrorResponse(r, "Serie [$name] not found");
+            });
     }
+
 
     public @Nullable ShowDto getProviderSerieIds(int tvdbId) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
-            .get(() -> {
-                List<ShowDto> shows =
-                    apiCall(() -> TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId)).execute().getShows();
-                if (shows == null || shows.isEmpty()) {
-                    return null;
-                }
-                return shows.getFirst();
+            .get(() -> switch (TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId).call()) {
+                case SuccessfulResponse<ShowSearchResponse> response -> first(response.body.shows);
+                case ErrorResponse r -> throw handleErrorResponse(r, "tvdbId [$tvdbId] not found");
             });
     }
 
     public List<Addic7edProxyGestdownSubtitle> getSubtitles(String providerId, int season, int episode,
         Language language) throws Addic7edApiException {
+
         return getCache("subtitles", b -> b.add("providerId", providerId)
             .add("season", season).add("episode", episode).add("language", language))
-            .get(() -> {
-                SubtitleSearchResponse response = apiCall(
-                    () -> SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
-                        UUID.fromString(providerId), season, episode)).execute();
-                List<SubtitleDto> subtitles = response.getMatchingSubtitles();
-                if (subtitles == null) {
-                    throw Addic7edApiException.noResult("Could not find subtitles for [$providerId], season[$season]," +
-                        " episode [$episode], language [$language]", CACHE_DISABLED);
-                }
-                return subtitles.stream().map(subtitleDto -> mapToSubtitle(subtitleDto, response.episode, language))
-                    .toList();
+            .get(() -> switch (
+                SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
+                    UUID.fromString(providerId), season, episode).call()) {
+                case SuccessfulResponse<SubtitleSearchResponse> response ->
+                    Optional.ofNullable(response.body.matchingSubtitles)
+                        .map(s -> s.stream().map(sub -> mapToSubtitle(sub, response.body.episode, language)).toList())
+                        .orElseThrow(() -> Addic7edApiException.noResult("Could not find subtitles for " +
+                                "[$providerId], season [$season], episode [$episode], language [$language]",
+                            CACHE_DISABLED));
+                case ErrorResponse r -> throw handleErrorResponse(r, "Could not find subtitles for " +
+                    "[$providerId], season[$season], episode [$episode], language [$language]");
             });
     }
 
@@ -122,8 +118,12 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             hearingImpaired:false);
     }
 
-    private static <T> ExecuteCall<T, Addic7edApiException> apiCall(
-        ThrowingSupplier<Call<T>, Addic7edApiException> supplier) {
-        return RetrofitService.handleExecution(supplier, Addic7edApiException::new);
+    private <T> @Nullable T first(@Nullable List<T> list) {
+        return list == null || list.isEmpty() ? null : list.getFirst();
+    }
+
+    private Addic7edApiException handleErrorResponse(ErrorResponse errorResponse, String message) {
+        return new Addic7edApiException(errorResponse.code, message + " - " + errorResponse.message,
+            errorResponse.cacheStrategy, errorResponse.logLevel);
     }
 }
