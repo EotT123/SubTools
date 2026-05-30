@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.function.Supplier;
 
 import manifold.ext.props.rt.api.set;
 import manifold.ext.props.rt.api.val;
@@ -36,11 +37,11 @@ public class SearchManager implements Cancelable {
     private int totalJobs;
 
     private final SearchHandler onFound;
-    @val Language language;
+    @val Supplier<Language> language;
     private final SearchProgressListener progressListener;
     @val UserInteractionHandler userInteractionHandler;
 
-    public SearchManager(Language language, SearchProgressListener progressListener,
+    public SearchManager(Supplier<Language> language, SearchProgressListener progressListener,
         UserInteractionHandler userInteractionHandler, SearchHandler onFound) {
         this.language = language;
         this.progressListener = progressListener;
