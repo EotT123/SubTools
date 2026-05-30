@@ -6,6 +6,7 @@ import static util.Utils.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
@@ -41,7 +42,7 @@ public class CliSearchAction extends SearchAction<ReleaseWithPath> {
     private final List<Path> folders;
     private final boolean recursive;
 
-    @get @override Language language;
+    @get @override Supplier<Language> language;
     @get(Protected) @override IndexingProgressListener indexingProgressListener;
     @get(Protected) @override SearchProgressListener searchProgressListener;
 
@@ -54,7 +55,7 @@ public class CliSearchAction extends SearchAction<ReleaseWithPath> {
         this.searchProgressListener = searchProgressListener;
         this.cli = cli;
         this.fileListAction = fileListAction;
-        this.language = language;
+        this.language = () -> language;
         this.releaseFactory = releaseFactory;
         this.filtering = filtering;
         this.folders = folders;
@@ -70,7 +71,7 @@ public class CliSearchAction extends SearchAction<ReleaseWithPath> {
         fileListAction.indexingProgressListener = this.indexingProgressListener;
 
         List<Path> files = this.folders.stream()
-            .flatMap(folder -> fileListAction.getFileListing(folder, recursive, language, overwriteSubtitles)
+            .flatMap(folder -> fileListAction.getFileListing(folder, recursive, language.get(), overwriteSubtitles)
                 .stream())
             .toList();
 
