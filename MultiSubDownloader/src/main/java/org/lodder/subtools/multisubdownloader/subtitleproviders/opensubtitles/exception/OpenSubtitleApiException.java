@@ -43,18 +43,8 @@ public class OpenSubtitleApiException extends OpenSubtitleException implements A
         this.stopContactingServer = stopContactingServer;
     }
 
-    public static OpenSubtitleApiException noResult(String message, CacheStrategy cacheStrategy=CACHE_TEMPORARY,
-        LogLevel logLevel=WARN) {
-        return new OpenSubtitleApiException(NO_CONTENT, message, cacheStrategy, logLevel);
-    }
-
     public static OpenSubtitleApiException error(Exception cause, String message=cause.getMessage(),
         CacheStrategy cacheStrategy=CACHE_TEMPORARY) {
         return new OpenSubtitleApiException(SERVER_ERROR, cause, message, cacheStrategy, ERROR, false);
-    }
-
-    public static OpenSubtitleApiException stopContactingServer(String message,
-        CacheStrategy cacheStrategy=CACHE_DISABLED, LogLevel logLevel=WARN) {
-        return new OpenSubtitleApiException(SERVER_ERROR, message, cacheStrategy, logLevel, true);
     }
 }

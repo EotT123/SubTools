@@ -1,9 +1,15 @@
 package org.lodder.subtools.sublibrary.util.webpage.http;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status.Family;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public enum HttpStatus {
@@ -84,14 +90,17 @@ public enum HttpStatus {
     @val String description;
     @val Family family;
 
+    private static Map<Integer, HttpStatus> MAP =
+        Arrays.stream(values()).collect(Collectors.toMap(status -> status.code, Function.identity()));
+
     HttpStatus(int code, String description) {
         this.code = code;
         this.description = description;
         this.family = Response.Status.Family.familyOf(code);
     }
 
-    public static HttpStatus fromStatusCode(int statusCode) {
-       return HttpStatus.values().stream().filter(s -> s.code == statusCode).findFirst().orElse(null);
+    public static @Nullable HttpStatus fromStatusCode(int statusCode) {
+        return MAP.get(statusCode);
     }
 
 }
