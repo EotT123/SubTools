@@ -9,7 +9,6 @@ import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
-import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.exception.SubtitlesProviderInitException;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -35,7 +34,6 @@ public class SearchWorker extends Thread {
 
     @Override
     public void run() {
-        Language language = this.scheduler.language;
         this.busy = false;
         try {
             while (!this.isInterrupted()) {
@@ -49,7 +47,7 @@ public class SearchWorker extends Thread {
                 this.release = release;
                 LOGGER.debug("[Search] {} searching {} ", this.provider.provider, release);
 
-                Set<Subtitle> subtitles = this.provider.search(release, language);
+                Set<Subtitle> subtitles = this.provider.search(release, this.scheduler.language.get());
 
                 /* clone to prevent other threads from ever messing with it */
                 this.subtitles = Set.copyOf(subtitles);

@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.gui.actions.search;
 import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.override;
@@ -55,8 +56,8 @@ public abstract sealed class GuiSearchAction<P extends InputPanel, R extends Rel
     }
 
     @Override
-    protected Language getLanguage() {
-        return this.searchPanel.inputPanel.selectedLanguage;
+    protected Supplier<Language> getLanguage() {
+        return () -> this.searchPanel.inputPanel.selectedLanguage;
     }
 
     @Override

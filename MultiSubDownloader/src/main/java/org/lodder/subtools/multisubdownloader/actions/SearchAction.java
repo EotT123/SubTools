@@ -4,6 +4,7 @@ import static java.util.Objects.*;
 import static manifold.ext.props.rt.api.PropOption.*;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
@@ -33,7 +34,7 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
 
     @get(Protected) @set(Private) @Nullable StatusListener statusListener;
     @get(Protected) @set(Private) @Nullable List<R> releases;
-    @get(Protected) abstract Language language;
+    @get(Protected) abstract Supplier<Language> language;
     abstract @get(Protected) IndexingProgressListener indexingProgressListener;
     abstract @get(Protected) UserInteractionHandler userInteractionHandler;
     abstract @get(Protected) SearchProgressListener searchProgressListener;
