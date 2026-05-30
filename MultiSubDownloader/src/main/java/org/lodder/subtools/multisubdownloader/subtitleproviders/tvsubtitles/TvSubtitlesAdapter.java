@@ -110,6 +110,7 @@ public final class TvSubtitlesAdapter
             fileName:sub.filename,
             language:sub.language,
             quality:ReleaseParser.getQualityKeyword(sub.filename + " " + sub.source),
-            releaseGroup:sub.releaseGroup);
+            releaseGroup:sub.releaseGroup,
+            uploader:sub.uploader);
     }
 }

@@ -9,5 +9,5 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 
 @NullMarked
 public record TVSubtitlesSubtitleMetadata(String title, String filename, String url, @Nullable Source source,
-    String releaseGroup, @Nullable Language language) implements Serializable {
+    String releaseGroup, @Nullable String uploader, @Nullable Language language) implements Serializable {
 }

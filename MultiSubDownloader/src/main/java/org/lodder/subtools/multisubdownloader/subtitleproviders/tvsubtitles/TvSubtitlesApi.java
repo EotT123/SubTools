@@ -25,7 +25,6 @@ import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.control.VideoPatterns.Source;
 import org.lodder.subtools.sublibrary.data.ProviderId;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
-import org.lodder.subtools.sublibrary.util.webpage.http.CookieManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,11 +75,9 @@ public class TvSubtitlesApi implements SubtitleApi {
             b -> b.add("providerId", providerId).add("season", season).add("language", providerLang))
             .get(() -> {
                 try {
-                    CookieManager cookieManager = providerLang == null ? null :
-                        new CookieManager().storeCookie("tvsubtitles.net", "setlang", providerLang.langCode);
-                    return Manager.getDocument(new PageContentParams(
-                            DOMAIN + "/" + providerId.replace(".html", "-$season.html"),
-                            cookieManager:cookieManager))
+                    String url = providerLang == null ? providerId :
+                        "setlang.php?page=/$providerId.html&setlang1=" + providerLang.langCode;
+                    return Manager.getDocument(new PageContentParams(DOMAIN + "/" + url))
                         .select("#table5 tr[bgcolor]")
                         .stream()
                         .filter(episodeRow -> StringUtils.isNotBlank(episodeRow.selectFirst("td").text()))
@@ -119,6 +116,7 @@ public class TvSubtitlesApi implements SubtitleApi {
                                 DOMAIN + "/" + subtitleElement.select("a[href^='download-']").attr("href"),
                                 Source.fromValue(metadataMap.get(MetadataType.SOURCE)),
                                 metadataMap.get(MetadataType.RELEASE),
+                                metadataMap.get(MetadataType.UPLOADER),
                                 providerLang != null ? providerLang.language : null);
                         }).toList();
                 } catch (ManagerException e) {
@@ -134,10 +132,11 @@ public class TvSubtitlesApi implements SubtitleApi {
 
     @NullMarked
     private enum MetadataType {
-        TITLE("episode title"),
-        SOURCE("rip"),
-        RELEASE("release"),
-        FILE_NAME("filename");
+        TITLE("episode title:"),
+        SOURCE("rip:"),
+        RELEASE("release:"),
+        FILE_NAME("filename:"),
+        UPLOADER("author:");
 
         @val String value;
 
