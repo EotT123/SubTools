@@ -75,8 +75,8 @@ public final class TvSubtitlesAdapter
     }
 
     @Override
-    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) {
-        return List.of();
+    public @Nullable ProviderId getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) {
+        return null;
     }
 
     @Override

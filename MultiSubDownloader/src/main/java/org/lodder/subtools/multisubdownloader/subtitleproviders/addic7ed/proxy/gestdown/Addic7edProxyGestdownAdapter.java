@@ -71,10 +71,9 @@ public final class Addic7edProxyGestdownAdapter extends
     // ===== \\
 
     @Override
-    public List<Addic7edProxyGestdownSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
-        throws Addic7edException {
-        return providerIds.userOrElse(TVDB,
-            tvdbId -> ifNotNull(api.getProviderSerieIds(tvdbId), ids -> List.of(toSerieId(ids))), List::of);
+    public @Nullable Addic7edProxyGestdownSerieId getSerieProviderIdById(ProviderIds providerIds,
+        @Nullable Integer season) throws Addic7edException {
+        return providerIds.get(TVDB, tvdbId -> ifNotNull(api.getProviderSerieId(tvdbId), this::toSerieId));
     }
 
     @Override

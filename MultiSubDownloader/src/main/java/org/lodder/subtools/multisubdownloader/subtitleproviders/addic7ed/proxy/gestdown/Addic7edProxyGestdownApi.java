@@ -75,7 +75,7 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
     }
 
 
-    public @Nullable ShowDto getProviderSerieIds(int tvdbId) throws Addic7edApiException {
+    public @Nullable ShowDto getProviderSerieId(int tvdbId) throws Addic7edApiException {
         return getCache("providerId", b -> b.add("tvdbId", tvdbId))
             .get(() -> switch (TV_SHOWS_API.showsExternalTvdbTvdbIdGet(tvdbId).call()) {
                 case SuccessfulResponse<ShowSearchResponse> response -> first(response.body.shows);

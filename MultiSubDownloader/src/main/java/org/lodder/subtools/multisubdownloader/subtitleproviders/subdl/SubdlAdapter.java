@@ -64,10 +64,9 @@ public final class SubdlAdapter extends
     // ===== \\
 
     @Override
-    public List<SubdlSerieId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+    public @Nullable SubdlSerieId getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws SubdlException {
-        return providerIds.userOrElse(IMDB, imdbId -> ifNotNull(api.getProviderIdUsingImdbId(imdbId), List::of),
-            List::of);
+        return providerIds.get(IMDB, api::getProviderIdUsingImdbId);
     }
 
     @Override

@@ -26,8 +26,8 @@ public class ProviderIds {
         return (T) providerIdMap.get(providerIdType);
     }
 
-    public <T, S extends @Nullable Object, E extends Exception> S get(ProviderIdType<T> providerIdType,
-        ThrowingFunction<T, S, E> mapper) throws E {
+    public <T, S, E extends Exception> @Nullable S get(ProviderIdType<T> providerIdType,
+        ThrowingFunction<T, @Nullable S, E> mapper) throws E {
         return ifNotNull(get(providerIdType), mapper);
     }
 

@@ -209,7 +209,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     private @Nullable SerieMapping getProviderSerieMapping(String name, String nameToSearchFor, String displayName,
         @Nullable Integer season, ProviderIds providerIds) throws X {
 
-        ThrowingSupplier<List<S_ID>, X> providerReleaseIdsByIdFunction =
+        ThrowingSupplier<@Nullable S_ID, X> providerReleaseIdsByIdFunction =
             () -> getSerieProviderIdById(providerIds, season);
         ThrowingFunction<String, List<S_ID>, X> providerReleaseIdsByNameFunction
             = _nameToSearchFor -> getSortedSerieProviderIds(_nameToSearchFor, season);
@@ -237,10 +237,10 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
      *
      * @param providerIds the provider IDs containing various IDs for providers
      * @param season the season number of the serie
-     * @return a list containing the serie provider IDs found
+     * @return the serie provider ID
      * @throws X if an error occurs during the operation
      */
-    public abstract List<S_ID> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) throws X;
+    public abstract @Nullable S_ID getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) throws X;
 
     /**
      * Get a sorted list of provider serie ids for the given serie name and season. Results are already cached and
@@ -302,7 +302,7 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
     public <M extends ReleaseMapping, P extends ProviderId> @Nullable M getProviderReleaseMapping(String name,
         String nameToSearchFor, String displayName,
         List<ProviderCacheKeyParam> extraParams, ProviderIds providerIds,
-        ThrowingSupplier<List<P>, X> providerReleaseIdsByIdFunction,
+        ThrowingSupplier<@Nullable P, X> providerReleaseIdsByIdFunction,
         ThrowingFunction<String, List<P>, X> providerReleaseIdsByNameFunction,
         TriFunction<String, String, String, M> releaseMappingConstructor,
         UnaryOperator<String> selectFromListMessage,
@@ -322,21 +322,14 @@ public abstract class SubtitleAdapter<API_SUB, SUB extends Subtitle, S_ID extend
             return null;
         }
 
-        List<P> providerReleaseIds = providerReleaseIdsByIdFunction.get();
-        Function<P, M> providerIdToReleaseMapping =
+        P providerReleaseId = providerReleaseIdsByIdFunction.get();
+        Function<P, @Nullable M> providerIdToReleaseMapping =
             providerId -> releaseMappingConstructor.apply(name, providerId.id, providerId.name);
         M releaseMapping = null;
-        if (providerReleaseIds.size() == 1) {
-            releaseMapping = providerIdToReleaseMapping.apply(providerReleaseIds.first());
-        } else if (!providerReleaseIds.isEmpty()) {
-            // Prompt the user to select the correct provider release id.
-            releaseMapping = userInteractionHandler.selectFromList(
-                providerReleaseIds,
-                selectFromListMessage.apply(displayName),
-                provider,
-                providerReleaseIdToDisplayStringFunction).map(providerIdToReleaseMapping).orElse(null);
-        }
-        if (releaseMapping == null) {
+        if (providerReleaseId != null) {
+            releaseMapping = providerIdToReleaseMapping.apply(providerReleaseId);
+        } else {
+            List<P> providerReleaseIds;
             try {
                 providerReleaseIds = providerReleaseIdsByNameFunction.apply(nameToSearchFor);
             } catch (Exception exc) {

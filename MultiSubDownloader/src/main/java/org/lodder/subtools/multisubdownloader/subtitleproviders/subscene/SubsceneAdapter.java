@@ -70,10 +70,10 @@ public final class SubsceneAdapter
     // ===== \\
 
     @Override
-    public List<SubSceneSerieId> getSerieProviderIdById(ProviderIds providerIds, Integer season)
+    public @Nullable SubSceneSerieId getSerieProviderIdById(ProviderIds providerIds, Integer season)
         throws SubsceneException {
-        return providerIds.userOrElse(IMDB, imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)),
-            List::of);
+        return providerIds.get(IMDB,
+            imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)).stream().findAny().orElse(null));
     }
 
     /**
