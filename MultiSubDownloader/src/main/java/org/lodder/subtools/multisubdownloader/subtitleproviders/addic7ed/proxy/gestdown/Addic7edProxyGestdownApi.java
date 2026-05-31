@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import connection.retrofit.ErrorResponse;
+import connection.retrofit.SuccessfulResponse;
 import extensions.java.lang.String.StringExt;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -29,8 +31,6 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraIn
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.ErrorResponse;
-import retrofit.SuccessfulResponse;
 
 /**
  * Provides access to Addic7ed subtitle data via the Gestdown proxy.

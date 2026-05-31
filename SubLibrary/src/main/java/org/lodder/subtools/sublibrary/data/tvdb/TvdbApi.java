@@ -14,6 +14,8 @@ import com.uwetrottmann.thetvdb.entities.EpisodesResponse;
 import com.uwetrottmann.thetvdb.entities.Series;
 import com.uwetrottmann.thetvdb.entities.SeriesResponse;
 import com.uwetrottmann.thetvdb.entities.SeriesResultsResponse;
+import connection.retrofit.ErrorResponse;
+import connection.retrofit.SuccessfulResponse;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
@@ -22,8 +24,6 @@ import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
-import retrofit.ErrorResponse;
-import retrofit.SuccessfulResponse;
 
 @NullMarked
 public class TvdbApi implements ApiIntf {
