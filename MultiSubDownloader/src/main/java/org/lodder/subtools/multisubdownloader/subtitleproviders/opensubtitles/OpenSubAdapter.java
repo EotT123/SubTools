@@ -67,9 +67,9 @@ public final class OpenSubAdapter
     // ===== \\
 
     @Override
-    public List<OpensubtitleId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
+    public @Nullable OpensubtitleId getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
         throws OpenSubtitleException {
-        return ifNotNull(providerIds.get(IMDB, api::getProviderSerieId), List::of);
+        return providerIds.get(IMDB, api::getProviderSerieId);
     }
 
     @Override

@@ -61,9 +61,8 @@ public final class PodnapisiAdapter
     // ===== \\
 
     @Override
-    public List<ProviderId> getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season)
-        throws PodnapisiException {
-        return List.of();
+    public @Nullable ProviderId getSerieProviderIdById(ProviderIds providerIds, @Nullable Integer season) {
+        return null;
     }
 
     @Override
