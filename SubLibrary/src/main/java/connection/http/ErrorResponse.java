@@ -1,9 +1,10 @@
-package retrofit;
+package connection.http;
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static util.Utils.*;
 
+import connection.ErrorHandlerType;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.CacheStrategy;

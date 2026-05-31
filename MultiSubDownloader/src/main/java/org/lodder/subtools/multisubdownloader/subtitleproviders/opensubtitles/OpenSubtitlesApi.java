@@ -12,7 +12,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,10 @@ import java.util.function.Function;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import connection.retrofit.ErrorResponse;
+import connection.retrofit.Response;
+import connection.retrofit.Response.ErrorHandler;
+import connection.retrofit.SuccessfulResponse;
 import jakarta.ws.rs.core.MediaType;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -46,7 +49,6 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.pa
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.SearchSubtitlesEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.TrustedSourcesEnum;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.param.TypeEnum;
-import org.lodder.subtools.sublibrary.CacheStrategy;
 import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.LogLevel;
@@ -70,10 +72,6 @@ import org.opensubtitles.model.Subtitle;
 import org.opensubtitles.model.Subtitles200Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.ErrorResponse;
-import retrofit.Response;
-import retrofit.Response.ErrorHandler;
-import retrofit.SuccessfulResponse;
 
 @NullMarked
 public class OpenSubtitlesApi implements SubtitleApi {
@@ -83,6 +81,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private static final String USER_AGENT = "SubTools v1.0";
     private static final String CONTENT_TYPE = "application/json";
     private static final String APIKEY = "YrrY0zddovN1rY55tCWQbMxcNR68wnN3";
+    private static final ErrorHandler[] ERROR_HANDLERS = {createQuotaErrorHandler()};
 
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     private @Nullable Credentials credentials;
@@ -171,7 +170,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5 Second), contentType:MediaType.APPLICATION_JSON
+                                5Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -196,7 +195,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5 Second), contentType:MediaType.APPLICATION_JSON
+                                5Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -276,7 +275,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
                             getValue(movieHashMatch),
                             page, USER_AGENT)
-                        .addErrorHandler(createQuotaErrorHandler()).call()) {
+                        .call(ERROR_HANDLERS)) {
                     case SuccessfulResponse<Subtitles200Response> r -> r.body.data;
                     case ErrorResponse r -> {
                         StringBuilder sb = new StringBuilder("Could not find subtitles for:");
@@ -318,44 +317,40 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-    public @Nullable String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
+    public String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
         return getDownloadUrl(fileId, true);
     }
 
 
-    private @Nullable String getDownloadUrl(int fileId, boolean retryInvalidToken) throws OpenSubtitleApiException {
+    private String getDownloadUrl(int fileId, boolean retryInvalidToken) throws OpenSubtitleApiException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
             .get(() -> {
                 try (HttpClient client = HttpClient.newHttpClient()) {
 
-                    HttpRequest.Builder builder = HttpRequest.newBuilder()
+                    HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("https://api.opensubtitles.com/api/v1/download"))
                         .header("Accept", "application/json")
                         .header("Api-Key", APIKEY)
                         .header("Content-Type", "application/json")
-                        .header("User-Agent", "Test v1.0");
-                    ifNotNull(credentials,
-                        c -> builder.header("Authorization", "Bearer " + getBearerToken(c.username, c.password)));
-                    HttpRequest request = builder
+                        .header("User-Agent", "Test v1.0")
+                        .addHeaderIfNotNull("Authorization",
+                            ifNotNull(credentials, c -> "Bearer " + getBearerToken(c.username, c.password)))
                         .POST(HttpRequest.BodyPublishers.ofString(
                             new ObjectMapper().writeValueAsString(Map.of("file_id", fileId))))
-                        //.POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
                         .build();
 
-                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    if (response.statusCode() / 200 == 1) {
-                        return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
-                    } else {
-                        if (retryInvalidToken && response.body().contains("invalid token")) {
-                            resetBearerToken();
-                            getDownloadUrl(fileId, false);
-                        }
-                        throw new OpenSubtitleApiException(HttpStatus.fromStatusCode(response.statusCode()),
-                            response.body(), CacheStrategy.CACHE_DISABLED, LogLevel.ERROR);
-                    }
-                } catch (IOException | InterruptedException | JsonSyntaxException e) {
-                    throw new OpenSubtitleApiException(SERVER_ERROR, e.getMessage(), CacheStrategy.CACHE_DISABLED,
-                        LogLevel.ERROR);
+                    connection.http.Response.ErrorHandler invalidTokenHandler =
+                        new connection.http.Response.ErrorHandler((_, body) -> body.contains("invalid token"),
+                            this::resetBearerToken);
+
+                    return switch (client.call(request, invalidTokenHandler)) {
+                        case connection.http.SuccessfulResponse r ->
+                            JsonParser.parseString(r.body).getAsJsonObject().get("link").getAsString();
+                        case connection.http.ErrorResponse r ->
+                            throw new OpenSubtitleApiException(r.code, r.message, CACHE_DISABLED, LogLevel.ERROR);
+                    };
+                } catch (IOException | JsonSyntaxException e) {
+                    throw new OpenSubtitleApiException(SERVER_ERROR, e.getMessage(), CACHE_DISABLED, LogLevel.ERROR);
                 }
             });
     }
@@ -365,7 +360,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return param == null ? null : param.value;
     }
 
-    private ErrorHandler createQuotaErrorHandler() {
+    private static ErrorHandler createQuotaErrorHandler() {
         return new ErrorHandler(
             (HttpStatus code, String errorBody) -> code == NOT_ACCEPTABLE && errorBody.contains("quota"),
             null,

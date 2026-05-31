@@ -1,12 +1,11 @@
 package extensions.retrofit2.Call;
 
-import java.util.List;
+import java.util.Arrays;
 
+import connection.retrofit.Response;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.jspecify.annotations.NullMarked;
-import retrofit.Response;
-import retrofit.Response.Response2;
 import retrofit2.Call;
 
 @Extension
@@ -17,11 +16,7 @@ public class CallExt {
         // Hide Utility Class Constructor
     }
 
-    public static <T> Response<T> call(@This Call<T> call) {
-        return Response.execute(call, List.of(), true);
-    }
-
-    public static <T> Response2<T> addErrorHandler(@This Call<T> call, Response.ErrorHandler errorHandler) {
-        return new Response2<>(call).addErrorHandlers(errorHandler);
+    public static <T> Response<T> call(@This Call<T> call, Response.ErrorHandler... errorHandlers) {
+        return Response.execute(call, Arrays.asList(errorHandlers), true);
     }
 }

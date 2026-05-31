@@ -1,14 +1,5 @@
 package org.lodder.subtools.sublibrary.data.imdb;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.jsoup.nodes.Document;
@@ -69,19 +60,20 @@ public class ImdbApi implements ApiIntf {
     }
 
 
-    private JsonNode post(String query) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(API_DOMAIN))
-            .header("Content-Type", "application/json")
-            .POST(BodyPublishers.ofString(createJsonQuery(query)))
-            .build();
-
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readTree(response.body());
-        }
-    }
+    //private JsonNode post(String query) throws IOException, ImdbApiException {
+    //    HttpRequest request = HttpRequest.newBuilder()
+    //        .uri(URI.create(API_DOMAIN))
+    //        .header("Content-Type", "application/json")
+    //        .POST(BodyPublishers.ofString(createJsonQuery(query)))
+    //        .build();
+    //
+    //    try (HttpClient client = HttpClient.newHttpClient()) {
+    //        return switch (client.call(request)) {
+    //            case SuccessfulResponse r -> new ObjectMapper().readTree(r.body);
+    //            case ErrorResponse r -> throw new ImdbApiException(r.code, r.message, CACHE_DISABLED, LogLevel.ERROR);
+    //        };
+    //    }
+    //}
 
     private String createJsonQuery(String query) {
         return String.format("{\"query\": \"%s\"}", query.replace("\"", "\\\"").replace("\n", ""));
