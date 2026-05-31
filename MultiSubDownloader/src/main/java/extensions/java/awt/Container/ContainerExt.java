@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ContainerExt {
     private ContainerExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self Container addComponent(@This Container component, Component child) {

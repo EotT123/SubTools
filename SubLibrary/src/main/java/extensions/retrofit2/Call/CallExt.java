@@ -14,7 +14,7 @@ import retrofit2.Call;
 public class CallExt {
 
     private CallExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static <T> Response<T> call(@This Call<T> call) {

@@ -111,7 +111,7 @@ public class ExportImport {
     public static class ExportImportPreferences {
 
         private ExportImportPreferences() {
-            // hide utility class constructor
+            // Hide Utility Class Constructor
         }
 
         public static void exportSettings(Path path) throws Exception {
@@ -132,7 +132,7 @@ public class ExportImport {
     public static class ExportImportSerieMapping {
 
         private ExportImportSerieMapping() {
-            // hide utility class constructor
+            // Hide Utility Class Constructor
         }
 
         public static void exportSettings(Path path) throws IOException {

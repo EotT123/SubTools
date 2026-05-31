@@ -12,7 +12,7 @@ import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 @NullMarked
 public class JCheckBoxExt {
     private JCheckBoxExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JCheckBox addCheckedChangeListener(@This JCheckBox checkBox, BooleanConsumer... listeners) {

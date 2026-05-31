@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 public class JSliderExt {
 
     private JSliderExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JSlider minimum(@This JSlider slider, int minimum) {

@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 public class MapUtil {
 
     private MapUtil() {
-        // Hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static <K, V extends @Nullable Object> Map<K, V> create(K k1, V v1) {

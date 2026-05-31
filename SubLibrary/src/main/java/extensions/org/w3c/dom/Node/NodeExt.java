@@ -12,7 +12,7 @@ import org.w3c.dom.Node;
 public class NodeExt {
 
     private NodeExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Nullable String getAttribute(@This @Nullable Node node, String attribute) {

@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 public class StringExt {
 
     private StringExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static String removeIllegalFilenameChars(@This String s) {

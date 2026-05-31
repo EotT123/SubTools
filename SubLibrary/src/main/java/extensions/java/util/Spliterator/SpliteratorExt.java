@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
 public class SpliteratorExt {
 
     private SpliteratorExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static <T> Stream<T> stream(@This Spliterator<T> spliterator) {

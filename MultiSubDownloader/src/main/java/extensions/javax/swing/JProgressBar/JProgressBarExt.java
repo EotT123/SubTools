@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
 public class JProgressBarExt {
 
     private JProgressBarExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JProgressBar indeterminate(@This JProgressBar progressBar, boolean indeterminate) {

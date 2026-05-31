@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 public class JTableExt {
 
     private JTableExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JTable model(@This JTable jTable, TableModel dataModel) {

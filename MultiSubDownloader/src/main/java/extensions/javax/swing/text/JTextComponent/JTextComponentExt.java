@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
 public class JTextComponentExt {
 
     private JTextComponentExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JTextComponent editable(@This JTextComponent textComponent, boolean editable) {

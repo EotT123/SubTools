@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 public class Sleep {
 
     private Sleep() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static void sleep(Time time) {

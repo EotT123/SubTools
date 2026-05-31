@@ -14,7 +14,7 @@ public class Info {
     private static final Logger LOGGER = LoggerFactory.getLogger(Info.class);
 
     private Info() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static void subtitleSources(boolean isCli) {

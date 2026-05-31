@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 public class JButtonExt {
 
     private JButtonExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JButton defaultButtonFor(@This JButton abstractButton, JRootPane rootPane) {

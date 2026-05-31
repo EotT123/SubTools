@@ -15,7 +15,7 @@ import org.lodder.subtools.sublibrary.util.function.BooleanConsumer;
 @NullMarked
 public class AbstractButtonExt {
     private AbstractButtonExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self AbstractButton actionListener(@This AbstractButton abstractButton, ActionListener listener) {

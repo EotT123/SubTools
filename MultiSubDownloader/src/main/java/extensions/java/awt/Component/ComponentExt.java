@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 public class ComponentExt {
 
     private ComponentExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static void setRecursive(@This Component component, Consumer<Component> consumer) {

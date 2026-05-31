@@ -9,7 +9,7 @@ import org.lodder.subtools.sublibrary.model.TvRelease;
 public class SubLibraryAssertions {
 
     private SubLibraryAssertions() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static TvReleaseAssert assertThat(TvRelease actual) {

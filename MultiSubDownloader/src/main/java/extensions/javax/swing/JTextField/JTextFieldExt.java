@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 public class JTextFieldExt {
 
     private JTextFieldExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JTextField columns(@This JTextField textField, int columns) {

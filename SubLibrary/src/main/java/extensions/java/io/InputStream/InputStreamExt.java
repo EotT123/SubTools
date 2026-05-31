@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
 public class InputStreamExt {
 
     private InputStreamExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static String asString(@This InputStream inputStream, Charset charset) throws IOException {

@@ -15,7 +15,7 @@ import org.w3c.dom.NodeList;
 public class NodeListExt {
 
     private NodeListExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static Stream<Node> stream(@This @Nullable NodeList nodeList) {
