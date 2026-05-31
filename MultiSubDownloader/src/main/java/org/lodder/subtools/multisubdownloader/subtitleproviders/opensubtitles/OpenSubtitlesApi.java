@@ -19,7 +19,6 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import connection.retrofit.ErrorResponse;
 import connection.retrofit.Response;
 import connection.retrofit.Response.ErrorHandler;
@@ -81,7 +80,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private static final String USER_AGENT = "SubTools v1.0";
     private static final String CONTENT_TYPE = "application/json";
     private static final String APIKEY = "YrrY0zddovN1rY55tCWQbMxcNR68wnN3";
-    private static final ErrorHandler[] ERROR_HANDLERS = {createQuotaErrorHandler()};
+    private static final ErrorHandler[] RETROFIT_ERROR_HANDLERS = {createQuotaErrorHandler()};
+    private static final connection.http.Response.ErrorHandler[] HTTP_ERROR_HANDLERS =
+        {createInvalidTokenErrorHandler()};
 
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     private @Nullable Credentials credentials;
@@ -125,15 +126,15 @@ public class OpenSubtitlesApi implements SubtitleApi {
         }
     }
 
-    private void resetBearerToken() {
+    private static void resetBearerToken() {
         getBearerTokenCache().remove();
     }
 
-    private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
+    private static String getBearerToken(String username, String password) throws OpenSubtitleApiException {
         return getBearerTokenCache().get(() -> getBearerTokenWithoutCache(username, password), 23.5hr);
     }
 
-    private CacheKey getBearerTokenCache() {
+    private static CacheKey getBearerTokenCache() {
         return Manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"));
     }
 
@@ -275,7 +276,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             parentFeatureId, parentImdbId, parentTmdbId, season, episode, year,
                             getValue(movieHashMatch),
                             page, USER_AGENT)
-                        .call(ERROR_HANDLERS)) {
+                        .call(RETROFIT_ERROR_HANDLERS)) {
                     case SuccessfulResponse<Subtitles200Response> r -> r.body.data;
                     case ErrorResponse r -> {
                         StringBuilder sb = new StringBuilder("Could not find subtitles for:");
@@ -339,17 +340,13 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             new ObjectMapper().writeValueAsString(Map.of("file_id", fileId))))
                         .build();
 
-                    connection.http.Response.ErrorHandler invalidTokenHandler =
-                        new connection.http.Response.ErrorHandler((_, body) -> body.contains("invalid token"),
-                            this::resetBearerToken);
-
-                    return switch (client.call(request, invalidTokenHandler)) {
+                    return switch (client.call(request, HTTP_ERROR_HANDLERS)) {
                         case connection.http.SuccessfulResponse r ->
                             JsonParser.parseString(r.body).getAsJsonObject().get("link").getAsString();
                         case connection.http.ErrorResponse r ->
                             throw new OpenSubtitleApiException(r.code, r.message, CACHE_DISABLED, LogLevel.ERROR);
                     };
-                } catch (IOException | JsonSyntaxException e) {
+                } catch (IOException e) {
                     throw new OpenSubtitleApiException(SERVER_ERROR, e.getMessage(), CACHE_DISABLED, LogLevel.ERROR);
                 }
             });
@@ -373,6 +370,11 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 }
                 return new ErrorResponse(code, message, WARN, CACHE_DISABLED);
             });
+    }
+
+    private static connection.http.Response.ErrorHandler createInvalidTokenErrorHandler() {
+        return new connection.http.Response.ErrorHandler((_, body) -> body.contains("invalid token"),
+            OpenSubtitlesApi::resetBearerToken);
     }
 
     private static OpenSubtitleApiException handleErrorResponse(ErrorResponse errorResponse, String message) {
