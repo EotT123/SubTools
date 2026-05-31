@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import connection.retrofit.ErrorResponse;
 import connection.retrofit.Response;
+import connection.retrofit.Response.CustomErrorHandler;
 import connection.retrofit.Response.ErrorHandler;
 import connection.retrofit.SuccessfulResponse;
 import jakarta.ws.rs.core.MediaType;
@@ -352,10 +353,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
         return param == null ? null : param.value;
     }
 
-    private static ErrorHandler createQuotaErrorHandler() {
-        return new ErrorHandler(
+    private static CustomErrorHandler createQuotaErrorHandler() {
+        return new CustomErrorHandler(
             (HttpStatus code, String errorBody) -> code == NOT_ACCEPTABLE && errorBody.contains("quota"),
-            null,
             (HttpStatus code, String errorBody) -> {
                 String message;
                 try {
@@ -367,8 +367,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-    private static connection.http.Response.ErrorHandler createInvalidTokenErrorHandler() {
-        return new connection.http.Response.ErrorHandler((_, body) -> body.contains("invalid token"),
+    private static connection.http.Response.RetryErrorHandler createInvalidTokenErrorHandler() {
+        return new connection.http.Response.RetryErrorHandler((_, body) -> body.contains("invalid token"),
             OpenSubtitlesApi::resetBearerToken);
     }
 

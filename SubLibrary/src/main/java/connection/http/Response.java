@@ -14,8 +14,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 import connection.ErrorHandlerType;
+import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.util.Sleep;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 
 @NullMarked
@@ -33,9 +34,7 @@ public sealed interface Response permits SuccessfulResponse, ErrorResponse {
                     return new ErrorResponse(SERVER_ERROR, "Unknown status code [${response.statusCode()}]");
                 }
 
-                BiFunction<HttpStatus, String, ErrorResponse> errorResponseFtn = ErrorResponse::new;
-                Supplier<ErrorResponse> errorResponseSupplier =
-                    () -> errorResponseFtn.apply(statusCode, response.body());
+                Supplier<ErrorResponse> errorResponseSupplier = () -> new ErrorResponse(statusCode, response.body());
 
                 if (!retry) {
                     return errorResponseSupplier.get();
@@ -45,21 +44,22 @@ public sealed interface Response permits SuccessfulResponse, ErrorResponse {
                     errorHandlers.stream().filter(eh -> eh.isApplicable(statusCode, response.body())).findAny()
                         .orElse(null);
 
-
-                return ifNotNullOrElseGet(applicableErrorHandler, errorHandler -> {
-                    if (errorHandler.runnableBeforeRetry == null) {
-                        return ifNullThen(errorHandler.errorResponseFunction(), errorResponseFtn)
-                            .apply(statusCode, response.body());
-                    }
-                    errorHandler.runnableBeforeRetry.run();
-                    return execute(httpClient, request, responseBodyHandler, List.of(), false);
-                }, () -> ifNotNullOrElseGet(ErrorHandlerType.getForCode(statusCode), errorHandler -> {
-                    if (errorHandler.sleepTimeBeforeRetry == null) {
-                        return errorResponseSupplier.get();
-                    }
-                    sleep(errorHandler.sleepTimeBeforeRetry);
-                    return execute(httpClient, request, responseBodyHandler, List.of(), false);
-                }, errorResponseSupplier::get));
+                return ifNotNullOrElseGet(applicableErrorHandler,
+                    errorHandler -> switch (errorHandler) {
+                        case RetryErrorHandler handler -> {
+                            handler.runnableBeforeRetry.run();
+                            yield execute(httpClient, request, responseBodyHandler, List.of(), false);
+                        }
+                        case CustomErrorHandler customErrorHandler ->
+                            customErrorHandler.errorResponseFunction().apply(statusCode, response.body());
+                    }, () -> ifNotNullOrElseGet(ErrorHandlerType.getForCode(statusCode),
+                        errorHandlerType -> switch (errorHandlerType.handler) {
+                            case ErrorHandlerType.RetryErrorHandler handler -> {
+                                sleep(handler.duration);
+                                yield execute(httpClient, request, responseBodyHandler, List.of(), false);
+                            }
+                            case ErrorHandlerType.CustomErrorHandler _ -> errorResponseSupplier.get();
+                        }, errorResponseSupplier::get));
             }
         } catch (IOException | InterruptedException e) {
             return new ErrorResponse(BAD_GATEWAY, e.getMessage());
@@ -67,16 +67,32 @@ public sealed interface Response permits SuccessfulResponse, ErrorResponse {
     }
 
     @NullMarked
-    record ErrorHandler(
+    sealed interface ErrorHandler permits RetryErrorHandler, CustomErrorHandler {
+        // predicate to test if this handler is applicable
+        BiPredicate<HttpStatus, String> predicate();
+
+        default boolean isApplicable(HttpStatus status, String message) {
+            return predicate().test(status, message);
+        }
+    }
+
+    @NullMarked
+    record RetryErrorHandler(
         // predicate to test if this handler is applicable
         BiPredicate<HttpStatus, String> predicate,
         // Runnable to execute before a retry
-        @Nullable Runnable runnableBeforeRetry=null,
-        // Optional function to create a custom errorResponse
-        @Nullable BiFunction<HttpStatus, String, ErrorResponse> errorResponseFunction=null) {
+        Runnable runnableBeforeRetry) implements ErrorHandler {
 
-        public boolean isApplicable(HttpStatus status, String message) {
-            return predicate.test(status, message);
+        static RetryErrorHandler sleep(BiPredicate<HttpStatus, String> predicate, Time duration) {
+            return new RetryErrorHandler(predicate, () -> Sleep.sleep(duration));
         }
+    }
+
+    @NullMarked
+    record CustomErrorHandler(
+        // predicate to test if this handler is applicable
+        BiPredicate<HttpStatus, String> predicate,
+        // Function to create a custom errorResponse
+        BiFunction<HttpStatus, String, ErrorResponse> errorResponseFunction) implements ErrorHandler {
     }
 }

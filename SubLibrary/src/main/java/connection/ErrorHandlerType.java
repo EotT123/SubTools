@@ -22,63 +22,62 @@ import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 @NullMarked
 public
 enum ErrorHandlerType {
-    ERR_BAD_REQUEST(BAD_REQUEST),
-    ERR_UNAUTHORIZED(UNAUTHORIZED, CACHE_DISABLED),
-    ERR_PAYMENT_REQUIRED(PAYMENT_REQUIRED, CACHE_DISABLED),
-    ERR_FORBIDDEN(FORBIDDEN),
-    ERR_NOT_FOUND(NOT_FOUND, logLevel:INFO),
-    ERR_METHOD_NOT_ALLOWED(METHOD_NOT_ALLOWED),
-    ERR_NOT_ACCEPTABLE(NOT_ACCEPTABLE),
-    ERR_PROXY_AUTHENTICATION_REQUIRED(PROXY_AUTHENTICATION_REQUIRED, CACHE_DISABLED),
-    ERR_REQUEST_TIMEOUT(REQUEST_TIMEOUT, CACHE_DISABLED, sleepTimeBeforeRetry:5 s),
-    ERR_CONFLICT(CONFLICT),
-    ERR_GONE(GONE),
-    ERR_LENGTH_REQUIRED(LENGTH_REQUIRED),
-    ERR_PRECONDITION_FAILED(PRECONDITION_FAILED),
-    ERR_REQUEST_TOO_LONG(REQUEST_TOO_LONG),
-    ERR_REQUEST_URI_TOO_LONG(REQUEST_URI_TOO_LONG),
-    ERR_UNSUPPORTED_MEDIA_TYPE(UNSUPPORTED_MEDIA_TYPE),
-    ERR_REQUESTED_RANGE_NOT_SATISFIABLE(REQUESTED_RANGE_NOT_SATISFIABLE),
-    ERR_EXPECTATION_FAILED(EXPECTATION_FAILED),
-    ERR_INSUFFICIENT_SPACE_ON_RESOURCE(INSUFFICIENT_SPACE_ON_RESOURCE),
-    ERR_METHOD_FAILURE(METHOD_FAILURE, sleepTimeBeforeRetry:2 Second),
-    ERR_MISDIRECTED_REQUEST(MISDIRECTED_REQUEST),
-    ERR_UNPROCESSABLE_ENTITY(UNPROCESSABLE_ENTITY),
-    ERR_LOCKED(LOCKED, logLevel:INFO, sleepTimeBeforeRetry:5 Second),
-    ERR_TOO_EARLY(TOO_EARLY, sleepTimeBeforeRetry:1 Second),
-    ERR_UPGRADE_REQUIRED(UPGRADE_REQUIRED),
-    ERR_PRECONDITION_REQUIRED(PRECONDITION_REQUIRED),
-    ERR_TOO_MANY_REQUESTS(TOO_MANY_REQUESTS, CACHE_DISABLED, WARN, 5 Second),
-    ERR_REQUEST_HEADER_FIELDS_TOO_LARGE(REQUEST_HEADER_FIELDS_TOO_LARGE),
-    ERR_UNAVAILABLE_FOR_LEGAL_REASONS(UNAVAILABLE_FOR_LEGAL_REASONS),
+    ERR_BAD_REQUEST(new CustomErrorHandler(BAD_REQUEST)),
+    ERR_UNAUTHORIZED(new CustomErrorHandler(UNAUTHORIZED, CACHE_DISABLED)),
+    ERR_PAYMENT_REQUIRED(new CustomErrorHandler(PAYMENT_REQUIRED, CACHE_DISABLED)),
+    ERR_FORBIDDEN(new CustomErrorHandler(FORBIDDEN)),
+    ERR_NOT_FOUND(new CustomErrorHandler(NOT_FOUND, logLevel:INFO)),
+    ERR_METHOD_NOT_ALLOWED(new CustomErrorHandler(METHOD_NOT_ALLOWED)),
+    ERR_NOT_ACCEPTABLE(new CustomErrorHandler(NOT_ACCEPTABLE)),
+    ERR_PROXY_AUTHENTICATION_REQUIRED(new CustomErrorHandler(PROXY_AUTHENTICATION_REQUIRED, CACHE_DISABLED)),
+    ERR_REQUEST_TIMEOUT(new RetryErrorHandler(REQUEST_TIMEOUT, 5s, CACHE_DISABLED)),
+    ERR_CONFLICT(new CustomErrorHandler(CONFLICT)),
+    ERR_GONE(new CustomErrorHandler(GONE)),
+    ERR_LENGTH_REQUIRED(new CustomErrorHandler(LENGTH_REQUIRED)),
+    ERR_PRECONDITION_FAILED(new CustomErrorHandler(PRECONDITION_FAILED)),
+    ERR_REQUEST_TOO_LONG(new CustomErrorHandler(REQUEST_TOO_LONG)),
+    ERR_REQUEST_URI_TOO_LONG(new CustomErrorHandler(REQUEST_URI_TOO_LONG)),
+    ERR_UNSUPPORTED_MEDIA_TYPE(new CustomErrorHandler(UNSUPPORTED_MEDIA_TYPE)),
+    ERR_REQUESTED_RANGE_NOT_SATISFIABLE(new CustomErrorHandler(REQUESTED_RANGE_NOT_SATISFIABLE)),
+    ERR_EXPECTATION_FAILED(new CustomErrorHandler(EXPECTATION_FAILED)),
+    ERR_INSUFFICIENT_SPACE_ON_RESOURCE(new CustomErrorHandler(INSUFFICIENT_SPACE_ON_RESOURCE)),
+    ERR_METHOD_FAILURE(new RetryErrorHandler(METHOD_FAILURE, 2Second)),
+    ERR_MISDIRECTED_REQUEST(new CustomErrorHandler(MISDIRECTED_REQUEST)),
+    ERR_UNPROCESSABLE_ENTITY(new CustomErrorHandler(UNPROCESSABLE_ENTITY)),
+    ERR_LOCKED(new RetryErrorHandler(LOCKED, 5Second, logLevel:INFO)),
+    ERR_TOO_EARLY(new RetryErrorHandler(TOO_EARLY, 1Second)),
+    ERR_UPGRADE_REQUIRED(new CustomErrorHandler(UPGRADE_REQUIRED)),
+    ERR_PRECONDITION_REQUIRED(new CustomErrorHandler(PRECONDITION_REQUIRED)),
+    ERR_TOO_MANY_REQUESTS(new RetryErrorHandler(TOO_MANY_REQUESTS, 5Second, CACHE_DISABLED, WARN)),
+    ERR_REQUEST_HEADER_FIELDS_TOO_LARGE(new CustomErrorHandler(REQUEST_HEADER_FIELDS_TOO_LARGE)),
+    ERR_UNAVAILABLE_FOR_LEGAL_REASONS(new CustomErrorHandler(UNAVAILABLE_FOR_LEGAL_REASONS)),
 
     // 5xx Server Error
-    ERR_SERVER_ERROR(SERVER_ERROR, sleepTimeBeforeRetry:2 Second),
-    ERR_NOT_IMPLEMENTED(NOT_IMPLEMENTED),
-    ERR_BAD_GATEWAY(BAD_GATEWAY, sleepTimeBeforeRetry:2 Second),
-    ERR_SERVICE_UNAVAILABLE(SERVICE_UNAVAILABLE, sleepTimeBeforeRetry:5 Second),
-    ERR_GATEWAY_TIMEOUT(GATEWAY_TIMEOUT, sleepTimeBeforeRetry:2 Second),
-    ERR_HTTP_VERSION_NOT_SUPPORTED(HTTP_VERSION_NOT_SUPPORTED),
-    ERR_VARIANT_ALSO_NEGOTIATES(VARIANT_ALSO_NEGOTIATES),
-    ERR_INSUFFICIENT_STORAGE(INSUFFICIENT_STORAGE),
-    ERR_LOOP_DETECTED(LOOP_DETECTED),
-    ERR_NOT_EXTENDED(NOT_EXTENDED),
-    ERR_NETWORK_AUTHENTICATION_REQUIRED(NETWORK_AUTHENTICATION_REQUIRED);
+    ERR_SERVER_ERROR(new RetryErrorHandler(SERVER_ERROR, 2Second)),
+    ERR_NOT_IMPLEMENTED(new CustomErrorHandler(NOT_IMPLEMENTED)),
+    ERR_BAD_GATEWAY(new RetryErrorHandler(BAD_GATEWAY, 2Second)),
+    ERR_SERVICE_UNAVAILABLE(new RetryErrorHandler(SERVICE_UNAVAILABLE, 5Second)),
+    ERR_GATEWAY_TIMEOUT(new RetryErrorHandler(GATEWAY_TIMEOUT, 2Second)),
+    ERR_HTTP_VERSION_NOT_SUPPORTED(new CustomErrorHandler(HTTP_VERSION_NOT_SUPPORTED)),
+    ERR_VARIANT_ALSO_NEGOTIATES(new CustomErrorHandler(VARIANT_ALSO_NEGOTIATES)),
+    ERR_INSUFFICIENT_STORAGE(new CustomErrorHandler(INSUFFICIENT_STORAGE)),
+    ERR_LOOP_DETECTED(new CustomErrorHandler(LOOP_DETECTED)),
+    ERR_NOT_EXTENDED(new CustomErrorHandler(NOT_EXTENDED)),
+    ERR_NETWORK_AUTHENTICATION_REQUIRED(new CustomErrorHandler(NETWORK_AUTHENTICATION_REQUIRED));
 
+    @val Handler handler;
     @val HttpStatus code;
     @val CacheStrategy cacheStrategy;
     @val LogLevel logLevel;
-    @val @Nullable Time sleepTimeBeforeRetry;
 
     private static Map<Integer, ErrorHandlerType> MAP =
         Arrays.stream(values()).collect(Collectors.toMap(eht -> eht.code.code, Function.identity()));
 
-    ErrorHandlerType(HttpStatus code, CacheStrategy cacheStrategy=CACHE_TEMPORARY, LogLevel logLevel=ERROR,
-        @Nullable Time sleepTimeBeforeRetry=null) {
-        this.code = code;
-        this.cacheStrategy = cacheStrategy;
-        this.logLevel = logLevel;
-        this.sleepTimeBeforeRetry = sleepTimeBeforeRetry;
+    ErrorHandlerType(Handler handler) {
+        this.handler = handler;
+        this.code = handler.code();
+        this.cacheStrategy = handler.cacheStrategy();
+        this.logLevel = handler.logLevel();
     }
 
     public static @Nullable ErrorHandlerType getForCode(int code) {
@@ -89,4 +88,21 @@ enum ErrorHandlerType {
         return MAP.get(code.code);
     }
 
+    @NullMarked
+    public sealed interface Handler permits RetryErrorHandler, CustomErrorHandler {
+        HttpStatus code();
+
+        CacheStrategy cacheStrategy();
+
+        LogLevel logLevel();
+    }
+
+    @NullMarked
+    public record RetryErrorHandler(HttpStatus code, Time duration, CacheStrategy cacheStrategy=CACHE_TEMPORARY,
+        LogLevel logLevel=ERROR) implements Handler {}
+
+    @NullMarked
+    public record CustomErrorHandler(HttpStatus code, CacheStrategy cacheStrategy=CACHE_TEMPORARY,
+        LogLevel logLevel=ERROR)
+        implements Handler {}
 }
