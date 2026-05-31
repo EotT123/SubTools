@@ -51,6 +51,7 @@ import org.lodder.subtools.sublibrary.Credentials;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.LogLevel;
 import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.Manager.CacheKey;
 import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
@@ -98,8 +99,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
                 Builder builder = DEFAULT_BUILDER.apply(chain);
                 if (credentials != null) {
                     try {
-                        String bearerToken = getBearerToken(credentials.username, credentials.password);
-                        builder.header("Authorization", "Bearer " + bearerToken);
+                        builder.header("Authorization",
+                            "Bearer " + getBearerToken(credentials.username, credentials.password));
                     } catch (OpenSubtitleApiException e) {
                         // continue without authentication
                     }
@@ -125,9 +126,16 @@ public class OpenSubtitlesApi implements SubtitleApi {
         }
     }
 
+    private void resetBearerToken() {
+        getBearerTokenCache().remove();
+    }
+
     private String getBearerToken(String username, String password) throws OpenSubtitleApiException {
-        return Manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"))
-            .get(() -> getBearerTokenWithoutCache(username, password), 23.5hr);
+        return getBearerTokenCache().get(() -> getBearerTokenWithoutCache(username, password), 23.5hr);
+    }
+
+    private CacheKey getBearerTokenCache() {
+        return Manager.getCache(CacheType.DISK, new CacheKeyBuilder("opensubtitles", "bearerToken"));
     }
 
     private static String getBearerTokenWithoutCache(String username, String password) throws OpenSubtitleApiException {
@@ -310,19 +318,25 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-
     public @Nullable String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
+        return getDownloadUrl(fileId, true);
+    }
+
+
+    private @Nullable String getDownloadUrl(int fileId, boolean retryInvalidToken) throws OpenSubtitleApiException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
             .get(() -> {
                 try (HttpClient client = HttpClient.newHttpClient()) {
 
-                    HttpRequest request = HttpRequest.newBuilder()
+                    HttpRequest.Builder builder = HttpRequest.newBuilder()
                         .uri(URI.create("https://api.opensubtitles.com/api/v1/download"))
                         .header("Accept", "application/json")
                         .header("Api-Key", APIKEY)
-                        .header("Authorization", "Bearer " + getBearerToken(credentials.username, credentials.password))
                         .header("Content-Type", "application/json")
-                        .header("User-Agent", "Test v1.0")
+                        .header("User-Agent", "Test v1.0");
+                    ifNotNull(credentials,
+                        c -> builder.header("Authorization", "Bearer " + getBearerToken(c.username, c.password)));
+                    HttpRequest request = builder
                         .POST(HttpRequest.BodyPublishers.ofString(
                             new ObjectMapper().writeValueAsString(Map.of("file_id", fileId))))
                         //.POST(HttpRequest.BodyPublishers.ofString("{\"file_id\":\"" + fileId + "\"}"))
@@ -332,6 +346,10 @@ public class OpenSubtitlesApi implements SubtitleApi {
                     if (response.statusCode() / 200 == 1) {
                         return JsonParser.parseString(response.body()).getAsJsonObject().get("link").getAsString();
                     } else {
+                        if (retryInvalidToken && response.body().contains("invalid token")) {
+                            resetBearerToken();
+                            getDownloadUrl(fileId, false);
+                        }
                         throw new OpenSubtitleApiException(HttpStatus.fromStatusCode(response.statusCode()),
                             response.body(), CacheStrategy.CACHE_DISABLED, LogLevel.ERROR);
                     }
