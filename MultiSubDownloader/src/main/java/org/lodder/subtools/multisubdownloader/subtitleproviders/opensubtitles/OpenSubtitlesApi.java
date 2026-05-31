@@ -319,11 +319,6 @@ public class OpenSubtitlesApi implements SubtitleApi {
     }
 
     public String getDownloadUrl(int fileId) throws OpenSubtitleApiException {
-        return getDownloadUrl(fileId, true);
-    }
-
-
-    private String getDownloadUrl(int fileId, boolean retryInvalidToken) throws OpenSubtitleApiException {
         return getCache("downloadUrl", b -> b.add("fileId", fileId))
             .get(() -> {
                 try (HttpClient client = HttpClient.newHttpClient()) {
