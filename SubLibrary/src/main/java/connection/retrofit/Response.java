@@ -50,7 +50,7 @@ public sealed interface Response<T> permits SuccessfulResponse, ErrorResponse {
 
                 Supplier<ErrorResponse> errorResponseSupplier = () -> new ErrorResponse(statusCode, response.message());
 
-                return ifNotNullOrElseGet(applicableErrorHandler,
+                return (Response<T>) ifNotNullOrElseGet(applicableErrorHandler,
                     errorHandler -> switch (errorHandler) {
                         case RetryErrorHandler handler -> {
                             ifNotNullDo(handler.sleepTimeBeforeRetry, Sleep::sleep);

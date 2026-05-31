@@ -12,9 +12,4 @@ public class LazySupplier<T extends @Nullable Object> extends LazyThrowingSuppli
     public LazySupplier(Supplier<T> supplier) {
         super(supplier::get);
     }
-
-    @Override
-    public T get() {
-        return super.get();
-    }
 }
