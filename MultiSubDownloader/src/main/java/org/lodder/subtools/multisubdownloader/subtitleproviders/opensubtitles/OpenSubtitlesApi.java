@@ -170,7 +170,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5Second), contentType:MediaType.APPLICATION_JSON
+                                5 Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
@@ -195,7 +195,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             retry:new Retry(
                                 1,
                                 exc -> exc instanceof HttpClientException e && e.responseCode == 429,
-                                5Second), contentType:MediaType.APPLICATION_JSON
+                                5 Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
                         .filter(show -> "tv".equals(show.getString("kind")))
