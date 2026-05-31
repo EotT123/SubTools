@@ -1,4 +1,4 @@
-package connection.http;
+package org.lodder.subtools.sublibrary.connection.http;
 
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
@@ -13,9 +13,9 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
-import connection.ErrorHandlerType;
 import manifold.science.measures.Time;
 import org.jspecify.annotations.NullMarked;
+import org.lodder.subtools.sublibrary.connection.ErrorHandlerType;
 import org.lodder.subtools.sublibrary.util.Sleep;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 

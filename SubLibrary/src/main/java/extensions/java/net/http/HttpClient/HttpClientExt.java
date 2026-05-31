@@ -6,11 +6,11 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandler;
 import java.util.Arrays;
 
-import connection.http.Response;
-import connection.http.Response.ErrorHandler;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.jspecify.annotations.NullMarked;
+import org.lodder.subtools.sublibrary.connection.http.Response;
+import org.lodder.subtools.sublibrary.connection.http.Response.ErrorHandler;
 
 @Extension
 @NullMarked

@@ -1,4 +1,4 @@
-package connection;
+package org.lodder.subtools.sublibrary.connection;
 
 import static manifold.science.measures.TimeUnit.*;
 import static manifold.science.util.UnitConstants.*;

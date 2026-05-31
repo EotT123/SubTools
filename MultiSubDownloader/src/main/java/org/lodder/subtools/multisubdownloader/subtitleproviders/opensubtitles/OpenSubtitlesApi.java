@@ -19,11 +19,6 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
-import connection.retrofit.ErrorResponse;
-import connection.retrofit.Response;
-import connection.retrofit.Response.CustomErrorHandler;
-import connection.retrofit.Response.ErrorHandler;
-import connection.retrofit.SuccessfulResponse;
 import jakarta.ws.rs.core.MediaType;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -58,6 +53,11 @@ import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.connection.retrofit.ErrorResponse;
+import org.lodder.subtools.sublibrary.connection.retrofit.Response;
+import org.lodder.subtools.sublibrary.connection.retrofit.Response.CustomErrorHandler;
+import org.lodder.subtools.sublibrary.connection.retrofit.Response.ErrorHandler;
+import org.lodder.subtools.sublibrary.connection.retrofit.SuccessfulResponse;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
@@ -82,7 +82,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
     private static final String CONTENT_TYPE = "application/json";
     private static final String APIKEY = "YrrY0zddovN1rY55tCWQbMxcNR68wnN3";
     private static final ErrorHandler[] RETROFIT_ERROR_HANDLERS = {createQuotaErrorHandler()};
-    private static final connection.http.Response.ErrorHandler[] HTTP_ERROR_HANDLERS =
+    private static final org.lodder.subtools.sublibrary.connection.http.Response.ErrorHandler[] HTTP_ERROR_HANDLERS =
         {createInvalidTokenErrorHandler()};
 
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
@@ -337,9 +337,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
                         .build();
 
                     return switch (client.call(request, HTTP_ERROR_HANDLERS)) {
-                        case connection.http.SuccessfulResponse r ->
+                        case org.lodder.subtools.sublibrary.connection.http.SuccessfulResponse r ->
                             JsonParser.parseString(r.body).getAsJsonObject().get("link").getAsString();
-                        case connection.http.ErrorResponse r ->
+                        case org.lodder.subtools.sublibrary.connection.http.ErrorResponse r ->
                             throw new OpenSubtitleApiException(r.code, r.message, CACHE_DISABLED, LogLevel.ERROR);
                     };
                 } catch (IOException e) {
@@ -367,8 +367,9 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-    private static connection.http.Response.RetryErrorHandler createInvalidTokenErrorHandler() {
-        return new connection.http.Response.RetryErrorHandler((_, body) -> body.contains("invalid token"),
+    private static org.lodder.subtools.sublibrary.connection.http.Response.RetryErrorHandler createInvalidTokenErrorHandler() {
+        return new org.lodder.subtools.sublibrary.connection.http.Response.RetryErrorHandler(
+            (_, body) -> body.contains("invalid token"),
             OpenSubtitlesApi::resetBearerToken);
     }
 

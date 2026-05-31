@@ -2,10 +2,10 @@ package extensions.retrofit2.Call;
 
 import java.util.Arrays;
 
-import connection.retrofit.Response;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.This;
 import org.jspecify.annotations.NullMarked;
+import org.lodder.subtools.sublibrary.connection.retrofit.Response;
 import retrofit2.Call;
 
 @Extension

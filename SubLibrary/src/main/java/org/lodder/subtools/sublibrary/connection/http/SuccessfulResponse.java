@@ -1,4 +1,4 @@
-package connection.http;
+package org.lodder.subtools.sublibrary.connection.http;
 
 import java.net.http.HttpHeaders;
 

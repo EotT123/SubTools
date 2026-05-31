@@ -1,4 +1,4 @@
-package connection.retrofit;
+package org.lodder.subtools.sublibrary.connection.retrofit;
 
 import manifold.ext.props.rt.api.val;
 import okhttp3.Headers;

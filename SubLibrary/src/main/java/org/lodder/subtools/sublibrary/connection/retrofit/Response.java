@@ -1,4 +1,4 @@
-package connection.retrofit;
+package org.lodder.subtools.sublibrary.connection.retrofit;
 
 import static java.util.Objects.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
@@ -11,11 +11,11 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
-import connection.ErrorHandlerType;
 import manifold.science.measures.Time;
 import okhttp3.ResponseBody;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.connection.ErrorHandlerType;
 import org.lodder.subtools.sublibrary.util.Sleep;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 import retrofit2.Call;

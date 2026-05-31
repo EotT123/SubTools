@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import connection.retrofit.ErrorResponse;
-import connection.retrofit.SuccessfulResponse;
 import extensions.java.lang.String.StringExt;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
@@ -26,6 +24,8 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.exception.Addic7edApiException;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
 import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.connection.retrofit.ErrorResponse;
+import org.lodder.subtools.sublibrary.connection.retrofit.SuccessfulResponse;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraInfo;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
