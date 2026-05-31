@@ -20,6 +20,7 @@ import org.lodder.subtools.sublibrary.util.Sleep;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 import retrofit2.Call;
 
+@SuppressWarnings("unchecked")
 @NullMarked
 public sealed interface Response<T> permits SuccessfulResponse, ErrorResponse {
 

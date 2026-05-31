@@ -70,7 +70,7 @@ enum ErrorHandlerType {
     @val CacheStrategy cacheStrategy;
     @val LogLevel logLevel;
 
-    private static Map<Integer, ErrorHandlerType> MAP =
+    private static final Map<Integer, ErrorHandlerType> MAP =
         Arrays.stream(values()).collect(Collectors.toMap(eht -> eht.code.code, Function.identity()));
 
     ErrorHandlerType(Handler handler) {
@@ -85,7 +85,7 @@ enum ErrorHandlerType {
     }
 
     public static @Nullable ErrorHandlerType getForCode(HttpStatus code) {
-        return MAP.get(code.code);
+        return getForCode(code.code);
     }
 
     @NullMarked
