@@ -171,7 +171,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             cacheType:CacheType.MEMORY,
                             retry:new Retry(
                                 1,
-                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                                exc -> exc instanceof HttpClientException e && e.responseCode == TOO_MANY_REQUESTS.code,
                                 5 Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()
@@ -196,7 +196,7 @@ public class OpenSubtitlesApi implements SubtitleApi {
                             cacheType:CacheType.MEMORY,
                             retry:new Retry(
                                 1,
-                                exc -> exc instanceof HttpClientException e && e.responseCode == 429,
+                                exc -> exc instanceof HttpClientException e && e.responseCode == TOO_MANY_REQUESTS.code,
                                 5 Second), contentType:MediaType.APPLICATION_JSON
                             ))
                         .streamJsonObjects()

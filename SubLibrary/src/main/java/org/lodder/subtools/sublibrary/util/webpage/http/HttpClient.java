@@ -1,5 +1,7 @@
 package org.lodder.subtools.sublibrary.util.webpage.http;
 
+import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -96,7 +98,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
 
             getCookieManager(cookieManager).storeCookies(conn);
 
-            if (conn.responseCode == 302 && isUrl(conn.getHeaderField(HttpHeaders.LOCATION))) {
+            if (conn.responseCode == MOVED_TEMPORARILY.code && isUrl(conn.getHeaderField(HttpHeaders.LOCATION))) {
                 return doGet(new URI(conn.getHeaderField(HttpHeaders.LOCATION)).toURL(), userAgent, cookieManager,
                     null);
             }

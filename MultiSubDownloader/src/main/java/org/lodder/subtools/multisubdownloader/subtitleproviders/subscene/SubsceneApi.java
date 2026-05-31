@@ -3,6 +3,7 @@ package org.lodder.subtools.multisubdownloader.subtitleproviders.subscene;
 import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
+import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
 
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,8 @@ public class SubsceneApi implements SubtitleApi {
         Pattern.compile("(?<name>.*?) - (?<seasonName>[A-Z][a-z]*) Season.*");
 
     private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
-        case HttpClientException httpClientException ->
-            httpClientException.responseCode == 409 || httpClientException.responseCode == 429;
+        case HttpClientException httpClientException -> httpClientException.responseCode == CONFLICT.code ||
+            httpClientException.responseCode == TOO_MANY_REQUESTS.code;
         case ManagerException managerException -> managerException.getMessage().contains("409 Conflict");
         default -> false;
     };
