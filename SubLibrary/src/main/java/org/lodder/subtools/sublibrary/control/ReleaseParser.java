@@ -52,7 +52,7 @@ public class ReleaseParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseParser.class);
 
     private ReleaseParser() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     /**

@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 public class TabbedPaneExt {
 
     private TabbedPaneExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JTabbedPane tabLayoutPolicy(@This JTabbedPane tabbedPane, int tabLayoutPolicy) {

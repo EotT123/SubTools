@@ -16,7 +16,7 @@ import org.jspecify.annotations.NullMarked;
 public class IterableExt {
 
     private IterableExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static <T> Stream<T> stream(@This Iterable<T> iterable) {

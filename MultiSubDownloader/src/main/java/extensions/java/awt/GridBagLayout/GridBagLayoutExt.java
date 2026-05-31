@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 public class GridBagLayoutExt {
 
     private GridBagLayoutExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self GridBagLayout columnWidths(@This GridBagLayout gridBagLayout, int[] columnWidths) {

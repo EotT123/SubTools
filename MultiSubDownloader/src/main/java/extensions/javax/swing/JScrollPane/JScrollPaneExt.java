@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
 public class JScrollPaneExt {
 
     private JScrollPaneExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JScrollPane viewportView(@This JScrollPane scrollPane, Component view) {

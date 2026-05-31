@@ -23,7 +23,7 @@ public class RegexUtils {
         "[" + Pattern.quote(DELIMITERS.stream().map(String::valueOf).collect(Collectors.joining(""))) + "]";
 
     private RegexUtils() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     @NullMarked

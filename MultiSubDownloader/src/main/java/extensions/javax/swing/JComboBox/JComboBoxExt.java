@@ -20,7 +20,7 @@ import org.lodder.subtools.multisubdownloader.gui.ToStringListCellRenderer;
 public class JComboBoxExt {
     
     private JComboBoxExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
 

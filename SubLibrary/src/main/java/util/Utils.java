@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 public class Utils {
 
     private Utils() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static <T, K, V> Collector<T, Map<K, V>, Map<K, V>> mapCollector(BiConsumer<Map<K, V>, T> accumulator) {

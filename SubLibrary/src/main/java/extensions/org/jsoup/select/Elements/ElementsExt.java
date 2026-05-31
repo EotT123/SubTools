@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 public class ElementsExt {
 
     private ElementsExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     @Intercept

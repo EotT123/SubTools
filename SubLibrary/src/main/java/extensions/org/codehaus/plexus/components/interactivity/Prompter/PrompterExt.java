@@ -33,7 +33,7 @@ import org.lodder.subtools.sublibrary.util.Validator;
 public class PrompterExt {
 
     private PrompterExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static Validator<String> NON_BLANK_VALIDATOR =

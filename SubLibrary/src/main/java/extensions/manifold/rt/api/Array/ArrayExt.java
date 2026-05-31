@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 public class ArrayExt {
 
     private ArrayExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     /**

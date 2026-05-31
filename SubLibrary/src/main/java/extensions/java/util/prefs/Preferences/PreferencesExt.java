@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 public class PreferencesExt {
 
     private PreferencesExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static <R> R computeIfPresent(@This Preferences preferences, String key, Function<String, R> mapper,

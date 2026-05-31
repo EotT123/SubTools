@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 public class JComponentExt {
     
     private JComponentExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JComponent enabled(@This JComponent component, boolean enabled) {

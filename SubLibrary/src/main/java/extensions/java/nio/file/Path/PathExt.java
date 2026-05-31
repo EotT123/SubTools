@@ -32,7 +32,7 @@ import org.lodder.subtools.sublibrary.util.DeleteDirVisitor;
 public class PathExt {
 
     private PathExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static String getExtension(@This Path path) {

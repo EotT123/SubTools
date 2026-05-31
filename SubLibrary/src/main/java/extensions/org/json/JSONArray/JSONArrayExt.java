@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 public class JSONArrayExt {
 
     private JSONArrayExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static Stream<JSONObject> streamJsonObjects(@This JSONArray jsonArray) {

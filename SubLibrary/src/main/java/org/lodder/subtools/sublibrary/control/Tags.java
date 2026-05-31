@@ -17,7 +17,7 @@ import org.lodder.subtools.sublibrary.control.VideoPatterns.VideoEncoding;
 public class Tags {
 
     private Tags() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     @NullMarked

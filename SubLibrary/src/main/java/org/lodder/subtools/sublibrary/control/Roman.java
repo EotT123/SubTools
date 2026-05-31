@@ -27,7 +27,7 @@ public class Roman {
     }
 
     private Roman() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     private static int decodeSingle(char letter) {

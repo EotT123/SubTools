@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class GridBagConstraintsExt {
     private GridBagConstraintsExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self GridBagConstraints insets(@This GridBagConstraints gridBagConstraints, Insets insets) {

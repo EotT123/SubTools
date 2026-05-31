@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 public class VideoPatterns {
 
     private VideoPatterns() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     @NullMarked

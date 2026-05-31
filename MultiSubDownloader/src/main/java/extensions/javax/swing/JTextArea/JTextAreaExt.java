@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 public class JTextAreaExt {
 
     private JTextAreaExt() {
-        // hide utility class constructor
+        // Hide Utility Class Constructor
     }
 
     public static @Self JTextArea autoScrolls(@This JTextArea textArea, boolean autoScrolls) {
