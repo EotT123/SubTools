@@ -6,7 +6,7 @@ import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.LogLevel.*;
 import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
 
-import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -70,8 +70,8 @@ enum ErrorHandlerType {
     @val CacheStrategy cacheStrategy;
     @val LogLevel logLevel;
 
-    private static final Map<Integer, ErrorHandlerType> MAP =
-        Arrays.stream(values()).collect(Collectors.toMap(eht -> eht.code.code, Function.identity()));
+    private static final Map<HttpStatus, ErrorHandlerType> MAP = values().stream().collect(
+        Collectors.toMap(eht -> eht.code, Function.identity(), (a, _) -> a, () -> new EnumMap<>(HttpStatus.class)));
 
     ErrorHandlerType(Handler handler) {
         this.handler = handler;
@@ -80,12 +80,8 @@ enum ErrorHandlerType {
         this.logLevel = handler.logLevel();
     }
 
-    public static @Nullable ErrorHandlerType getForCode(int code) {
-        return MAP.get(code);
-    }
-
     public static @Nullable ErrorHandlerType getForCode(HttpStatus code) {
-        return getForCode(code.code);
+        return MAP.get(code);
     }
 
     @NullMarked

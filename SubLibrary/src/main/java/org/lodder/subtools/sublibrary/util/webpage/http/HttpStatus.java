@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.util.webpage.http;
 
-import java.util.Arrays;
+import static util.Utils.*;
+
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -9,7 +10,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status.Family;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public enum HttpStatus {
@@ -84,14 +84,18 @@ public enum HttpStatus {
     INSUFFICIENT_STORAGE(507, "Insufficient Storage: The server is unable to store the representation needed to complete the request."),
     LOOP_DETECTED(508, "Loop Detected: The server detected an infinite loop while processing the request."),
     NOT_EXTENDED(510, "Not Extended: Further extensions to the request are required for the server to fulfill it."),
-    NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required: The client needs to authenticate to gain network access.");
+    NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required: The client needs to authenticate to gain network access."),
+
+    // 6xx SubTools
+    UNKNOWN(601, "Unknown reason");
+
 
     @val int code;
     @val String description;
     @val Family family;
 
-    private static Map<Integer, HttpStatus> MAP =
-        Arrays.stream(values()).collect(Collectors.toMap(status -> status.code, Function.identity()));
+    private static final Map<Integer, HttpStatus> MAP =
+        values().stream().collect(Collectors.toUnmodifiableMap(status -> status.code, Function.identity()));
 
     HttpStatus(int code, String description) {
         this.code = code;
@@ -99,8 +103,8 @@ public enum HttpStatus {
         this.family = Response.Status.Family.familyOf(code);
     }
 
-    public static @Nullable HttpStatus fromStatusCode(int statusCode) {
-        return MAP.get(statusCode);
+    public static HttpStatus fromStatusCode(int statusCode) {
+        return ifNullThen(MAP.get(statusCode), UNKNOWN);
     }
 
 }

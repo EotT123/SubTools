@@ -27,15 +27,12 @@ public sealed interface Response<T> permits SuccessfulResponse, ErrorResponse {
     static <T> Response<T> execute(Call<T> call, List<ErrorHandler> errorHandlers, boolean retry) {
         try {
             retrofit2.Response<T> response = call.execute();
+            HttpStatus statusCode = fromStatusCode(response.code());
             if (response.body() != null) {
-                return new SuccessfulResponse<>(requireNonNull(response.body()), response.code(), response.message(),
+                return new SuccessfulResponse<>(requireNonNull(response.body()), statusCode, response.message(),
                     response.headers());
             } else {
                 ResponseBody errorBody = requireNonNull(response.errorBody());
-                HttpStatus statusCode = fromStatusCode(response.code());
-                if (statusCode == null) {
-                    return new ErrorResponse(SERVER_ERROR, "Unknown status code [${response.code()}]");
-                }
                 if (!retry) {
                     return new ErrorResponse(statusCode, response.message());
                 }

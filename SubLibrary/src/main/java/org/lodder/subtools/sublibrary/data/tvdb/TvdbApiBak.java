@@ -38,7 +38,6 @@ import org.lodder.subtools.sublibrary.data.ApiIntf;
 import org.lodder.subtools.sublibrary.data.tvdb.exception.TvdbApiException;
 import org.lodder.subtools.sublibrary.data.tvdb.model.TvdbEpisode;
 import org.lodder.subtools.sublibrary.util.lazy.LazyThrowingSupplier;
-import org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus;
 
 @NullMarked
 public class TvdbApiBak implements ApiIntf {
@@ -67,8 +66,7 @@ public class TvdbApiBak implements ApiIntf {
                     case SuccessfulResponse<LoginPost200Response> r -> {
                         String token = ifNotNull(r.body.data, LoginPost200ResponseData::getToken);
                         if (token == null) {
-                            HttpStatus code = ifNullThen(HttpStatus.fromStatusCode(r.code), HttpStatus.NO_CONTENT);
-                            throw new TvdbApiException(code, "Could not acquire a bearer token - " + r.message,
+                            throw new TvdbApiException(r.code, "Could not acquire a bearer token - " + r.message,
                                 CACHE_TEMPORARY, ERROR);
                         }
                         yield token;

@@ -49,12 +49,12 @@ public class SubsceneApi implements SubtitleApi {
     private static final Pattern SERIE_NAME_PATTERN =
         Pattern.compile("(?<name>.*?) - (?<seasonName>[A-Z][a-z]*) Season.*");
 
-    private static final Predicate<Exception> RETRY_PREDICATE = exception -> switch (exception) {
-        case HttpClientException httpClientException -> httpClientException.responseCode == CONFLICT.code ||
-            httpClientException.responseCode == TOO_MANY_REQUESTS.code;
-        case ManagerException managerException -> managerException.getMessage().contains("409 Conflict");
-        default -> false;
-    };
+    private static final Predicate<Exception> RETRY_PREDICATE = exception ->
+        switch (exception) {
+            case HttpClientException e -> e.responseCode == CONFLICT || e.responseCode == TOO_MANY_REQUESTS;
+            case ManagerException e -> e.getMessage().contains("409 Conflict");
+            default -> false;
+        };
 
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.SUBSCENE;
     private int selectedLanguage;

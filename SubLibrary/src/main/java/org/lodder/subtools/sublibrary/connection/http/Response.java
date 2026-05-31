@@ -26,14 +26,10 @@ public sealed interface Response permits SuccessfulResponse, ErrorResponse {
         HttpResponse.BodyHandler<String> responseBodyHandler, List<ErrorHandler> errorHandlers, boolean retry) {
         try {
             HttpResponse<String> response = httpClient.send(request, responseBodyHandler);
+            HttpStatus statusCode = fromStatusCode(response.statusCode());
             if (response.statusCode() / 200 == 1) {
-                return new SuccessfulResponse(response.body(), response.statusCode(), response.headers());
+                return new SuccessfulResponse(response.body(), statusCode, response.headers());
             } else {
-                HttpStatus statusCode = fromStatusCode(response.statusCode());
-                if (statusCode == null) {
-                    return new ErrorResponse(SERVER_ERROR, "Unknown status code [${response.statusCode()}]");
-                }
-
                 Supplier<ErrorResponse> errorResponseSupplier = () -> new ErrorResponse(statusCode, response.body());
 
                 if (!retry) {

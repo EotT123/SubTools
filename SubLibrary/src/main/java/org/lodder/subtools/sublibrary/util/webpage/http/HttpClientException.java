@@ -13,7 +13,7 @@ public class HttpClientException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    @val int responseCode;
+    @val HttpStatus responseCode;
     @val String responseMessage;
 
     public HttpClientException(HttpURLConnection connection) {
@@ -26,15 +26,15 @@ public class HttpClientException extends Exception {
         this.responseMessage = getResponseMessage(connection);
     }
 
-    private int getResponseCode(@Nullable HttpURLConnection connection) {
+    private HttpStatus getResponseCode(@Nullable HttpURLConnection connection) {
         if (connection != null) {
             try {
-                return connection.getResponseCode();
+                return HttpStatus.fromStatusCode(connection.getResponseCode());
             } catch (IOException e) {
                 // continue
             }
         }
-        return -1;
+        return HttpStatus.UNKNOWN;
     }
 
     private String getResponseMessage(@Nullable HttpURLConnection connection) {

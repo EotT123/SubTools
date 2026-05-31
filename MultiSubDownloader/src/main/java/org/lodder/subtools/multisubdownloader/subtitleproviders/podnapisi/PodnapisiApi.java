@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 
 import extensions.org.jsoup.nodes.Element.ElementExt;
+import jakarta.ws.rs.core.Response.Status.Family;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import org.apache.commons.lang3.StringUtils;
@@ -175,7 +176,8 @@ public class PodnapisiApi implements SubtitleApi {
                 } catch (Exception e) {
                     throw PodnapisiApiException.error(e, cacheStrategy:CACHE_DISABLED);
                 }
-            }, null, new Retry(1, ex -> ex instanceof HttpClientException e && e.responseCode >= 500, 1Second));
+            }, null, new Retry(1, ex -> ex instanceof HttpClientException e &&
+                e.responseCode.family == Family.SERVER_ERROR, 1Second));
     }
 
     // see https://www.podnapisi.net/forum/viewtopic.php?f=62&t=26164#p212652
@@ -208,8 +210,7 @@ public class PodnapisiApi implements SubtitleApi {
             return Manager.getDocument(new PageContentParams(url, CacheType.MEMORY, userAgent,
                 new Retry(
                     1,
-                    ex -> ex instanceof HttpClientException e && e.responseCode >= 500 &&
-                        e.responseCode < 600,
+                    ex -> ex instanceof HttpClientException e && e.responseCode.family == Family.SERVER_ERROR,
                     5Second)));
         } catch (Exception e) {
             throw PodnapisiApiException.error(e);
