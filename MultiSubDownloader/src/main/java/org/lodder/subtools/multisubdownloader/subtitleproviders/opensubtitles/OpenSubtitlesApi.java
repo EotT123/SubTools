@@ -53,6 +53,7 @@ import org.lodder.subtools.sublibrary.Manager.CacheKeyBuilder;
 import org.lodder.subtools.sublibrary.Manager.Retry;
 import org.lodder.subtools.sublibrary.PageContentParams;
 import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.connection.http.Response.RetryErrorHandler;
 import org.lodder.subtools.sublibrary.connection.retrofit.ErrorResponse;
 import org.lodder.subtools.sublibrary.connection.retrofit.Response;
 import org.lodder.subtools.sublibrary.connection.retrofit.Response.CustomErrorHandler;
@@ -367,10 +368,8 @@ public class OpenSubtitlesApi implements SubtitleApi {
             });
     }
 
-    private static org.lodder.subtools.sublibrary.connection.http.Response.RetryErrorHandler createInvalidTokenErrorHandler() {
-        return new org.lodder.subtools.sublibrary.connection.http.Response.RetryErrorHandler(
-            (_, body) -> body.contains("invalid token"),
-            OpenSubtitlesApi::resetBearerToken);
+    private static RetryErrorHandler createInvalidTokenErrorHandler() {
+        return new RetryErrorHandler((_, body) -> body.contains("invalid token"), OpenSubtitlesApi::resetBearerToken);
     }
 
     private static OpenSubtitleApiException handleErrorResponse(ErrorResponse errorResponse, String message) {

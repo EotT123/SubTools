@@ -17,8 +17,8 @@ public class LoggingPanel extends JPanel {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private final static Logger ROOT = (Logger) org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private final JTextArea txtLogging;
-    private final Logger ROOT = (Logger) org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
     public LoggingPanel() {
         this.setLayout(new MigLayout("", "[698px,grow][]", "[][70px,grow]"));

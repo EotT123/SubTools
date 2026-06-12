@@ -35,9 +35,9 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     @get(Protected) @set(Private) @Nullable StatusListener statusListener;
     @get(Protected) @set(Private) @Nullable List<R> releases;
     @get(Protected) abstract Supplier<Language> language;
-    abstract @get(Protected) IndexingProgressListener indexingProgressListener;
-    abstract @get(Protected) UserInteractionHandler userInteractionHandler;
-    abstract @get(Protected) SearchProgressListener searchProgressListener;
+    @get(Protected) abstract IndexingProgressListener indexingProgressListener;
+    @get(Protected) abstract UserInteractionHandler userInteractionHandler;
+    @get(Protected) abstract SearchProgressListener searchProgressListener;
     private final LazySupplier<SearchManager> searchManagerLazy;
     @get(Protected) SearchManager searchManager; // Computed property
 

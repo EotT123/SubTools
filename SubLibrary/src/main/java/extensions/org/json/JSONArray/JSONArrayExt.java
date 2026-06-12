@@ -17,6 +17,7 @@ public class JSONArrayExt {
         // Hide Utility Class Constructor
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static Stream<JSONObject> streamJsonObjects(@This JSONArray jsonArray) {
         Iterator<JSONObject> iterator = (Iterator<JSONObject>) (Iterator) jsonArray.iterator();
         return iterator.stream();

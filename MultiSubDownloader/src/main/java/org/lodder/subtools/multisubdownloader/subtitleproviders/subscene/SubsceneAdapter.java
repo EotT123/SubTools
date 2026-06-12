@@ -72,8 +72,7 @@ public final class SubsceneAdapter
     @Override
     public @Nullable SubSceneSerieId getSerieProviderIdById(ProviderIds providerIds, Integer season)
         throws SubsceneException {
-        return providerIds.get(IMDB,
-            imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)).stream().findAny().orElse(null));
+        return providerIds.get(IMDB, imdbId -> getSortedSerieProviderIds(imdbId, requireNonNull(season)).firstOrNull());
     }
 
     /**

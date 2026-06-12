@@ -63,7 +63,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
                     true, videoType, StructureBuilderDialog.StructureType.FOLDER, userInteractionHandler,
                     getLibraryStructureBuilder());
                 String value = sDialog.showDialog(txtFolderStructure.getText());
-                if (!"".equals(value)) {
+                if (!value.isEmpty()) {
                     txtFolderStructure.setText(value);
                 }
             })

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class CustomTable extends ZebraJTable {
@@ -72,7 +73,7 @@ public class CustomTable extends ZebraJTable {
     }
 
     @Override
-    public String getToolTipText(MouseEvent e) {
+    public @Nullable String getToolTipText(MouseEvent e) {
         int row = rowAtPoint(e.getPoint());
         int column = columnAtPoint(e.getPoint());
 

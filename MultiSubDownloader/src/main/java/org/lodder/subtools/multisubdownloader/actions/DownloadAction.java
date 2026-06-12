@@ -42,19 +42,17 @@ public class DownloadAction {
     public void download(ReleaseWithPath release, Subtitle subtitle,
         @Nullable AtomicInteger counter=null) throws IOException {
         LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
-        switch (release) {
-            case TvReleaseWithPath _ ->
-                download(release, subtitle, SettingsControl.settings.episodeLibrarySettings, counter);
-            case MovieReleaseWithPath _ ->
-                download(release, subtitle, SettingsControl.settings.movieLibrarySettings, counter);
-        }
+        LibrarySettings librarySettings = switch (release) {
+            case TvReleaseWithPath _ -> SettingsControl.settings.episodeLibrarySettings;
+            case MovieReleaseWithPath _ -> SettingsControl.settings.movieLibrarySettings;
+        };
+        download(release, subtitle, librarySettings, counter);
     }
 
     private void download(ReleaseWithPath release, Subtitle subtitle, LibrarySettings librarySettings,
         @Nullable AtomicInteger counter) throws IOException {
         LOGGER.trace("cleanUpFiles: LibraryAction {}", librarySettings.action);
-        Path path =
-            PathLibraryBuilder.fromSettings(librarySettings, userInteractionHandler).buildPath(release);
+        Path path = PathLibraryBuilder.fromSettings(librarySettings, userInteractionHandler).buildPath(release);
         if (!path.exists()) {
             LOGGER.debug("Download creating folder [{}] ", path.toAbsolutePath());
             try {

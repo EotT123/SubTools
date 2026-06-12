@@ -60,8 +60,8 @@ public final class Addic7edAdapter extends SubtitleAdapter<Addic7edSubtitle, Add
     @Override
     public Collection<Addic7edSubtitle> searchMovieSubtitlesWithName(String title, @Nullable Integer year,
         Language language, ProviderIds providerIds) throws Addic7edException {
-        return ifNotNullOrElseGet(getMovieProviderId(title, year),
-            providerId -> api.searchMovieSubtitles(providerId.id, language), List::of);
+        return ifNotNullOrElse(getMovieProviderId(title, year),
+            providerId -> api.searchMovieSubtitles(providerId.id, language), List.of());
     }
 
     private @Nullable Addic7edMovieSubtitleId getMovieProviderId(String title, @Nullable Integer year)

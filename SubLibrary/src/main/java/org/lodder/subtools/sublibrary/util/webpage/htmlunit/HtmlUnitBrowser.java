@@ -114,7 +114,7 @@ public class HtmlUnitBrowser {
     }
 
     public static void setWebClientProps(WebClient webClient) {
-        // Javascript to pass cloudflare's security challenge
+        // JavaScript to pass Cloudflare's security challenge
         webClient.options.setJavaScriptEnabled(true);
         webClient.setJavaScriptTimeout(30000);
 

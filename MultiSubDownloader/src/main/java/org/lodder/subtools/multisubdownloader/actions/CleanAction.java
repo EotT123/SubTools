@@ -32,8 +32,8 @@ public class CleanAction {
         }
 
         release.path.parent.list()
-            .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME))
-                || (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
+            .filter(p -> (p.isDirectory() && p.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME)) ||
+                (p.isRegularFile() && FILE_FILTERS.contains(p.getExtension())))
             .forEachEx(p -> {
                 switch (librarySettings.otherFileAction) {
                     case MOVE -> move(p, destination);
@@ -50,9 +50,8 @@ public class CleanAction {
 
     private void rename(Path path, Path destinationFolder, String videoFileName) throws IOException {
         if (path.isRegularFile()) {
-            String fileName =
-                path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
-                    StringUtils.substringBeforeLast(videoFileName, ".");
+            String fileName = path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
+                StringUtils.substringBeforeLast(videoFileName, ".");
             String extension = path.getExtension();
             if (!extension.isBlank()) {
                 extension = "." + extension;
@@ -69,9 +68,8 @@ public class CleanAction {
 
     private void moveAndRename(Path path, Path destinationFolder, String videoFileName) throws IOException {
         if (path.isRegularFile()) {
-            String fileName =
-                path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
-                    StringUtils.substringBeforeLast(videoFileName, ".");
+            String fileName = path.fileNameContainsIgnoreCase(SAMPLE_DIR_NAME) ? SAMPLE_DIR_NAME :
+                StringUtils.substringBeforeLast(videoFileName, ".");
             String extension = path.getExtension();
             if (!extension.isBlank()) {
                 extension = "." + extension;

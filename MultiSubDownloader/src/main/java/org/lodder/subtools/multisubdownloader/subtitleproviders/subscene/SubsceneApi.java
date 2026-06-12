@@ -4,6 +4,7 @@ import static manifold.science.measures.TimeUnit.*;
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static org.lodder.subtools.sublibrary.util.Sleep.*;
 import static org.lodder.subtools.sublibrary.util.webpage.http.HttpStatus.*;
+import static util.Utils.*;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,6 @@ import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.lodder.subtools.sublibrary.util.webpage.http.HttpClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.Utils;
 
 @NullMarked
 public class SubsceneApi implements SubtitleApi {
@@ -166,7 +166,7 @@ public class SubsceneApi implements SubtitleApi {
             String url = "$DOMAIN/subtitles/searchbytitle?query=" + name.urlEncode();
             return getJsoupDocument(url).selectFirstByClass("search-result").select("h2")
                 .stream()
-                .collect(Utils.mapCollector((map, titleElement) -> map.put(SearchResultType.of(titleElement.text()),
+                .collect(mapCollector((map, titleElement) -> map.put(SearchResultType.of(titleElement.text()),
                     titleElement.nextElementSibling().select("a").stream().map(subsceneIdCreator).toList())));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

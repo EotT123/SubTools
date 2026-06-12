@@ -189,8 +189,8 @@ public class PodnapisiApi implements SubtitleApi {
         EPISODE("sTE=%s"),
         XML("sXML=1"), //to enable XML output
         KEYWORDS("sK=%s"),
-        LANGUAGE_OLD("sJ=%s"), //(old integer IDs), comma delimited
-        LANGUAGE("sL=%s"), // in ISO codes (exception are sr-latn and pt-br), comma delimited
+        LANGUAGE_OLD("sJ=%s"), //(old integer IDs), comma-delimited
+        LANGUAGE("sL=%s"), // in ISO codes (exception are sr-latn and pt-br), comma-delimited
         OMDB("sM=%s"), // OMDb movie ID (old numeric ID)
         IMDB("sI=%s"), //
         HEARING_IMPAIRED("sEH=%s"),

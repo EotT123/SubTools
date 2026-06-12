@@ -9,7 +9,7 @@ public enum SearchSubtitlesEnum {
     // exclude, include (default: exclude)
     AI_TRANSLATED("ai_translated"),
 
-    // For Tvshows
+    // For Tv-shows
     EPISODE_NUMBER("episode_number"),
 
     // exclude, include, only (default: include)
@@ -30,14 +30,14 @@ public enum SearchSubtitlesEnum {
     // exclude, include (default: exclude)
     MACHINE_TRANSLATED("machine_translated"),
 
-    // Moviehash of the movie
-    MOVIEHASH("moviehash"),
+    // Movie hash of the movie
+    MOVIE_HASH("moviehash"),
 
     // >= 16 characters
     // <= 16 characters
     // Match pattern: ^[a-f0-9]{16}$
     // include, only (default: include)
-    MOVIEHASH_MATCH("moviehash_match"),
+    MOVIE_HASH_MATCH("moviehash_match"),
 
     // Order of the returned results, accept any of above fields
     ORDER_BY("order_by"),
@@ -48,19 +48,19 @@ public enum SearchSubtitlesEnum {
     // Results page to display
     PAGE("page"),
 
-    // For Tvshows
+    // For Tv-shows
     PARENT_FEATURE_ID("parent_feature_id"),
 
-    // For Tvshows
+    // For Tv-shows
     PARENT_IMDB_ID("parent_imdb_id"),
 
-    // For Tvshows
+    // For Tv-shows
     PARENT_TMDB_ID("parent_tmdb_id"),
 
     // file name or text search
     QUERY("query"),
 
-    // For Tvshows
+    // For Tv-shows
     SEASON_NUMBER("season_number"),
 
     // TMDB ID of the movie or episode

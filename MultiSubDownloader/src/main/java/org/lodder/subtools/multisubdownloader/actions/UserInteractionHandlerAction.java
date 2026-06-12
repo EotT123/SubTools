@@ -38,8 +38,7 @@ public class UserInteractionHandlerAction {
      * @param dryRun dryRun
      * @return integer which subtitle is selected for downloading
      */
-    public List<Subtitle> subtitleSelection(Release release, final boolean subtitleSelectionDialog,
-        final boolean dryRun) {
+    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog, boolean dryRun) {
 
         // Sort subtitles by score
         List<Subtitle> subs = release.matchingSubs.stream().sorted(new SubtitleComparator()).toList();
