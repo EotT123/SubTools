@@ -1,11 +1,10 @@
-package org.lodder.subtools.multisubdownloader.serviceproviders;
+package org.lodder.subtools.multisubdownloader.serviceprovider;
 
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.Addic7edAdapter;
@@ -13,7 +12,7 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.g
 import org.lodder.subtools.sublibrary.Credentials;
 
 @NullMarked
-public class Addic7edServiceProvider implements ServiceProvider {
+public final class Addic7edServiceProvider implements ServiceProvider {
 
     @Override
     public Supplier<SubtitleProvider> createProviderSupplier(UserInteractionHandler userInteractionHandler) {

@@ -1,17 +1,16 @@
-package org.lodder.subtools.multisubdownloader.serviceproviders;
+package org.lodder.subtools.multisubdownloader.serviceprovider;
 
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.framework.service.providers.ServiceProvider;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 
 @NullMarked
-public class OpenSubtitlesServiceProvider implements ServiceProvider {
+public final class OpenSubtitlesServiceProvider implements ServiceProvider {
 
     @Override
     public Supplier<OpenSubAdapter> createProviderSupplier(UserInteractionHandler userInteractionHandler) {

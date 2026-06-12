@@ -1,4 +1,4 @@
-package org.lodder.subtools.multisubdownloader.framework.service.providers;
+package org.lodder.subtools.multisubdownloader.serviceprovider;
 
 import java.util.function.Supplier;
 
@@ -8,7 +8,9 @@ import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider
 import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
 
 @NullMarked
-public interface ServiceProvider {
+public sealed interface ServiceProvider
+    permits Addic7edServiceProvider, LocalServiceProvider, OpenSubtitlesServiceProvider, PodnapisiServiceProvider,
+    SubdlServiceProvider, SubsceneServiceProvider, TvSubtitlesServiceProvider {
 
     default void register(UserInteractionHandler userInteractionHandler) {
         SubtitleProviderStore.registerProvider(createProviderSupplier(userInteractionHandler));
