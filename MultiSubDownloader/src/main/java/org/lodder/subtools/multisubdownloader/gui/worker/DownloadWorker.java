@@ -1,0 +1,92 @@
+package org.lodder.subtools.multisubdownloader.gui.worker;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jspecify.annotations.NullMarked;
+import org.lodder.subtools.multisubdownloader.GUI;
+import org.lodder.subtools.multisubdownloader.Messages;
+import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
+import org.lodder.subtools.multisubdownloader.actions.DownloadAction;
+import org.lodder.subtools.multisubdownloader.actions.UserInteractionHandlerAction;
+import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
+import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
+import org.lodder.subtools.multisubdownloader.gui.extra.table.CustomTable;
+import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
+import org.lodder.subtools.multisubdownloader.lib.Info;
+import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
+import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
+import org.lodder.subtools.sublibrary.model.Subtitle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Created by IntelliJ IDEA. User: lodder Date: 4/12/11 Time: 8:52 AM To change this template use Path | Settings | Path
+ * Templates.
+ */
+@NullMarked
+public class DownloadWorker extends SwingWorker<Void, String> implements Cancelable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadWorker.class);
+
+    private final CustomTable table;
+    private final DownloadAction downloadAction;
+    private final UserInteractionHandlerAction userInteractionHandlerAction;
+
+    public DownloadWorker(CustomTable table, GUI gui) {
+        this.table = table;
+        UserInteractionHandlerGUI userInteractionHandler = new UserInteractionHandlerGUI(SettingsControl.settings, gui);
+        this.downloadAction = new DownloadAction(userInteractionHandler);
+        this.userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
+    }
+
+    @Override
+    protected Void doInBackground() {
+        VideoTableModel model = (VideoTableModel) table.getModel();
+        LOGGER.trace("doInBackground: Rows to treat: {} ", model.getRowCount());
+        Info.downloadOptions(false);
+
+        model.executedSynchronized(() -> {
+            List<ReleaseWithPath> selectedShows = model.getSelectedShows();
+            int selectedCount = selectedShows.size();
+            int progress = 0;
+            int k = 0;
+            for (ReleaseWithPath selectedShow : selectedShows) {
+                k++;
+                if (k > 0) {
+                    progress = 100 * k / selectedCount;
+                }
+                if (progress == 0 && selectedCount > 1) {
+                    progress = 1;
+                }
+                setProgress(progress);
+                publish(selectedShow.fileName);
+                List<Subtitle> selection = userInteractionHandlerAction.subtitleSelection(selectedShow, true);
+                AtomicInteger counter = selection.size() == 1 ? null : new AtomicInteger(0);
+                try {
+                    selection.forEachEx(s -> downloadAction.download(selectedShow, s, counter));
+                    if (!selection.isEmpty()) {
+                        model.removeShow(selectedShow);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                    showErrorMessage(e.toString());
+                }
+            }
+        });
+        return null;
+    }
+
+    @Override
+    protected void process(List<String> data) {
+        data.forEach(s -> StatusMessenger.instance.message(Messages.getText("MainWindow.DownloadingSubtitle", s)));
+    }
+
+    private void showErrorMessage(String message) {
+        JOptionPane.showConfirmDialog(null, message, "JBierSubDownloader", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+}

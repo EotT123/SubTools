@@ -4,8 +4,8 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProvider;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProviderStore;
 
 @NullMarked
 public sealed interface ServiceProvider

@@ -6,9 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.Addic7edAdapter;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.addic7ed.proxy.gestdown.Addic7edProxyGestdownAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProvider;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.Addic7edAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.gestdown.Addic7edProxyGestdownAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 
 @NullMarked

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.podnapisi.PodnapisiAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.podnapisi.PodnapisiAdapter;
 
 @NullMarked
 public final class PodnapisiServiceProvider implements ServiceProvider {

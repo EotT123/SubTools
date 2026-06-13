@@ -17,8 +17,8 @@ import org.lodder.subtools.multisubdownloader.actions.UserInteractionHandlerActi
 import org.lodder.subtools.multisubdownloader.cli.actions.CliSearchAction;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLIFileIndexerProgress;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLISearchProgress;
-import org.lodder.subtools.multisubdownloader.exceptions.CliException;
-import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
+import org.lodder.subtools.multisubdownloader.exception.CliException;
+import org.lodder.subtools.multisubdownloader.exception.SearchSetupException;
 import org.lodder.subtools.multisubdownloader.lib.Info;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;

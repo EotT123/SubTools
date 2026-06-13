@@ -10,14 +10,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
-import org.lodder.subtools.multisubdownloader.gui.panels.preference.EpisodeLibraryPanel;
-import org.lodder.subtools.multisubdownloader.gui.panels.preference.GeneralPanel;
-import org.lodder.subtools.multisubdownloader.gui.panels.preference.MovieLibraryPanel;
-import org.lodder.subtools.multisubdownloader.gui.panels.preference.OptionsPanel;
-import org.lodder.subtools.multisubdownloader.gui.panels.preference.PreferencePanelIntf;
-import org.lodder.subtools.multisubdownloader.gui.panels.preference.SerieProvidersPanel;
+import org.lodder.subtools.multisubdownloader.gui.panel.preference.EpisodeLibraryPanel;
+import org.lodder.subtools.multisubdownloader.gui.panel.preference.GeneralPanel;
+import org.lodder.subtools.multisubdownloader.gui.panel.preference.MovieLibraryPanel;
+import org.lodder.subtools.multisubdownloader.gui.panel.preference.OptionsPanel;
+import org.lodder.subtools.multisubdownloader.gui.panel.preference.PreferencePanelIntf;
+import org.lodder.subtools.multisubdownloader.gui.panel.preference.SerieProvidersPanel;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProviderStore;
 import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 
 @NullMarked

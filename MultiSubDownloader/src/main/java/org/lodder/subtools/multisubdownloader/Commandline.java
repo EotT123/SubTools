@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOption;
 import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionEnable;
 import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionWithArgParam;
-import org.lodder.subtools.multisubdownloader.exceptions.CliException;
+import org.lodder.subtools.multisubdownloader.exception.CliException;
 
 @NullMarked
 public class Commandline {

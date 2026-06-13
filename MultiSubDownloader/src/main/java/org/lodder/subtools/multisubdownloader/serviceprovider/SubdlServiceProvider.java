@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.subdl.SubdlAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.subdl.SubdlAdapter;
 
 @NullMarked
 public final class SubdlServiceProvider implements ServiceProvider {

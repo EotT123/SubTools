@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.local.Local;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.local.Local;
 
 @NullMarked
 public final class LocalServiceProvider implements ServiceProvider {

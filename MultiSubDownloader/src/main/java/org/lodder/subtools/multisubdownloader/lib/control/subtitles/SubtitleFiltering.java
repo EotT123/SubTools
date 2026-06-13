@@ -1,10 +1,10 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles;
 
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.ExactNameFilter;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.KeywordFilter;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.ReleaseGroupFilter;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filters.SubtitleFilter;
+import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filter.ExactNameFilter;
+import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filter.KeywordFilter;
+import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filter.ReleaseGroupFilter;
+import org.lodder.subtools.multisubdownloader.lib.control.subtitles.filter.SubtitleFilter;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;

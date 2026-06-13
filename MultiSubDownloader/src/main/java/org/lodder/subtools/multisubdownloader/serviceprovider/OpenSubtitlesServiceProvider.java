@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.opensubtitles.OpenSubAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.opensubtitles.OpenSubAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 
 @NullMarked
