@@ -1,4 +1,4 @@
-package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers;
+package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacer;
 
 import java.util.Map;
 

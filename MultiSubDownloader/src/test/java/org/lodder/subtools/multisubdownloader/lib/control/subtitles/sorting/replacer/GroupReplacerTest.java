@@ -1,4 +1,4 @@
-package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers;
+package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacer;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
