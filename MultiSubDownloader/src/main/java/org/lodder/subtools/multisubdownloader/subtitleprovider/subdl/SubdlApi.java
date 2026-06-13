@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.subtitleprovider.subdl;
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
+import static util.Utils.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -151,7 +152,7 @@ public class SubdlApi implements SubtitleApi {
             SearchParam.SEASON, season,
             SearchParam.TYPE, ReleaseType.tv);
         return getSubtitles(language, params)
-            .stream().filter(sub -> sub.episodes.contains(episode)).toList();
+            .stream().filter(sub -> sub.episodes.isEmpty() || sub.episodes.contains(episode)).toList();
     }
 
     /**
@@ -172,7 +173,7 @@ public class SubdlApi implements SubtitleApi {
             SearchParam.SEASON, season,
             SearchParam.TYPE, ReleaseType.tv);
         return getSubtitles(language, params)
-            .stream().filter(sub -> sub.episodes.contains(episode)).toList();
+            .stream().filter(sub -> sub.episodes.isEmpty() || sub.episodes.contains(episode)).toList();
     }
 
     // ====== \\
@@ -271,7 +272,7 @@ public class SubdlApi implements SubtitleApi {
         if (sub.episode_from != null) {
             episodes = IntStream.rangeClosed(sub.episode_from, sub.episode_end).boxed().toList();
         } else {
-            episodes = List.of(sub.episode);
+            episodes = ifNotNullOrElseGet(sub.episode, List::of, List::of);
         }
         return new SubdlSubtitleMetadata(sub.release_name.split("/").last(), sub.name.split("/").last(),
             DOMAIN + sub.url, sub.season, episodes, sub.author, sub.hi, SubdlLanguage.of(sub.language).language);
