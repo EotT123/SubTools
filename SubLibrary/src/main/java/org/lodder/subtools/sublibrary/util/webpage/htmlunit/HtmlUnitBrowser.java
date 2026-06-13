@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.htmlunit.AbstractPage;
 import org.htmlunit.AjaxController;
 import org.htmlunit.BrowserVersion;
-import org.htmlunit.CookieManager;
 import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.Page;
@@ -82,8 +81,7 @@ public class HtmlUnitBrowser {
     private static @Nullable String getPageContents(WebRequest wr, List<Cookie> cookies,
         @Nullable Predicate<PageIntf> waitUntilCondition) throws WebpageException {
         try (WebClient webClient = new WebClient(BrowserVersion.CHROME)) {
-            CookieManager cookieManager = webClient.cookieManager;
-            cookies.forEach(cookieManager::addCookie);
+            cookies.forEach(webClient.cookieManager::addCookie);
             setWebClientProps(webClient);
             Page page = webClient.getPage(wr);
             if (waitUntilCondition != null) {

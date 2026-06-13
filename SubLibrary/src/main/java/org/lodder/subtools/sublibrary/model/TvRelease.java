@@ -32,7 +32,7 @@ public sealed interface TvRelease extends Release permits TvReleaseWithPath, TvR
         return "S%02dE%02d".formatted(season, episode);
     }
 
-    @val String displayName = StringUtils.defaultIfBlank(originalName, name);
+    @val String displayName = !StringUtils.isBlank(originalName) ? originalName : name;
 
     @Override
     default boolean isOfType(VideoType videoType) {

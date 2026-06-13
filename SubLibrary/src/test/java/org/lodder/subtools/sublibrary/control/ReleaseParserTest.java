@@ -5,7 +5,6 @@ import static org.lodder.subtools.sublibrary.assertions.SubLibraryAssertions.ass
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.lodder.subtools.sublibrary.exception.ReleaseParseException;
 
 class ReleaseParserTest {
 
@@ -209,7 +208,7 @@ class ReleaseParserTest {
     }
 
     @Test
-    void testReleaseParseExceptionMessage() throws ReleaseParseException {
+    void testReleaseParseExceptionMessage() {
         String name = "exceptiontesting.mkv";
         assertThat(ReleaseParser.parse(name)).isNull();
     }
