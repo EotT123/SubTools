@@ -1,7 +1,6 @@
 package org.lodder.subtools.multisubdownloader.subtitleprovider.subdl.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.Language;
@@ -19,7 +18,7 @@ import org.lodder.subtools.sublibrary.Language;
  * @param hearingImpaired Indicates whether the subtitle includes hearing-impaired annotations.
  */
 @NullMarked
-public record SubdlSubtitleMetadata(String title, String fileName, String url, int season, List<Integer> episodes,
+public record SubdlSubtitleMetadata(String title, String fileName, String url, int season, int[] episodes,
     String uploader, boolean hearingImpaired, Language language)
     implements Serializable {
 }

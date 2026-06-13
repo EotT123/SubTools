@@ -268,11 +268,11 @@ public class SubdlApi implements SubtitleApi {
      * @return a metadata representing the subtitle metadata
      */
     private SubdlSubtitleMetadata convertToSubtitleMetadata(Serie.Subtitle sub) {
-        List<Integer> episodes;
+        int[] episodes;
         if (sub.episode_from != null) {
-            episodes = IntStream.rangeClosed(sub.episode_from, sub.episode_end).boxed().toList();
+            episodes = IntStream.rangeClosed(sub.episode_from, sub.episode_end).toArray();
         } else {
-            episodes = ifNotNullOrElseGet(sub.episode, List::of, List::of);
+            episodes = ifNotNullOrElseGet(sub.episode, int[]::new, () -> new int[]{});
         }
         return new SubdlSubtitleMetadata(sub.release_name.split("/").last(), sub.name.split("/").last(),
             DOMAIN + sub.url, sub.season, episodes, sub.author, sub.hi, SubdlLanguage.of(sub.language).language);

@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import com.google.common.base.Objects;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
@@ -33,7 +34,21 @@ public class ArrayExt {
         Class<?> componentType = array.getClass().getComponentType();
         if (componentType.isPrimitive()) {
             throw new IllegalArgumentException("$array has not a primitive component type: " +
-                    array.getClass().getComponentType().getSimpleName());
+                array.getClass().getComponentType().getSimpleName());
         }
+    }
+
+    public static boolean contains(@This Object array, @Self(true) Object object) {
+        return ((Object[]) array).indexOf(object) > -1;
+    }
+
+    public static int indexOf(@This Object array, @Self(true) Object object) {
+        Object[] a = (Object[]) array;
+        for (int i = 0; i < a.length; i++) {
+            if (Objects.equal(a[i], object)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
