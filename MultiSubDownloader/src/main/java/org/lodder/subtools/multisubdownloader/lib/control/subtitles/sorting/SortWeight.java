@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting;
 
 import static manifold.ext.props.rt.api.PropOption.*;
+import static util.Utils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +11,9 @@ import java.util.regex.Pattern;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.set;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.GroupReplacer;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacers.KeywordReplacer;
+import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacer.GroupReplacer;
+import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.replacer.KeywordReplacer;
 import org.lodder.subtools.sublibrary.control.ReleaseParser;
 import org.lodder.subtools.sublibrary.model.Release;
 
@@ -39,10 +39,9 @@ public class SortWeight {
         replaceReservedKeywords(release, defaultWeightsNew);
 
         /* get a list of tags */
-        List<String> tags = new ArrayList<>(ReleaseParser.getQualityKeyWords(release.quality));
-        if (StringUtils.isNotBlank(release.releaseGroup)) {
-            tags.add(release.releaseGroup.toLowerCase());
-        }
+        List<String> tags = new ArrayList<>();
+        ifNotNullDo(release.quality, quality -> tags.addAll(ReleaseParser.getQualityKeyWords(quality)));
+        ifNotNullDo(release.releaseGroup, releaseGroup -> tags.add(releaseGroup.toLowerCase()));
 
         /* store weights for this release */
         tags.forEach(tag ->
@@ -58,6 +57,6 @@ public class SortWeight {
     }
 
     private void replaceReservedKeywords(Release release, Map<String, Integer> weights) {
-        SortWeight.KEYWORD_REPLACERS.forEach(replacer -> replacer.replace(release, weights));
+        KEYWORD_REPLACERS.forEach(replacer -> replacer.replace(release, weights));
     }
 }

@@ -24,9 +24,8 @@ public enum SearchColumnName implements CustomColumnName {
     SOURCE("SearchColumnName.Source", String.class, false),
     SCORE("SearchColumnName.Score", Integer.class, false);
 
-    private static final Map<String, SearchColumnName> MAP =
-            SearchColumnName.values().stream()
-                    .collect(Collectors.toMap(SearchColumnName::getColumnName, Function.identity()));
+    private static final Map<String, SearchColumnName> MAP = SearchColumnName.values().stream()
+        .collect(Collectors.toMap(SearchColumnName::getColumnName, Function.identity()));
 
     @val @override String columnName;
     @val @override Class<?> clazz;

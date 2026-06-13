@@ -1,19 +1,10 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
+import module java.base;
 import static org.lodder.subtools.multisubdownloader.gui.extra.table.SearchColumnName.*;
 
 import javax.swing.table.DefaultTableModel;
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import manifold.ext.props.rt.api.get;
 import manifold.ext.props.rt.api.var;

@@ -7,6 +7,7 @@ import java.util.Set;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -24,8 +25,8 @@ public abstract sealed class ReleaseWithoutPath implements Release permits Movie
     protected ReleaseWithoutPath(String name, @Nullable String releaseGroup,
         @Nullable String quality, String completeName) {
         this.name = name;
-        this.releaseGroup = releaseGroup;
-        this.quality = quality;
+        this.releaseGroup = StringUtils.trimToNull(releaseGroup);
+        this.quality = StringUtils.trimToNull(quality);
         this.completeName = completeName;
     }
 

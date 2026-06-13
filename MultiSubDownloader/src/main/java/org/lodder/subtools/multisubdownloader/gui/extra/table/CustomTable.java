@@ -1,11 +1,9 @@
 package org.lodder.subtools.multisubdownloader.gui.extra.table;
 
+import module java.base;
+
 import javax.swing.table.TableColumn;
 import java.awt.event.MouseEvent;
-import java.io.Serial;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.stream.IntStream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

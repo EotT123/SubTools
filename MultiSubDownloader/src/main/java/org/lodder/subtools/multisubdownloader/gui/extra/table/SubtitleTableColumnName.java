@@ -19,14 +19,13 @@ public enum SubtitleTableColumnName implements CustomColumnName {
     QUALITY("SubtitleTableColumnName.Quality", String.class, false, Subtitle::getQuality),
     RELEASEGROUP("SubtitleTableColumnName.Releasegroup", String.class, false, Subtitle::getReleaseGroup);
 
-
     @val @override String columnName;
     @val @override Class<?> clazz;
     @val @override boolean editable;
     @val Function<Subtitle, Object> valueFunction;
 
     SubtitleTableColumnName(String columnNameCode, Class<?> clazz, boolean editable,
-            Function<Subtitle, Object> valueFunction) {
+        Function<Subtitle, Object> valueFunction) {
         this.columnName = Messages.getText(columnNameCode);
         this.clazz = clazz;
         this.editable = editable;
@@ -34,10 +33,8 @@ public enum SubtitleTableColumnName implements CustomColumnName {
     }
 
     public static SubtitleTableColumnName forColumnName(String columnName) {
-        return SubtitleTableColumnName.values().stream()
-                .filter(stcn -> stcn.columnName.equals(columnName))
-                .findAny()
-                .orElseThrow();
+        return SubtitleTableColumnName.values().stream().filter(stcn -> stcn.columnName.equals(columnName)).findAny()
+            .orElseThrow();
     }
 
     public Object getValue(Subtitle subtitle) {
