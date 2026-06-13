@@ -28,13 +28,10 @@ import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.gui.Menu;
 import org.lodder.subtools.multisubdownloader.gui.action.search.FileGuiSearchAction;
 import org.lodder.subtools.multisubdownloader.gui.action.search.TextGuiSearchAction;
-import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog;
 import org.lodder.subtools.multisubdownloader.gui.dialog.PreferenceDialog;
 import org.lodder.subtools.multisubdownloader.gui.dialog.ProgressDialog;
 import org.lodder.subtools.multisubdownloader.gui.dialog.RenameDialog;
-import org.lodder.subtools.multisubdownloader.gui.dialog.progress.fileindexer.IndexingProgressDialog;
-import org.lodder.subtools.multisubdownloader.gui.dialog.progress.search.SearchProgressDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.gui.extra.PopupListener;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusLabel;
@@ -77,7 +74,6 @@ public class GUI extends JFrame implements PropertyChangeListener {
     private SearchPanel<SearchTextInputPanel> pnlSearchText;
     private SearchFileInputPanel pnlSearchFileInput;
     private Menu menuBar;
-    private IndexingProgressDialog fileIndexerProgressDialog;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GUI.class);
 
@@ -245,7 +241,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
         subtitleTable.setModel(VideoTableModel.getDefaultSubtitleTableModel());
         final RowSorter<TableModel> sorterSubtitle = new TableRowSorter<>(subtitleTable.getModel());
         subtitleTable.setRowSorter(sorterSubtitle);
-        subtitleTable.hideColumn(SearchColumnName.OBJECT);
+        subtitleTable.hideColumn(OBJECT);
         return subtitleTable;
     }
 
@@ -285,18 +281,18 @@ public class GUI extends JFrame implements PropertyChangeListener {
         customTable.setRowSorter(sorter);
         customTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        int columnId = customTable.getColumnIdByName(SearchColumnName.FOUND);
+        int columnId = customTable.getColumnIdByName(FOUND);
         customTable.getColumnModel().getColumn(columnId).setResizable(false);
         customTable.getColumnModel().getColumn(columnId).setPreferredWidth(100);
         customTable.getColumnModel().getColumn(columnId).setMaxWidth(100);
-        columnId = customTable.getColumnIdByName(SearchColumnName.SELECT);
+        columnId = customTable.getColumnIdByName(SELECT);
         customTable.getColumnModel().getColumn(columnId).setResizable(false);
         customTable.getColumnModel().getColumn(columnId).setPreferredWidth(85);
         customTable.getColumnModel().getColumn(columnId).setMaxWidth(85);
-        customTable.hideColumn(SearchColumnName.OBJECT);
-        customTable.hideColumn(SearchColumnName.SEASON);
-        customTable.hideColumn(SearchColumnName.EPISODE);
-        customTable.hideColumn(SearchColumnName.TITLE);
+        customTable.hideColumn(OBJECT);
+        customTable.hideColumn(SEASON);
+        customTable.hideColumn(EPISODE);
+        customTable.hideColumn(TITLE);
         return customTable;
     }
 
@@ -310,11 +306,10 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
         ScreenSettings screenSettings = SettingsControl.settings.screenSettings;
 
-        visibilityConsumer.accept(SearchColumnName.EPISODE, screenSettings.hideEpisode,
-            menuBar::withViewEpisodeSelected);
+        visibilityConsumer.accept(EPISODE, screenSettings.hideEpisode, menuBar::withViewEpisodeSelected);
         visibilityConsumer.accept(FILENAME, screenSettings.hideFilename, menuBar::withViewFileNameSelected);
-        visibilityConsumer.accept(SearchColumnName.SEASON, screenSettings.hideSeason, menuBar::withViewSeasonSelected);
-        visibilityConsumer.accept(SearchColumnName.TITLE, screenSettings.hideTitle, menuBar::withViewTitleSelected);
+        visibilityConsumer.accept(SEASON, screenSettings.hideSeason, menuBar::withViewSeasonSelected);
+        visibilityConsumer.accept(TITLE, screenSettings.hideTitle, menuBar::withViewTitleSelected);
     }
 
     private void initPopupMenu() {
@@ -388,11 +383,11 @@ public class GUI extends JFrame implements PropertyChangeListener {
             .selectDirectory(contentPane, getText("MainWindow.SelectFolder"))
             .ifPresent(folder -> {
                 CustomTable subtitleTable = pnlSearchText.resultPanel.getTable();
-                final VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
+                VideoTableModel model = (VideoTableModel) subtitleTable.getModel();
                 for (int i = 0; i < model.getRowCount(); i++) {
-                    if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SearchColumnName.SELECT))) {
-                        final Subtitle subtitle = (Subtitle) model.getValueAt(i,
-                            subtitleTable.getColumnIdByName(SearchColumnName.OBJECT));
+                    if ((Boolean) model.getValueAt(i, subtitleTable.getColumnIdByName(SELECT))) {
+                        Subtitle subtitle = (Subtitle) model.getValueAt(i,
+                            subtitleTable.getColumnIdByName(OBJECT));
                         Function<AtomicInteger, String> filenameSupplier = _ -> {
                             String filename = "";
                             if (!subtitle.fileName.endsWith(".srt")) {
@@ -437,8 +432,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 pnlSearchFile.resultPanel.enableButtons();
                 progressDialog.setVisible(false);
             } else {
-                final int progress = downloadWorker.getProgress();
-                progressDialog.updateProgress(progress);
+                progressDialog.updateProgress(downloadWorker.getProgress());
                 StatusMessenger.instance.message(getText("MainWindow.StatusDownload"));
             }
         } else if (event.getSource() instanceof RenameWorker renameWorker) {
@@ -446,8 +440,7 @@ public class GUI extends JFrame implements PropertyChangeListener {
                 pnlSearchFile.resultPanel.enableButtons();
                 progressDialog.setVisible(false);
             } else {
-                final int progress = renameWorker.getProgress();
-                progressDialog.updateProgress(progress);
+                progressDialog.updateProgress(renameWorker.getProgress());
                 StatusMessenger.instance.message(getText("MainWindow.StatusRename"));
             }
         }
@@ -462,46 +455,13 @@ public class GUI extends JFrame implements PropertyChangeListener {
 
     private void storeScreenSettings() {
         CustomTable customTable = pnlSearchFile.resultPanel.getTable();
-        SettingsControl.settings.screenSettings.hideEpisode = customTable.isHideColumn(SearchColumnName.EPISODE);
+        SettingsControl.settings.screenSettings.hideEpisode = customTable.isHideColumn(EPISODE);
         SettingsControl.settings.screenSettings.hideFilename = customTable.isHideColumn(FILENAME);
-        SettingsControl.settings.screenSettings.hideSeason = customTable.isHideColumn(SearchColumnName.SEASON);
-        SettingsControl.settings.screenSettings.hideTitle = customTable.isHideColumn(SearchColumnName.TITLE);
-    }
-
-    public ProgressDialog setProgressDialog(Cancelable worker) {
-        progressDialog = new ProgressDialog(this, worker);
-        return progressDialog;
-    }
-
-    public void showProgressDialog() {
-        this.progressDialog.setVisible(true);
-    }
-
-    public void hideProgressDialog() {
-        this.progressDialog.setVisible(false);
+        SettingsControl.settings.screenSettings.hideSeason = customTable.isHideColumn(SEASON);
+        SettingsControl.settings.screenSettings.hideTitle = customTable.isHideColumn(TITLE);
     }
 
     public void setStatusMessage(String message) {
         StatusMessenger.instance.message(message);
-    }
-
-    public void updateProgressDialog(int progress) {
-        progressDialog.updateProgress(progress);
-    }
-
-    public SearchProgressDialog createSearchProgressDialog(Cancelable searchAction) {
-        return new SearchProgressDialog(this, searchAction);
-    }
-
-    public IndexingProgressDialog createFileIndexerProgressDialog(Cancelable searchAction) {
-        fileIndexerProgressDialog = new IndexingProgressDialog(this, searchAction);
-        return fileIndexerProgressDialog;
-    }
-
-    public void hideFileIndexerProgressDialog() {
-        if (fileIndexerProgressDialog == null) {
-            return;
-        }
-        fileIndexerProgressDialog.setVisible(false);
     }
 }

@@ -11,6 +11,8 @@ import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerGUI;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
+import org.lodder.subtools.multisubdownloader.gui.dialog.progress.fileindexer.IndexingProgressDialog;
+import org.lodder.subtools.multisubdownloader.gui.dialog.progress.search.SearchProgressDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.table.VideoTableModel;
 import org.lodder.subtools.multisubdownloader.gui.panel.InputPanel;
 import org.lodder.subtools.multisubdownloader.gui.panel.SearchPanel;
@@ -46,8 +48,8 @@ public abstract sealed class GuiSearchAction<P extends InputPanel, R extends Rel
          * reset()-method might get implemented. But for now the GuiSearchAction will get a reference to
          * GUI and creates the listeners.
          */
-        this.indexingProgressListener = mainWindow.createFileIndexerProgressDialog(this);
-        this.searchProgressListener = mainWindow.createSearchProgressDialog(this);
+        this.indexingProgressListener = new IndexingProgressDialog(mainWindow, this);
+        this.searchProgressListener = new SearchProgressDialog(mainWindow, this);
         this.userInteractionHandler = new UserInteractionHandlerGUI(SettingsControl.settings, mainWindow);
     }
 
