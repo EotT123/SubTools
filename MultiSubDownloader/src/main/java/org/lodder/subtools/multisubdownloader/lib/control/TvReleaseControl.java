@@ -59,7 +59,6 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
                 TvdbEpisode::name));
         release.originalName =
             ifNotNullOrElseGet(tvdbAdapter.searchSerie(release.name, release.providerIds), TvdbSerie::getProviderName,
-                () -> ifNotNull(release.providerIds.get(IMDB),
-                    imdbId -> ifNotNull(imdbAdapter.getDetails(imdbId), ImdbDetails::title)));
+                () -> ifNotNull(release.providerIds.get(IMDB), imdbAdapter::getDetails, ImdbDetails::title));
     }
 }

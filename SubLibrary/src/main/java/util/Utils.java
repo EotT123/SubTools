@@ -75,14 +75,32 @@ public class Utils {
         return value != null ? mapper.apply(value) : null;
     }
 
+    public static <T, I1, R extends @Nullable Object, X extends Exception> @Nullable R ifNotNull(@Nullable T value,
+        ThrowingFunction<T, @Nullable I1, X> mapper1, ThrowingFunction<I1, R, X> mapper2) throws X {
+        return value != null ? ifNotNull(mapper1.apply(value), mapper2) : null;
+    }
+
     public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElse(@Nullable T value,
         ThrowingFunction<T, R, X> mapper, R orElseValue) throws X {
         return value != null ? mapper.apply(value) : orElseValue;
     }
 
+    public static <T, I1, R extends @Nullable Object, X extends Exception> R ifNotNullOrElse(
+        @Nullable T value, ThrowingFunction<T, @Nullable I1, X> mapper1, ThrowingFunction<I1, R, X> mapper2,
+        R orElseValue)
+        throws X {
+        return value != null ? ifNotNullOrElse(mapper1.apply(value), mapper2, orElseValue) : orElseValue;
+    }
+
     public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGet(@Nullable T value,
         ThrowingFunction<T, R, X> mapper, Supplier<R> orElseSupplier) throws X {
         return value != null ? mapper.apply(value) : orElseSupplier.get();
+    }
+
+    public static <T, I1, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseGet(
+        @Nullable T value, ThrowingFunction<T, @Nullable I1, X> mapper1, ThrowingFunction<I1, R, X> mapper2,
+        Supplier<R> orElseSupplier) throws X {
+        return value != null ? ifNotNullOrElseGet(mapper1.apply(value), mapper2, orElseSupplier) : orElseSupplier.get();
     }
 
     public static <T, R extends @Nullable Object, X extends Exception> R ifNotNullOrElseThrow(@Nullable T value,
