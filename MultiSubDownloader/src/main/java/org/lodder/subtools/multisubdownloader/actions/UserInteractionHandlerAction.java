@@ -1,10 +1,10 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.SubtitleComparator;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -41,7 +41,8 @@ public class UserInteractionHandlerAction {
     public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog, boolean dryRun) {
 
         // Sort subtitles by score
-        List<Subtitle> subs = release.matchingSubs.stream().sorted(new SubtitleComparator()).toList();
+        List<Subtitle> subs =
+            release.matchingSubs.stream().sorted(Comparator.comparingInt(Subtitle::getScore).reversed()).toList();
         if (dryRun) {
             if (!subs.isEmpty()) {
                 userInteractionHandler.dryRunOutput(release);
