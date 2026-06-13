@@ -25,7 +25,7 @@ class ReleaseParserTest {
     }
 
     @Test
-    void testListGetQualityKeyWords() throws Exception {
+    void testListGetQualityKeyWords() {
 
         String name = "Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv";
 
@@ -45,7 +45,7 @@ class ReleaseParserTest {
         class StartsWithSeasonEpisode {
 
             @Test
-            void StartsWithSeasonEpisode1() throws Exception {
+            void StartsWithSeasonEpisode1() {
                 String name = "S04E02 - White Collar - Most Wanted.mkv";
 
                 assertThat(ReleaseParser.parse(name))
@@ -61,7 +61,7 @@ class ReleaseParserTest {
             }
 
             @Test
-            void StartsWithSeasonEpisode2() throws Exception {
+            void StartsWithSeasonEpisode2() {
                 String name = "(S04E02) - White Collar - Most Wanted.mkv";
 
                 assertThat(ReleaseParser.parse(name))
@@ -77,7 +77,7 @@ class ReleaseParserTest {
             }
 
             @Test
-            void StartsWithSeasonEpisode3() throws Exception {
+            void StartsWithSeasonEpisode3() {
                 String name = "(S04E02) White Collar - Most Wanted.mkv";
 
                 assertThat(ReleaseParser.parse(name))
@@ -95,7 +95,7 @@ class ReleaseParserTest {
 
 
         @Test
-        void testTV1() throws Exception {
+        void testTV1() {
             String name = "Criminal.Minds.S10E12.720p.HDTV.X264-DIMENSION.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -111,7 +111,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testTV4() throws Exception {
+        void testTV4() {
             String name = "Spartacus.Gods.of.The.Arena.Pt.IV.720p.HDTV.X264-DIMENSION.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -127,7 +127,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testTV5() throws Exception {
+        void testTV5() {
             String name = "hawaii.five-0.2010.410.hdtv-lol.mp4";
 
             assertThat(ReleaseParser.parse(name))
@@ -143,7 +143,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testTV6() throws Exception {
+        void testTV6() {
             String name = "Greys.Anatomy.S10E01E02.720p.HDTV.X264-DIMENSION.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -159,7 +159,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testTV7() throws Exception {
+        void testTV7() {
             String name = "Greys.Anatomy.S10E01E02 Seal Our Fate 720p.HDTV.X264-DIMENSION.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -176,7 +176,7 @@ class ReleaseParserTest {
 
 
         @Test
-        void testTV8() throws Exception {
+        void testTV8() {
             String name = "(2-11) Joey and the High School Friend.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -192,7 +192,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testTV9() throws Exception {
+        void testTV9() {
             String name = "The.Boys.S04E05.Beware.the.jabberwock.my.son.1080p.web.dl.hevc.x265.rmteam.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -218,7 +218,7 @@ class ReleaseParserTest {
     class TestMovie {
 
         @Test
-        void testMovie1() throws Exception {
+        void testMovie1() {
             String name = "Back.to.the.Future.Part.II.1989.720p.BluRay.X264-AMIABLE.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -232,7 +232,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testMovie2() throws Exception {
+        void testMovie2() {
             String name = "Back.to.the.Future.Part.21.1989.720p.BluRay.X264-AMIABLE.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -246,7 +246,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testMovie3() throws Exception {
+        void testMovie3() {
             String name = "The.Equalizer.2014.720p.BluRay.x264-SPARKS.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -260,7 +260,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testMovie4() throws Exception {
+        void testMovie4() {
             String name = "The.Trip.to.Italy.2014.LIMITED.720p.BluRay.x264-GECKOS.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -274,7 +274,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testMovie5() throws Exception {
+        void testMovie5() {
             String name = "Final.Destination.5.720p.Bluray.x264-TWiZTED.mkv";
 
             assertThat(ReleaseParser.parse(name))
@@ -288,7 +288,7 @@ class ReleaseParserTest {
         }
 
         @Test
-        void testMovie6() throws Exception {
+        void testMovie6() {
             String name = "Final.Destination.5.2011.720p.Bluray.x264-TWiZTED.mkv";
 
             assertThat(ReleaseParser.parse(name))

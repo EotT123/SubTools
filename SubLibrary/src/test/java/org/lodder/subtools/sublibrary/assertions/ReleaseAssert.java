@@ -46,7 +46,7 @@ public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAsse
 
     public @Self ReleaseAssert<R> withoutReleaseGroup() {
         isNotNull();
-        assertThat(actual.releaseGroup).isEmpty();
+        assertThat(actual.releaseGroup).isNull();
         return this;
     }
 
@@ -58,7 +58,7 @@ public class ReleaseAssert<R extends Release> extends AbstractAssert<ReleaseAsse
 
     public @Self ReleaseAssert<R> withoutQuality() {
         isNotNull();
-        assertThat(actual.quality).isEmpty();
+        assertThat(actual.quality).isNull();
         return this;
     }
 }
