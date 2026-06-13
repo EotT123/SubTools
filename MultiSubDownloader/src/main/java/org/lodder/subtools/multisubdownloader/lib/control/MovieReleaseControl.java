@@ -26,7 +26,7 @@ public final class MovieReleaseControl extends ReleaseControl<MovieReleaseWithou
     }
 
     @Override
-    public MovieReleaseWithoutPath process(MovieReleaseWithoutPath release) throws ReleaseControlException {
+    public <R extends MovieReleaseWithoutPath> R process(R release) throws ReleaseControlException {
         if (StringUtils.isBlank(release.name)) {
             throw new ReleaseControlException("Unable to extract title, check file", release);
         }

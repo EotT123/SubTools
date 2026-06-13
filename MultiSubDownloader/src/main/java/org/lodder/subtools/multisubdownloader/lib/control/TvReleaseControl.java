@@ -25,7 +25,7 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
     }
 
     @Override
-    public TvReleaseWithoutPath process(TvReleaseWithoutPath release) throws ReleaseControlException {
+    public <R extends TvReleaseWithoutPath> R process(R release) throws ReleaseControlException {
         if (StringUtils.isBlank(release.name)) {
             throw new ReleaseControlException("Unable to extract episode details, check file", release);
         }
