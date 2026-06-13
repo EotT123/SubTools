@@ -50,7 +50,7 @@ public class CLI {
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(SettingsControl.settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
         downloadAction = new DownloadAction(userInteractionHandler);
-        this.folders = commandline.get(FOLDER, List::of, () -> List.copyOf(SettingsControl.settings.defaultFolders));
+        this.folders = commandline.map(FOLDER, List::of, () -> List.copyOf(SettingsControl.settings.defaultFolders));
         this.language = commandline.get(LANGUAGE, Language.ENGLISH);
         this.force = commandline.isEnabled(FORCE);
         this.downloadAll = commandline.isEnabled(DOWNLOAD_ALL);

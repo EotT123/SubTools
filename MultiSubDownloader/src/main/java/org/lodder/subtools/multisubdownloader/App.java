@@ -1,6 +1,5 @@
 package org.lodder.subtools.multisubdownloader;
 
-import static java.util.Objects.*;
 import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionEnable.*;
 import static org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionPath.*;
 import static util.Utils.*;
@@ -8,8 +7,9 @@ import static util.Utils.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
 
 import ch.qos.logback.classic.Level;
 import org.apache.commons.cli.CommandLineParser;
@@ -64,13 +64,13 @@ public class App {
             setLogLevel(Level.DEBUG);
         }
 
-        if (commandline.isEnabled(NO_GUI)) {
-            new Bootstrapper(new UserInteractionHandlerCLI(SettingsControl.settings));
+        try {
+            if (commandline.isEnabled(NO_GUI)) {
+                new Bootstrapper(new UserInteractionHandlerCLI(SettingsControl.settings));
 
-            /* Defined here so there is output on console */
-            importPreferences(commandline);
+                /* Defined here so there is output on console */
+                importPreferences(commandline);
 
-            try {
                 CLI cmd = new CLI(commandline);
                 if (commandline.isEnabled(HELP)) {
                     formatter.printHelp(ConfigProperties.getProperty(Property.NAME), "help", getCLIOptions(), "",
@@ -78,27 +78,27 @@ public class App {
                     return;
                 }
                 cmd.run();
-            } catch (IOException | CliException e) {
-                System.out.println("Error: " + e.getMessage());
-                return;
+            } else {
+                splash = new Splash(Messages.getText("App.Starting")).showSplash();
+                new Bootstrapper(new UserInteractionHandlerGUI(SettingsControl.settings, null));
+
+                /* Defined here so there is output in the splash */
+                importPreferences(commandline);
+
+                EventQueue.invokeLater(() -> {
+                    try {
+                        JFrame window = new GUI();
+                        window.setVisible(true);
+                        splash.setVisible(false);
+                        splash.dispose();
+                    } catch (Exception e) {
+                        LOGGER.error("", e);
+                    }
+                });
             }
-        } else {
-            splash = new Splash(Messages.getText("App.Starting")).showSplash();
-            new Bootstrapper(new UserInteractionHandlerGUI(SettingsControl.settings, null));
-
-            /* Defined here so there is output in the splash */
-            importPreferences(commandline);
-
-            EventQueue.invokeLater(() -> {
-                try {
-                    JFrame window = new GUI();
-                    window.setVisible(true);
-                    splash.setVisible(false);
-                    splash.dispose();
-                } catch (Exception e) {
-                    LOGGER.error("", e);
-                }
-            });
+        } catch (IOException | CliException e) {
+            System.out.println("Error: " + e.getMessage());
+            return;
         }
         new Thread(() -> {
             List<String> providerNames =
@@ -117,18 +117,16 @@ public class App {
         root.setLevel(level);
     }
 
-    private static void importPreferences(Commandline commandline) {
-        if (!commandline.contains(IMPORT_PREFERENCES)) {
-            return;
-        }
-        try {
-            Path file = requireNonNull(commandline.get(IMPORT_PREFERENCES));
+    private static void importPreferences(Commandline commandline) throws CliException {
+        commandline.execute(IMPORT_PREFERENCES, file -> {
             if (file.isRegularFile()) {
-                SettingsControl.importPreferences(file);
+                try {
+                    SettingsControl.importPreferences(file);
+                } catch (IOException | BackingStoreException | InvalidPreferencesFormatException e) {
+                    LOGGER.error("executeArgs: importPreferences", e);
+                }
             }
-        } catch (Exception e) {
-            LOGGER.error("executeArgs: importPreferences", e);
-        }
+        });
     }
 
     public static Options getCLIOptions() {

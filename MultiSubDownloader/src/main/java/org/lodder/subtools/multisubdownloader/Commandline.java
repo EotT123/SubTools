@@ -2,13 +2,14 @@ package org.lodder.subtools.multisubdownloader;
 
 import static util.Utils.*;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-import name.falgout.jeffrey.throwing.ThrowingSupplier;
 import org.apache.commons.cli.CommandLine;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOption;
 import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionEnable;
 import org.lodder.subtools.multisubdownloader.cli.CliOptions.CliOptionWithArgParam;
 import org.lodder.subtools.multisubdownloader.exception.CliException;
@@ -26,26 +27,17 @@ public class Commandline {
         return cliOption.containsValue(commandLine);
     }
 
-    public <T> @Nullable T get(CliOptionWithArgParam<T> cliOption) throws CliException {
-        return cliOption.getValue(commandLine);
+    @Contract("_,null->null; _,!null->!null")
+    public <T> @Nullable T get(CliOptionWithArgParam<T> cliOption, @Nullable T defaultValue=null) throws CliException {
+        return map(cliOption, v -> v, () -> defaultValue);
     }
 
-    public <T> T get(CliOptionWithArgParam<T> cliOption, T defaultValue) {
-        return get(cliOption, Function.identity(), () -> defaultValue);
+    public <T, R extends @Nullable Object> R map(CliOptionWithArgParam<T> cliOption, Function<T, R> mapper,
+        Supplier<R> defaultValueSupplier=() -> null) throws CliException {
+        return ifNotNullOrElseGet(cliOption.getValue(commandLine), mapper::apply, defaultValueSupplier);
     }
 
-    public <T, S, X extends Exception> S get(CliOptionWithArgParam<T> cliOption, Function<T, S> mapper,
-        ThrowingSupplier<S, X> defaultValue) throws X {
-        S value;
-        try {
-            value = mapper.apply(cliOption.getValue(commandLine));
-        } catch (CliException e) {
-            value = null;
-        }
-        return ifNullThenGet(value, defaultValue);
-    }
-
-    public boolean contains(CliOption cliOption) {
-        return cliOption.containsValue(commandLine);
+    public <T> void execute(CliOptionWithArgParam<T> cliOption, Consumer<T> consumer) throws CliException {
+        ifNotNullDo(cliOption.getValue(commandLine), consumer::accept);
     }
 }
