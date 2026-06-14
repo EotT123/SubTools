@@ -6,7 +6,6 @@ import static util.Utils.*;
 import com.tvdb.model.MovieBaseRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
-import org.lodder.subtools.sublibrary.data.omdb.OmdbAdapter;
 import org.lodder.subtools.sublibrary.exception.ReleaseControlException;
 import org.lodder.subtools.sublibrary.model.MovieReleaseWithoutPath;
 import org.lodder.subtools.sublibrary.model.VideoType;
@@ -16,13 +15,11 @@ import org.slf4j.LoggerFactory;
 
 @NullMarked
 public final class MovieReleaseControl extends ReleaseControl<MovieReleaseWithoutPath> {
-    private final OmdbAdapter omdbAdapter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieReleaseControl.class);
 
     public MovieReleaseControl(UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
-        this.omdbAdapter = OmdbAdapter.getInstance(userInteractionHandler);
     }
 
     @Override
