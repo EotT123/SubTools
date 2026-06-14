@@ -6,6 +6,7 @@ import java.util.Map;
 
 import manifold.ext.props.rt.api.var;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
 import org.lodder.subtools.sublibrary.Language;
@@ -15,19 +16,17 @@ public class LibrarySettings {
 
     @var String filenameStructure = "";
     @var String folderStructure = "";
-    @var Path folder;
+    @var @Nullable Path folder;
     @var boolean filenameReplaceSpace;
-    @var boolean folderReplaceSpace;
     @var boolean includeLanguageCode;
     @var boolean removeEmptyFolders;
     @var boolean useTvdbNaming;
     @var LibraryActionType action = LibraryActionType.NOTHING;
     @var LibraryOtherFileActionType otherFileAction = LibraryOtherFileActionType.NOTHING;
-    @var Character filenameReplacingSpaceChar;
-    @var Character folderReplacingSpaceChar;
-    @var boolean backupSubtitle;
+    @var @Nullable Character filenameReplacingSpaceChar;
+    @var @Nullable Character folderReplacingSpaceChar;
     @var boolean backupUseWebsiteFileName;
-    @var Path backupSubtitlePath;
+    @var @Nullable Path backupSubtitlePath;
     @var Map<Language, String> langCodeMap = new LinkedHashMap<>();
 
     public boolean hasLibraryAction(LibraryActionType libraryAction) {

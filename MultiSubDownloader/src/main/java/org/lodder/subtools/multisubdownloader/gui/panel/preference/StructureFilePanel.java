@@ -151,7 +151,6 @@ public class StructureFilePanel extends JPanel {
     private Function<String, FilenameLibraryBuilder> getLibraryStructureBuilder() {
         return structure -> new FilenameLibraryBuilder(
             structure:structure,
-            replaceSpace:chkReplaceSpace.isSelected(),
             replacingSpaceChar:cbxReplaceSpaceChar.getSelectedValue(),
             includeLanguageCode:chkIncludeLanguageCode.isSelected(),
             languageTags:languageMapping.toSettingsMap(),

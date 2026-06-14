@@ -107,7 +107,7 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         txtLibraryFolder.setObject(librarySettings.folder);
         txtFolderStructure.setText(librarySettings.folderStructure);
         chkRemoveEmptyFolder.setSelected(librarySettings.removeEmptyFolders);
-        chkReplaceSpace.setSelected(librarySettings.folderReplaceSpace);
+        chkReplaceSpace.setSelected(librarySettings.folderReplacingSpaceChar != null);
         cbxReplaceSpaceChar.setSelectedItem(librarySettings.folderReplacingSpaceChar);
     }
 
@@ -115,7 +115,6 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
         librarySettings.folder = txtLibraryFolder.getObject();
         librarySettings.folderStructure = txtFolderStructure.getText();
         librarySettings.removeEmptyFolders = chkRemoveEmptyFolder.isSelected();
-        librarySettings.folderReplaceSpace = chkReplaceSpace.isSelected();
         librarySettings.folderReplacingSpaceChar = cbxReplaceSpaceChar.getSelectedValue();
     }
 

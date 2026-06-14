@@ -98,7 +98,7 @@ public class DownloadAction {
                 }
             }
         }
-        if (librarySettings.backupSubtitle) {
+        if (librarySettings.backupSubtitlePath != null) {
             Path backupPath = librarySettings.backupSubtitlePath.resolve(subtitle.language.iso639_3);
 
             if (!backupPath.exists()) {

@@ -58,13 +58,12 @@ public class SubtitleBackupPanel extends JPanel implements PreferencePanelIntf {
     }
 
     public void loadPreferenceSettings() {
-        chkBackupSubtitle.setSelected(librarySettings.backupSubtitle);
+        chkBackupSubtitle.setSelected(librarySettings.backupSubtitlePath != null);
         txtBackupSubtitlePath.setObject(librarySettings.backupSubtitlePath);
         chkBackupUseSourceFileName.setSelected(librarySettings.backupUseWebsiteFileName);
     }
 
     public void savePreferenceSettings() {
-        librarySettings.backupSubtitle = chkBackupSubtitle.isSelected();
         librarySettings.backupSubtitlePath = txtBackupSubtitlePath.getObject();
         librarySettings.backupUseWebsiteFileName = chkBackupUseSourceFileName.isSelected();
     }
