@@ -14,7 +14,7 @@ public final class ReleaseGroupFilter extends SubtitleFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseGroupFilter.class);
 
     @Override
-    public boolean useSubtitle(Release release, Subtitle subtitle) {
+    public boolean include(Release release, Subtitle subtitle) {
         if (!Strings.CI.containsAny(subtitle.releaseGroup, release.releaseGroup, subtitle.releaseGroup)) {
             return false;
         }

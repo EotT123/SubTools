@@ -19,10 +19,10 @@ public final class ExactNameFilter extends SubtitleFilter {
     private final Map<String, Pattern> patterns = new LRUMap<>(10);
 
     @Override
-    public boolean useSubtitle(Release release, Subtitle subtitle) {
-        Pattern p = patterns.computeIfAbsent(getReleaseName(release), _ ->
-                Pattern.compile(getReleaseName(release).replace(" ", "[. ]"), Pattern.CASE_INSENSITIVE));
-        if (p.matcher(subtitle.fileName.toLowerCase().replace(".srt", "")).matches()) {
+    public boolean include(Release release, Subtitle subtitle) {
+        Pattern p = patterns.computeIfAbsent(release.fileNameOrName, _ ->
+            Pattern.compile(release.fileNameOrName.replace(" ", "[. ]"), Pattern.CASE_INSENSITIVE));
+        if (p.matcher(subtitle.fileName).find()) {
             LOGGER.debug("getSubtitlesFiltered: found EXACT match [{}] ", subtitle.fileName);
             subtitle.subtitleMatchType = SubtitleMatchType.EXACT;
             return true;

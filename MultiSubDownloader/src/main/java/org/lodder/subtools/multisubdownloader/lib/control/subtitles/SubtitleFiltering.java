@@ -12,9 +12,9 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 @NullMarked
 public class SubtitleFiltering {
 
-    private final SubtitleFilter exactName = new ExactNameFilter();
-    private final SubtitleFilter keyword = new KeywordFilter();
-    private final SubtitleFilter releaseGroup = new ReleaseGroupFilter();
+    private final SubtitleFilter exactNameFilter = new ExactNameFilter();
+    private final SubtitleFilter keywordFilter = new KeywordFilter();
+    private final SubtitleFilter releaseGroupFilter = new ReleaseGroupFilter();
 
     public boolean useSubtitle(Subtitle subtitle, Release release) {
         return !excludeSubtitle(subtitle, release);
@@ -32,10 +32,10 @@ public class SubtitleFiltering {
 
     private boolean excludeSubtitleKeywordMatch(Subtitle subtitle, Release release) {
         return SettingsControl.settings.optionSubtitleKeywordMatch &&
-               (keyword.excludeSubtitle(release, subtitle) || releaseGroup.excludeSubtitle(release, subtitle));
+            (keywordFilter.exclude(release, subtitle) || releaseGroupFilter.exclude(release, subtitle));
     }
 
     private boolean excludeSubtitleExactMatch(Subtitle subtitle, Release release) {
-        return SettingsControl.settings.optionSubtitleExactMatch && exactName.excludeSubtitle(release, subtitle);
+        return SettingsControl.settings.optionSubtitleExactMatch && exactNameFilter.exclude(release, subtitle);
     }
 }
