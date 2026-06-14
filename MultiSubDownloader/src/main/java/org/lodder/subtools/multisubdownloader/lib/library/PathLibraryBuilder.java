@@ -1,5 +1,7 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
+import static util.Utils.*;
+
 import java.nio.file.Path;
 
 import org.jspecify.annotations.NullMarked;
@@ -104,7 +106,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         String structure = this.structure;
 
         structure = replace(structure, MovieStructureTag.MOVIE_TITLE, movieRelease.name.removeIllegalWindowsChars());
-        structure = replace(structure, MovieStructureTag.YEAR, Integer.toString(movieRelease.year));
+        structure = replace(structure, MovieStructureTag.YEAR, ifNotNull(movieRelease.year, y -> Integer.toString(y)));
         structure = replace(structure, MovieStructureTag.QUALITY, movieRelease.quality);
         if (replaceSpace) {
             structure = structure.replace(' ', replacingSpaceChar);

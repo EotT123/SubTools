@@ -22,7 +22,7 @@ import org.lodder.subtools.sublibrary.model.SubtitleSource;
 @NullMarked
 public class Settings implements UserInteractionSettingsIntf {
 
-    @var Path lastOutputDir;
+    @var @Nullable Path lastOutputDir;
     @override @var boolean optionsAlwaysConfirm;
     @var boolean optionSubtitleExactMatch = true;
     @var boolean optionSubtitleKeywordMatch = true;

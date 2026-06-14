@@ -40,8 +40,8 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
             name);
     }
 
-    protected String replace(String structure, StructureTag tag, String value) {
-        return structure.replace(tag.label, value);
+    protected String replace(String structure, StructureTag tag, @Nullable String value) {
+        return structure.replace(tag.label, value != null ? value : "");
     }
 
     protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, Set<Integer> episodeNumbers,

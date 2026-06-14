@@ -38,7 +38,7 @@ public final class OpenSubAdapter
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.OPENSUBTITLES;
     @val @override boolean useSeasonForSerieId = false;
 
-    public OpenSubAdapter(Credentials credentials, UserInteractionHandler userInteractionHandler) {
+    public OpenSubAdapter(@Nullable Credentials credentials, UserInteractionHandler userInteractionHandler) {
         super(userInteractionHandler);
         api = new OpenSubtitlesApi(credentials);
     }
