@@ -90,7 +90,6 @@ public class StructureFolderPanel extends JPanel implements PreferencePanelIntf 
     private Function<String, PathLibraryBuilder> getLibraryStructureBuilder() {
         return structure -> new PathLibraryBuilder(
             structure:structure,
-            replaceSpace:chkReplaceSpace.isSelected(),
             replacingSpaceChar:cbxReplaceSpaceChar.getSelectedValue(),
             libraryFolder:txtLibraryFolder.getObject(),
             move:true);
