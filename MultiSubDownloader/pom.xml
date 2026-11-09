@@ -236,18 +236,18 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>gestdown</id>
+                        <id>subvault</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
                             <generatorName>java</generatorName>
-                            <inputSpec>${project.basedir}/src/main/resources/gestdown/gestdown-swagger.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/subvault/subvault-swagger.json</inputSpec>
                             <output>${project.build.directory}/generated-source/openapi</output>
-                            <modelPackage>org.gestdown.model</modelPackage>
-                            <apiPackage>org.gestdown.api</apiPackage>
-                            <invokerPackage>org.gestdown.invoker</invokerPackage>
-                            <packageName>org.gestdown</packageName>
+                            <modelPackage>org.subvault.model</modelPackage>
+                            <apiPackage>org.subvault.api</apiPackage>
+                            <invokerPackage>org.subvault.invoker</invokerPackage>
+                            <packageName>org.subvault</packageName>
                             <skipValidateSpec>true</skipValidateSpec>
                             <apisToGenerate>Subtitles,TvShows</apisToGenerate>
                             <!--                            <modelsToGenerate>AbstractOpenApiSchema,EpisodeDto,EpisodeWithSubtitlesDto,ErrorResponse,SearchRequest,ShowDto,ShowSearchResponse,SubtitleDto,SubtitleSearchResponse,TvShowSubtitleResponse,WrongFormatResponse</modelsToGenerate>-->

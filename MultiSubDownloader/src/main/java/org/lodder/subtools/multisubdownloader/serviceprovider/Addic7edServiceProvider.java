@@ -8,7 +8,7 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProvider;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.Addic7edAdapter;
-import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.gestdown.Addic7edProxyGestdownAdapter;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.subvault.Addic7edProxySubvaultAdapter;
 import org.lodder.subtools.sublibrary.Credentials;
 
 @NullMarked
@@ -29,7 +29,7 @@ public final class Addic7edServiceProvider implements ServiceProvider {
             }
 
             if (SettingsControl.settings.serieSourceAddic7edProxy) {
-                return new Addic7edProxyGestdownAdapter(userInteractionHandler);
+                return new Addic7edProxySubvaultAdapter(userInteractionHandler);
             } else {
                 return new Addic7edAdapter(credentials, userInteractionHandler);
             }

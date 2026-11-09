@@ -8,7 +8,7 @@ public enum SubtitleProviderFrontEnd {
     OPENSUBTITLES(SubtitleSource.OPENSUBTITLES),
     PODNAPISI(SubtitleSource.PODNAPISI),
     ADDIC7ED(SubtitleSource.ADDIC7ED),
-    ADDIC7ED_GESTDOWN(SubtitleSource.ADDIC7ED, "Addic7ed via Gestdown"),
+    ADDIC7ED_SUBVAULT(SubtitleSource.ADDIC7ED, "Addic7ed via Subvault"),
     TVSUBTITLES(SubtitleSource.TVSUBTITLES),
     LOCAL(SubtitleSource.LOCAL),
     SUBSCENE(SubtitleSource.SUBSCENE),

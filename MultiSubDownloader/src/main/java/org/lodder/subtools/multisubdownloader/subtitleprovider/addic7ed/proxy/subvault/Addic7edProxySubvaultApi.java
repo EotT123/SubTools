@@ -1,28 +1,19 @@
-package org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.gestdown;
+package org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.subvault;
 
 import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static util.Utils.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import extensions.java.lang.String.StringExt;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
-import org.gestdown.api.SubtitlesApi;
-import org.gestdown.api.TvShowsApi;
-import org.gestdown.invoker.ApiClient;
-import org.gestdown.model.EpisodeDto;
-import org.gestdown.model.ShowDto;
-import org.gestdown.model.ShowSearchResponse;
-import org.gestdown.model.SubtitleDto;
-import org.gestdown.model.SubtitleSearchResponse;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.exception.Addic7edApiException;
-import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.gestdown.model.Addic7edProxyGestdownSubtitle;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.subvault.model.Addic7edProxySubvaultSubtitle;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.connection.retrofit.ErrorResponse;
 import org.lodder.subtools.sublibrary.connection.retrofit.SuccessfulResponse;
@@ -31,21 +22,29 @@ import org.lodder.subtools.sublibrary.control.ReleaseParser.ReleaseParserExtraIn
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.subvault.api.SubtitlesApi;
+import org.subvault.api.TvShowsApi;
+import org.subvault.invoker.ApiClient;
+import org.subvault.model.EpisodeDto;
+import org.subvault.model.ShowDto;
+import org.subvault.model.ShowSearchResponse;
+import org.subvault.model.SubtitleDto;
+import org.subvault.model.SubtitleSearchResponse;
 
 /**
- * Provides access to Addic7ed subtitle data via the Gestdown proxy.
+ * Provides access to Addic7ed subtitle data via the Subvault proxy.
  * <p>
  * Note: Only supports TV series search; movie support is not available.
  */
-// see https://www.gestdown.info/Api
+// see https://www.subvault.info/Api
 @NullMarked
-public class Addic7edProxyGestdownApi implements SubtitleApi {
+public class Addic7edProxySubvaultApi implements SubtitleApi {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxyGestdownApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxySubvaultApi.class);
 
-    private static final String DOMAIN = "https://api.gestdown.info";
+    private static final String DOMAIN = "https://api.subvault.info";
 
-    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN;
+    @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_SUBVAULT;
     private static final TvShowsApi TV_SHOWS_API;
     private static final SubtitlesApi SUBTITLES_API;
 
@@ -83,14 +82,14 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
             });
     }
 
-    public List<Addic7edProxyGestdownSubtitle> getSubtitles(String providerId, int season, int episode,
+    public List<Addic7edProxySubvaultSubtitle> getSubtitles(String providerId, int season, int episode,
         Language language) throws Addic7edApiException {
 
         return getCache("subtitles", b -> b.add("providerId", providerId)
             .add("season", season).add("episode", episode).add("language", language))
             .get(() -> switch (
                 SUBTITLES_API.subtitlesGetShowUniqueIdSeasonEpisodeLanguageGet(language.iso639_3,
-                    UUID.fromString(providerId), season, episode).call()) {
+                    providerId, season, episode).call()) {
                 case SuccessfulResponse<SubtitleSearchResponse> response ->
                     Optional.ofNullable(response.body.matchingSubtitles)
                         .map(s -> s.stream().map(sub -> mapToSubtitle(sub, response.body.episode, language)).toList())
@@ -107,9 +106,9 @@ public class Addic7edProxyGestdownApi implements SubtitleApi {
     // ====== \\
 
 
-    private Addic7edProxyGestdownSubtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {
+    private Addic7edProxySubvaultSubtitle mapToSubtitle(SubtitleDto sub, EpisodeDto episodedto, Language language) {
         ReleaseParserExtraInfo extraInfoParser = ReleaseParser.parseExtraInfo(sub.getVersion());
-        return new Addic7edProxyGestdownSubtitle(
+        return new Addic7edProxySubvaultSubtitle(
             url:DOMAIN + sub.getDownloadUri(),
             fileName:StringExt.removeIllegalFilenameChars("${episodedto.show} - ${episodedto.title} - ${sub.version}"),
             language:language,

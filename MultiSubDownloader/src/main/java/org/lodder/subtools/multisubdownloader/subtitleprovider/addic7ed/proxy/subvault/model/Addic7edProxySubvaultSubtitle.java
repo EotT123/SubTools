@@ -1,4 +1,4 @@
-package org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.gestdown.model;
+package org.lodder.subtools.multisubdownloader.subtitleprovider.addic7ed.proxy.subvault.model;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,12 +16,12 @@ import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
 
 @NullMarked
-public class Addic7edProxyGestdownSubtitle extends Subtitle {
+public class Addic7edProxySubvaultSubtitle extends Subtitle {
 
     private final String url;
     @val @override SubtitleSource source = SubtitleSource.ADDIC7ED;
 
-    public Addic7edProxyGestdownSubtitle(String url,
+    public Addic7edProxySubvaultSubtitle(String url,
         String fileName,
         Language language,
         @Nullable String releaseGroup=null,

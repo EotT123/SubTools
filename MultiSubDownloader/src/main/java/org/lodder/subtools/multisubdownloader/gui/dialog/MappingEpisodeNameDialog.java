@@ -145,7 +145,7 @@ public class MappingEpisodeNameDialog extends MultiSubDialog {
         TVDB("TVDB", "TVDB", "EPISODEmapping"),
         IMDB("IMDB", "IMDB", "EPISODEmapping"),
         ADDIC7ED(SubtitleProviderFrontEnd.ADDIC7ED, "EPISODEmapping"),
-        ADDIC7ED_PROXY(SubtitleProviderFrontEnd.ADDIC7ED_GESTDOWN, "EPISODEmapping"),
+        ADDIC7ED_PROXY(SubtitleProviderFrontEnd.ADDIC7ED_SUBVAULT, "EPISODEmapping"),
         SUBSCENE(SubtitleProviderFrontEnd.SUBSCENE, "EPISODEmapping"),
         TV_SUBTITLES(SubtitleProviderFrontEnd.TVSUBTITLES, "EPISODEmapping"),
         OPEN_SUBTITLES(SubtitleProviderFrontEnd.OPENSUBTITLES, "EPISODEmapping"),
