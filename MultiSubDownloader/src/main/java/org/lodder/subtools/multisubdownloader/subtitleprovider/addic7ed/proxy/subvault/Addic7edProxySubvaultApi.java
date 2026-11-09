@@ -42,7 +42,7 @@ public class Addic7edProxySubvaultApi implements SubtitleApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Addic7edProxySubvaultApi.class);
 
-    private static final String DOMAIN = "https://api.subvault.info";
+    private static final String DOMAIN = "https://api.gestdown.info";
 
     @val @override SubtitleProviderFrontEnd subtitleProviderFrontEnd = SubtitleProviderFrontEnd.ADDIC7ED_SUBVAULT;
     private static final TvShowsApi TV_SHOWS_API;
