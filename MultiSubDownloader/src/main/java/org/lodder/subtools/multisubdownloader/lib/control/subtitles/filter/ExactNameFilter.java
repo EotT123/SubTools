@@ -20,8 +20,8 @@ public final class ExactNameFilter extends SubtitleFilter {
 
     @Override
     public boolean include(Release release, Subtitle subtitle) {
-        Pattern p = patterns.computeIfAbsent(release.fileNameOrName, _ ->
-            Pattern.compile(release.fileNameOrName.replace(" ", "[. ]"), Pattern.CASE_INSENSITIVE));
+        Pattern p = patterns.computeIfAbsent(release.fileNameWithoutExtensionOrName, _ ->
+            Pattern.compile(release.fileNameWithoutExtensionOrName.replace(" ", "[. ]"), Pattern.CASE_INSENSITIVE));
         if (p.matcher(subtitle.fileName).find()) {
             LOGGER.debug("getSubtitlesFiltered: found EXACT match [{}] ", subtitle.fileName);
             subtitle.subtitleMatchType = SubtitleMatchType.EXACT;
