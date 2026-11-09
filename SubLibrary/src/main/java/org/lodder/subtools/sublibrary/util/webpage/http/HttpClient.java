@@ -118,13 +118,13 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
         LOGGER.debug("doDownloadFile: URL [{}], file [{}]", url, file);
 
         try (InputStream rawIn = getInputStream(url, getCookieManager(cookieManager));
-             InputStream in = url.getFile().endsWith(".gz") ? new GZIPInputStream(rawIn) : rawIn;
+             InputStream in = url.getPath().endsWith(".gz") ? new GZIPInputStream(rawIn) : rawIn;
              BufferedInputStream bufferedIn = new BufferedInputStream(in)) {
             bufferedIn.mark(10); // for checking headers
             boolean isZip = PathExt.isZipFile(bufferedIn);
             bufferedIn.reset();
 
-            if (isZip || url.getFile().endsWith(".zip")) {
+            if (isZip || url.getPath().endsWith(".zip")) {
                 PathExt.unzip(bufferedIn, file, ".srt");
             } else {
                 // Buffer the data just once
