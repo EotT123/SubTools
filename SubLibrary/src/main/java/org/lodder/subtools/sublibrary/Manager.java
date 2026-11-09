@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import manifold.ext.props.rt.api.val;
 import manifold.science.measures.Time;
@@ -62,26 +61,13 @@ public class Manager {
         // Hide Utility Class Constructor
     }
 
-    public static void downloadAndExtractSubtitleFile(String downloadLink, Path file,
-        @Nullable ThrowingConsumer<String, IOException> validateFunction=null, @Nullable Integer index=null)
-        throws IOException {
+    public static void downloadAndExtractFile(String downloadLink, Path file,
+        @Nullable ThrowingConsumer<String, IOException> validateFunction=null) throws IOException {
         try {
             HTTP_CLIENT.downloadAndExtractFile(new URI(downloadLink).toURL(), file, validateFunction);
-            if (!Files.exists(file) && index != null) {
-                // Support season zips
-                try (Stream<Path> files = Files.list(file.getParent())) {
-                    files.filter(Files::isRegularFile)
-                        .filter(p -> p.getFileNameAsString().startsWith(file.getFileNameAsString()))
-                        .skip(index - 1).findFirst().ifPresentOrElseEx(p -> {
-                            if (Files.size(p) == 0) {
-                                throw new IOException("Downloaded subtitle is empty");
-                            }
-                            Files.createDirectories(file);
-                            Files.copy(p, file.resolve(
-                                p.getFileNameAsString() + (p.getFileNameAsString().endsWith(".srt") ? "" : ".srt")));
-                        }, () -> new IOException("Could not download subtitle"));
-                }
-            } else if (Files.exists(file) && Files.size(file) == 0) {
+            if (!Files.exists(file)) {
+                throw new IOException("Could not download subtitle");
+            } else if (Files.size(file) == 0) {
                 // file is empty, delete it
                 Files.delete(file);
                 throw new IOException("Downloaded subtitle is empty");
@@ -136,9 +122,9 @@ public class Manager {
         }
     }
 
-// ================ \\
-// GET PAGE CONTENT \\
-// ================ \\
+    // ================ \\
+    // GET PAGE CONTENT \\
+    // ================ \\
 
     public static Document getDocument(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {

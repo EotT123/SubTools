@@ -128,7 +128,6 @@ class SubtitleFilteringTest {
         ReleaseWithoutPath release = mock(TvReleaseWithoutPath.class);
 
         when(release.fileNameOrName).thenReturn(filename);
-        when(release.fileNameWithoutExtensionOrName).thenReturn(filename.substring(0, filename.lastIndexOf('.')));
         when(release.releaseGroup).thenReturn(releaseGroup);
 
         return release;
