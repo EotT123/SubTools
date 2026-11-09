@@ -24,16 +24,9 @@ public class ArrayExt {
      * @param action an action to perform on the elements
      */
     public static void forEach(@This Object array, Consumer<? super @Self(true) Object> action) {
-        int length = Array.getLength(array);
-        if (!array.getClass().getComponentType().isPrimitive()) {
-            Object[] a = (Object[]) array;
-            for (int i = 0; i < length; i++) {
-                action.accept(a[i]);
-            }
-        } else {
-            for (int i = 0; i < length; i++) {
-                action.accept(Array.get(array, i));
-            }
+        requireNonPrimitive(array);
+        for (Object o : (Object[]) array) {
+            action.accept(o);
         }
     }
 
@@ -62,5 +55,13 @@ public class ArrayExt {
             }
         }
         return -1;
+    }
+
+    private static void requireNonPrimitive(Object array) {
+        Class<?> componentType = array.getClass().getComponentType();
+        if (componentType.isPrimitive()) {
+            throw new IllegalArgumentException(
+                array + " has a primitive component type: " + array.getClass().getComponentType().getSimpleName());
+        }
     }
 }
