@@ -339,8 +339,8 @@ public class PathExt {
     }
 
     /*
-     * Determines if a byte array is compressed. The java.util.zip GZip
-     * implementation does not expose the GZip header, so it is difficult to
+     * Determines if a byte array is compressed. The java.util.zip Gzip
+     * implementation does not expose the Gzip header, so it is difficult to
      * determine if a string is compressed.
      *
      * @param bytes an array of bytes

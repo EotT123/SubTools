@@ -17,8 +17,8 @@ import org.lodder.subtools.multisubdownloader.actions.UserInteractionHandlerActi
 import org.lodder.subtools.multisubdownloader.cli.actions.CliSearchAction;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLIFileIndexerProgress;
 import org.lodder.subtools.multisubdownloader.cli.progress.CLISearchProgress;
-import org.lodder.subtools.multisubdownloader.exceptions.CliException;
-import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
+import org.lodder.subtools.multisubdownloader.exception.CliException;
+import org.lodder.subtools.multisubdownloader.exception.SearchSetupException;
 import org.lodder.subtools.multisubdownloader.lib.Info;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;
@@ -50,7 +50,7 @@ public class CLI {
         UserInteractionHandlerCLI userInteractionHandler = new UserInteractionHandlerCLI(SettingsControl.settings);
         userInteractionHandlerAction = new UserInteractionHandlerAction(userInteractionHandler);
         downloadAction = new DownloadAction(userInteractionHandler);
-        this.folders = commandline.get(FOLDER, List::of, () -> List.copyOf(SettingsControl.settings.defaultFolders));
+        this.folders = commandline.map(FOLDER, List::of, () -> List.copyOf(SettingsControl.settings.defaultFolders));
         this.language = commandline.get(LANGUAGE, Language.ENGLISH);
         this.force = commandline.isEnabled(FORCE);
         this.downloadAll = commandline.isEnabled(DOWNLOAD_ALL);

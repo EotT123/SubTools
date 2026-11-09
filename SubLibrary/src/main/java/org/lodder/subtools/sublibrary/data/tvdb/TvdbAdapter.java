@@ -67,7 +67,7 @@ public class TvdbAdapter implements AdapterIntf {
             return cache.get();
         }
 
-        TvdbSerie tvdbSerie = providerIds.get(IMDB, (String imdbId) -> {
+        TvdbSerie tvdbSerie = providerIds.get(IMDB, imdbId -> {
             try {
                 return new TvdbSerie(serieName, api.searchSerieWithRemoteId(imdbId));
             } catch (TvdbException e) {

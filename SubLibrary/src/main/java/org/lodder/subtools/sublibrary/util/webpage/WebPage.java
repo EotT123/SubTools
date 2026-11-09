@@ -1,5 +1,6 @@
 package org.lodder.subtools.sublibrary.util.webpage;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -89,8 +90,8 @@ public class WebPage {
     }
 
     public static void openUrlInBrowser(String url) {
-        if (java.awt.Desktop.isDesktopSupported()) {
-            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
             try {
                 desktop.browse(new URI(url));
             } catch (IOException | URISyntaxException e) {

@@ -19,35 +19,31 @@ public class ProgressDialog extends MultiSubDialog implements Messenger {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private JProgressBar progressBar;
-    private JLabel label;
+    private final JProgressBar progressBar;
+    private final JLabel label;
 
     public ProgressDialog(@Nullable JFrame frame=null, Cancelable sft) {
         super(frame, getText("ProgressDialog.Title"), false);
         StatusMessenger.instance.addListener(this);
-        initializeUi(sft);
-        if (frame != null) {
-            setDialogLocation(frame);
-        }
-        repaint();
-    }
 
-    private void initializeUi(Cancelable worker) {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                worker.cancel(true);
+                sft.cancel(true);
             }
         });
         setBounds(100, 100, 501, 151);
-
         contentPane
             .layout(new MigLayout("", "[][475px,center][]", "[][40px:n][][]"))
             .addComponent("cell 1 0 2 1,alignx left", label = new JLabel(""))
             .addComponent("cell 1 1,grow", progressBar = new JProgressBar(0, 100).indeterminate((true)))
             .addComponent("cell 1 2 1 2,alignx left", new JButton("Stop!")
-                .actionListener(_ -> worker.cancel(true))
+                .actionListener(_ -> sft.cancel(true))
             );
+        if (frame != null) {
+            setDialogLocation(frame);
+        }
+        repaint();
     }
 
     public void setMessage(String message) {

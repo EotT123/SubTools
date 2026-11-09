@@ -12,15 +12,15 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
+import org.lodder.subtools.multisubdownloader.exception.SearchSetupException;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
-import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
-import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
-import org.lodder.subtools.multisubdownloader.listeners.StatusListener;
+import org.lodder.subtools.multisubdownloader.listener.IndexingProgressListener;
+import org.lodder.subtools.multisubdownloader.listener.SearchProgressListener;
+import org.lodder.subtools.multisubdownloader.listener.StatusListener;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProviderStore;
-import org.lodder.subtools.multisubdownloader.workers.SearchHandler;
-import org.lodder.subtools.multisubdownloader.workers.SearchManager;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProviderStore;
+import org.lodder.subtools.multisubdownloader.worker.SearchHandler;
+import org.lodder.subtools.multisubdownloader.worker.SearchManager;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.util.lazy.LazySupplier;
@@ -35,9 +35,9 @@ public abstract class SearchAction<R extends Release> implements Runnable, Cance
     @get(Protected) @set(Private) @Nullable StatusListener statusListener;
     @get(Protected) @set(Private) @Nullable List<R> releases;
     @get(Protected) abstract Supplier<Language> language;
-    abstract @get(Protected) IndexingProgressListener indexingProgressListener;
-    abstract @get(Protected) UserInteractionHandler userInteractionHandler;
-    abstract @get(Protected) SearchProgressListener searchProgressListener;
+    @get(Protected) abstract IndexingProgressListener indexingProgressListener;
+    @get(Protected) abstract UserInteractionHandler userInteractionHandler;
+    @get(Protected) abstract SearchProgressListener searchProgressListener;
     private final LazySupplier<SearchManager> searchManagerLazy;
     @get(Protected) SearchManager searchManager; // Computed property
 

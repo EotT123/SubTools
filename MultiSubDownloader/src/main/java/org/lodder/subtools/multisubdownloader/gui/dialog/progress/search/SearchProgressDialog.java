@@ -14,8 +14,8 @@ import org.lodder.subtools.multisubdownloader.GUI;
 import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MultiSubDialog;
-import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
-import org.lodder.subtools.multisubdownloader.subtitleproviders.SubtitleProvider;
+import org.lodder.subtools.multisubdownloader.listener.SearchProgressListener;
+import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleProvider;
 import org.lodder.subtools.sublibrary.model.Release;
 
 @NullMarked

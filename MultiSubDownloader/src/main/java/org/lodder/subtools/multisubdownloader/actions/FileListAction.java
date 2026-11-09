@@ -10,7 +10,7 @@ import extensions.java.nio.file.Path.PathExt;
 import manifold.ext.props.rt.api.set;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
+import org.lodder.subtools.multisubdownloader.listener.IndexingProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.control.VideoPatterns;

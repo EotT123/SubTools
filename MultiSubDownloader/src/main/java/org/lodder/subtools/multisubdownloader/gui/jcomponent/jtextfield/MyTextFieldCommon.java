@@ -35,7 +35,7 @@ public abstract sealed class MyTextFieldCommon<T extends @Nullable Object, R ext
     private final Function<T, String> toStringMapper;
     private final Function<String, T> toObjectMapper;
     private final @Nullable Consumer<T> valueChangedCallbackListener;
-    private List<BooleanConsumer> validityChangedCallbackListeners = new ArrayList<>();
+    private final List<BooleanConsumer> validityChangedCallbackListeners = new ArrayList<>();
 
     private final ObjectWrapper<T> valueWrapper = new ObjectWrapper<>();
     private final ObjectWrapper<Boolean> validWrapper = new ObjectWrapper<>();

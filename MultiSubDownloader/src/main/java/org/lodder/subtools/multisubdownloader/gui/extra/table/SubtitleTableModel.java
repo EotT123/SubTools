@@ -5,7 +5,6 @@ import static org.lodder.subtools.multisubdownloader.gui.extra.table.SubtitleTab
 import javax.swing.table.DefaultTableModel;
 import java.io.Serial;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -17,8 +16,7 @@ public class SubtitleTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
     private static final SubtitleTableColumnName[] COLUMNS =
-        Stream.of(SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED)
-            .toArray(SubtitleTableColumnName[]::new);
+        {SELECT, SCORE, FILENAME, RELEASEGROUP, QUALITY, SOURCE, UPLOADER, HEARINGIMPAIRED};
 
     public SubtitleTableModel(Object[][] data, String[] columnNames) {
         super(data, columnNames);

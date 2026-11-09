@@ -30,14 +30,8 @@ public class ImageListCellRenderer extends JLabel implements ListCellRenderer<Ob
     public Component getListCellRendererComponent(JList<?> jlist, Object value, int cellIndex,
             boolean selected, boolean cellHasFocus) {
         if (value instanceof JPanel component) {
-            if (selected) {
-                component.setBackground(jlist.getSelectionBackground());
-                component.setForeground(jlist.getSelectionForeground());
-            } else {
-                component.setBackground(jlist.getBackground());
-                component.setForeground(jlist.getForeground());
-            }
-
+            component.setBackground(selected ? jlist.getSelectionBackground() : jlist.getBackground());
+            component.setForeground(selected ? jlist.getSelectionForeground() : jlist.getBackground());
             return component;
         } else {
             // TODO - I get one String here when the JList is first rendered; proper way to deal with this?

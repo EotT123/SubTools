@@ -360,11 +360,12 @@ public class Manager {
             return new Value<V, Nothing>(_ -> null);
         }
 
-        public static <V> Value<V, Nothing> of(V value) {
+        public static <V extends @Nullable Object> Value<V, Nothing> of(V value) {
             return new Value<>(_ -> value);
         }
 
-        public static <V, X extends Exception> Value<V, X> of(ThrowingSupplier<V, X> supplier) {
+        public static <V extends @Nullable Object, X extends Exception> Value<V, X> of(
+            ThrowingSupplier<V, X> supplier) {
             return new Value<>(retry -> executeSupplier(supplier, retry));
         }
 

@@ -1,10 +1,10 @@
 package org.lodder.subtools.multisubdownloader.actions;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
-import org.lodder.subtools.multisubdownloader.lib.control.subtitles.sorting.SubtitleComparator;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.Subtitle;
@@ -26,23 +26,14 @@ public class UserInteractionHandlerAction {
     /**
      * @param release release
      * @param subtitleSelectionDialog subtitleSelectionDialog
-     * @return integer which subtitle is selected for downloading
-     */
-    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog) {
-        return this.subtitleSelection(release, subtitleSelectionDialog, false);
-    }
-
-    /**
-     * @param release release
-     * @param subtitleSelectionDialog subtitleSelectionDialog
      * @param dryRun dryRun
      * @return integer which subtitle is selected for downloading
      */
-    public List<Subtitle> subtitleSelection(Release release, final boolean subtitleSelectionDialog,
-        final boolean dryRun) {
+    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog, boolean dryRun=false) {
 
         // Sort subtitles by score
-        List<Subtitle> subs = release.matchingSubs.stream().sorted(new SubtitleComparator()).toList();
+        List<Subtitle> subs =
+            release.matchingSubs.stream().sorted(Comparator.comparingInt(Subtitle::getScore).reversed()).toList();
         if (dryRun) {
             if (!subs.isEmpty()) {
                 userInteractionHandler.dryRunOutput(release);
@@ -63,10 +54,10 @@ public class UserInteractionHandlerAction {
                     List<Subtitle> shortlist = userInteractionHandler.getAutomaticSelection(subs);
                     shortlist.forEach(release::addMatchingSub);
                     if (shortlist.isEmpty()) {
-                        // nothing match the minimum automatic selection value
+                        // nothing matches the minimum automatic selection value
                         return List.of();
                     } else if (shortlist.size() == 1) {
-                        // automatic selection results in 1 result
+                        // automatic selection resulted in 1 result
                         return List.of(subs.first);
                     }
 

@@ -1,6 +1,7 @@
 package org.lodder.subtools.sublibrary.assertions;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.model.MovieRelease;
 import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.TvRelease;
@@ -20,7 +21,7 @@ public class SubLibraryAssertions {
         return new MovieReleaseAssert(actual);
     }
 
-    public static ReleaseAssert<?> assertThat(Release actual) {
+    public static ReleaseAssert<?> assertThat(@Nullable Release actual) {
         return new ReleaseAssert<>(actual);
     }
 }

@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 public class LazyObjectNullableThrow<T extends @Nullable Object, X extends Exception> {
 
     @val ThrowingSupplier<T, X> supplier;
-    private @Nullable T object;
+    private T object;
     @get @var(Private) volatile boolean initialized = false;
 
     public LazyObjectNullableThrow(ThrowingSupplier<T, X> supplier) {

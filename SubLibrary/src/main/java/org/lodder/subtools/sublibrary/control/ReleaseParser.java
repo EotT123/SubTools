@@ -360,7 +360,7 @@ public class ReleaseParser {
                 Matcher matcher = pattern.matcher(part);
                 if (matcher.find()) {
                     Map<String, Integer> namedGroupMap = matcher.namedGroups();
-                    namedGroupMap.entrySet().forEach(entry -> matches.put(entry.key, matcher.group(entry.value)));
+                    namedGroupMap.forEach((k, v) -> ifNotNullDo(matcher.group(v), val -> matches.put(k, val)));
                     String match = matcher.group();
                     if (removeMatchedParts) {
                         List<String> remainingParts = parts.stream()

@@ -38,8 +38,7 @@ public record HttpClient(CookieManager cookieManager=new CookieManager()) {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
     public String doGet(URL url, @Nullable String userAgent, @Nullable CookieManager cookieManager=null,
-        @Nullable String contentType)
-        throws IOException, HttpClientException {
+        @Nullable String contentType) throws IOException, HttpClientException {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();

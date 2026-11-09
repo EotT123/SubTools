@@ -17,11 +17,11 @@ import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandlerCLI;
 import org.lodder.subtools.multisubdownloader.actions.FileListAction;
 import org.lodder.subtools.multisubdownloader.actions.SearchAction;
-import org.lodder.subtools.multisubdownloader.exceptions.SearchSetupException;
+import org.lodder.subtools.multisubdownloader.exception.SearchSetupException;
 import org.lodder.subtools.multisubdownloader.lib.ReleaseFactory;
 import org.lodder.subtools.multisubdownloader.lib.control.subtitles.SubtitleFiltering;
-import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
-import org.lodder.subtools.multisubdownloader.listeners.SearchProgressListener;
+import org.lodder.subtools.multisubdownloader.listener.IndexingProgressListener;
+import org.lodder.subtools.multisubdownloader.listener.SearchProgressListener;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
@@ -71,8 +71,7 @@ public class CliSearchAction extends SearchAction<ReleaseWithPath> {
         fileListAction.indexingProgressListener = this.indexingProgressListener;
 
         List<Path> files = this.folders.stream()
-            .flatMap(folder -> fileListAction.getFileListing(folder, recursive, language.get(), overwriteSubtitles)
-                .stream())
+            .flatMap(f -> fileListAction.getFileListing(f, recursive, language.get(), overwriteSubtitles).stream())
             .toList();
 
         /* fix: remove carriage return from progressbar */

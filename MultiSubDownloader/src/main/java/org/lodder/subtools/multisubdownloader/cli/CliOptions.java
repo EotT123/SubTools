@@ -15,7 +15,7 @@ import org.apache.commons.cli.Option;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.Messages;
-import org.lodder.subtools.multisubdownloader.exceptions.CliException;
+import org.lodder.subtools.multisubdownloader.exception.CliException;
 import org.lodder.subtools.sublibrary.Language;
 
 @NullMarked

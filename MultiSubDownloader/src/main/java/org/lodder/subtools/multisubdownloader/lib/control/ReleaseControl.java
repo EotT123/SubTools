@@ -25,5 +25,5 @@ public abstract sealed class ReleaseControl<T extends ReleaseWithoutPath>
         this.omdbAdapter = OmdbAdapter.getInstance(userInteractionHandler);
     }
 
-    public abstract T process(T release) throws ReleaseControlException;
+    public abstract <R extends T> R process(R release) throws ReleaseControlException;
 }

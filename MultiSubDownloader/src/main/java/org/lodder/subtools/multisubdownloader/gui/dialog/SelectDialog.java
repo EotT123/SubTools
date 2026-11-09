@@ -29,7 +29,7 @@ public class SelectDialog extends MultiSubDialog {
     private final List<Subtitle> subtitles;
     private final CustomTable customTable;
 
-    private List<Integer> selectedSubtitleIdxs;
+    private int[] selectedSubtitleIdxs;
 
     /**
      * Create the dialog.
@@ -54,13 +54,13 @@ public class SelectDialog extends MultiSubDialog {
                     .actionCommand(getText("App.OK")))
                 .addComponent(new JButton(getText("SelectDialog.Everything"))
                     .actionListener(() -> {
-                        selectedSubtitleIdxs = IntStream.range(0, release.matchingSubCount).boxed().toList();
+                        selectedSubtitleIdxs = IntStream.range(0, release.matchingSubCount).toArray();
                         setVisible(false);
                     })
                     .actionCommand(getText("App.All")))
                 .addComponent(new JButton(getText("App.Cancel"))
                     .actionListener(() -> {
-                        selectedSubtitleIdxs = List.of();
+                        selectedSubtitleIdxs = new int[]{};
                         setVisible(false);
                     })
                     .actionCommand(getText("App.Cancel"))));
@@ -96,15 +96,14 @@ public class SelectDialog extends MultiSubDialog {
         return table;
     }
 
-    private List<Integer> getSelectedIdxs() {
+    private int[] getSelectedIdxs() {
         return IntStream.range(0, customTable.getModel().getRowCount())
             .filter(i -> (boolean) customTable.getModel()
                 .getValueAt(i, customTable.getColumnIdByName(SubtitleTableColumnName.SELECT)))
-            .boxed()
-            .toList();
+            .toArray();
     }
 
-    public List<Integer> getSelection() {
+    public int[] getSelection() {
         return selectedSubtitleIdxs;
     }
 }

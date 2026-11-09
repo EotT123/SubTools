@@ -8,7 +8,7 @@ import org.lodder.subtools.multisubdownloader.actions.ActionException;
 import org.lodder.subtools.multisubdownloader.gui.dialog.Cancelable;
 import org.lodder.subtools.multisubdownloader.gui.dialog.ProgressDialog;
 import org.lodder.subtools.multisubdownloader.gui.extra.progress.StatusMessenger;
-import org.lodder.subtools.multisubdownloader.listeners.IndexingProgressListener;
+import org.lodder.subtools.multisubdownloader.listener.IndexingProgressListener;
 
 @NullMarked
 public class IndexingProgressDialog extends ProgressDialog implements IndexingProgressListener {

@@ -23,35 +23,29 @@ public record ReleaseFactory() {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseFactory.class);
 
-    public @Nullable ReleaseWithPath createRelease(Path file,
-        UserInteractionHandler userInteractionHandler, boolean validate=true) {
+    public @Nullable ReleaseWithPath createRelease(Path file, UserInteractionHandler userInteractionHandler) {
         try {
-            ReleaseWithPath release = ReleaseParser.parse(file);
-            if (validate && release != null) {
-                switch (release) {
-                    case TvReleaseWithPath tvRelease -> new TvReleaseControl(userInteractionHandler).process(tvRelease);
-                    case MovieReleaseWithPath movieRelease ->
-                        new MovieReleaseControl(userInteractionHandler).process(movieRelease);
-                }
-            }
-            return release;
+            return switch (ReleaseParser.parse(file)) {
+                case TvReleaseWithPath r -> new TvReleaseControl(userInteractionHandler).process(r);
+                case MovieReleaseWithPath r -> new MovieReleaseControl(userInteractionHandler).process(r);
+                case null -> null;
+            };
         } catch (ReleaseControlException e) {
             LOGGER.error("Failed to create a release for $file: " + e.getMessage(), e);
             return null;
         }
     }
 
-    public @Nullable ReleaseWithoutPath createRelease(String name,
-        UserInteractionHandler userInteractionHandler, boolean validate=true) {
+    public @Nullable ReleaseWithoutPath createRelease(String name, UserInteractionHandler userInteractionHandler,
+        boolean process=true) {
         try {
             ReleaseWithoutPath release = ReleaseParser.parse(name);
-            if (validate && release != null) {
-                switch (release) {
-                    case TvReleaseWithoutPath tvRelease ->
-                        new TvReleaseControl(userInteractionHandler).process(tvRelease);
-                    case MovieReleaseWithoutPath movieRelease ->
-                        new MovieReleaseControl(userInteractionHandler).process(movieRelease);
-                }
+            if (process) {
+                return switch (release) {
+                    case TvReleaseWithoutPath r -> new TvReleaseControl(userInteractionHandler).process(r);
+                    case MovieReleaseWithoutPath r -> new MovieReleaseControl(userInteractionHandler).process(r);
+                    case null -> null;
+                };
             }
             return release;
         } catch (ReleaseControlException e) {

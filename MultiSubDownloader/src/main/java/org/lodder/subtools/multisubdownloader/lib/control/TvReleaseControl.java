@@ -25,7 +25,7 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
     }
 
     @Override
-    public TvReleaseWithoutPath process(TvReleaseWithoutPath release) throws ReleaseControlException {
+    public <R extends TvReleaseWithoutPath> R process(R release) throws ReleaseControlException {
         if (StringUtils.isBlank(release.name)) {
             throw new ReleaseControlException("Unable to extract episode details, check file", release);
         }
@@ -59,7 +59,6 @@ public final class TvReleaseControl extends ReleaseControl<TvReleaseWithoutPath>
                 TvdbEpisode::name));
         release.originalName =
             ifNotNullOrElseGet(tvdbAdapter.searchSerie(release.name, release.providerIds), TvdbSerie::getProviderName,
-                () -> ifNotNull(release.providerIds.get(IMDB),
-                    imdbId -> ifNotNull(imdbAdapter.getDetails(imdbId), ImdbDetails::title)));
+                () -> ifNotNull(release.providerIds.get(IMDB), imdbAdapter::getDetails, ImdbDetails::title));
     }
 }

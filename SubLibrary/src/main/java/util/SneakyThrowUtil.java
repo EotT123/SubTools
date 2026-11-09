@@ -30,31 +30,29 @@ public final class SneakyThrowUtil {
         return t -> {
             try {
                 return function.apply(t);
-            } catch (final Exception ex) {
+            } catch (Exception ex) {
                 return sneakyThrow(ex);
             }
         };
     }
 
     public static <T extends @Nullable Object, E extends Exception> ToIntFunction<T> sneaky(
-        ThrowingToIntFunction<? super T, E> function)
-        throws E {
+        ThrowingToIntFunction<? super T, E> function) throws E {
         return t -> {
             try {
                 return function.applyAsInt(t);
-            } catch (final Exception ex) {
+            } catch (Exception ex) {
                 return sneakyThrow(ex);
             }
         };
     }
 
     public static <T extends @Nullable Object, E extends Exception> ToLongFunction<T> sneaky(
-        ThrowingToLongFunction<? super T, E> function)
-        throws E {
+        ThrowingToLongFunction<? super T, E> function) throws E {
         return t -> {
             try {
                 return function.applyAsLong(t);
-            } catch (final Exception ex) {
+            } catch (Exception ex) {
                 return sneakyThrow(ex);
             }
         };
@@ -65,7 +63,7 @@ public final class SneakyThrowUtil {
         return t -> {
             try {
                 return function.applyAsDouble(t);
-            } catch (final Exception ex) {
+            } catch (Exception ex) {
                 return sneakyThrow(ex);
             }
         };
@@ -76,7 +74,7 @@ public final class SneakyThrowUtil {
         return t -> {
             try {
                 function.accept(t);
-            } catch (final Exception ex) {
+            } catch (Exception ex) {
                 sneakyThrow(ex);
             }
         };
@@ -87,7 +85,7 @@ public final class SneakyThrowUtil {
         return t -> {
             try {
                 return function.test(t);
-            } catch (final Exception ex) {
+            } catch (Exception ex) {
                 return sneakyThrow(ex);
             }
         };

@@ -17,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import io.gsonfire.GsonFireBuilder;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.UserInteractionHandler;
 import org.lodder.subtools.multisubdownloader.gui.dialog.MappingEpisodeNameDialog.MappingType;
 import org.lodder.subtools.multisubdownloader.settings.SettingsControl;
@@ -137,7 +138,7 @@ public class ExportImport {
 
         public static void exportSettings(Path path) throws IOException {
             List<SerieMappingWithKey> serieMappingsWithKey = MappingType.values().stream()
-                .map(mappingType -> mappingType.getValues()).flatMap(List::stream)
+                .flatMap(mappingType -> mappingType.getValues().stream())
                 .map(pair -> new SerieMappingWithKey(pair.getKey(), pair.getValue()))
                 .toList();
             Files.writeString(path, new GsonBuilder().setPrettyPrinting().create().toJson(serieMappingsWithKey));
@@ -172,7 +173,7 @@ public class ExportImport {
         }
 
         @NullMarked
-        private record SerieMappingWithKey(ProviderCacheKey key, SerieMapping serieMapping) {
+        private record SerieMappingWithKey(ProviderCacheKey key, @Nullable SerieMapping serieMapping) {
         }
     }
 

@@ -1,0 +1,56 @@
+package org.lodder.subtools.multisubdownloader.subtitleprovider;
+
+import java.util.Set;
+
+import manifold.ext.props.rt.api.val;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.lodder.subtools.sublibrary.Language;
+import org.lodder.subtools.sublibrary.Manager;
+import org.lodder.subtools.sublibrary.cache.CacheType;
+import org.lodder.subtools.sublibrary.model.MovieRelease;
+import org.lodder.subtools.sublibrary.model.Release;
+import org.lodder.subtools.sublibrary.model.Subtitle;
+import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
+import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.TvRelease;
+import org.lodder.subtools.sublibrary.settings.model.SerieMapping;
+import org.slf4j.LoggerFactory;
+
+@NullMarked
+public interface SubtitleProvider<SUB extends Subtitle> {
+
+    @val SubtitleProviderFrontEnd subtitleProviderFrontEnd;
+    @val SubtitleSource source = subtitleProviderFrontEnd.subtitleSource;
+    @val String provider = subtitleProviderFrontEnd.name;
+
+    Set<SUB> searchSubtitles(TvRelease tvRelease, Language language);
+
+    Set<SUB> searchSubtitles(MovieRelease movieRelease, Language language);
+
+    /**
+     * Starts a search for subtitles
+     *
+     * @param release The release being searched for
+     * @param language The language of the desired subtitles
+     * @return The found subtitles
+     */
+    default Set<SUB> search(Release release, Language language) {
+        try {
+            return switch (release) {
+                case MovieRelease movieRelease -> this.searchSubtitles(movieRelease, language);
+                case TvRelease tvRelease -> this.searchSubtitles(tvRelease, language);
+            };
+        } catch (Exception e) {
+            LoggerFactory.getLogger(SubtitleProvider.class)
+                .error("Error in %s API: %s".formatted(provider, e.getMessage()), e);
+        }
+        return Set.of();
+    }
+
+    default void clearCache() {
+        Manager.getCache(CacheType.DISK, k -> k.provider.equals(provider)).clearExpiredCache();
+    }
+
+    <X extends Exception> @Nullable SerieMapping getProviderSerieMapping(TvRelease tvRelease) throws X;
+}

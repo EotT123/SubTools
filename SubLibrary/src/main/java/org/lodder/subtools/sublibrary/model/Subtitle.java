@@ -42,7 +42,7 @@ public abstract class Subtitle implements Serializable {
         this.releaseGroup = releaseGroup;
         this.uploader = uploader;
         this.hearingImpaired = hearingImpaired;
-        this.quality = ifNullThenGet(quality, () -> ifNotNullOrElse(fileName, ReleaseParser::getQualityKeyword, ""));
+        this.quality = quality != null ? quality : ifNotNullOrElse(fileName, ReleaseParser::getQualityKeyword, "");
     }
 
     public abstract List<Path> download(Path destinationFolder,

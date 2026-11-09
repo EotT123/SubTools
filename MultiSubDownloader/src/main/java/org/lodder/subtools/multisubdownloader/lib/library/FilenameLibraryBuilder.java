@@ -24,18 +24,16 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 public final class FilenameLibraryBuilder extends LibraryBuilder {
 
     private final String structure;
-    private final boolean replaceSpace;
-    private final Character replacingSpaceChar;
+    private final @Nullable Character replacingSpaceChar;
     private final boolean includeLanguageCode;
     private final Map<Language, String> languageTags;
     private final boolean rename;
 
-    public FilenameLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
+    public FilenameLibraryBuilder(String structure, @Nullable Character replacingSpaceChar,
         boolean includeLanguageCode, Map<Language, String> languageTags, @Nullable TvdbAdapter tvdbAdapter=null,
         boolean rename) {
         super(tvdbAdapter);
         this.structure = structure;
-        this.replaceSpace = replaceSpace;
         this.replacingSpaceChar = replacingSpaceChar;
         this.includeLanguageCode = includeLanguageCode;
         this.languageTags = languageTags;
@@ -46,7 +44,6 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         UserInteractionHandler userInteractionHandler) {
         return new FilenameLibraryBuilder(
             structure:libSettings.folderStructure,
-            replaceSpace:libSettings.folderReplaceSpace,
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
             includeLanguageCode:libSettings.includeLanguageCode,
             languageTags:libSettings.langCodeMap,
@@ -102,7 +99,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
 
         filename += "." + StringUtils.substringAfterLast(tvRelease.fileNameOrName, ".");
         filename = filename.removeIllegalWindowsChars();
-        if (replaceSpace) {
+        if (replacingSpaceChar != null) {
             filename = filename.replace(' ', replacingSpaceChar);
         }
         return filename;
@@ -119,7 +116,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
         filename += "." + StringUtils.substringAfterLast(movieRelease.fileNameOrName, ".");
 
         filename = filename.removeIllegalWindowsChars();
-        if (replaceSpace) {
+        if (replacingSpaceChar != null) {
             filename = filename.replace(' ', replacingSpaceChar);
         }
         return filename;
@@ -145,7 +142,7 @@ public final class FilenameLibraryBuilder extends LibraryBuilder {
             subFileName = changeExtension(subFileName, ".srt");
         }
         subFileName = subFileName.removeIllegalWindowsChars();
-        if (replaceSpace) {
+        if (replacingSpaceChar != null) {
             subFileName = subFileName.replace(' ', replacingSpaceChar);
         }
         return subFileName;

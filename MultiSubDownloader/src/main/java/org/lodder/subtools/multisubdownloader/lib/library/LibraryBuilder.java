@@ -36,12 +36,12 @@ public abstract sealed class LibraryBuilder permits FilenameLibraryBuilder, Path
     public abstract String buildPathStructure(Release release);
 
     protected String getShowName(String name) {
-        return tvdbAdapter == null ? name :
-            ifNotNullOrElse(tvdbAdapter.searchSerie(name, new ProviderIds()), TvdbSerie::getProviderName, name);
+        return ifNotNullOrElse(tvdbAdapter, a -> a.searchSerie(name, new ProviderIds()), TvdbSerie::getProviderName,
+            name);
     }
 
-    protected String replace(String structure, StructureTag tag, String value) {
-        return structure.replace(tag.label, value);
+    protected String replace(String structure, StructureTag tag, @Nullable String value) {
+        return structure.replace(tag.label, value != null ? value : "");
     }
 
     protected String replaceFormattedEpisodeNumber(String structure, StructureTag tag, Set<Integer> episodeNumbers,

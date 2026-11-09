@@ -1,5 +1,8 @@
 package org.lodder.subtools.multisubdownloader.lib.library;
 
+import static java.util.Objects.*;
+import static util.Utils.*;
+
 import java.nio.file.Path;
 
 import org.jspecify.annotations.NullMarked;
@@ -21,16 +24,14 @@ import org.lodder.subtools.sublibrary.userinteraction.UserInteractionHandler;
 public final class PathLibraryBuilder extends LibraryBuilder {
 
     private final String structure;
-    private final boolean replaceSpace;
-    private final Character replacingSpaceChar;
-    private final Path libraryFolder;
+    private final @Nullable Character replacingSpaceChar;
+    private final @Nullable Path libraryFolder;
     private final boolean move;
 
-    public PathLibraryBuilder(String structure, boolean replaceSpace, char replacingSpaceChar,
-        @Nullable TvdbAdapter tvdbAdapter=null, Path libraryFolder, boolean move) {
+    public PathLibraryBuilder(String structure, @Nullable Character replacingSpaceChar,
+        @Nullable TvdbAdapter tvdbAdapter=null, @Nullable Path libraryFolder, boolean move) {
         super(tvdbAdapter);
         this.structure = structure;
-        this.replaceSpace = replaceSpace;
         this.replacingSpaceChar = replacingSpaceChar;
         this.libraryFolder = libraryFolder;
         this.move = move;
@@ -40,7 +41,6 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         UserInteractionHandler userInteractionHandler) {
         return new PathLibraryBuilder(
             structure:libSettings.folderStructure,
-            replaceSpace:libSettings.folderReplaceSpace,
             replacingSpaceChar:libSettings.folderReplacingSpaceChar,
             tvdbAdapter:libSettings.useTvdbNaming ? TvdbAdapter.getInstance(userInteractionHandler) : null,
             libraryFolder:libSettings.folder,
@@ -60,7 +60,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
                 case TvReleaseWithPath tvRelease -> buildEpisodeFolderStructure(tvRelease);
                 case MovieReleaseWithPath movieRelease -> buildMovieFolderStructure(movieRelease);
             };
-            return libraryFolder.resolve(pathStructure.split(FolderStructureTag.SEPARATOR.label));
+            return requireNonNull(libraryFolder).resolve(pathStructure.split(FolderStructureTag.SEPARATOR.label));
         } else {
             return release.path.parent;
         }
@@ -94,7 +94,7 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         structure = replace(structure, SerieStructureTag.TITLE, tvRelease.title);
         structure = replace(structure, SerieStructureTag.QUALITY, tvRelease.quality);
         structure = replace(structure, SerieStructureTag.RELEASE_GROUP, tvRelease.releaseGroup);
-        if (replaceSpace) {
+        if (replacingSpaceChar != null) {
             structure = structure.replace(' ', replacingSpaceChar);
         }
         return structure.trim();
@@ -104,9 +104,9 @@ public final class PathLibraryBuilder extends LibraryBuilder {
         String structure = this.structure;
 
         structure = replace(structure, MovieStructureTag.MOVIE_TITLE, movieRelease.name.removeIllegalWindowsChars());
-        structure = replace(structure, MovieStructureTag.YEAR, Integer.toString(movieRelease.year));
+        structure = replace(structure, MovieStructureTag.YEAR, ifNotNull(movieRelease.year, y -> Integer.toString(y)));
         structure = replace(structure, MovieStructureTag.QUALITY, movieRelease.quality);
-        if (replaceSpace) {
+        if (replacingSpaceChar != null) {
             structure = structure.replace(' ', replacingSpaceChar);
         }
         return structure.trim();

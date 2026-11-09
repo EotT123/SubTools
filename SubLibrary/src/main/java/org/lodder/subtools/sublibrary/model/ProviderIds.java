@@ -22,6 +22,7 @@ public class ProviderIds {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> @Nullable T get(ProviderIdType<T> providerIdType) {
         return (T) providerIdMap.get(providerIdType);
     }

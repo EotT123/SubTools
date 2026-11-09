@@ -15,6 +15,7 @@ import com.google.common.base.Objects;
 import extensions.java.nio.file.Path.PathExt;
 import manifold.ext.props.rt.api.val;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.multisubdownloader.gui.extra.MemoryFolderChooser;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryActionType;
 import org.lodder.subtools.multisubdownloader.lib.library.LibraryOtherFileActionType;
@@ -167,11 +168,6 @@ public enum SettingValue {
         LibrarySettings::getBackupSubtitlePath,
         LibrarySettings::setBackupSubtitlePath,
         null)),
-    EPISODE_LIBRARY_BACKUP_SUBTITLE(createSetting(Mappers.BOOLEAN,
-        Settings::getEpisodeLibrarySettings,
-        LibrarySettings::isBackupSubtitle,
-        LibrarySettings::setBackupSubtitle,
-        false)),
     EPISODE_LIBRARY_BACKUP_USE_WEBSITE_FILE_NAME(createSetting(Mappers.BOOLEAN,
         Settings::getEpisodeLibrarySettings,
         LibrarySettings::isBackupUseWebsiteFileName,
@@ -222,11 +218,6 @@ public enum SettingValue {
         LibrarySettings::getFilenameReplacingSpaceChar,
         LibrarySettings::setFilenameReplacingSpaceChar,
         '_')),
-    EPISODE_LIBRARY_FOLDER_REPLACE_SPACE(createSetting(Mappers.BOOLEAN,
-        Settings::getEpisodeLibrarySettings,
-        LibrarySettings::isFolderReplaceSpace,
-        LibrarySettings::setFolderReplaceSpace,
-        false)),
     EPISODE_LIBRARY_FOLDER_REPLACING_SIGN(createSetting(Mappers.CHAR,
         Settings::getEpisodeLibrarySettings,
         LibrarySettings::getFolderReplacingSpaceChar,
@@ -247,12 +238,6 @@ public enum SettingValue {
         LibrarySettings::getBackupSubtitlePath,
         LibrarySettings::setBackupSubtitlePath,
         null)),
-
-    MOVIE_LIBRARY_BACKUP_SUBTITLE(createSetting(Mappers.BOOLEAN,
-        Settings::getMovieLibrarySettings,
-        LibrarySettings::isBackupSubtitle,
-        LibrarySettings::setBackupSubtitle,
-        false)),
 
     MOVIE_LIBRARY_BACKUP_USE_WEBSITE_FILE_NAME(createSetting(Mappers.BOOLEAN,
         Settings::getMovieLibrarySettings,
@@ -312,12 +297,6 @@ public enum SettingValue {
         LibrarySettings::getFilenameReplacingSpaceChar,
         LibrarySettings::setFilenameReplacingSpaceChar,
         '_')),
-
-    MOVIE_LIBRARY_FOLDER_REPLACE_SPACE(createSetting(Mappers.BOOLEAN,
-        Settings::getMovieLibrarySettings,
-        LibrarySettings::isFolderReplaceSpace,
-        LibrarySettings::setFolderReplaceSpace,
-        false)),
 
     MOVIE_LIBRARY_FOLDER_REPLACING_SIGN(createSetting(Mappers.CHAR,
         Settings::getMovieLibrarySettings,
@@ -435,7 +414,8 @@ public enum SettingValue {
     }
 
     @NullMarked
-    private record Mapper<T>(Function<T, String> toStringMapper, Function<String, T> toObjectMapper) {
+    private record Mapper<T extends @Nullable Object>(Function<T, String> toStringMapper,
+        Function<String, T> toObjectMapper) {
     }
 
     @NullMarked
@@ -448,7 +428,7 @@ public enum SettingValue {
         Mapper<PathOrRegex> PATH_OR_REGEX = new Mapper<>(PathOrRegex::getValue, PathOrRegex::new);
     }
 
-    private static <T> SettingTyped<Settings, T> createSetting(
+    private static <T extends @Nullable Object> SettingTyped<Settings, T> createSetting(
         Mapper<T> mapper,
         Function<Settings, T> valueGetter,
         BiConsumer<Settings, T> valueSetter,
@@ -457,7 +437,7 @@ public enum SettingValue {
         return createSetting(mapper, Function.identity(), valueGetter, valueSetter, defaultValue);
     }
 
-    private static <S, T> SettingTyped<S, T> createSetting(
+    private static <S, T extends @Nullable Object> SettingTyped<S, T> createSetting(
         Mapper<T> mapper,
         Function<Settings, S> rootElementFunction,
         Function<S, T> valueGetter,
@@ -482,7 +462,7 @@ public enum SettingValue {
         return new SettingTyped<>(mapper, rootElementFunction, collectionGetter);
     }
 
-    private static <T extends Enum<T>> SettingTyped<Settings, T> createSettingEnum(
+    private static <T extends @Nullable Enum<T>> SettingTyped<Settings, T> createSettingEnum(
         Function<Settings, T> valueGetter,
         BiConsumer<Settings, T> valueSetter,
         T defaultValue) {
@@ -490,7 +470,7 @@ public enum SettingValue {
         return createSettingEnum(Function.identity(), valueGetter, valueSetter, defaultValue);
     }
 
-    private static <S, T extends Enum<T>> SettingTyped<S, T> createSettingEnum(
+    private static <S, T extends @Nullable Enum<T>> SettingTyped<S, T> createSettingEnum(
         Function<Settings, S> rootElementFunction,
         Function<S, T> valueGetter,
         BiConsumer<S, T> valueSetter,
@@ -534,7 +514,7 @@ public enum SettingValue {
     }
 
     @NullMarked
-    private static class SettingTyped<S, T> extends SettingCommon {
+    private static class SettingTyped<S, T extends @Nullable Object> extends SettingCommon {
 
         // SINGLE VALUE
 

@@ -5,6 +5,7 @@ import java.util.Set;
 import manifold.ext.props.rt.api.override;
 import manifold.ext.props.rt.api.val;
 import manifold.ext.props.rt.api.var;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lodder.subtools.sublibrary.data.imdb.model.ImdbDetails;
@@ -33,12 +34,12 @@ public sealed class TvReleaseWithoutPath extends ReleaseWithoutPath implements T
         @Nullable String quality=null, @Nullable String originalName=name, @Nullable String customName=null,
         @Nullable String title=null, boolean special=false, String completeName) {
         super(name, releaseGroup, quality, completeName);
-        this.title = title;
+        this.title = StringUtils.trimToNull(title);
         this.season = season;
         this.episodes = Set.copyOf(episodes);
         this.special = special;
-        this.originalName = originalName;
-        this.customName = customName;
+        this.originalName = StringUtils.trimToNull(originalName);
+        this.customName = StringUtils.trimToNull(customName);
     }
 
     public void updateImdbEpisodeInfo(ImdbDetails imdbDetails) {
