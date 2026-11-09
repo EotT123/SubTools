@@ -136,9 +136,9 @@ public class Manager {
         }
     }
 
-// ================ \\
-// GET PAGE CONTENT \\
-// ================ \\
+    // ================ \\
+    // GET PAGE CONTENT \\
+    // ================ \\
 
     public static Document getDocument(PageContentParams params) throws ManagerException {
         return switch (params.cacheType) {
