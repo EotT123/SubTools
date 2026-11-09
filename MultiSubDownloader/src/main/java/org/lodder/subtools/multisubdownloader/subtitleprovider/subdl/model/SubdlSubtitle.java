@@ -22,6 +22,7 @@ import org.lodder.subtools.sublibrary.model.Release;
 import org.lodder.subtools.sublibrary.model.ReleaseWithPath;
 import org.lodder.subtools.sublibrary.model.Subtitle;
 import org.lodder.subtools.sublibrary.model.SubtitleSource;
+import org.lodder.subtools.sublibrary.model.TvRelease;
 import org.lodder.subtools.sublibrary.model.TvReleaseWithoutPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,8 @@ public class SubdlSubtitle extends Subtitle {
         Path unzipPath = tempDir.resolve(StringUtils.substringBeforeLast(zipFileName, "."));
 
         if (!Files.exists(unzipPath)) {
-            Manager.downloadAndExtractFile(url, unzipPath);
+            Integer index = forRelease instanceof TvRelease tvRelease ? tvRelease.firstEpisode : null;
+            Manager.downloadAndExtractSubtitleFile(url, unzipPath, index:index);
         }
 
         // find all extracted subtitle files and move them to the destination folder, renaming them using the
