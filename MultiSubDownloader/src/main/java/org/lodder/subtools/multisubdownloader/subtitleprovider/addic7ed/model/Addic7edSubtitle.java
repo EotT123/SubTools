@@ -46,7 +46,7 @@ public class Addic7edSubtitle extends Subtitle {
                 throw new IOException("Addic7ed Daily Download count exceeded!");
             }
         };
-        Manager.downloadAndExtractFile(url, subPath, validateFunction);
+        Manager.downloadAndExtractSubtitleFile(url, subPath, validateFunction);
         return List.of(subPath);
     }
 }

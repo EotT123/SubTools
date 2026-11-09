@@ -37,7 +37,7 @@ public class PodnapisiSubtitle extends Subtitle {
     public List<Path> download(Path destinationFolder, Function<@Nullable AtomicInteger, String> fileNameFunction)
         throws IOException {
         Path subPath = destinationFolder.resolve(fileNameFunction.apply(null));
-        Manager.downloadAndExtractFile(url, subPath);
+        Manager.downloadAndExtractSubtitleFile(url, subPath);
         return List.of(subPath);
     }
 }
