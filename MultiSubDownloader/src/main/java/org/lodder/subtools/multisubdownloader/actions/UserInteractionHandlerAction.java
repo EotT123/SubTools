@@ -26,19 +26,10 @@ public class UserInteractionHandlerAction {
     /**
      * @param release release
      * @param subtitleSelectionDialog subtitleSelectionDialog
-     * @return integer which subtitle is selected for downloading
-     */
-    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog) {
-        return this.subtitleSelection(release, subtitleSelectionDialog, false);
-    }
-
-    /**
-     * @param release release
-     * @param subtitleSelectionDialog subtitleSelectionDialog
      * @param dryRun dryRun
      * @return integer which subtitle is selected for downloading
      */
-    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog, boolean dryRun) {
+    public List<Subtitle> subtitleSelection(Release release, boolean subtitleSelectionDialog, boolean dryRun=false) {
 
         // Sort subtitles by score
         List<Subtitle> subs =
@@ -63,10 +54,10 @@ public class UserInteractionHandlerAction {
                     List<Subtitle> shortlist = userInteractionHandler.getAutomaticSelection(subs);
                     shortlist.forEach(release::addMatchingSub);
                     if (shortlist.isEmpty()) {
-                        // nothing match the minimum automatic selection value
+                        // nothing matches the minimum automatic selection value
                         return List.of();
                     } else if (shortlist.size() == 1) {
-                        // automatic selection results in 1 result
+                        // automatic selection resulted in 1 result
                         return List.of(subs.first);
                     }
 
