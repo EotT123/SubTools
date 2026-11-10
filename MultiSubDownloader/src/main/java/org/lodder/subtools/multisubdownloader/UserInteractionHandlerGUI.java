@@ -1,6 +1,7 @@
 package org.lodder.subtools.multisubdownloader;
 
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
@@ -21,7 +22,7 @@ public class UserInteractionHandlerGUI extends org.lodder.subtools.sublibrary.us
     @Override
     public List<Subtitle> selectSubtitles(Release release) {
         int[] selection = new SelectDialog(frame, release.matchingSubs, release).getSelection();
-        return selection.stream().map(release.matchingSubs::get).toList();
+        return Arrays.stream(selection).mapToObj(release.matchingSubs::get).toList();
 
     }
 
