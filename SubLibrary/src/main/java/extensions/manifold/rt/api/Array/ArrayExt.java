@@ -1,10 +1,9 @@
 package extensions.manifold.rt.api.Array;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Consumer;
 
-import com.google.common.base.Objects;
 import manifold.ext.rt.api.Extension;
 import manifold.ext.rt.api.Self;
 import manifold.ext.rt.api.This;
@@ -25,30 +24,44 @@ public class ArrayExt {
      * @param action an action to perform on the elements
      */
     public static void forEach(@This Object array, Consumer<? super @Self(true) Object> action) {
-        primitiveCheck(array);
-        Arrays.stream((Object[]) array, 0, Array.getLength(array)).forEach(action);
-    }
-
-
-    private static void primitiveCheck(Object array) {
-        Class<?> componentType = array.getClass().getComponentType();
-        if (componentType.isPrimitive()) {
-            throw new IllegalArgumentException("$array has not a primitive component type: " +
-                array.getClass().getComponentType().getSimpleName());
+        requireNonPrimitive(array);
+        for (Object o : (Object[]) array) {
+            action.accept(o);
         }
     }
 
     public static boolean contains(@This Object array, @Self(true) Object object) {
-        return ((Object[]) array).indexOf(object) > -1;
+        return indexOfInternally(array, object) > -1;
     }
 
     public static int indexOf(@This Object array, @Self(true) Object object) {
-        Object[] a = (Object[]) array;
-        for (int i = 0; i < a.length; i++) {
-            if (Objects.equal(a[i], object)) {
-                return i;
+        return indexOfInternally(array, object);
+    }
+
+    private static int indexOfInternally(Object array, Object object) {
+        int length = Array.getLength(array);
+        if (!array.getClass().getComponentType().isPrimitive()) {
+            Object[] a = (Object[]) array;
+            for (int i = 0; i < length; i++) {
+                if (Objects.equals(a[i], object)) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i = 0; i < length; i++) {
+                if (Objects.equals(Array.get(array, i), object)) {
+                    return i;
+                }
             }
         }
         return -1;
+    }
+
+    private static void requireNonPrimitive(Object array) {
+        Class<?> componentType = array.getClass().getComponentType();
+        if (componentType.isPrimitive()) {
+            throw new IllegalArgumentException(
+                array + " has a primitive component type: " + array.getClass().getComponentType().getSimpleName());
+        }
     }
 }

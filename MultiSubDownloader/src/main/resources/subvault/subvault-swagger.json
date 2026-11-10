@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.4",
   "info": {
-    "title": "Gestdown: Addicted Proxy",
+    "title": "Subvault: Addicted Proxy",
     "description": "Provide a full api to search and download subtitles from Addic7ed website.",
-    "version": "4.68.1"
+    "version": "6.3.0"
   },
   "servers": [
     {
@@ -93,8 +93,7 @@
             "description": "",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -138,8 +137,7 @@
             "description": "",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
@@ -231,7 +229,7 @@
         "tags": [
           "Subtitles"
         ],
-        "summary": "Download specific subtitle. Supports regular subtitle GUIDs, season pack ZIPs (sp_{uuid}), and single episode extraction from season packs (sp_{uuid}_ep_{N}).",
+        "summary": "Download specific subtitle. Supports regular subtitle base62 ids (3h7q...), season pack ZIPs (sp_{base62}, canonical Guid encoding per docs/2026-10-20-api-id-base62.md), and single episode extraction from season packs (sp_{base62}_ep_{N}).",
         "operationId": "DownloadSubtitle",
         "parameters": [
           {
@@ -315,8 +313,7 @@
             "description": "Unique ID of the show, you can get it from Shows::Search",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
@@ -496,8 +493,7 @@
             "description": "",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -524,8 +520,7 @@
             "description": "",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
@@ -618,8 +613,7 @@
             "description": "Unique ID of the show",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
@@ -980,9 +974,9 @@
           "subtitleId": {
             "minLength": 1,
             "type": "string",
-            "description": "Unique Id of the season pack subtitle (prefixed with sp_)",
+            "description": "Unique Id of the season pack subtitle (sp_-prefixed canonical base62 encoding of the Guid)",
             "readOnly": true,
-            "example": "sp_1086727A-EB71-4B24-A209-7CF22374574D"
+            "example": "sp_0VBJpBmUXk2twqNJdYbHmH"
           },
           "language": {
             "minLength": 1,
@@ -1062,7 +1056,7 @@
             "minLength": 1,
             "type": "string",
             "description": "Url to download the season pack (ZIP archive)",
-            "example": "/subtitles/download/sp_1086727A-EB71-4B24-A209-7CF22374574D"
+            "example": "/subtitles/download/sp_0VBJpBmUXk2twqNJdYbHmH"
           },
           "downloadCount": {
             "type": "integer",
@@ -1088,8 +1082,8 @@
           "id": {
             "type": "string",
             "description": "Unique ID of the show",
-            "format": "uuid",
-            "example": "E9C1FA23-55AF-4711-8E34-3B31E2A75533"
+            "format": "string",
+            "example": "775rJjCDufZ0nuSVDeriR1"
           },
           "name": {
             "minLength": 1,
@@ -1175,9 +1169,9 @@
           "subtitleId": {
             "minLength": 1,
             "type": "string",
-            "description": "Unique Id of the subtitle",
+            "description": "Unique Id of the subtitle — canonical base62 encoding of the Guid (see\ndocs/2026-10-20-api-id-base62.md); for season packs wrapped as\nsp_{base62}[_ep_{N}|_entry_{base62}]",
             "readOnly": true,
-            "example": "1086727A-EB71-4B24-A209-7CF22374574D"
+            "example": "0VBJpBmUXk2twqNJdYbHmH"
           },
           "version": {
             "minLength": 1,
@@ -1207,7 +1201,7 @@
             "minLength": 1,
             "type": "string",
             "description": "Url to download the subtitle",
-            "example": "/download/1086727A-EB71-4B24-A209-7CF22374574D"
+            "example": "/subtitles/download/0VBJpBmUXk2twqNJdYbHmH"
           },
           "language": {
             "minLength": 1,
