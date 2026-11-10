@@ -9,6 +9,8 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -44,11 +46,12 @@ public class PathExt {
     }
 
     public static String changeExtension(@This Path path, String newExtension) {
-        return StringUtils.substringBeforeLast(path.getFileName().toString(), ".") + "." + newExtension;
+        String withoutExtension = withoutExtension(path);
+        return StringUtils.isBlank(newExtension) ? withoutExtension : withoutExtension + "." + newExtension;
     }
 
     public static String withoutExtension(@This Path path) {
-        return changeExtension(path, "");
+        return StringUtils.substringBeforeLast(path.getFileName().toString(), ".");
     }
 
     @NullMarked
@@ -58,10 +61,6 @@ public class PathExt {
     public static FilenameAndExtension splitExtension(@This Path path) {
         return new FilenameAndExtension(StringUtils.substringBeforeLast(path.getFileName().toString(), "."),
             StringUtils.substringAfterLast(path.getFileName().toString(), "."));
-    }
-
-    public static String withoutExtension(String path) {
-        return StringUtils.substringBeforeLast(path, ".");
     }
 
     public static String toAbsolutePathAsString(@This Path path) {
@@ -289,14 +288,15 @@ public class PathExt {
         //    }
         //}
         int index = 1;
+        List<Path> createdFiles = new ArrayList<>();
         try (ZipInputStream zis = new ZipInputStream(inputStream)) {
             ZipEntry ze;
             while ((ze = zis.getNextEntry()) != null) {
                 if (!ze.isDirectory() && ze.getName().endsWith(extensionFilter)) {
                     Files.createDirectories(outputFile.getParent());
-                    FilenameAndExtension filenameAndExtension = outputFile.splitExtension();
                     Path path = outputFile.getParent().resolve(
-                        filenameAndExtension.filename + "_v" + index++ + "." + filenameAndExtension.extension);
+                        PathExt.withoutExtension(outputFile) + "_v" + index++ + "." +
+                            StringUtils.substringAfterLast(ze.getName(), "."));
                     try (OutputStream out = Files.newOutputStream(path)) {
                         byte[] buffer = new byte[4096];
                         int len;
@@ -304,14 +304,15 @@ public class PathExt {
                             out.write(buffer, 0, len);
                         }
                     }
+                    createdFiles.add(path);
                 }
             }
         }
         if (index == 2) {
-            FilenameAndExtension filenameAndExtension = outputFile.splitExtension();
-            Path path = outputFile.getParent().resolve(
-                filenameAndExtension.filename + "_v1." + filenameAndExtension.extension);
-            Files.move(path, outputFile);
+            Path path = createdFiles.getFirst();
+            Path newPath = path.getParent().resolve(path.getFileNameAsString().replace("_v1", ""));
+            Files.deleteIfExists(newPath);
+            Files.move(path, newPath);
         }
     }
 

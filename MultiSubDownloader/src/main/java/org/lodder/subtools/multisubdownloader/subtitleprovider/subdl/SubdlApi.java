@@ -4,6 +4,7 @@ import static org.lodder.subtools.sublibrary.CacheStrategy.*;
 import static util.Utils.*;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,7 +19,6 @@ import org.lodder.subtools.multisubdownloader.subtitleprovider.SubtitleApi;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.subdl.exception.SubdlApiException;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.subdl.model.SubdlSerieId;
 import org.lodder.subtools.multisubdownloader.subtitleprovider.subdl.model.SubdlSubtitleMetadata;
-import org.lodder.subtools.multisubdownloader.util.MapUtil;
 import org.lodder.subtools.sublibrary.Language;
 import org.lodder.subtools.sublibrary.cache.ProviderCacheKeyParam;
 import org.lodder.subtools.sublibrary.model.SubtitleProviderFrontEnd;
@@ -57,7 +57,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String title, @Nullable Integer year,
         Language language) throws SubdlApiException {
-        Map<SearchParam, @Nullable Serializable> params = MapUtil.create(
+        Map<SearchParam, @Nullable Serializable> params = Map.of(
             SearchParam.FILM_NAME, title,
             SearchParam.YEAR, year,
             SearchParam.TYPE, ReleaseType.movie);
@@ -74,7 +74,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlApiException if the API call fails
      */
     public List<SubdlSubtitleMetadata> getMovieSubtitles(String imdbId, Language language) throws SubdlApiException {
-        Map<SearchParam, Serializable> params = MapUtil.create(
+        Map<SearchParam, Serializable> params = Map.of(
             SearchParam.IMDB_ID, imdbId,
             SearchParam.TYPE, ReleaseType.movie);
         return getSubtitles(language, params);
@@ -93,7 +93,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlApiException if the API call fails
      */
     public @Nullable SubdlSerieId getProviderIdUsingImdbId(String imdbId) throws SubdlApiException {
-        return getSerie(MapUtil.create(SearchParam.IMDB_ID, imdbId))
+        return getSerie(Map.of(SearchParam.IMDB_ID, imdbId))
             .results.stream().map(SubdlSerieId::new).findFirst().orElse(null);
 
 //        return getCache("providerId", b -> b.add("imdbId", imdbId))
@@ -118,7 +118,7 @@ public class SubdlApi implements SubtitleApi {
      * @throws SubdlApiException if the API call fails
      */
     public List<SubdlSerieId> getProviderIdsUsingSerieName(String serieName) throws SubdlApiException {
-        return getSerie(MapUtil.create(SearchParam.FILM_NAME, serieName))
+        return getSerie(Map.of(SearchParam.FILM_NAME, serieName))
             .results.stream().map(SubdlSerieId::new).toList();
 
 //        return getCache("providerId", b -> b.add("name", serieName))
@@ -147,7 +147,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getSerieSubtitlesUsingImdbId(String imdbId, int season, int episode,
         Language language) throws SubdlApiException {
-        Map<SearchParam, Serializable> params = MapUtil.create(
+        Map<SearchParam, Serializable> params = Map.of(
             SearchParam.IMDB_ID, imdbId,
             SearchParam.SEASON, season,
             SearchParam.TYPE, ReleaseType.tv);
@@ -168,7 +168,7 @@ public class SubdlApi implements SubtitleApi {
      */
     public List<SubdlSubtitleMetadata> getSerieSubtitles(String providerId, int season, int episode, Language language)
         throws SubdlApiException {
-        Map<SearchParam, Serializable> params = MapUtil.create(
+        Map<SearchParam, Serializable> params = Map.of(
             SearchParam.SUBDL_ID, providerId,
             SearchParam.SEASON, season,
             SearchParam.TYPE, ReleaseType.tv);
@@ -191,9 +191,10 @@ public class SubdlApi implements SubtitleApi {
      */
     private List<SubdlSubtitleMetadata> getSubtitles(Language language,
         Map<SearchParam, @Nullable Serializable> extraParams) throws SubdlApiException {
-        extraParams.put(SearchParam.LANGUAGES,
+        var params = new HashMap<>(extraParams);
+        params.put(SearchParam.LANGUAGES,
             SubdlLanguage.of(language).map(SubdlLanguage::getLangCode).collect(Collectors.joining(",")));
-        return getSerie(extraParams).subtitles.stream().map(this::convertToSubtitleMetadata).toList();
+        return getSerie(params).subtitles.stream().map(this::convertToSubtitleMetadata).toList();
 
 //        return getCache("serieSubtitles", b -> b.add("language", language).add(extraParams))
 //            .getCollection(() -> {
