@@ -62,6 +62,29 @@ public class Manager {
         // Hide Utility Class Constructor
     }
 
+    /**
+     * Downloads a subtitle file from the specified URL and extracts it to the target path.
+     * <p>
+     * If the downloaded file does not exist and an index is provided, the method assumes that
+     * the download may be a season archive containing multiple subtitle files. It searches the
+     * target directory for matching subtitle files and selects one based on the specified index.
+     * If only one matching subtitle file is found, it is selected regardless of the index.
+     * <p>
+     * The selected subtitle must not be empty. If its extension is not {@code .srt}, the
+     * extension is appended when copying it to the target directory.
+     * <p>
+     * If the downloaded file exists but is empty, it is deleted before an exception is thrown.
+     *
+     * @param downloadLink the URL from which to download the subtitle file
+     * @param file the target path where the subtitle file should be extracted or copied
+     * @param validateFunction an optional validation function applied to the downloaded file,
+     * or {@code null} if no validation is required
+     * @param index the one-based index (i.e. the episode number) of the subtitle to select when extracting
+     * subtitles from a season archive, or {@code null} if season archive
+     * handling is not required
+     * @throws IOException if the URL is invalid, the download or extraction fails, no matching
+     * subtitle can be found, or the downloaded subtitle is empty
+     */
     public static void downloadAndExtractSubtitleFile(String downloadLink, Path file,
         @Nullable ThrowingConsumer<String, IOException> validateFunction=null, @Nullable Integer index=null)
         throws IOException {
@@ -70,16 +93,23 @@ public class Manager {
             if (!Files.exists(file) && index != null) {
                 // Support season zips
                 try (Stream<Path> files = Files.list(file.getParent())) {
-                    files.filter(Files::isRegularFile)
+                    List<Path> matchingSubtitles = files.filter(Files::isRegularFile)
                         .filter(p -> p.getFileNameAsString().startsWith(file.getFileNameAsString()))
-                        .skip(index - 1).findFirst().ifPresentOrElseEx(p -> {
-                            if (Files.size(p) == 0) {
-                                throw new IOException("Downloaded subtitle is empty");
-                            }
-                            Files.createDirectories(file);
-                            Files.copy(p, file.resolve(
-                                p.getFileNameAsString() + (p.getFileNameAsString().endsWith(".srt") ? "" : ".srt")));
-                        }, () -> new IOException("Could not download subtitle"));
+                        .toList();
+                    Path subtitle;
+                    if (matchingSubtitles.size() == 1) {
+                        subtitle = matchingSubtitles.getFirst();
+                    } else if (matchingSubtitles.size() > index) {
+                        subtitle = matchingSubtitles.get(index);
+                    } else {
+                        throw new IOException("Could not find subtitle in season zip file");
+                    }
+                    if (Files.size(subtitle) == 0) {
+                        throw new IOException("Downloaded subtitle is empty");
+                    }
+                    Files.createDirectories(file);
+                    Files.copy(subtitle, file.resolve(subtitle.getFileNameAsString() +
+                        (subtitle.getFileNameAsString().endsWith(".srt") ? "" : ".srt")));
                 }
             } else if (Files.exists(file) && Files.size(file) == 0) {
                 // file is empty, delete it
