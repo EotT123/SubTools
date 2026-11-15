@@ -41,7 +41,8 @@ public class DownloadAction {
 
     public void download(ReleaseWithPath release, Subtitle subtitle,
         @Nullable AtomicInteger counter=null) throws IOException {
-        LOGGER.info("Downloading subtitle: [{}] for release: [{}]", subtitle.fileName, release.fileName);
+        LOGGER.info("Downloading subtitle: [{}] for release: [{}] from [{}]", subtitle.fileName, release.fileName,
+            subtitle.source);
         LibrarySettings librarySettings = switch (release) {
             case TvReleaseWithPath _ -> SettingsControl.settings.episodeLibrarySettings;
             case MovieReleaseWithPath _ -> SettingsControl.settings.movieLibrarySettings;
