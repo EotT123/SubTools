@@ -89,6 +89,7 @@ public class SubdlSubtitle extends Subtitle {
                                     "exists");
                                 return null;
                             }
+                            destination = destinationNew;
                         }
                         try {
                             return Files.copy(path, destination, StandardCopyOption.REPLACE_EXISTING);
