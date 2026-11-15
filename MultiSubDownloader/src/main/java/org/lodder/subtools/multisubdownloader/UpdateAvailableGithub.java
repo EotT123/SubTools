@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +37,9 @@ public class UpdateAvailableGithub {
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAvailableGithub.class);
 
     private static final String DOMAIN = "https://github.com";
-    private static final String REPO_URI = "/EotT123/SubTools";
+    private static final String REPO_OWNER = "EotT123";
+    private static final String REPO_URI = "/" + REPO_OWNER + "/SubTools";
+    private static final String REPO_OWNER_URL = DOMAIN + "/" + REPO_OWNER;
     private static final String REPO_URL = DOMAIN + REPO_URI;
 
     public boolean shouldCheckForNewUpdate(@Nullable UpdateCheckPeriod updateCheckPeriod) {
@@ -118,14 +122,17 @@ public class UpdateAvailableGithub {
                             url:"$REPO_URL/actions?query=branch%3Amaster",
                             cacheType:CacheType.MEMORY,
                             userAgent:null))
-                        .selectFirstByCss("#partial-actions-workflow-runs .Box-row");
-                    LocalDateTime nightlyBuildTista = zonedDateTimeStringToLocalDateTime(
-                        rowElement.selectFirstByCss("relative-time").attr("datetime"));
+                        .selectFirstByCss("[aria-label='Workflow runs'] ul[data-listview-component='items-list'] > li");
+
+                    String dateString = rowElement.selectFirst("relative-time").text();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.ENGLISH);
+                    LocalDate nightlyBuildDate = LocalDate.parse(dateString, formatter);
                     updateLastUpdateCheck();
-                    if (nightlyBuildTista.isBefore(buildTista)) {
+                    if (!nightlyBuildDate.isAfter(buildTista.toLocalDate())) {
                         return null;
                     }
-                    String url = "https://nightly.link" + rowElement.selectFirstByCss("a").attr("href");
+                    String url = "https://nightly.link" + "/" + REPO_OWNER +
+                        rowElement.selectFirstByCss("a").attr("href").split(REPO_OWNER_URL)[1];
                     String downloadUrl = Manager.getDocument(new PageContentParams(url, CacheType.MEMORY))
                         .selectFirstByCss("table td a")
                         .attr("href");
